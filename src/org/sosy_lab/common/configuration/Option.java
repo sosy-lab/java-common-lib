@@ -108,11 +108,4 @@ public @interface Option {
    * A text that describes the current option (this will be part of the user documentation).
    */
   public String description();
-
-  /**
-   * If the type of the option is Class<...>, this field provides an optional
-   * prefix that will be added to the specified class name, if a class with the
-   * specified name is not found.
-   */
-  public String packagePrefix() default "";
 }
