@@ -36,6 +36,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -86,8 +87,9 @@ public class LogManager {
   @Option(toUppercase=true, description="single levels to be excluded from being logged")
   private List<Level> consoleExclude = ImmutableList.of();
 
-  @Option(name="file", type=Option.Type.OUTPUT_FILE,
+  @Option(name="file",
       description="name of the log file")
+  @FileOption(FileOption.Type.OUTPUT_FILE)
   private File outputFile = new File("CPALog.txt");
 
   @Option(description="maximum size of log output strings before they will be truncated")
