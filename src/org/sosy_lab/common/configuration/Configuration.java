@@ -48,6 +48,7 @@ import java.util.logging.Level;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.Files;
+import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -534,7 +535,7 @@ public class Configuration {
       }
 
     } else {
-      value = convertDefaultValue(name, defaultValue, type, secondaryOption);
+      value = convertDefaultValue(name, defaultValue, type, genericType, secondaryOption);
     }
 
     if (exportUsedOptions) {
@@ -655,7 +656,7 @@ public class Configuration {
       }
 
     } else {
-      value = convertDefaultValue(name, null, type, secondaryOption);
+      value = convertDefaultValue(name, null, type, genericType, secondaryOption);
     }
 
     if (exportUsedOptions) {
@@ -882,9 +883,18 @@ public class Configuration {
   }
 
   private Object convertDefaultValue(final String optionName, final Object defaultValue,
-      final Class<?> type, final Annotation secondaryOption) throws InvalidConfigurationException {
+      final Class<?> type, final Type genericType, final Annotation secondaryOption) throws InvalidConfigurationException {
 
-    checkApplicability(secondaryOption, type);
+    Class<?> innerType;
+    if (type.isArray()) {
+      innerType = type.getComponentType();
+    } else if (COLLECTIONS.containsKey(type)) {
+      innerType = getComponentType(type, genericType).getFirst();
+    } else {
+      innerType = type;
+    }
+
+    checkApplicability(secondaryOption, innerType);
 
     // TODO check for forbidden collections of Files with default values
 
@@ -988,6 +998,20 @@ public class Configuration {
       Class<?> type, Type genericType, final Option option, final Annotation secondaryOption) throws UnsupportedOperationException,
       InvalidConfigurationException {
 
+    Pair<Class<?>, Type> componentType = getComponentType(type, genericType);
+
+    // now we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
+
+    Class<?> implementationClass = COLLECTIONS.get(type);
+    assert implementationClass != null : "Only call this method with a class that has a mapping in COLLECTIONS";
+
+    Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType.getFirst(), componentType.getSecond(), option, secondaryOption);
+
+    // invoke ImmutableSet.copyOf(Iterable) etc.
+    return invokeMethod(implementationClass, "copyOf", Iterable.class, values, optionName);
+  }
+
+  private static Pair<Class<?>, Type> getComponentType(Class<?> type, Type genericType) {
     // it's a collections class, get value of type parameter
     assert genericType instanceof ParameterizedType : "Collections type that is not a ParameterizedType";
     ParameterizedType pType = (ParameterizedType)genericType;
@@ -1009,15 +1033,7 @@ public class Configuration {
       throw new UnsupportedOperationException("Currently types like \"" + type + "\" are not supported");
     }
 
-    // now we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
-
-    Class<?> implementationClass = COLLECTIONS.get(type);
-    assert implementationClass != null : "Only call this method with a class that has a mapping in COLLECTIONS";
-
-    Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, option, secondaryOption);
-
-    // invoke ImmutableSet.copyOf(Iterable) etc.
-    return invokeMethod(implementationClass, "copyOf", Iterable.class, values, optionName);
+    return Pair.<Class<?>, Type>of(componentType, componentGenericType);
   }
 
   private static Type extractUpperBoundFromType(Type type) {
