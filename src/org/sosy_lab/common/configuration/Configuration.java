@@ -520,20 +520,26 @@ public class Configuration {
       assert false : "Accessibility setting failed silently above.";
     }
 
-    final Object value = convertValue(
-        name, valueStr, defaultValue, type, genericType, option);
+    final Object value;
+
+    if (valueStr != null) {
+      // option was specified
+      value = convertValue(name, valueStr, type, genericType, option);
+
+      if (field.getAnnotation(Deprecated.class) != null) {
+        deprecatedProperties.add(name);
+      }
+
+    } else {
+      value = convertDefaultValue(name, defaultValue, type, option.type());
+    }
 
     if (exportUsedOptions) {
-      printOptionInfos(field, option, name, valueStr, defaultValue);
+      printOptionInfos(type, option, name, valueStr, defaultValue);
     }
 
-    // options which were not specified need not to be set
-    // but do set OUTPUT_FILE options for disableOutput to work
-    if (value == null && (option.type() != Option.Type.OUTPUT_FILE)) { return; }
-
-    if (value != null && (field.getAnnotation(Deprecated.class) != null)) {
-      deprecatedProperties.add(name);
-    }
+    // options which were not changed need not to be set
+    if (value == defaultValue) { return; }
 
     checkRange(option, name, value);
 
@@ -547,17 +553,17 @@ public class Configuration {
     }
   }
 
-  private void printOptionInfos(final Field field, final Option option,
+  private void printOptionInfos(final Class<?> type, final Option option,
       final String name, final String valueStr, final Object defaultValue) {
 
     // create optionInfo for file
     final StringBuilder optionInfo =
         new StringBuilder(OptionCollector.formatText(option.description()));
     optionInfo.append(name + "\n");
-    if (field.getType().isArray()) {
+    if (type.isArray()) {
       optionInfo.append("    default value:  "
           + java.util.Arrays.deepToString((Object[]) defaultValue) + "\n");
-    } else if (field.getType().equals(String.class)) {
+    } else if (type.equals(String.class)) {
       optionInfo.append("    default value:  '" + defaultValue + "'\n");
     } else {
       optionInfo.append("    default value:  " + defaultValue + "\n");
@@ -595,14 +601,22 @@ public class Configuration {
     final Class<?> type = parameters[0];
     final Type genericType = method.getGenericParameterTypes()[0];
     final String valueStr = getOptionValue(name, option, type.isEnum());
-    final Object value = convertValue(name, valueStr, null, type, genericType, option);
+    final Object value;
 
-    // options which were not specified need not to be set
-    // but do set OUTPUT_FILE options for disableOutput to work
-    if (value == null && (option.type() != Option.Type.OUTPUT_FILE)) { return; }
+    if (valueStr != null) {
+      // option was specified
+      value = convertValue(name, valueStr, type, genericType, option);
 
-    if (value != null && (method.getAnnotation(Deprecated.class) != null)) {
-      deprecatedProperties.add(name);
+      if (method.getAnnotation(Deprecated.class) != null) {
+        deprecatedProperties.add(name);
+      }
+
+    } else {
+      value = convertDefaultValue(name, null, type, option.type());
+    }
+
+    if (exportUsedOptions) {
+      printOptionInfos(type, option, name, valueStr, null);
     }
 
     checkRange(option, name, value);
@@ -701,22 +715,17 @@ public class Configuration {
    *
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
-   * @param defaultValue old value of the option
    * @param type type of the object
    * @param genericType type of the object
    * @param option the annotation
    */
   private <T> Object convertValue(final String optionName, final String valueStr,
-      final Object defaultValue, final Class<?> type, final Type genericType,
+      final Class<?> type, final Type genericType,
       final Option option)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
     if (type.isArray()) {
-      if (valueStr == null) {
-        return null;
-      }
-
       @SuppressWarnings("unchecked")
       Class<Object> componentType = (Class<Object>) type.getComponentType();
       Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, null, option);
@@ -724,19 +733,15 @@ public class Configuration {
       return Iterables.toArray(values, componentType);
 
     } else if (COLLECTIONS.containsKey(type)) {
-      if (valueStr == null) {
-        return null;
-      }
-
       return handleCollectionOption(optionName, valueStr, type, genericType, option);
 
     } else {
-      return convertSingleValue(optionName, valueStr, defaultValue, type, genericType, option);
+      return convertSingleValue(optionName, valueStr, type, genericType, option);
     }
   }
 
   private Object convertSingleValue(final String optionName, final String valueStr,
-      final Object defaultValue, final Class<?> type, final Type genericType, final Option option)
+      final Class<?> type, final Type genericType, final Option option)
       throws InvalidConfigurationException {
 
     Option.Type typeInfo = option.type();
@@ -749,10 +754,6 @@ public class Configuration {
 
     if (!option.packagePrefix().isEmpty() && !type.equals(Class.class)) {
       throw new UnsupportedOperationException("Package prefix may be specified only for Class options, not for option " + optionName);
-    }
-
-    if ((valueStr == null) && (option.type() != Option.Type.OUTPUT_FILE)) {
-      return null;
     }
 
     if (type.isPrimitive()) {
@@ -772,15 +773,7 @@ public class Configuration {
       return valueStr;
 
     } else if (type.equals(File.class)) {
-
-      if ((defaultValue != null) && !(defaultValue instanceof File)) {
-        assert defaultValue instanceof Iterable<?> || defaultValue instanceof File[] : defaultValue;
-
-        throw new UnsupportedOperationException(
-            "Collections of Files are not allowed with defaultValues (option " + optionName + ")");
-      }
-
-      return handleFileOption(optionName, valueStr, (File) defaultValue, typeInfo);
+      return handleFileOption(optionName, new File(valueStr), typeInfo);
 
     } else if (type.equals(Class.class)) {
       return handleClassOption(optionName, valueStr, genericType, option.packagePrefix());
@@ -811,7 +804,7 @@ public class Configuration {
     List<Object> result = new ArrayList<Object>();
 
     for (String item : values) {
-      result.add(convertSingleValue(optionName, item, null, type, genericType, option));
+      result.add(convertSingleValue(optionName, item, type, genericType, option));
     }
 
     return result;
@@ -847,31 +840,39 @@ public class Configuration {
     }
   }
 
+  private Object convertDefaultValue(final String optionName, final Object defaultValue,
+      final Class<?> type, final Option.Type typeInfo) throws InvalidConfigurationException {
+
+    // TODO check for forbidden collections of Files with default values
+
+    if (defaultValue == null || !(defaultValue instanceof File)) {
+      return defaultValue;
+    }
+
+    assert typeInfo != Option.Type.NOT_APPLICABLE;
+
+    File file = (File)defaultValue;
+
+    if (typeInfo == Option.Type.OUTPUT_FILE) {
+      if (disableOutput) {
+        // if output is disabled and option was not specified explicitly
+        return null;
+      }
+    }
+
+    return handleFileOption(optionName, file, typeInfo);
+  }
+
   /** This function returns a file. It sets the path of the file to
    * the given outputDirectory in the given rootDirectory.
    *
    * @param optionName name of option only for error handling
-   * @param valueStr new value
-   * @param defaultValue default filename
+   * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
-  private File handleFileOption(final String optionName, final String valueStr,
-      final File defaultValue, final Option.Type typeInfo)
-          throws UnsupportedOperationException, InvalidConfigurationException {
-    File file;
-    if (valueStr != null) {
-      file = new File(valueStr);
-    } else if (defaultValue != null) {
-      file = defaultValue;
-    } else {
-      return null;
-    }
+  private File handleFileOption(final String optionName, File file, final Option.Type typeInfo)
+          throws InvalidConfigurationException {
 
     if (typeInfo == Option.Type.OUTPUT_FILE) {
-      if (disableOutput && (valueStr == null)) {
-        // if output is disabled and option was not specified explicitly
-        return null;
-      }
-
       if (!file.isAbsolute()) {
         file = new File(outputDirectory, file.getPath());
       }
