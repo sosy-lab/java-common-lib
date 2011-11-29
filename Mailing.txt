@@ -1,0 +1,27 @@
+
+The Common-Lib Project uses the following mailing lists:
+
+- Common-Lib@sosy-lab.org
+  Announcements about the Common-Lib project.
+  User discussion, questions, solutions to common problems.
+  Developer discussion about the design and implementation of Common-Lib.
+  Anyone can post, anyone can join.
+  https://groups.google.com/a/sosy-lab.org/group/common-lib
+
+- Common-Lib-Commits@sosy-lab.org
+  Archive of commit messages from the Common-Lib repository.
+  Read-only, by invitation only, low volume.
+  Replies go to Common-Lib@sosy-lab.org
+  https://groups.google.com/a/sosy-lab.org/group/common-lib-commits
+
+For group subscription and web access: visit http://groups.sosy-lab.org
+  and click on "Browse all groups".
+  Choose the group you want to visit or subscribe.
+  In order to sign in to one of the sosy-lab groups,
+  use the non-bold link "Sign in for Google Groups".
+  It might ask you for a Sosy-Lab account -- if you don't have one,
+  click on "Enter your email address to access ...".
+  This does not necessarily need to be a Google email account.
+
+dbeyer 2011-11-29
+
