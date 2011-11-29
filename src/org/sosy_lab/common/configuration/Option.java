@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -52,6 +53,7 @@ import java.lang.annotation.Target;
  *
  * @see Configuration
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Option {
@@ -106,20 +108,6 @@ public @interface Option {
    * A text that describes the current option (this will be part of the user documentation).
    */
   public String description();
-
-  /**
-   * If the type of the option needs further specification, this field provides
-   * it. See {@link Type} for possible values. The type of the option and the
-   * value of this field have to match.
-   */
-  public Type type() default Type.NOT_APPLICABLE;
-
-  public static enum Type {
-    NOT_APPLICABLE,
-    REQUIRED_INPUT_FILE,
-    OPTIONAL_INPUT_FILE,
-    OUTPUT_FILE,
-  }
 
   /**
    * If the type of the option is Class<...>, this field provides an optional

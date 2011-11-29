@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -505,6 +507,7 @@ public class Configuration {
   private void setOptionValueForField(final Object obj, final Field field,
       final Options options) throws InvalidConfigurationException {
     final Option option = field.getAnnotation(Option.class);
+    final Annotation secondaryOption = getSecondaryAnnotation(field);
     final String name = getOptionName(options, field, option);
     final Class<?> type = field.getType();
     final Type genericType = field.getGenericType();
@@ -524,14 +527,14 @@ public class Configuration {
 
     if (valueStr != null) {
       // option was specified
-      value = convertValue(name, valueStr, type, genericType, option);
+      value = convertValue(name, valueStr, type, genericType, option, secondaryOption);
 
       if (field.getAnnotation(Deprecated.class) != null) {
         deprecatedProperties.add(name);
       }
 
     } else {
-      value = convertDefaultValue(name, defaultValue, type, option.type());
+      value = convertDefaultValue(name, defaultValue, type, secondaryOption);
     }
 
     if (exportUsedOptions) {
@@ -550,6 +553,45 @@ public class Configuration {
       assert false : "Type checks above were not successful apparently.";
     } catch (IllegalAccessException e) {
       assert false : "Accessibility setting failed silently above.";
+    }
+  }
+
+  private Annotation getSecondaryAnnotation(AnnotatedElement element) {
+    Annotation result = null;
+    for (Annotation a : element.getDeclaredAnnotations()) {
+      if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
+        if (result != null) {
+          throw new UnsupportedOperationException("Both " + result + " and " + a + " are present at " + element.toString());
+        }
+        result = a;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Check whether a given annotation (which itself has to be annotated with
+   * {@link OptionDetailAnnotation}!) is applicable to an option of a given type.
+   *
+   * @throws UnsupportedOperationException If the annotation is not applicable.
+   */
+  private void checkApplicability(Annotation annotation, final Class<?> optionType) throws UnsupportedOperationException {
+    if (annotation == null) {
+      return;
+    }
+
+    Class<?>[] applicableTypes = annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo();
+
+    boolean applicable = false;
+    for (Class<?> candidate : applicableTypes) {
+      if (candidate.isAssignableFrom(optionType)) {
+        applicable = true;
+        break;
+      }
+    }
+
+    if (!applicable) {
+      throw new UnsupportedOperationException("Annotation " + annotation + " is not applicable for options of type " + optionType.getCanonicalName());
     }
   }
 
@@ -585,6 +627,7 @@ public class Configuration {
   private void setOptionValueForMethod(final Object obj, final Method method,
       final Options options) throws InvalidConfigurationException{
     final Option option = method.getAnnotation(Option.class);
+    final Annotation secondaryOption = getSecondaryAnnotation(method);
 
     final Class<?>[] parameters = method.getParameterTypes();
     if (parameters.length != 1) {
@@ -605,14 +648,14 @@ public class Configuration {
 
     if (valueStr != null) {
       // option was specified
-      value = convertValue(name, valueStr, type, genericType, option);
+      value = convertValue(name, valueStr, type, genericType, option, secondaryOption);
 
       if (method.getAnnotation(Deprecated.class) != null) {
         deprecatedProperties.add(name);
       }
 
     } else {
-      value = convertDefaultValue(name, null, type, option.type());
+      value = convertDefaultValue(name, null, type, secondaryOption);
     }
 
     if (exportUsedOptions) {
@@ -721,36 +764,30 @@ public class Configuration {
    */
   private <T> Object convertValue(final String optionName, final String valueStr,
       final Class<?> type, final Type genericType,
-      final Option option)
+      final Option option, final Annotation secondaryOption)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
     if (type.isArray()) {
       @SuppressWarnings("unchecked")
       Class<Object> componentType = (Class<Object>) type.getComponentType();
-      Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, null, option);
+      Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, null, option, secondaryOption);
 
       return Iterables.toArray(values, componentType);
 
     } else if (COLLECTIONS.containsKey(type)) {
-      return handleCollectionOption(optionName, valueStr, type, genericType, option);
+      return handleCollectionOption(optionName, valueStr, type, genericType, option, secondaryOption);
 
     } else {
-      return convertSingleValue(optionName, valueStr, type, genericType, option);
+      return convertSingleValue(optionName, valueStr, type, genericType, option, secondaryOption);
     }
   }
 
   private Object convertSingleValue(final String optionName, final String valueStr,
-      final Class<?> type, final Type genericType, final Option option)
+      final Class<?> type, final Type genericType, final Option option, final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    Option.Type typeInfo = option.type();
-
-    // (type has to be File) XOR (typeInfo has to be NOT_APPLICABLE)
-    if ((typeInfo == Option.Type.NOT_APPLICABLE) == (type.equals(File.class))) {
-      throw new UnsupportedOperationException("Type " + type.getSimpleName()
-          + " and type=" + typeInfo + " do not match for option " + optionName);
-    }
+    checkApplicability(secondaryOption, type);
 
     if (!option.packagePrefix().isEmpty() && !type.equals(Class.class)) {
       throw new UnsupportedOperationException("Package prefix may be specified only for Class options, not for option " + optionName);
@@ -773,7 +810,11 @@ public class Configuration {
       return valueStr;
 
     } else if (type.equals(File.class)) {
-      return handleFileOption(optionName, new File(valueStr), typeInfo);
+      if (!(secondaryOption instanceof FileOption)) {
+        throw new UnsupportedOperationException("Options of type File need to be annotated with @FileOption");
+      }
+
+      return handleFileOption(optionName, new File(valueStr), ((FileOption)secondaryOption).value());
 
     } else if (type.equals(Class.class)) {
       return handleClassOption(optionName, valueStr, genericType, option.packagePrefix());
@@ -792,7 +833,7 @@ public class Configuration {
   }
 
   private Iterable<?> convertMultipleValues(final String optionName, final String valueStr,
-      final Class<?> type, final Type genericType, final Option option)
+      final Class<?> type, final Type genericType, final Option option, final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
@@ -804,7 +845,7 @@ public class Configuration {
     List<Object> result = new ArrayList<Object>();
 
     for (String item : values) {
-      result.add(convertSingleValue(optionName, item, type, genericType, option));
+      result.add(convertSingleValue(optionName, item, type, genericType, option, secondaryOption));
     }
 
     return result;
@@ -841,7 +882,9 @@ public class Configuration {
   }
 
   private Object convertDefaultValue(final String optionName, final Object defaultValue,
-      final Class<?> type, final Option.Type typeInfo) throws InvalidConfigurationException {
+      final Class<?> type, final Annotation secondaryOption) throws InvalidConfigurationException {
+
+    checkApplicability(secondaryOption, type);
 
     // TODO check for forbidden collections of Files with default values
 
@@ -849,11 +892,14 @@ public class Configuration {
       return defaultValue;
     }
 
-    assert typeInfo != Option.Type.NOT_APPLICABLE;
+    if (!(secondaryOption instanceof FileOption)) {
+      throw new UnsupportedOperationException("Options of type File need to be annotated with @FileOption");
+    }
 
+    FileOption.Type typeInfo = ((FileOption)secondaryOption).value();
     File file = (File)defaultValue;
 
-    if (typeInfo == Option.Type.OUTPUT_FILE) {
+    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
       if (disableOutput) {
         // if output is disabled and option was not specified explicitly
         return null;
@@ -869,10 +915,10 @@ public class Configuration {
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
-  private File handleFileOption(final String optionName, File file, final Option.Type typeInfo)
+  private File handleFileOption(final String optionName, File file, final FileOption.Type typeInfo)
           throws InvalidConfigurationException {
 
-    if (typeInfo == Option.Type.OUTPUT_FILE) {
+    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
       if (!file.isAbsolute()) {
         file = new File(outputDirectory, file.getPath());
       }
@@ -886,7 +932,7 @@ public class Configuration {
       throw new InvalidConfigurationException("Option " + optionName + " needs to specify a file and not a directory");
     }
 
-    if (typeInfo == Option.Type.REQUIRED_INPUT_FILE) {
+    if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
       try {
         Files.checkReadableFile(file);
       } catch (FileNotFoundException e) {
@@ -939,7 +985,7 @@ public class Configuration {
   }
 
   private Object handleCollectionOption(String optionName, String valueStr,
-      Class<?> type, Type genericType, final Option option) throws UnsupportedOperationException,
+      Class<?> type, Type genericType, final Option option, final Annotation secondaryOption) throws UnsupportedOperationException,
       InvalidConfigurationException {
 
     // it's a collections class, get value of type parameter
@@ -968,7 +1014,7 @@ public class Configuration {
     Class<?> implementationClass = COLLECTIONS.get(type);
     assert implementationClass != null : "Only call this method with a class that has a mapping in COLLECTIONS";
 
-    Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, option);
+    Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, option, secondaryOption);
 
     // invoke ImmutableSet.copyOf(Iterable) etc.
     return invokeMethod(implementationClass, "copyOf", Iterable.class, values, optionName);
