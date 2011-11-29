@@ -790,10 +790,6 @@ public class Configuration {
 
     checkApplicability(secondaryOption, type);
 
-    if (!option.packagePrefix().isEmpty() && !type.equals(Class.class)) {
-      throw new UnsupportedOperationException("Package prefix may be specified only for Class options, not for option " + optionName);
-    }
-
     if (type.isPrimitive()) {
       // get wrapper type in order to use valueOf method
       final Class<?> wrapperType = Primitives.wrap(type);
@@ -818,7 +814,7 @@ public class Configuration {
       return handleFileOption(optionName, new File(valueStr), ((FileOption)secondaryOption).value());
 
     } else if (type.equals(Class.class)) {
-      return handleClassOption(optionName, valueStr, genericType, option.packagePrefix());
+      return handleClassOption(optionName, valueStr, genericType, secondaryOption);
 
     } else if (type.equals(Level.class)) {
       try {
@@ -955,7 +951,16 @@ public class Configuration {
   }
 
   private Class<?> handleClassOption(final String optionName, final String valueStr,
-      Type genericType, String packagePrefix) throws InvalidConfigurationException {
+      Type genericType, Annotation secondaryOption) throws InvalidConfigurationException {
+
+    // get optional package prefix
+    String packagePrefix = "";
+    if (secondaryOption != null) {
+      if (!(secondaryOption instanceof ClassOption)) {
+        throw new UnsupportedOperationException("Options of type Class may not be annotated with " + secondaryOption);
+      }
+      packagePrefix = ((ClassOption) secondaryOption).packagePrefix();
+    }
 
     assert genericType != null : "Need a generic type for class options";
 
