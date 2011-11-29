@@ -545,8 +545,6 @@ public class Configuration {
     // options which were not changed need not to be set
     if (value == defaultValue) { return; }
 
-    checkRange(option, name, value);
-
     // set value to field
     try {
       field.set(obj, value);
@@ -662,8 +660,6 @@ public class Configuration {
     if (exportUsedOptions) {
       printOptionInfos(type, option, name, valueStr, null);
     }
-
-    checkRange(option, name, value);
 
     // set value to field
     try {
@@ -793,11 +789,19 @@ public class Configuration {
     if (type.isPrimitive()) {
       // get wrapper type in order to use valueOf method
       final Class<?> wrapperType = Primitives.wrap(type);
-      return valueOf(wrapperType, optionName, valueStr);
+      Object value = valueOf(wrapperType, optionName, valueStr);
+
+      checkRange(optionName, value, secondaryOption);
+
+      return value;
 
     } else if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
-      return valueOf(type, optionName, valueStr);
+      Object value = valueOf(type, optionName, valueStr);
+
+      checkRange(optionName, value, secondaryOption);
+
+      return value;
 
     } else if (type.isEnum()) {
       // all enums have valueOf method
@@ -1056,13 +1060,21 @@ public class Configuration {
     return type;
   }
 
-  private static void checkRange(Option option, String name, Object value) throws InvalidConfigurationException {
-    if (value instanceof Integer || value instanceof Long) {
+  private static void checkRange(String name, Object value, Annotation secondaryOption) throws InvalidConfigurationException {
+    if (secondaryOption != null) {
+
+      if (!(secondaryOption instanceof IntegerOption)
+          || !(value instanceof Integer || value instanceof Long)) {
+        throw new UnsupportedOperationException("Option " + name + " may not be annotated with " + secondaryOption);
+      }
+
+      IntegerOption intOption = (IntegerOption)secondaryOption;
+
       long n = ((Number)value).longValue();
-      if (option.min() > n || n > option.max()) {
+      if (intOption.min() > n || n > intOption.max()) {
         throw new InvalidConfigurationException("Invalid value in configuration file: \""
             + name + " = " + value + '\"'
-            + " (not in range [" + option.min() + ", " + option.max() + "])");
+            + " (not in range [" + intOption.min() + ", " + intOption.max() + "])");
       }
     }
   }

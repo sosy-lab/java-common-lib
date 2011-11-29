@@ -95,16 +95,6 @@ public @interface Option {
   public String[] values() default {};
 
   /**
-   * An optional minimum value for this option (only works with types int and long).
-   */
-  public long min() default Long.MIN_VALUE;
-
-  /**
-   * An optional maximum value for this option (only works with types int and long).
-   */
-  public long max() default Long.MAX_VALUE;
-
-  /**
    * A text that describes the current option (this will be part of the user documentation).
    */
   public String description();
