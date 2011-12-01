@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Concurrency {
 
-  private Concurrency() { }
+  private Concurrency() {}
 
   /**
    * Wait uninterruptibly until an ExecutorService has shutdown.
@@ -54,5 +55,16 @@ public class Concurrency {
     if (interrupted) {
       Thread.currentThread().interrupt();
     }
+  }
+
+  /**
+   * Creates a thread pool of fixed size. Size is determined by processors
+   * available to the JVM.
+   *
+   * @return thread pool
+   */
+  public static ExecutorService createThreadPool() {
+    final int processors = Runtime.getRuntime().availableProcessors();
+    return Executors.newFixedThreadPool(processors);
   }
 }
