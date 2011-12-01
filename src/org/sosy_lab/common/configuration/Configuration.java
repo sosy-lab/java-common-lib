@@ -914,7 +914,7 @@ public class Configuration {
     return invokeMethod(type, "valueOf", String.class, value, optionName);
   }
 
-  private <T> Object invokeMethod(final Class<?> type, final String method,
+  private static <T> Object invokeMethod(final Class<?> type, final String method,
       final Class<T> paramType, final T value, final String optionName)
           throws InvalidConfigurationException {
     try {
@@ -1011,7 +1011,7 @@ public class Configuration {
     return file;
   }
 
-  private Class<?> handleClassOption(final String optionName, final String valueStr,
+  private static Class<?> handleClassOption(final String optionName, final String valueStr,
       Type genericType, Annotation secondaryOption) throws InvalidConfigurationException {
 
     // get optional package prefix
