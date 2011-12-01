@@ -1060,23 +1060,6 @@ public class Configuration {
     return cls;
   }
 
-  private Object handleCollectionOption(String optionName, String valueStr,
-      Class<?> type, Type genericType, final Annotation secondaryOption) throws UnsupportedOperationException,
-      InvalidConfigurationException {
-
-    Pair<Class<?>, Type> componentType = getComponentType(type, genericType);
-
-    // now we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
-
-    Class<?> implementationClass = COLLECTIONS.get(type);
-    assert implementationClass != null : "Only call this method with a class that has a mapping in COLLECTIONS";
-
-    Iterable<?> values = convertMultipleValues(optionName, valueStr, componentType.getFirst(), componentType.getSecond(), secondaryOption);
-
-    // invoke ImmutableSet.copyOf(Iterable) etc.
-    return invokeMethod(implementationClass, "copyOf", Iterable.class, values, optionName);
-  }
-
   private static Pair<Class<?>, Type> getComponentType(Class<?> type, Type genericType) {
     if (type.isArray()) {
       return Pair.<Class<?>, Type>of((Class<?>)type.getComponentType(), null);
