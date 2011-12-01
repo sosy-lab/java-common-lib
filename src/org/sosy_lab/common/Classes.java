@@ -25,6 +25,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.concurrent.Callable;
 
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -278,5 +281,69 @@ public final class Classes {
       }
     }
     return null;
+  }
+
+  /**
+   * From a type "X<Foo>", extract the "Foo".
+   * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
+   *
+   * Example results:
+   * X<Foo>          : (Foo.class, null)
+   * X<? extends Foo>: (Foo.class, null)
+   * X<Foo<Bar>>     : (Foo.class, Foo<Bar>)
+   *
+   * @param type The type (needs to be parameterized with exactly one parameter)
+   * @return A tuple of a class object and a ParameterizedType object (the latter is null if the type is not generic)
+   */
+  public static Pair<Class<?>, ParameterizedType> getComponentType(final Type type) {
+    checkArgument(type instanceof ParameterizedType, "Cannot extract generic parameter from non-parameterized type %s", type);
+
+    ParameterizedType pType = (ParameterizedType)type;
+    Type[] parameterTypes = pType.getActualTypeArguments();
+
+    checkArgument(parameterTypes.length == 1, "Cannot extract generic parameter from parameterized type %s which has not exactly one parameter", type);
+
+    Type paramType = parameterTypes[0];
+
+    paramType = extractUpperBoundFromType(paramType);
+
+    ParameterizedType componentGenericType = null;
+    if (paramType instanceof ParameterizedType) {
+      componentGenericType = (ParameterizedType)paramType;
+      paramType = componentGenericType.getRawType();
+    }
+
+    Class<?> componentType;
+    if (paramType instanceof Class<?>) {
+      componentType = (Class<?>)paramType;
+    } else {
+      throw new UnsupportedOperationException("Cannot extract generic base type from type " + paramType);
+    }
+
+    return Pair.<Class<?>, ParameterizedType>of(componentType, componentGenericType);
+  }
+
+  /**
+   * Simplify a {@link Type} instance: if it is a wildcard generic type, replace
+   * it with its upper bound.
+   *
+   * It does not support wildcards with several upper bounds.
+   *
+   * @param type A possibly generic type.
+   * @return The type or its simplification.
+   */
+  public static Type extractUpperBoundFromType(Type type) {
+    if (type instanceof WildcardType) {
+      WildcardType wcType = (WildcardType)type;
+      if (wcType.getLowerBounds().length > 0) {
+        throw new UnsupportedOperationException("Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
+      }
+      Type[] upperBounds = ((WildcardType)type).getUpperBounds();
+      if (upperBounds.length != 1) {
+        throw new UnsupportedOperationException("Currently only type bounds with one upper bound are supported, not \"" + type + "\"");
+      }
+      type = upperBounds[0];
+    }
+    return type;
   }
 }

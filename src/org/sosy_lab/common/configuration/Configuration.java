@@ -32,7 +32,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -793,22 +792,29 @@ public class Configuration {
     }
 
     // first get the real type of a single value (i.e., String[] => String)
-    Pair<Class<?>, Type> p = getComponentType(type, genericType);
+    Class<?> componentType;
+    ParameterizedType componentGenericType = null;
+    if (type.isArray()) {
+      componentType = type.getComponentType();
+    } else {
+      Pair<Class<?>, ParameterizedType> p = Classes.getComponentType(genericType);
+      componentType = p.getFirst();
+      componentGenericType = p.getSecond();
+    }
 
-    checkApplicability(secondaryOption, p.getFirst());
+    checkApplicability(secondaryOption, componentType);
 
-    List<?> values = convertMultipleValues(optionName, valueStr, p.getFirst(), p.getSecond(), secondaryOption);
+    List<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, secondaryOption);
 
     if (type.isArray()) {
 
       @SuppressWarnings("unchecked")
-      Class<T> componentType = (Class<T>) p.getFirst();
-      T[] result = ObjectArrays.newArray(componentType, values.size());
+      Class<T> arrayComponentType = (Class<T>)componentType;
+      T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
       return values.toArray(result);
 
     } else {
-      assert collectionClass != null;
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
@@ -946,7 +952,7 @@ public class Configuration {
     if (type.isArray()) {
       innerType = type.getComponentType();
     } else if (COLLECTIONS.containsKey(type)) {
-      innerType = getComponentType(type, genericType).getFirst();
+      innerType = Classes.getComponentType(genericType).getFirst();
     } else {
       innerType = type;
     }
@@ -1023,26 +1029,8 @@ public class Configuration {
       packagePrefix = ((ClassOption) secondaryOption).packagePrefix();
     }
 
-    assert genericType != null : "Need a generic type for class options";
-
     // get value of type parameter
-    assert genericType instanceof ParameterizedType : "Class type that is not a ParameterizedType";
-    ParameterizedType pType = (ParameterizedType)genericType;
-    Type[] parameterTypes = pType.getActualTypeArguments();
-    assert parameterTypes.length == 1 : "Class type with more than one type parameter";
-    Type paramType = parameterTypes[0];
-
-    paramType = extractUpperBoundFromType(paramType);
-    if (paramType instanceof ParameterizedType) {
-      paramType = ((ParameterizedType)paramType).getRawType();
-    }
-
-    Class<?> targetType;
-    if (paramType instanceof Class<?>) {
-      targetType = (Class<?>)paramType;
-    } else {
-      throw new UnsupportedOperationException("Currently types like \"" + paramType + "\" are not supported");
-    }
+    Class<?> targetType = Classes.getComponentType(genericType).getFirst();
 
     // get class object
     Class<?> cls;
@@ -1058,50 +1046,6 @@ public class Configuration {
     }
 
     return cls;
-  }
-
-  private static Pair<Class<?>, Type> getComponentType(Class<?> type, Type genericType) {
-    if (type.isArray()) {
-      return Pair.<Class<?>, Type>of((Class<?>)type.getComponentType(), null);
-    }
-
-    // it's a collections class, get value of type parameter
-    assert genericType instanceof ParameterizedType : "Collections type that is not a ParameterizedType";
-    ParameterizedType pType = (ParameterizedType)genericType;
-    Type[] parameterTypes = pType.getActualTypeArguments();
-    assert parameterTypes.length == 1 : "Collections type with more than one type parameter";
-    Type paramType = parameterTypes[0];
-
-    paramType = extractUpperBoundFromType(paramType);
-
-    Class<?> componentType;
-    Type componentGenericType = null;
-    if (paramType instanceof ParameterizedType) {
-      componentGenericType = paramType;
-      paramType = ((ParameterizedType)paramType).getRawType();
-    }
-    if (paramType instanceof Class<?>) {
-      componentType = (Class<?>)paramType;
-    } else {
-      throw new UnsupportedOperationException("Currently types like \"" + type + "\" are not supported");
-    }
-
-    return Pair.<Class<?>, Type>of(componentType, componentGenericType);
-  }
-
-  private static Type extractUpperBoundFromType(Type type) {
-    if (type instanceof WildcardType) {
-      WildcardType wcType = (WildcardType)type;
-      if (wcType.getLowerBounds().length > 0) {
-        throw new UnsupportedOperationException("Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
-      }
-      Type[] upperBounds = ((WildcardType)type).getUpperBounds();
-      if (upperBounds.length != 1) {
-        throw new UnsupportedOperationException("Currently only type bounds with one upper bound are supported, not \"" + type + "\"");
-      }
-      type = upperBounds[0];
-    }
-    return type;
   }
 
   private static void checkRange(String name, Object value, Annotation secondaryOption) throws InvalidConfigurationException {
