@@ -37,14 +37,14 @@ import java.util.TreeMap;
 
 import org.sosy_lab.common.Pair;
 
-/** This class collects all {@link Option}s of CPAchecker. */
+/** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
   private final static int CHARS_PER_LINE = 75; // for description
   private final static HashSet<String> errorMessages = new LinkedHashSet<String>();
-  private static String cpacheckerSourcePath = "";
+  private static String sourcePath = "";
 
-  /** The main-method collects all classes of CPAchecker and
+  /** The main-method collects all classes of a program and
    * then it searches for all {@link Option}s.
    *
    * @param args use '-v' for verbose output */
@@ -66,7 +66,7 @@ public class OptionCollector {
    *
    * @param verbose short or long output? */
   public static String getCollectedOptions(final boolean verbose) {
-    cpacheckerSourcePath = getCPAcheckerSourcePath();
+    sourcePath = getSourcePath();
 
     // TreeMap for alphabetical order of keys
     final SortedMap<String, Pair<String, String>> map =
@@ -104,20 +104,20 @@ public class OptionCollector {
     return content.toString();
   }
 
-  /** This method tries to get CPAchecker-Source-Path. This path is used
+  /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
-  private static String getCPAcheckerSourcePath() {
+  private static String getSourcePath() {
     Enumeration<URL> resources = getClassLoaderResources();
 
     // check each resource:
-    // cut off the ending 'bin', append 'src/org/sosy_lab/cpachecker'
+    // cut off the ending 'bin', append 'src/org/sosy_lab'
     // and check, if the result is a folder.
-    // '/src/org/sosy_lab/cpachecker' is the default location of CPAchecker.
+    // '/src/org/sosy_lab/X' is the default location of program X.
     while (resources.hasMoreElements()) {
       final File file = new File(resources.nextElement().getFile());
       final String testPath =
           file.toString().substring(0, file.toString().length() - 3);
-      if (new File(testPath + "src/org/sosy_lab/cpachecker").isDirectory()) {
+      if (new File(testPath + "src/org/sosy_lab").isDirectory()) {
         return testPath + "src/";
       }
     }
@@ -315,7 +315,7 @@ public class OptionCollector {
    * in the sourcefile of the actual field/class and returns it
    * or an emtpy String, if the value not found.
    *
-   * This part only works, if you have the source code of CPAchecker.
+   * This part only works, if you have the source code.
    *
    * @param field where to get the default value */
   private static String getDefaultValue(final Field field) {
@@ -391,7 +391,7 @@ public class OptionCollector {
     }
 
     // get name of source file
-    filename = cpacheckerSourcePath + filename + ".java";
+    filename = sourcePath + filename + ".java";
 
     try {
       return com.google.common.io.Files.toString(new File(filename),
@@ -454,7 +454,7 @@ public class OptionCollector {
     return defaultValue.trim();
   }
 
-  /** This function return the allowed values or interval for a field.
+  /** This function returns the allowed values or interval for a field.
    *
    * @param field field with the {@link Option}-annotation
    * @param verbose short or long output? */
