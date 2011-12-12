@@ -411,6 +411,7 @@ public class Configuration {
 
   private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.<Class<?>, TypeConverter>of(
       Class.class, new ClassTypeConverter(),
+      IntegerOption.class, new IntegerTypeConverter(),
       TimeSpanOption.class, new TimeSpanTypeConverter()
       );
 
@@ -950,19 +951,11 @@ public class Configuration {
     if (type.isPrimitive()) {
       // get wrapper type in order to use valueOf method
       final Class<?> wrapperType = Primitives.wrap(type);
-      Object value = valueOf(wrapperType, optionName, valueStr);
-
-      checkRange(optionName, value, secondaryOption);
-
-      return value;
+      return valueOf(wrapperType, optionName, valueStr);
 
     } else if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
-      Object value = valueOf(type, optionName, valueStr);
-
-      checkRange(optionName, value, secondaryOption);
-
-      return value;
+      return valueOf(type, optionName, valueStr);
 
     } else if (type.isEnum()) {
       // all enums have valueOf method
@@ -1020,7 +1013,11 @@ public class Configuration {
     return result;
   }
 
-  private static Object valueOf(final Class<?> type, final String optionName, final String value)
+  /**
+   * Invoke the static "valueOf(String)" method on a class.
+   * Helpful for type converters.
+   */
+  static Object valueOf(final Class<?> type, final String optionName, final String value)
       throws InvalidConfigurationException {
     return invokeMethod(type, "valueOf", String.class, value, optionName);
   }
@@ -1125,25 +1122,6 @@ public class Configuration {
     }
 
     return file;
-  }
-
-  private static void checkRange(String name, Object value, Annotation secondaryOption) throws InvalidConfigurationException {
-    if (secondaryOption != null) {
-
-      if (!(secondaryOption instanceof IntegerOption)
-          || !(value instanceof Integer || value instanceof Long)) {
-        throw new UnsupportedOperationException("Option " + name + " may not be annotated with " + secondaryOption);
-      }
-
-      IntegerOption intOption = (IntegerOption)secondaryOption;
-
-      long n = ((Number)value).longValue();
-      if (intOption.min() > n || n > intOption.max()) {
-        throw new InvalidConfigurationException("Invalid value in configuration file: \""
-            + name + " = " + value + '\"'
-            + " (not in range [" + intOption.min() + ", " + intOption.max() + "])");
-      }
-    }
   }
 
   public String getRootDirectory() {
