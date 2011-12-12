@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -520,7 +521,7 @@ public class Configuration {
     Preconditions.checkNotNull(cls.getAnnotation(Options.class), "Class must have @Options annotation.");
 
     do {
-      if (cls.getAnnotation(Options.class) != null) {
+      if (cls.isAnnotationPresent(Options.class)) {
         inject(obj, cls);
       }
 
@@ -545,26 +546,31 @@ public class Configuration {
     final Options options = cls.getAnnotation(Options.class);
     Preconditions.checkNotNull(options, "Class must have @Options annotation.");
 
-    // handle fields of the class, override all final & private modifiers
+    // get all injectable memebers and override their final & private modifiers
     final Field[] fields = cls.getDeclaredFields();
     Field.setAccessible(fields, true);
 
-    for (final Field field : fields) {
-      // ignore all non-option fields
-      if (field.isAnnotationPresent(Option.class)) {
-        setOptionValueForField(obj, field, options);
-      }
-    }
-
-    // handle methods of the class, override all final & private modifiers
     final Method[] methods = cls.getDeclaredMethods();
     Method.setAccessible(methods, true);
 
-    for (final Method method : methods) {
-      // ignore all non-option methods
-      if (method.isAnnotationPresent(Option.class)) {
-        setOptionValueForMethod(obj, method, options);
+    try {
+      for (final Field field : fields) {
+        // ignore all non-option fields
+        if (field.isAnnotationPresent(Option.class)) {
+          setOptionValueForField(obj, field, options);
+        }
       }
+
+      for (final Method method : methods) {
+        // ignore all non-option methods
+        if (method.isAnnotationPresent(Option.class)) {
+          setOptionValueForMethod(obj, method, options);
+        }
+      }
+
+    } catch (IllegalAccessException e) {
+      // setAccessible() succeeded but member is still not accessible (should not happen)
+      throw new AssertionError(e);
     }
   }
 
@@ -576,23 +582,33 @@ public class Configuration {
    * @param field the field of the value to be injected
    * @param options options-annotation of the class of the object */
   private <T> void setOptionValueForField(final Object obj, final Field field,
-      final Options options) throws InvalidConfigurationException {
+      final Options options) throws InvalidConfigurationException, IllegalAccessException {
+
+    // check validity of field
+    if (Modifier.isStatic(field.getModifiers())) {
+      throw new UnsupportedOperationException("@Option is not allowed on static members");
+    }
+    if (Modifier.isFinal(field.getModifiers())) {
+      throw new UnsupportedOperationException("@Option is not allowed on final fields because Java doesn't guarantee visibility of new value");
+    }
+
     // try to read default value
     Object defaultValue = null;
     try {
       defaultValue = field.get(obj);
     } catch (IllegalArgumentException e) {
       assert false : "Type checks above were not successful apparently.";
-    } catch (IllegalAccessException e) {
-      assert false : "Accessibility setting failed silently above.";
     }
 
     @SuppressWarnings("unchecked")
     final T typedDefaultValue = (T)defaultValue;
+
+    // determine type of option
     @SuppressWarnings("unchecked")
     final Class<T> type = (Class<T>)field.getType();
     final Type genericType = field.getGenericType();
 
+    // get value
     final Option option = field.getAnnotation(Option.class);
     final String name = getOptionName(options, field, option);
     final Object value = getValue(name, typedDefaultValue, type, genericType, option, field);
@@ -605,70 +621,7 @@ public class Configuration {
       field.set(obj, value);
     } catch (IllegalArgumentException e) {
       assert false : "Type checks above were not successful apparently.";
-    } catch (IllegalAccessException e) {
-      assert false : "Accessibility setting failed silently above.";
     }
-  }
-
-  private Annotation getSecondaryAnnotation(AnnotatedElement element) {
-    Annotation result = null;
-    for (Annotation a : element.getDeclaredAnnotations()) {
-      if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
-        if (result != null) {
-          throw new UnsupportedOperationException("Both " + result + " and " + a + " are present at " + element.toString());
-        }
-        result = a;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Check whether a given annotation (which itself has to be annotated with
-   * {@link OptionDetailAnnotation}!) is applicable to an option of a given type.
-   *
-   * @throws UnsupportedOperationException If the annotation is not applicable.
-   */
-  private void checkApplicability(Annotation annotation, final Class<?> optionType) throws UnsupportedOperationException {
-    if (annotation == null) {
-      return;
-    }
-
-    Class<?>[] applicableTypes = annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo();
-
-    boolean applicable = false;
-    for (Class<?> candidate : applicableTypes) {
-      if (candidate.isAssignableFrom(optionType)) {
-        applicable = true;
-        break;
-      }
-    }
-
-    if (!applicable) {
-      throw new UnsupportedOperationException("Annotation " + annotation + " is not applicable for options of type " + optionType.getCanonicalName());
-    }
-  }
-
-  private void printOptionInfos(final Class<?> type, final Option option,
-      final String name, final String valueStr, final Object defaultValue) {
-
-    // create optionInfo for file
-    final StringBuilder optionInfo =
-        new StringBuilder(OptionCollector.formatText(option.description()));
-    optionInfo.append(name + "\n");
-    if (type.isArray()) {
-      optionInfo.append("    default value:  "
-          + java.util.Arrays.deepToString((Object[]) defaultValue) + "\n");
-    } else if (type.equals(String.class)) {
-      optionInfo.append("    default value:  '" + defaultValue + "'\n");
-    } else {
-      optionInfo.append("    default value:  " + defaultValue + "\n");
-    }
-    if (valueStr != null) {
-      optionInfo.append("--> used value:     " + valueStr + "\n");
-    }
-
-    System.out.println(optionInfo.toString());
   }
 
   /** This method sets a new value to a method with an {@link Options}-annotation.
@@ -679,21 +632,28 @@ public class Configuration {
    * @param method the method of the value to be injected
    * @param options options-annotation of the class of the object */
   private void setOptionValueForMethod(final Object obj, final Method method,
-      final Options options) throws InvalidConfigurationException{
+      final Options options) throws InvalidConfigurationException, IllegalAccessException{
 
+    // check validity of method
+    if (Modifier.isStatic(method.getModifiers())) {
+      throw new UnsupportedOperationException("@Option is not allowed on static members");
+    }
+
+    String exception = Classes.verifyDeclaredExceptions(method, InvalidConfigurationException.class);
+    if (exception != null) {
+      throw new UnsupportedOperationException("Method with @Option may not throw " + exception);
+    }
+
+    // determine type of option
     final Class<?>[] parameters = method.getParameterTypes();
     if (parameters.length != 1) {
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
           "Method with @Option must have exactly one parameter!");
     }
     final Class<?> type = parameters[0];
     final Type genericType = method.getGenericParameterTypes()[0];
 
-    String exception = Classes.verifyDeclaredExceptions(method, InvalidConfigurationException.class);
-    if (exception != null) {
-      throw new IllegalArgumentException("Method with @Option may not throw " + exception);
-    }
-
+    // get value
     final Option option = method.getAnnotation(Option.class);
     final String name = getOptionName(options, method, option);
     final Object value = getValue(name, null, type, genericType, option, method);
@@ -703,8 +663,6 @@ public class Configuration {
       method.invoke(obj, value);
     } catch (IllegalArgumentException e) {
       assert false : "Type checks above were not successful apparently.";
-    } catch (IllegalAccessException e) {
-      assert false : "Accessibility setting failed silently above.";
     } catch (InvocationTargetException e) {
       // ITEs always have a wrapped exception which is the real one thrown by
       // the invoked method. We want to handle this exception.
@@ -723,20 +681,20 @@ public class Configuration {
   }
 
   /** This function return the name of an {@link Option}.
-   * If no optionname is defined, the name of the field is returned.
+   * If no option name is defined, the name of the member is returned.
    * If a prefix is defined, it is added in front of the name.
    *
-   * @param options the options-annotation of the class, that contains the field
-   * @param field field with option-annotation
-   * @param option the option-annotation */
-  private String getOptionName(final Options options, final Member field, final Option option) {
+   * @param options the @Options annotation of the class, that contains the member
+   * @param member member with @Option annotation
+   * @param option the @Option annotation */
+  private String getOptionName(final Options options, final Member member, final Option option) {
     String prefix = options.prefix();
     if (!prefix.isEmpty()) {
       prefix += ".";
     }
     String name = option.name();
     if (name.isEmpty()) {
-      name = field.getName();
+      name = member.getName();
     }
     return prefix + name;
   }
@@ -768,7 +726,7 @@ public class Configuration {
       // option was specified
       value = convertValue(optionName, valueStr, type, genericType, secondaryOption);
 
-      if (member.getAnnotation(Deprecated.class) != null) {
+      if (member.isAnnotationPresent(Deprecated.class)) {
         deprecatedProperties.add(optionName);
       }
 
@@ -782,7 +740,7 @@ public class Configuration {
     }
 
     if (exportUsedOptions) {
-      printOptionInfos(type, option, optionName, valueStr, null);
+      printOptionInfos(type, option, optionName, valueStr, defaultValue);
     }
     return value;
   }
@@ -837,6 +795,70 @@ public class Configuration {
       return null;
     }
     return Strings.emptyToNull(s.trim());
+  }
+
+  /**
+   * Find any annotation which itself is annotated with {@link OptionDetailAnnotation}
+   * on a member.
+   */
+  private Annotation getSecondaryAnnotation(AnnotatedElement element) {
+    Annotation result = null;
+    for (Annotation a : element.getDeclaredAnnotations()) {
+      if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
+        if (result != null) {
+          throw new UnsupportedOperationException("Both " + result + " and " + a + " are present at " + element.toString());
+        }
+        result = a;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Check whether a given annotation (which itself has to be annotated with
+   * {@link OptionDetailAnnotation}!) is applicable to an option of a given type.
+   *
+   * @throws UnsupportedOperationException If the annotation is not applicable.
+   */
+  private void checkApplicability(Annotation annotation, final Class<?> optionType) throws UnsupportedOperationException {
+    if (annotation == null) {
+      return;
+    }
+
+    Class<?>[] applicableTypes = annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo();
+
+    boolean applicable = false;
+    for (Class<?> candidate : applicableTypes) {
+      if (candidate.isAssignableFrom(optionType)) {
+        return;
+      }
+    }
+
+    if (!applicable) {
+      throw new UnsupportedOperationException("Annotation " + annotation + " is not applicable for options of type " + optionType.getCanonicalName());
+    }
+  }
+
+  private void printOptionInfos(final Class<?> type, final Option option,
+      final String name, final String valueStr, final Object defaultValue) {
+
+    // create optionInfo for file
+    final StringBuilder optionInfo =
+        new StringBuilder(OptionCollector.formatText(option.description()));
+    optionInfo.append(name + "\n");
+    if (type.isArray()) {
+      optionInfo.append("    default value:  "
+          + java.util.Arrays.deepToString((Object[]) defaultValue) + "\n");
+    } else if (type.equals(String.class)) {
+      optionInfo.append("    default value:  '" + defaultValue + "'\n");
+    } else {
+      optionInfo.append("    default value:  " + defaultValue + "\n");
+    }
+    if (valueStr != null) {
+      optionInfo.append("--> used value:     " + valueStr + "\n");
+    }
+
+    System.out.println(optionInfo.toString());
   }
 
   /**
@@ -998,7 +1020,7 @@ public class Configuration {
     return result;
   }
 
-  private Object valueOf(final Class<?> type, final String optionName, final String value)
+  private static Object valueOf(final Class<?> type, final String optionName, final String value)
       throws InvalidConfigurationException {
     return invokeMethod(type, "valueOf", String.class, value, optionName);
   }
