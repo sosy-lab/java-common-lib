@@ -290,7 +290,7 @@ public class Configuration {
         if (oldConfig != null) {
           newConverters = oldConfig.converters;
         } else {
-          newConverters = ImmutableMap.of();
+          newConverters = DEFAULT_CONVERTERS;
         }
       } else {
         newConverters = ImmutableMap.copyOf(converters);
@@ -332,7 +332,7 @@ public class Configuration {
    */
   public static Configuration defaultConfiguration() {
     return new Configuration(ImmutableMap.<String, String>of(), "",
-        ImmutableMap.<Class<?>, TypeConverter>of(), new HashSet<String>(0),
+        DEFAULT_CONVERTERS, new HashSet<String>(0),
         new HashSet<String>(0));
   }
 
@@ -408,6 +408,8 @@ public class Configuration {
     assert !impl.isInterface();
     builder.put(iface, impl);
   }
+
+  private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.of();
 
   private final ImmutableMap<String, String> properties;
 
