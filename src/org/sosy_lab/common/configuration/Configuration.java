@@ -734,7 +734,7 @@ public class Configuration {
     } else {
       if (option.required()) {
         throw new InvalidConfigurationException(
-          "Required configuration option " + optionName  + " is missing!");
+          "Required configuration option " + optionName  + " is missing.");
       }
 
       value = convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
