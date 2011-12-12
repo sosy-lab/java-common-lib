@@ -41,7 +41,9 @@ public @interface OptionDetailAnnotation {
 
   /**
    * The annotation is applicable to configuration of these types or sub-types
-   * thereof.
+   * thereof. If a wrapper class of a primitive type is added here, the
+   * annotation automatically is also applicable to the corresponding primitive
+   * type.
    */
   Class<?>[] applicableTo();
 }

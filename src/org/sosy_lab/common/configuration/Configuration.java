@@ -873,13 +873,15 @@ public class Configuration {
    * @param secondaryOption the optional second annotation of the option
    */
   private <T> Object convertValue(final String optionName, final String valueStr,
-      final Class<?> type, final Type genericType, final Annotation secondaryOption)
+      final Class<?> pType, final Type genericType, final Annotation secondaryOption)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
-    Class<?> collectionClass = COLLECTIONS.get(type);
+    Class<?> collectionClass = COLLECTIONS.get(pType);
 
-    if (collectionClass == null && !type.isArray()) {
+    if (collectionClass == null && !pType.isArray()) {
+      Class<?> type = Primitives.wrap(pType);
+
       // single value, easy case
       checkApplicability(secondaryOption, type);
 
@@ -889,19 +891,21 @@ public class Configuration {
     // first get the real type of a single value (i.e., String[] => String)
     Class<?> componentType;
     ParameterizedType componentGenericType = null;
-    if (type.isArray()) {
-      componentType = type.getComponentType();
+    if (pType.isArray()) {
+      componentType = pType.getComponentType();
     } else {
       Pair<Class<?>, ParameterizedType> p = Classes.getComponentType(genericType);
       componentType = p.getFirst();
       componentGenericType = p.getSecond();
     }
 
+    componentType = Primitives.wrap(componentType);
+
     checkApplicability(secondaryOption, componentType);
 
     List<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, secondaryOption);
 
-    if (type.isArray()) {
+    if (pType.isArray()) {
 
       @SuppressWarnings("unchecked")
       Class<T> arrayComponentType = (Class<T>)componentType;
@@ -948,12 +952,7 @@ public class Configuration {
       return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
     }
 
-    if (type.isPrimitive()) {
-      // get wrapper type in order to use valueOf method
-      final Class<?> wrapperType = Primitives.wrap(type);
-      return valueOf(wrapperType, optionName, valueStr);
-
-    } else if (Primitives.isWrapperType(type)) {
+    if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
       return valueOf(type, optionName, valueStr);
 
@@ -999,8 +998,6 @@ public class Configuration {
   private List<?> convertMultipleValues(final String optionName, final String valueStr,
       final Class<?> type, final Type genericType, final Annotation secondaryOption)
       throws InvalidConfigurationException {
-
-    checkApplicability(secondaryOption, type);
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
 
@@ -1058,6 +1055,8 @@ public class Configuration {
     } else {
       innerType = type;
     }
+
+    innerType = Primitives.wrap(innerType);
 
     checkApplicability(secondaryOption, innerType);
 
