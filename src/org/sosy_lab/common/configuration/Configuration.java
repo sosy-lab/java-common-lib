@@ -82,6 +82,7 @@ public class Configuration {
     private Map<String, String> properties = null;
     private Configuration oldConfig = null;
     private String prefix = null;
+    private Map<Class<?>, TypeConverter> converters = null;
 
     private Builder() { }
 
@@ -155,6 +156,7 @@ public class Configuration {
       Preconditions.checkNotNull(oldConfig);
       Preconditions.checkState(this.properties == null);
       Preconditions.checkState(this.oldConfig == null);
+      Preconditions.checkState(this.converters == null);
 
       this.oldConfig = oldConfig;
 
@@ -219,6 +221,37 @@ public class Configuration {
     }
 
     /**
+     * Add a type converter for options with a certain type.
+     * This will enable the Configuration instance to parse strings into values
+     * of the given type and inject them just as the base option types.
+     *
+     * Previous type converters for the same type will be overwritten
+     * (this also works for types usually handled by the Configuration class,
+     * however not for collection and array types).
+     *
+     * The same converter may be used for several types.
+     *
+     * @param cls The type the type converter handles.
+     * @param converter A converter instance.
+     * @return this
+     */
+    public Builder addConverter(Class<?> cls, TypeConverter converter) {
+      Preconditions.checkNotNull(cls);
+      Preconditions.checkNotNull(converter);
+
+      if (converters == null) {
+        converters = new HashMap<Class<?>, TypeConverter>();
+        if (oldConfig != null) {
+          converters.putAll(oldConfig.converters);
+        }
+      }
+
+      converters.put(cls, converter);
+
+      return this;
+    }
+
+    /**
      * Create a Configuration instance with the settings specified by method
      * calls on this builder instance.
      *
@@ -251,6 +284,18 @@ public class Configuration {
         newPrefix = prefix;
       }
 
+      ImmutableMap<Class<?>, TypeConverter> newConverters;
+      if (converters == null) {
+        // we can re-use the old converters instance because it is immutable
+        if (oldConfig != null) {
+          newConverters = oldConfig.converters;
+        } else {
+          newConverters = ImmutableMap.of();
+        }
+      } else {
+        newConverters = ImmutableMap.copyOf(converters);
+      }
+
       Set<String> newUnusedProperties;
       Set<String> newDeprecatedProperties;
       if (oldConfig != null) {
@@ -262,7 +307,8 @@ public class Configuration {
         newDeprecatedProperties = new HashSet<String>(0);
       }
 
-      Configuration newConfig = new Configuration(newProperties, newPrefix, newUnusedProperties, newDeprecatedProperties);
+      Configuration newConfig = new Configuration(newProperties, newPrefix,
+          newConverters, newUnusedProperties, newDeprecatedProperties);
       newConfig.inject(newConfig);
 
       // reset builder instance so that it may be re-used
@@ -285,14 +331,17 @@ public class Configuration {
    * Creates a configuration with all values set to default.
    */
   public static Configuration defaultConfiguration() {
-    return new Configuration(ImmutableMap.<String, String>of(), "", new HashSet<String>(0), new HashSet<String>(0));
+    return new Configuration(ImmutableMap.<String, String>of(), "",
+        ImmutableMap.<Class<?>, TypeConverter>of(), new HashSet<String>(0),
+        new HashSet<String>(0));
   }
 
   /**
    * Creates a copy of a configuration with just the prefix set to a new value.
    */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
-    Configuration newConfig = new Configuration(oldConfig.properties, newPrefix, oldConfig.unusedProperties, oldConfig.deprecatedProperties);
+    Configuration newConfig = new Configuration(oldConfig.properties, newPrefix,
+        oldConfig.converters, oldConfig.unusedProperties, oldConfig.deprecatedProperties);
 
     // instead of calling inject() set options manually
     // this avoids the "throws InvalidConfigurationException" in the signature
@@ -364,6 +413,8 @@ public class Configuration {
 
   private final String prefix;
 
+  private final ImmutableMap<Class<?>, TypeConverter> converters;
+
   private final Set<String> unusedProperties;
   private final Set<String> deprecatedProperties;
 
@@ -371,9 +422,11 @@ public class Configuration {
    * This constructor does not set the fields annotated with @Option!
    */
   private Configuration(ImmutableMap<String, String> pProperties, String pPrefix,
+      ImmutableMap<Class<?>, TypeConverter> pConverters,
       Set<String> pUnusedProperties, Set<String> pDeprecatedProperties) {
     properties = pProperties;
     prefix = (pPrefix.isEmpty() ? "" : (pPrefix + "."));
+    converters = pConverters;
     unusedProperties = pUnusedProperties;
     deprecatedProperties = pDeprecatedProperties;
   }
@@ -518,11 +571,8 @@ public class Configuration {
    * @param obj the object to be injected
    * @param field the field of the value to be injected
    * @param options options-annotation of the class of the object */
-  private void setOptionValueForField(final Object obj, final Field field,
+  private <T> void setOptionValueForField(final Object obj, final Field field,
       final Options options) throws InvalidConfigurationException {
-    final Class<?> type = field.getType();
-    final Type genericType = field.getGenericType();
-
     // try to read default value
     Object defaultValue = null;
     try {
@@ -533,9 +583,15 @@ public class Configuration {
       assert false : "Accessibility setting failed silently above.";
     }
 
+    @SuppressWarnings("unchecked")
+    final T typedDefaultValue = (T)defaultValue;
+    @SuppressWarnings("unchecked")
+    final Class<T> type = (Class<T>)field.getType();
+    final Type genericType = field.getGenericType();
+
     final Option option = field.getAnnotation(Option.class);
     final String name = getOptionName(options, field, option);
-    final Object value = getValue(name, defaultValue, type, genericType, option, field);
+    final Object value = getValue(name, typedDefaultValue, type, genericType, option, field);
 
     // options which were not changed need not to be set
     if (value == defaultValue) { return; }
@@ -695,8 +751,8 @@ public class Configuration {
    * @throws UnsupportedOperationException If the declaration of the option in the source code is invalid.
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
-  private Object getValue(final String optionName, final Object defaultValue,
-      final Class<?> type, final Type genericType, final Option option,
+  private <T> Object getValue(final String optionName, final T defaultValue,
+      final Class<T> type, final Type genericType, final Option option,
       final AnnotatedElement member)
       throws UnsupportedOperationException, InvalidConfigurationException {
 
@@ -851,6 +907,11 @@ public class Configuration {
       final Class<?> type, final Type genericType, final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
+    TypeConverter converter = converters.get(type);
+    if (converter != null) {
+      return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
+    }
+
     if (secondaryOption instanceof TimeSpanOption) {
       return handleTimeSpanOption(optionName, valueStr, type, (TimeSpanOption)secondaryOption);
 
@@ -960,8 +1021,8 @@ public class Configuration {
     }
   }
 
-  private Object convertDefaultValue(final String optionName, final Object defaultValue,
-      final Class<?> type, final Type genericType, final Annotation secondaryOption) throws InvalidConfigurationException {
+  private <T> Object convertDefaultValue(final String optionName, final T defaultValue,
+      final Class<T> type, final Type genericType, final Annotation secondaryOption) throws InvalidConfigurationException {
 
     Class<?> innerType;
     if (type.isArray()) {
@@ -973,6 +1034,11 @@ public class Configuration {
     }
 
     checkApplicability(secondaryOption, innerType);
+
+    TypeConverter converter = converters.get(type);
+    if (converter != null) {
+      return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
+    }
 
     // TODO check for forbidden collections of Files with default values
 
