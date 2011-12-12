@@ -225,6 +225,10 @@ public class Configuration {
      * This will enable the Configuration instance to parse strings into values
      * of the given type and inject them just as the base option types.
      *
+     * As an alternative, the type of an option detail annotation
+     * ({@link OptionDetailAnnotation}) can be given. In this case, the type
+     * converter will be called for options annotated with this type.
+     *
      * Previous type converters for the same type will be overwritten
      * (this also works for types usually handled by the Configuration class,
      * however not for collection and array types).
@@ -246,6 +250,11 @@ public class Configuration {
         } else {
           converters.putAll(DEFAULT_CONVERTERS);
         }
+      }
+
+      if (cls.isAnnotation()
+          && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
+        throw new IllegalArgumentException("Can register type converters only for annotations which are option detail annotations");
       }
 
       converters.put(cls, converter);
@@ -913,7 +922,16 @@ public class Configuration {
       final Class<?> type, final Type genericType, final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    TypeConverter converter = converters.get(type);
+    // try to find a type converter, either for the type of the annotation
+    // or for the type of the field
+    TypeConverter converter = null;
+    if (secondaryOption != null) {
+      converter = converters.get(secondaryOption.annotationType());
+    }
+    if (converter == null) {
+      converter = converters.get(type);
+    }
+
     if (converter != null) {
       return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
     }
