@@ -1,0 +1,67 @@
+/*
+ *  CPAchecker is a tool for configurable software verification.
+ *  This file is part of CPAchecker.
+ *
+ *  Copyright (C) 2007-2011  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+ *  CPAchecker web page:
+ *    http://cpachecker.sosy-lab.org
+ */
+package org.sosy_lab.common.configuration;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import com.google.common.primitives.Primitives;
+
+/**
+ * Type converter for options of types int/long (plus wrapper types) annotated
+ * with {@link IntegerOption} (not for integer options without this annotation).
+ */
+public class IntegerTypeConverter implements TypeConverter {
+
+  @Override
+  public Object convert(String optionName, String valueStr, Class<?> pType,
+      Type pGenericType, Annotation pOption) throws InvalidConfigurationException {
+
+    if (!(pOption instanceof IntegerOption)) {
+      throw new UnsupportedOperationException("IntegerTypeConverter needs otions annotated with @IntegerOption");
+    }
+    IntegerOption option = (IntegerOption)pOption;
+
+    Class<?> type = Primitives.wrap(pType);
+    assert type.equals(Integer.class) || type.equals(Long.class);
+
+    Object value = Configuration.valueOf(type, optionName, valueStr);
+
+    long n = ((Number)value).longValue();
+    if (option.min() > n || n > option.max()) {
+      throw new InvalidConfigurationException("Invalid value in configuration file: \""
+          + optionName + " = " + value + '\"'
+          + " (not in range [" + option.min() + ", " + option.max() + "])");
+    }
+
+    return value;
+  }
+
+  @Override
+  public <T> T convertDefaultValue(String pOptionName, T pValue, Class<T> pType, Type pGenericType,
+      Annotation pSecondaryOption) {
+
+    return pValue;
+  }
+}
