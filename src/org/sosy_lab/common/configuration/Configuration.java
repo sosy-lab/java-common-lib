@@ -243,6 +243,8 @@ public class Configuration {
         converters = new HashMap<Class<?>, TypeConverter>();
         if (oldConfig != null) {
           converters.putAll(oldConfig.converters);
+        } else {
+          converters.putAll(DEFAULT_CONVERTERS);
         }
       }
 
