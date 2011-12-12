@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * Supported units are "ns", "ms", "s", "min", and "h".
  * Microseconds are not supported.
  */
-@OptionDetailAnnotation(applicableTo={int.class, Integer.class, long.class, Long.class})
+@OptionDetailAnnotation(applicableTo={Integer.class, Long.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

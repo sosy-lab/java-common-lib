@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  *
  * It serves to specify minimal and/or maximal values.
  */
-@OptionDetailAnnotation(applicableTo= {int.class, long.class, Integer.class, Long.class})
+@OptionDetailAnnotation(applicableTo= {Integer.class, Long.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

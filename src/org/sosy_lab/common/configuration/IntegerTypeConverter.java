@@ -26,16 +26,14 @@ package org.sosy_lab.common.configuration;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import com.google.common.primitives.Primitives;
-
 /**
- * Type converter for options of types int/long (plus wrapper types) annotated
+ * Type converter for options of types Integer/Long annotated
  * with {@link IntegerOption} (not for integer options without this annotation).
  */
 public class IntegerTypeConverter implements TypeConverter {
 
   @Override
-  public Object convert(String optionName, String valueStr, Class<?> pType,
+  public Object convert(String optionName, String valueStr, Class<?> type,
       Type pGenericType, Annotation pOption) throws InvalidConfigurationException {
 
     if (!(pOption instanceof IntegerOption)) {
@@ -43,7 +41,6 @@ public class IntegerTypeConverter implements TypeConverter {
     }
     IntegerOption option = (IntegerOption)pOption;
 
-    Class<?> type = Primitives.wrap(pType);
     assert type.equals(Integer.class) || type.equals(Long.class);
 
     Object value = Configuration.valueOf(type, optionName, valueStr);

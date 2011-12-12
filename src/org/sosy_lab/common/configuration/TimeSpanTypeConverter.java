@@ -85,7 +85,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     Object result;
 
-    if (pType.equals(int.class) || pType.equals(Integer.class)) {
+    if (pType.equals(Integer.class)) {
       if (value > Integer.MAX_VALUE) {
         throw new InvalidConfigurationException("Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
       }

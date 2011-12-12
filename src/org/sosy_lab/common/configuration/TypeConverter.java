@@ -33,6 +33,10 @@ import java.lang.reflect.Type;
  *
  * TypeConverters need not to be thread safe as long as no injection is performed
  * in parallel, however, they should have no mutable state anyway.
+ *
+ * Primitive types will be converted into their corresponding wrapper type
+ * before any type converter is called, so they do not need to care at all about
+ * primitive types.
  */
 public interface TypeConverter {
 
