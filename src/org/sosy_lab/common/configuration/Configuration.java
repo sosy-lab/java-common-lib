@@ -409,7 +409,9 @@ public class Configuration {
     builder.put(iface, impl);
   }
 
-  private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.of();
+  private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.<Class<?>, TypeConverter>of(
+      Class.class, new ClassTypeConverter()
+      );
 
   private final ImmutableMap<String, String> properties;
 
@@ -948,9 +950,6 @@ public class Configuration {
 
       return handleFileOption(optionName, new File(valueStr), ((FileOption)secondaryOption).value());
 
-    } else if (type.equals(Class.class)) {
-      return handleClassOption(optionName, valueStr, genericType, secondaryOption);
-
     } else if (type.equals(Level.class)) {
       try {
         return Level.parse(valueStr);
@@ -1147,37 +1146,6 @@ public class Configuration {
     }
 
     return file;
-  }
-
-  private static Class<?> handleClassOption(final String optionName, final String valueStr,
-      Type genericType, Annotation secondaryOption) throws InvalidConfigurationException {
-
-    // get optional package prefix
-    String packagePrefix = "";
-    if (secondaryOption != null) {
-      if (!(secondaryOption instanceof ClassOption)) {
-        throw new UnsupportedOperationException("Options of type Class may not be annotated with " + secondaryOption);
-      }
-      packagePrefix = ((ClassOption) secondaryOption).packagePrefix();
-    }
-
-    // get value of type parameter
-    Class<?> targetType = Classes.getComponentType(genericType).getFirst();
-
-    // get class object
-    Class<?> cls;
-    try {
-      cls = Classes.forName(valueStr, packagePrefix);
-    } catch (ClassNotFoundException e) {
-      throw new InvalidConfigurationException("Class " + valueStr + " specified in option " + optionName + " not found");
-    }
-
-    // check type
-    if (!targetType.isAssignableFrom(cls)) {
-      throw new InvalidConfigurationException("Class " + valueStr + " specified in option " + optionName + " is not an instance of " + targetType.getCanonicalName());
-    }
-
-    return cls;
   }
 
   private static void checkRange(String name, Object value, Annotation secondaryOption) throws InvalidConfigurationException {
