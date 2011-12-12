@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes;
@@ -50,13 +49,10 @@ import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.Files;
 import org.sosy_lab.common.Pair;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -403,14 +399,6 @@ public class Configuration {
     COLLECTIONS = builder.build();
   }
 
-  private static final BiMap<String, TimeUnit> TIME_UNITS = ImmutableBiMap.of(
-      "ns",  TimeUnit.NANOSECONDS,
-      "ms",  TimeUnit.MILLISECONDS,
-      "s",   TimeUnit.SECONDS,
-      "min", TimeUnit.MINUTES,
-      "h",   TimeUnit.HOURS
-      );
-
   // using this method to put key-value pairs into the builder ensures that
   // each implementation really implements the interface
   private static <T extends Iterable<?>> void putSafely(
@@ -421,7 +409,8 @@ public class Configuration {
   }
 
   private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.<Class<?>, TypeConverter>of(
-      Class.class, new ClassTypeConverter()
+      Class.class, new ClassTypeConverter(),
+      TimeSpanOption.class, new TimeSpanTypeConverter()
       );
 
   private final ImmutableMap<String, String> properties;
@@ -936,10 +925,7 @@ public class Configuration {
       return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
     }
 
-    if (secondaryOption instanceof TimeSpanOption) {
-      return handleTimeSpanOption(optionName, valueStr, type, (TimeSpanOption)secondaryOption);
-
-    } else if (type.isPrimitive()) {
+    if (type.isPrimitive()) {
       // get wrapper type in order to use valueOf method
       final Class<?> wrapperType = Primitives.wrap(type);
       Object value = valueOf(wrapperType, optionName, valueStr);
@@ -1082,55 +1068,6 @@ public class Configuration {
     }
 
     return handleFileOption(optionName, file, typeInfo);
-  }
-
-  /**
-   * Convert a value annotated with {@link TimeSpanOption}.
-   */
-  private Object handleTimeSpanOption(String optionName, String valueStr, Class<?> pType,
-      TimeSpanOption option) throws InvalidConfigurationException {
-
-    // find unit in input string
-    int i = valueStr.length()-1;
-    CharMatcher letterMatcher = CharMatcher.JAVA_LETTER;
-    while (i >= 0 && letterMatcher.matches(valueStr.charAt(i))) {
-      i--;
-    }
-    if (i < 0) {
-      throw new InvalidConfigurationException("Option " + optionName + " contains no number");
-    }
-
-    // convert unit string to TimeUnit
-    TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i+1));
-    if (userUnit == null) {
-      userUnit = option.defaultUserUnit();
-    }
-
-    // Parse string without unit
-    long value = Long.parseLong(valueStr.substring(0, i+1).trim());
-
-    // convert value from user unit to code unit
-    TimeUnit codeUnit = option.codeUnit();
-    value = codeUnit.convert(value, userUnit);
-
-    if (option.min() > value || value > option.max()) {
-      String codeUnitStr = TIME_UNITS.inverse().get(codeUnit);
-      throw new InvalidConfigurationException(String.format(
-          "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
-          optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
-    }
-
-    Object result;
-
-    if (pType.equals(int.class) || pType.equals(Integer.class)) {
-      if (value > Integer.MAX_VALUE) {
-        throw new InvalidConfigurationException("Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
-      }
-      result = (int)value;
-    } else {
-      result = value;
-    }
-    return result;
   }
 
   /** This function returns a file. It sets the path of the file to
