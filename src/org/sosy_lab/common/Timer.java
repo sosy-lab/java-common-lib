@@ -45,6 +45,9 @@ public class Timer {
   /** The number of intervals. */
   private int  numberOfIntervals = 0;
 
+  /** The length of the last measured interval */
+  private long lastIntervalLength = 0;
+
   /**
    * Create a fresh timer in the not-running state.
    */
@@ -82,13 +85,13 @@ public class Timer {
 
   final long stop(long endTime) {
     if (isRunning()) {
-      long intervallTime = endTime - startTime;
-      sumTime += intervallTime;
-      maxTime = Math.max(intervallTime, maxTime);
+      this.lastIntervalLength = endTime - startTime;
+      sumTime += this.lastIntervalLength;
+      maxTime = Math.max(this.lastIntervalLength, maxTime);
 
       // reset startTime for isRunning()
       startTime = 0;
-      return intervallTime;
+      return this.lastIntervalLength;
     }
     return 0;
   }
@@ -119,6 +122,13 @@ public class Timer {
    * @return number of intervals */
   public final int getNumberOfIntervals() {
     return numberOfIntervals;
+  }
+
+  /** Return the length of the laster measured interval.
+   * @return  length of interval.
+   */
+  public final long getLengthOfLasterInterval() {
+    return this.lastIntervalLength;
   }
 
   /** Return the average of all intervals. If timer is running, return the
