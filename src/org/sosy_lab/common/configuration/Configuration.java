@@ -519,7 +519,8 @@ public class Configuration {
    */
   public void recursiveInject(Object obj) throws InvalidConfigurationException {
     Class<?> cls = obj.getClass();
-    Preconditions.checkNotNull(cls.getAnnotation(Options.class), "Class must have @Options annotation.");
+    Preconditions.checkNotNull(cls.getAnnotation(Options.class), "Class "
+        + cls.getName() + " must have @Options annotation.");
 
     do {
       if (cls.isAnnotationPresent(Options.class)) {
@@ -545,7 +546,9 @@ public class Configuration {
     Preconditions.checkArgument(cls.isAssignableFrom(obj.getClass()));
 
     final Options options = cls.getAnnotation(Options.class);
-    Preconditions.checkNotNull(options, "Class must have @Options annotation.");
+    Preconditions.checkNotNull(options, "Class " + cls.getName()
+        + " must have @Options annotation.  If you used inject(Object), try"
+        + " inject(Object, Class) instead.");
 
     // get all injectable memebers and override their final & private modifiers
     final Field[] fields = cls.getDeclaredFields();
