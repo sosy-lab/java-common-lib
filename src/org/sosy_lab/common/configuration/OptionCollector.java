@@ -237,8 +237,14 @@ public class OptionCollector {
     }
   }
 
-  /** This function formats text and splits lines, if they are too long. */
+  /** This function formats text and splits lines, if they are too long.
+   * This functions adds "#" before each line.*/
   public static String formatText(final String text) {
+    return formatText(text, "# ", true);
+  }
+
+  /** This function formats text and splits lines, if they are too long. */
+  public static String formatText(final String text, final String lineStart, final boolean useLineStartInFirstLine) {
     if (text.isEmpty()) {
       return text;
     }
@@ -275,8 +281,12 @@ public class OptionCollector {
 
     // add "# " before each line
     StringBuilder formattedLines = new StringBuilder();
+    if (!useLineStartInFirstLine && splittedLines.size() > 0) {
+      formattedLines.append(splittedLines.remove(0));
+      formattedLines.append('\n');
+    }
     for (String line : splittedLines) {
-      formattedLines.append("# ");
+      formattedLines.append(lineStart);
       formattedLines.append(line);
       formattedLines.append('\n');
     }
@@ -340,15 +350,16 @@ public class OptionCollector {
 
       // remove package-definition in middle:
       // List<? extends package.name.X> --> List<? extends X>
-      genericType = genericType.replaceAll("<\\?[^<]*\\.", "<? extends ");
+      // we use the string as regex later, so we use 4 "\" in the string.
+      genericType = genericType.replaceAll("<\\?[^<]*\\.", "<\\\\?\\\\s+extends\\\\s+");
 
-      fieldString += " " + genericType;
+      fieldString += "\\s+" + genericType;
 
     } else {
-      fieldString += " " + field.getType().getSimpleName();
+      fieldString += "\\s+" + field.getType().getSimpleName();
     }
 
-    fieldString += " " + field.getName();
+    fieldString += "\\s+" + field.getName();
 
     String defaultValue = getDefaultValueFromContent(content, fieldString);
 
@@ -360,7 +371,7 @@ public class OptionCollector {
         String type = field.getType().toString();
         type = type.substring(type.lastIndexOf(".") + 1).replace("$", ".");
         fieldString =
-            Modifier.toString(field.getModifiers()) + " " + type + " "
+            Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+"
                 + field.getName();
         defaultValue = getDefaultValueFromContent(content, fieldString);
       }
@@ -409,14 +420,15 @@ public class OptionCollector {
    * @param content sourcecode where to search
    * @param fieldString name of the field, which value is returned */
   private static String getDefaultValueFromContent(final String content,
-      final String fieldString) {
+      final String fieldPattern) {
     // search for fieldString and get the whole content after it (=rest),
     // in 'rest' search for ';' and return all before it (=defaultValue)
     String defaultValue = "";
-    if (content.contains(fieldString)) {
-      final String rest = content.substring(content.indexOf(fieldString));
+    String[] splitted = content.split(fieldPattern);
+    if (splitted.length > 1) { // first part is before fieldString, second part is after it
+      final String rest = splitted[1];
       defaultValue =
-          rest.substring(fieldString.length(), rest.indexOf(";")).trim();
+          rest.substring(0, rest.indexOf(";")).trim();
 
       // remove unnecessary parts of field
       if (defaultValue.startsWith("=")) {
@@ -445,9 +457,9 @@ public class OptionCollector {
     } else {
 
       // special handling for generics
-      final String stringSetFieldString = fieldString.replace(" Set ", " Set<String> ");
-      if (content.contains(stringSetFieldString)) {
-        return getDefaultValueFromContent(content, stringSetFieldString);
+      final String stringSetFieldPattern = fieldPattern.replace("\\s+Set\\s+", "\\s+Set<String>\\s+");
+      if (content.contains(stringSetFieldPattern)) {
+        return getDefaultValueFromContent(content, stringSetFieldPattern);
       }
       // TODO: other types of generics?
     }
@@ -475,7 +487,7 @@ public class OptionCollector {
           enumTitles[i] = enums[i].getName();
         }
         allowedValues =
-            "  enum:     " + java.util.Arrays.toString(enumTitles) + "\n";
+            "  enum:     " + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
       } catch (ClassNotFoundException e) {
         // ignore, exception should not happen
       }
