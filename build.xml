@@ -120,6 +120,11 @@
         <ivy:publish pubrevision="${version}" resolver="Sosy-Lab-Publish" status="release">
             <artifacts pattern="[artifact]-[revision].[ext]"/>
         </ivy:publish>
+        <echo>
+            You now want to run
+            svn add repository/org.sosy_lab/common/*-${version}.*;
+            svn ci repository/org.sosy_lab/common -m"publish version ${version} of SoSy-Lab Common library"
+            to make the new version publicly available.</echo>
     </target>
 
 </project>
