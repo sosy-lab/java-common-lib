@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab : -->
+<project basedir="." default="build" name="Sosy-Lab Common Library" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="source.format" value="1.6"/>
+    <property name="source.dir" value="src"/>
+    <property name="class.format" value="1.6"/>
+    <property name="class.dir" value="bin"/>
+
+    <antversion property="ant.version.exact"/> <!-- Define property that contains the Ant version. -->
+    <property name="ivy.lib.dir" value="${basedir}/lib/java"/>
+
+    <path id="classpath">
+        <pathelement location="${class.dir}"/>
+        <fileset dir="lib" includes="*.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar"/>
+    </path>
+
+    <available property="svn.isworkingcopy" file=".svn"/>
+
+    <target name="determine-version-svn" if="svn.isworkingcopy">
+        <exec executable="svnversion" outputproperty="svn.version"
+              failonerror="false" failifexecutionfails="false" logError="false" error="/dev/null">
+            <env key="LANG" value="C"/>
+        </exec>
+        <property name="version" value="0.${svn.version}"/>
+    </target>
+
+    <target depends="determine-version-svn" name="determine-version">
+        <property name="version" value="UNKNOWN"/> <!-- provide default value if property is not yet set -->
+        <condition property="version.publishable">
+            <matches string="${version}" pattern="^0\.[0-9]+$"/>
+        </condition>
+    </target>
+
+
+    <target name="init" depends="determine-version">
+        <echo message="Building ${ant.project.name} ${version}"/>
+        <mkdir dir="${class.dir}"/>
+    </target>
+    <target name="clean">
+        <delete includeEmptyDirs="true">
+            <fileset dir="." includes="${class.dir}/** common-*.jar"/>
+        </delete>
+    </target>
+    <target depends="clean" name="cleanall"/>
+
+    <property name="ivy.version" value="2.2.0"/> <!-- Change version number here to use a newer version of Ivy. -->
+    <property name="ivy.repo.url" value="http://www.sosy-lab.org/ivy"/>
+    <property name="ivy.jar.dir" value="${ivy.lib.dir}/build"/>
+    <property name="ivy.jar.file" value="ivy.jar"/>
+    <available file="${ivy.jar.dir}/${ivy.jar.file}" property="ivy.jar.present"/>
+    <available file="${ivy.lib.dir}-contrib" property="ivy.contrib.present"/>
+
+    <!-- If necessary, download Ivy from web site so that it does not need to be installed. -->
+    <target name="bootstrap-ivy" unless="ivy.jar.present">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <echo message="Downloading ivy..."/>
+    <get src="${ivy.repo.url}/org.apache.ivy/ivy/ivy-${ivy.version}.jar" dest="${ivy.jar.dir}/${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <!-- Load the Ivy plugin for Ant so the Ivy tasks are available. -->
+    <target name="load-ivy" depends="bootstrap-ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="${ivy.jar.file}"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <!-- Ask Ivy to get all the dependencies for us -->
+    <target name="resolve-dependencies" depends="load-ivy, update-contrib">
+        <echo message="Downloading and installing dependencies with Ivy..."/>
+        <ivy:resolve conf="build, runtime, test"/>
+        <ivy:retrieve sync="true" overwriteMode="different" pattern="${ivy.lib.dir}/[conf]/[artifact](-[classifier]).[ext]"/>
+    </target>
+
+    <target name="report-dependencies" depends="resolve-dependencies" description="Generate dependencies report">
+        <ivy:report graph="false" dot="true" conf="runtime, build, test, contrib"/>
+    </target>
+
+    <!-- Update additional resources if they were downloaded previously. -->
+    <target name="update-contrib" if="ivy.contrib.present">
+        <antcall target="install-contrib"/>
+    </target>
+
+    <target name="install-contrib" depends="load-ivy" description="retrieve sources and docs for external libraries">
+        <ivy:resolve conf="contrib"/>
+        <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
+    </target>
+
+
+    <target depends="init,determine-version,resolve-dependencies" name="build-dependencies"/>
+
+    <target depends="build-project" name="build"/>
+
+    <target depends="build-dependencies" name="build-project">
+        <depend srcdir="${source.dir}" destdir="${class.dir}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${class.dir}" source="${source.format}" target="${class.format}" encoding="UTF-8">
+            <src path="${source.dir}"/>
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <target description="Make a distributable release" depends="build,jar" name="dist"/>
+
+    <target name="jar" depends="build">
+        <jar basedir="${class.dir}/" includes="**" destfile="common-${version}.jar"
+                whenmanifestonly="fail">
+            <manifest>
+                    <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+             </manifest>
+        </jar>
+    </target>
+
+    <target name="publish" depends="jar">
+        <fail unless="version.publishable"
+              message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
+        <ivy:publish pubrevision="${version}" resolver="Sosy-Lab-Publish" status="release">
+            <artifacts pattern="[artifact]-[revision].[ext]"/>
+        </ivy:publish>
+    </target>
+
+</project>
