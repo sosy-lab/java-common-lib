@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="common">
+      <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+    </info>
+
+    <configurations defaultconf="runtime">
+        <!-- All dependencies that are only needed during build. -->
+        <conf name="build" />
+
+        <!-- The normal dependencies. -->
+        <conf name="runtime" />
+
+        <!-- Dependencies needed for building or running tests. -->
+        <conf name="test" />
+
+        <!-- Additional files like JavaDocs or source code that will help developers.
+             These are not downloaded by default, but only when "ant install-contrib" is called. -->
+        <conf name="contrib" />
+    </configurations>
+
+    <publications>
+      <artifact name="common"/>
+    </publications>
+
+    <dependencies>
+        <!-- Google Core Libraries for Java
+             Contains a lot of helpful data structures. -->
+        <dependency org="com.google.guava" name="guava" rev="10.0" conf="runtime->default; contrib->sources"/>
+
+        <!-- Dependency on Ivy itself so that we can ugprade it easily.
+             Change version number in build.xml for upgrading. -->
+        <dependency org="org.apache.ivy" name="ivy" rev="${ivy.version}" conf="build->default"/>
+    </dependencies>
+</ivy-module>
