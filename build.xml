@@ -102,7 +102,7 @@
         </javac>
     </target>
 
-    <target description="Make a distributable release" depends="build,jar" name="dist"/>
+    <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
 
     <target name="jar" depends="build">
         <jar basedir="${class.dir}/" includes="**" destfile="common-${version}.jar"
@@ -114,15 +114,28 @@
         </jar>
     </target>
 
-    <target name="publish" depends="jar">
-        <fail unless="version.publishable"
+    <target name="sources" depends="determine-version">
+        <jar basedir="${source.dir}/" includes="**/*.java" destfile="common-${version}-sources.jar"
+                whenmanifestonly="fail">
+            <manifest>
+                    <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="publish" depends="jar,sources">
+        <fail if="version.publishable"
               message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
-        <ivy:publish pubrevision="${version}" resolver="Sosy-Lab-Publish" status="release">
-            <artifacts pattern="[artifact]-[revision].[ext]"/>
-        </ivy:publish>
+        <ivy:publish
+              pubrevision="${version}"
+              resolver="Sosy-Lab-Publish"
+              status="release"
+              artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
+              />
         <echo>
             You now want to run
-            svn add repository/org.sosy_lab/common/*-${version}.*;
+            svn add repository/org.sosy_lab/common/*-${version}.*
             svn ci repository/org.sosy_lab/common -m"publish version ${version} of SoSy-Lab Common library"
             to make the new version publicly available.</echo>
     </target>
