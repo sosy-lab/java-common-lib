@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0"
+        xmlns:e="http://ant.apache.org/ivy/extra"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="common">
       <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
     </info>
 
-    <configurations defaultconf="runtime">
+    <configurations>
         <!-- All dependencies that are only needed during build. -->
         <conf name="build" />
 
@@ -19,10 +20,14 @@
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
         <conf name="contrib" />
+
+        <!-- Configuration for publishing sources -->
+        <conf name="sources" />
     </configurations>
 
-    <publications>
-      <artifact name="common"/>
+    <publications defaultconf="runtime">
+      <artifact />
+      <artifact conf="sources" e:classifier="sources" type="source" ext="jar"/>
     </publications>
 
     <dependencies>
