@@ -125,7 +125,7 @@
     </target>
 
     <target name="publish" depends="jar,sources">
-        <fail if="version.publishable"
+        <fail unless="version.publishable"
               message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
         <ivy:publish
               pubrevision="${version}"
