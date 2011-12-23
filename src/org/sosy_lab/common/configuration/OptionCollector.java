@@ -493,25 +493,106 @@ public class OptionCollector {
       }
     }
 
-    // sometimes the allowed values are part of the option-annotation
-    final Option option = field.getAnnotation(Option.class);
-    if (option.values().length != 0) {
-      allowedValues +=
-          "  allowed values: " + java.util.Arrays.toString(option.values())
-              + "\n";
-    }
-
-    // sometimes the allowed values must match a regexp
-    if (verbose && !option.regexp().isEmpty()) {
-      allowedValues += "  regexp:   " + option.regexp() + "\n";
-    }
-
-    // sometimes the allowed values must be uppercase
-    if (verbose && option.toUppercase()) {
-      allowedValues += "  uppercase: true\n";
-    }
+    allowedValues += getOptionValues(field, verbose);
+    allowedValues += getClassOptionValues(field, verbose);
+    allowedValues += getFileOptionValues(field, verbose);
+    allowedValues += getIntegerOptionValues(field, verbose);
+    allowedValues += getTimeSpanOptionValues(field, verbose);
 
     return allowedValues;
+  }
+
+  /** This method returns text representing the values,
+   * that are defined in the {@link Option}-annotation. */
+  private static String getOptionValues(Field field, boolean verbose) {
+    final Option option = field.getAnnotation(Option.class);
+    assert option != null;
+    String str = "";
+    if (option.values().length != 0) {
+      str += "  allowed values: "
+          + java.util.Arrays.toString(option.values()) + "\n";
+    }
+
+    if (verbose && !option.regexp().isEmpty()) {
+      str += "  regexp:   " + option.regexp() + "\n";
+    }
+
+    if (verbose && option.toUppercase()) {
+      str += "  uppercase: true\n";
+    }
+    return str;
+  }
+
+  /** This method returns text representing the values,
+   * that are defined in the {@link ClassOption}-annotation. */
+  private static String getClassOptionValues(Field field, boolean verbose) {
+    final ClassOption classOption = field.getAnnotation(ClassOption.class);
+    String str = "";
+    if (classOption != null) {
+      if (verbose && !classOption.packagePrefix().isEmpty()) {
+        str += "  packagePrefix: " + classOption.packagePrefix() + "\n";
+      }
+    }
+    return str;
+  }
+
+  /** This method returns text representing the values,
+   * that are defined in the {@link FileOption}-annotation. */
+  private static String getFileOptionValues(Field field, boolean verbose) {
+    final FileOption fileOption = field.getAnnotation(FileOption.class);
+    String str = "";
+    if (fileOption != null) {
+      if (verbose) {
+        str += "  type of file: " + fileOption.value() + "\n";
+      }
+    }
+    return str;
+  }
+
+  /** This method returns text representing the values,
+   * that are defined in the {@link IntegerOption}-annotation. */
+  private static String getIntegerOptionValues(Field field, boolean verbose) {
+    final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
+    String str = "";
+    if (intOption != null) {
+      if (verbose) {
+        if (intOption.min() == Long.MIN_VALUE) {
+          str += "  min:      Long.MIN_VALUE\n";
+        } else {
+          str += "  min:      " + intOption.min() + "\n";
+        }
+        if (intOption.max() == Long.MAX_VALUE) {
+          str += "  max:      Long.MAX_VALUE\n";
+        } else {
+          str += "  max:      " + intOption.max() + "\n";
+        }
+      }
+    }
+    return str;
+  }
+
+  /** This method returns text representing the values,
+   * that are defined in the {@link TimeSpanOption}-annotation. */
+  private static String getTimeSpanOptionValues(Field field, boolean verbose) {
+    final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
+    String str = "";
+    if (timeSpanOption != null) {
+      if (verbose) {
+        str += "  code unit:     " + timeSpanOption.codeUnit() + "\n";
+        str += "  default unit:  " + timeSpanOption.defaultUserUnit() + "\n";
+        if (timeSpanOption.min() == Long.MIN_VALUE) {
+          str += "  time min:      Long.MIN_VALUE\n";
+        } else {
+          str += "  time min:      " + timeSpanOption.min() + "\n";
+        }
+        if (timeSpanOption.max() == Long.MAX_VALUE) {
+          str += "  time max:      Long.MAX_VALUE\n";
+        } else {
+          str += "  time max:      " + timeSpanOption.max() + "\n";
+        }
+      }
+    }
+    return str;
   }
 
   /**
