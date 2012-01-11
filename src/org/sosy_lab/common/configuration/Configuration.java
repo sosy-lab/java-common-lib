@@ -61,6 +61,8 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.MapConstraint;
+import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.io.Closeables;
@@ -241,17 +243,12 @@ public class Configuration {
       Preconditions.checkNotNull(converter);
 
       if (converters == null) {
-        converters = new HashMap<Class<?>, TypeConverter>();
+        converters = createConverterMap();
         if (oldConfig != null) {
           converters.putAll(oldConfig.converters);
         } else {
           converters.putAll(DEFAULT_CONVERTERS);
         }
-      }
-
-      if (cls.isAnnotation()
-          && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
-        throw new IllegalArgumentException("Can register type converters only for annotations which are option detail annotations");
       }
 
       converters.put(cls, converter);
@@ -298,7 +295,7 @@ public class Configuration {
         if (oldConfig != null) {
           newConverters = oldConfig.converters;
         } else {
-          newConverters = DEFAULT_CONVERTERS;
+          newConverters = ImmutableMap.copyOf(DEFAULT_CONVERTERS);
         }
       } else {
         newConverters = ImmutableMap.copyOf(converters);
@@ -340,7 +337,7 @@ public class Configuration {
    */
   public static Configuration defaultConfiguration() {
     return new Configuration(ImmutableMap.<String, String>of(), "",
-        DEFAULT_CONVERTERS, new HashSet<String>(0),
+        ImmutableMap.copyOf(DEFAULT_CONVERTERS), new HashSet<String>(0),
         new HashSet<String>(0));
   }
 
@@ -409,11 +406,60 @@ public class Configuration {
     builder.put(iface, impl);
   }
 
-  private static final ImmutableMap<Class<?>, TypeConverter> DEFAULT_CONVERTERS = ImmutableMap.<Class<?>, TypeConverter>of(
-      Class.class, new ClassTypeConverter(),
-      IntegerOption.class, new IntegerTypeConverter(),
-      TimeSpanOption.class, new TimeSpanTypeConverter()
-      );
+
+  // Mutable static state on purpose here!
+  // See below for explanation.
+  private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = Collections.synchronizedMap(createConverterMap());
+  static {
+    DEFAULT_CONVERTERS.put(Class.class, new ClassTypeConverter());
+    DEFAULT_CONVERTERS.put(IntegerOption.class, new IntegerTypeConverter());
+    DEFAULT_CONVERTERS.put(TimeSpanOption.class, new TimeSpanTypeConverter());
+  }
+
+  /**
+   * Get the map of registered default {@link TypeConverter}s.
+   * These type converters are used whenever a new Configuration instance is
+   * created, except when the {@link Builder#copyFrom(Configuration)} method is
+   * used.
+   *
+   * The returned map is mutable and changes have immediate effect on this class!
+   * Callers are free to add and remove mappings as they wish.
+   * However, as this is static state, this will affect all other callers as well!
+   * Thus, it should be used only with caution, for example to add default type
+   * converters in a large project at startup.
+   * It is discouraged to change this map, if the same effect can easily be
+   * achieved using {@link Builder#addConverter(Class, TypeConverter)}.
+   *
+   * @return A reference to the map of type converters used by this class.
+   */
+  public static Map<Class<?>, TypeConverter> getDefaultConverters() {
+    return DEFAULT_CONVERTERS;
+  }
+
+  /**
+   * Use this method to create a new map for storing type converters.
+   * In addition to being a normal HashMap, the returned map will have some
+   * additional checks on the entries.
+   * @return A new map.
+   */
+  private static Map<Class<?>, TypeConverter> createConverterMap() {
+    return MapConstraints.constrainedMap(new HashMap<Class<?>, TypeConverter>(),
+        new MapConstraint<Class<?>, TypeConverter>() {
+
+          @Override
+          public void checkKeyValue(Class<?> cls, TypeConverter pValue) {
+            if (cls.isAnnotation()
+                && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
+              throw new IllegalArgumentException("Can register type converters only for annotations which are option detail annotations");
+            }
+          }
+          @Override
+          public String toString() {
+            return "valid type converter registration";
+          }
+        });
+  }
+
 
   private final ImmutableMap<String, String> properties;
 
