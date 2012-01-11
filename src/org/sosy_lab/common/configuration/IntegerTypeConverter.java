@@ -39,7 +39,7 @@ public class IntegerTypeConverter implements TypeConverter {
 
     assert type.equals(Integer.class) || type.equals(Long.class);
 
-    Object value = Configuration.valueOf(type, optionName, valueStr);
+    Object value = BaseTypeConverter.valueOf(type, optionName, valueStr);
 
     long n = ((Number)value).longValue();
     if (option.min() > n || n > option.max()) {
