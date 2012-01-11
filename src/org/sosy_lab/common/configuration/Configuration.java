@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
@@ -940,7 +939,7 @@ public class Configuration {
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
-      return invokeStaticMethod(collectionClass, "copyOf", Iterable.class, values, optionName);
+      return BaseTypeConverter.invokeStaticMethod(collectionClass, "copyOf", Iterable.class, values, optionName);
     }
   }
 
@@ -964,32 +963,7 @@ public class Configuration {
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
-    if (converter != null) {
-      return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
-    }
-
-    if (Primitives.isWrapperType(type)) {
-      // all wrapper types have valueOf method
-      return valueOf(type, optionName, valueStr);
-
-    } else if (type.isEnum()) {
-      // all enums have valueOf method
-      return valueOf(type, optionName, valueStr);
-
-    } else if (type.equals(String.class)) {
-      return valueStr;
-
-    } else if (type.equals(Level.class)) {
-      try {
-        return Level.parse(valueStr);
-      } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException("Illegal log level " + valueStr + " in option " + optionName);
-      }
-
-    } else {
-      throw new UnsupportedOperationException(
-          "Unimplemented type for option: " + type.getSimpleName());
-    }
+    return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
   }
 
   /**
@@ -1041,9 +1015,7 @@ public class Configuration {
       // TODO: Also pass default values inside a collection.
 
       TypeConverter converter = getConverter(type, secondaryOption);
-      if (converter != null) {
-        return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
-      }
+      return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
     }
 
     return defaultValue;
@@ -1052,7 +1024,7 @@ public class Configuration {
 
   /**
    * Find a type converter for an option.
-   * @return A type converter or null.
+   * @return A type converter.
    */
   private TypeConverter getConverter(final Class<?> type, final Annotation secondaryOption) {
     TypeConverter converter = null;
@@ -1061,6 +1033,9 @@ public class Configuration {
     }
     if (converter == null) {
       converter = converters.get(type);
+    }
+    if (converter == null) {
+      converter = BaseTypeConverter.INSTANCE;
     }
     return converter;
   }
@@ -1073,39 +1048,5 @@ public class Configuration {
       return null;
     }
     return Strings.emptyToNull(s.trim());
-  }
-
-  /**
-   * Invoke the static "valueOf(String)" method on a class.
-   * Helpful for type converters.
-   */
-  static Object valueOf(final Class<?> type, final String optionName, final String value)
-      throws InvalidConfigurationException {
-    return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
-  }
-
-  private static <T> Object invokeStaticMethod(final Class<?> type, final String method,
-      final Class<T> paramType, final T value, final String optionName)
-          throws InvalidConfigurationException {
-    try {
-      Method m = type.getMethod(method, paramType);
-      if (!m.isAccessible()) {
-        m.setAccessible(true);
-      }
-      return m.invoke(null, value);
-
-    } catch (NoSuchMethodException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (SecurityException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (IllegalAccessException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (InvocationTargetException e) {
-      throw new InvalidConfigurationException("Could not parse \"" + optionName +
-          " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
-    }
   }
 }
