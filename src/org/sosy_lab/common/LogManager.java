@@ -196,7 +196,8 @@ public class LogManager {
       // is a way to determine whether stdout is connected to a terminal.
       // We assume that most users only redirect stderr if they also redirect
       // stdout, so this should be ok.
-      if (System.console() == null) {
+      if ((System.console() == null)
+          || System.getProperty("os.name", "").startsWith("Windows")) {
         useColors = false;
       }
     }
