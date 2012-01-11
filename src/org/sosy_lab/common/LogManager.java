@@ -181,14 +181,51 @@ public class LogManager {
   }
 
   // class to handle formatting for console output
+  @Options(prefix="log")
   public static class ConsoleLogFormatter extends Formatter {
+
+    @Option(description="use colors for log messages on console")
+    private boolean useColors = true;
+
+    public ConsoleLogFormatter(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+
+      // Using colors is only good if stderr is connected to a terminal and not
+      // redirected into a file.
+      // AFAIK there is no way to determine this from Java, but at least there
+      // is a way to determine whether stdout is connected to a terminal.
+      // We assume that most users only redirect stderr if they also redirect
+      // stdout, so this should be ok.
+      if (System.console() == null) {
+        useColors = false;
+      }
+    }
+
     @Override
     public String format(LogRecord lr) {
+      StringBuffer sb = new StringBuffer();
 
-      return lr.getMessage() + " ("
-          + extractSimpleClassName(lr)  + "." + lr.getSourceMethodName()  + ", "
-          + lr.getLevel().toString()
-          + ")\n\n";
+      if (useColors) {
+        if (lr.getLevel().equals(Level.WARNING)) {
+          sb.append("\033[1m"); // bold normal color
+        } else if (lr.getLevel().equals(Level.SEVERE)) {
+          sb.append("\033[31;1m"); // bold red color
+        }
+      }
+      sb.append(lr.getMessage());
+      sb.append(" (");
+      sb.append(extractSimpleClassName(lr));
+      sb.append(".");
+      sb.append(lr.getSourceMethodName());
+      sb.append(", ");
+      sb.append(lr.getLevel().toString());
+      sb.append(")");
+      if (useColors) {
+        sb.append("\033[m");
+      }
+      sb.append("\n\n");
+
+      return sb.toString();
     }
   }
 
@@ -239,7 +276,7 @@ public class LogManager {
     }
 
     // create console logger
-    setupHandler(consoleOutputHandler, new ConsoleLogFormatter(), consoleLevel, consoleExclude);
+    setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
 
     // create file logger
     if (!fileLevel.equals(Level.OFF) && outputFile != null) {
