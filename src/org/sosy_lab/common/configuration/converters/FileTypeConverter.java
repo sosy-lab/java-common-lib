@@ -21,7 +21,7 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common.configuration;
+package org.sosy_lab.common.configuration.converters;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +29,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import org.sosy_lab.common.Files;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.FileOption;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 
 /**
  * A {@link TypeConverter} for options of type {@link File} which offers some

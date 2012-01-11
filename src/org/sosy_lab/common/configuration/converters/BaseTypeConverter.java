@@ -21,13 +21,16 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common.configuration;
+package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
+
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 import com.google.common.primitives.Primitives;
 
@@ -37,7 +40,7 @@ import com.google.common.primitives.Primitives;
  *
  * This class should not have any relevance outside the {@link Configuration} class.
  */
-enum BaseTypeConverter implements TypeConverter {
+public enum BaseTypeConverter implements TypeConverter {
 
   INSTANCE;
 
@@ -80,12 +83,12 @@ enum BaseTypeConverter implements TypeConverter {
    * Invoke the static "valueOf(String)" method on a class.
    * Helpful for type converters.
    */
-  static Object valueOf(final Class<?> type, final String optionName, final String value)
+  public static Object valueOf(final Class<?> type, final String optionName, final String value)
       throws InvalidConfigurationException {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
   }
 
-  static <T> Object invokeStaticMethod(final Class<?> type, final String method,
+  public static <T> Object invokeStaticMethod(final Class<?> type, final String method,
       final Class<T> paramType, final T value, final String optionName)
           throws InvalidConfigurationException {
     try {

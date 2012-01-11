@@ -26,6 +26,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
+
 /**
  * This is an annotation providing more features for options of type {@link File}.
  * In order to use it, you need to register an instance of {@link FileTypeConverter}

@@ -17,10 +17,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.common.configuration;
+package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+
+import org.sosy_lab.common.configuration.IntegerOption;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 /**
  * Type converter for options of types Integer/Long annotated
