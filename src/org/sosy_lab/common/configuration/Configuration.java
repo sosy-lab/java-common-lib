@@ -792,16 +792,6 @@ public class Configuration {
   }
 
   /**
-   * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
-   */
-  private static String trimToNull(String s) {
-    if (s == null) {
-      return null;
-    }
-    return Strings.emptyToNull(s.trim());
-  }
-
-  /**
    * Find any annotation which itself is annotated with {@link OptionDetailAnnotation}
    * on a member.
    */
@@ -920,7 +910,7 @@ public class Configuration {
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
-      return invokeMethod(collectionClass, "copyOf", Iterable.class, values, optionName);
+      return invokeStaticMethod(collectionClass, "copyOf", Iterable.class, values, optionName);
     }
   }
 
@@ -1013,40 +1003,6 @@ public class Configuration {
     return result;
   }
 
-  /**
-   * Invoke the static "valueOf(String)" method on a class.
-   * Helpful for type converters.
-   */
-  static Object valueOf(final Class<?> type, final String optionName, final String value)
-      throws InvalidConfigurationException {
-    return invokeMethod(type, "valueOf", String.class, value, optionName);
-  }
-
-  private static <T> Object invokeMethod(final Class<?> type, final String method,
-      final Class<T> paramType, final T value, final String optionName)
-          throws InvalidConfigurationException {
-    try {
-      Method m = type.getMethod(method, paramType);
-      if (!m.isAccessible()) {
-        m.setAccessible(true);
-      }
-      return m.invoke(null, value);
-
-    } catch (NoSuchMethodException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (SecurityException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (IllegalAccessException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
-    } catch (InvocationTargetException e) {
-      throw new InvalidConfigurationException("Could not parse \"" + optionName +
-          " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
-    }
-  }
-
   private <T> Object convertDefaultValue(final String optionName, final T defaultValue,
       final Class<T> type, final Type genericType, final Annotation secondaryOption) throws InvalidConfigurationException {
 
@@ -1134,4 +1090,48 @@ public class Configuration {
     return disableOutput ? null : outputDirectory;
   }
 
+
+  /**
+   * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
+   */
+  private static String trimToNull(String s) {
+    if (s == null) {
+      return null;
+    }
+    return Strings.emptyToNull(s.trim());
+  }
+
+  /**
+   * Invoke the static "valueOf(String)" method on a class.
+   * Helpful for type converters.
+   */
+  static Object valueOf(final Class<?> type, final String optionName, final String value)
+      throws InvalidConfigurationException {
+    return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
+  }
+
+  private static <T> Object invokeStaticMethod(final Class<?> type, final String method,
+      final Class<T> paramType, final T value, final String optionName)
+          throws InvalidConfigurationException {
+    try {
+      Method m = type.getMethod(method, paramType);
+      if (!m.isAccessible()) {
+        m.setAccessible(true);
+      }
+      return m.invoke(null, value);
+
+    } catch (NoSuchMethodException e) {
+      throw new AssertionError("Class " + type.getSimpleName() + " without "
+          + method + "(" + paramType.getSimpleName() + ") method!");
+    } catch (SecurityException e) {
+      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
+          + method + "(" + paramType.getSimpleName() + ") method!");
+    } catch (IllegalAccessException e) {
+      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
+          + method + "(" + paramType.getSimpleName() + ") method!");
+    } catch (InvocationTargetException e) {
+      throw new InvalidConfigurationException("Could not parse \"" + optionName +
+          " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
+    }
+  }
 }
