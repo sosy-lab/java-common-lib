@@ -21,7 +21,6 @@ package org.sosy_lab.common.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -47,7 +46,6 @@ import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.Files;
 import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Preconditions;
@@ -350,24 +348,10 @@ public class Configuration {
 
     // instead of calling inject() set options manually
     // this avoids the "throws InvalidConfigurationException" in the signature
-    newConfig.disableOutput = oldConfig.disableOutput;
-    newConfig.outputDirectory = oldConfig.outputDirectory;
-    newConfig.rootDirectory = oldConfig.rootDirectory;
     newConfig.exportUsedOptions = oldConfig.exportUsedOptions;
 
     return newConfig;
   }
-
-  @Option(name="output.path", description="directory to put all output files in")
-  private String outputDirectory = "output/";
-
-  @Option(name="output.disable", description="disable all default output files"
-    + "\n(any explicitly given file will still be written)")
-  private boolean disableOutput = false;
-
-  @Option (description="base directory for all input & output files"
-    + "\n(except for the configuration file itself)")
-  private String rootDirectory = ".";
 
   @Option (name="log.usedOptions.export",
       description="all used options are printed")
@@ -979,14 +963,7 @@ public class Configuration {
 
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
-    TypeConverter converter = null;
-    if (secondaryOption != null) {
-      converter = converters.get(secondaryOption.annotationType());
-    }
-    if (converter == null) {
-      converter = converters.get(type);
-    }
-
+    TypeConverter converter = getConverter(type, secondaryOption);
     if (converter != null) {
       return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
     }
@@ -1001,13 +978,6 @@ public class Configuration {
 
     } else if (type.equals(String.class)) {
       return valueStr;
-
-    } else if (type.equals(File.class)) {
-      if (!(secondaryOption instanceof FileOption)) {
-        throw new UnsupportedOperationException("Options of type File need to be annotated with @FileOption");
-      }
-
-      return handleFileOption(optionName, new File(valueStr), ((FileOption)secondaryOption).value());
 
     } else if (type.equals(Level.class)) {
       try {
@@ -1065,77 +1035,35 @@ public class Configuration {
 
     checkApplicability(secondaryOption, innerType);
 
-    TypeConverter converter = converters.get(type);
-    if (converter != null) {
-      return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
-    }
+    if (type == innerType) {
+      // If its not a collection, we try to pass the default value to the
+      // type converter if there is any.
+      // TODO: Also pass default values inside a collection.
 
-    // TODO check for forbidden collections of Files with default values
-
-    if (defaultValue == null || !(defaultValue instanceof File)) {
-      return defaultValue;
-    }
-
-    if (!(secondaryOption instanceof FileOption)) {
-      throw new UnsupportedOperationException("Options of type File need to be annotated with @FileOption");
-    }
-
-    FileOption.Type typeInfo = ((FileOption)secondaryOption).value();
-    File file = (File)defaultValue;
-
-    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
-      if (disableOutput) {
-        // if output is disabled and option was not specified explicitly
-        return null;
+      TypeConverter converter = getConverter(type, secondaryOption);
+      if (converter != null) {
+        return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
       }
     }
 
-    return handleFileOption(optionName, file, typeInfo);
+    return defaultValue;
   }
 
-  /** This function returns a file. It sets the path of the file to
-   * the given outputDirectory in the given rootDirectory.
-   *
-   * @param optionName name of option only for error handling
-   * @param file the file name to adjust
-   * @param typeInfo info about the type of the file (outputfile, inputfile) */
-  private File handleFileOption(final String optionName, File file, final FileOption.Type typeInfo)
-          throws InvalidConfigurationException {
 
-    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
-      if (!file.isAbsolute()) {
-        file = new File(outputDirectory, file.getPath());
-      }
+  /**
+   * Find a type converter for an option.
+   * @return A type converter or null.
+   */
+  private TypeConverter getConverter(final Class<?> type, final Annotation secondaryOption) {
+    TypeConverter converter = null;
+    if (secondaryOption != null) {
+      converter = converters.get(secondaryOption.annotationType());
     }
-
-    if (!file.isAbsolute()) {
-      file = new File(rootDirectory, file.getPath());
+    if (converter == null) {
+      converter = converters.get(type);
     }
-
-    if (file.isDirectory()) {
-      throw new InvalidConfigurationException("Option " + optionName + " needs to specify a file and not a directory");
-    }
-
-    if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
-      try {
-        Files.checkReadableFile(file);
-      } catch (FileNotFoundException e) {
-        throw new InvalidConfigurationException("Option " + optionName
-            + " specifies an invalid input file: " + e.getMessage(), e);
-      }
-    }
-
-    return file;
+    return converter;
   }
-
-  public String getRootDirectory() {
-    return this.rootDirectory;
-  }
-
-  public String getOutputDirectory() {
-    return disableOutput ? null : outputDirectory;
-  }
-
 
   /**
    * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
