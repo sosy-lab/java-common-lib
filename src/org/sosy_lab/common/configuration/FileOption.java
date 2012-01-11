@@ -27,10 +27,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is a required annotation for all configuration options (i.e., elements
- * that are annotated with {@link Option}) whose type is {@link File}.
- *
- * It serves to specify additional information which is required for file options.
+ * This is an annotation providing more features for options of type {@link File}.
+ * In order to use it, you need to register an instance of {@link FileTypeConverter}
+ * as a converter for {@link FileOption}.
  */
 @OptionDetailAnnotation(applicableTo=File.class)
 @Documented
