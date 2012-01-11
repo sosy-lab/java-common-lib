@@ -45,6 +45,11 @@ import java.util.SortedSet;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
+import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
+import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
+import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Preconditions;

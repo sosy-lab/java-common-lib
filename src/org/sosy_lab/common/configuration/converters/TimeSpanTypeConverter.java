@@ -17,11 +17,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.common.configuration;
+package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
+
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.TimeSpanOption;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.BiMap;
