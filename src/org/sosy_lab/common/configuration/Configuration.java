@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,12 +47,12 @@ import java.util.SortedSet;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
 import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -436,6 +438,8 @@ public class Configuration {
 
           @Override
           public void checkKeyValue(Class<?> cls, TypeConverter pValue) {
+            checkNotNull(cls);
+            checkNotNull(pValue);
             if (cls.isAnnotation()
                 && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
               throw new IllegalArgumentException("Can register type converters only for annotations which are option detail annotations");
