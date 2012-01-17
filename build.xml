@@ -92,7 +92,7 @@
 
     <target depends="init,determine-version,resolve-dependencies" name="build-dependencies"/>
 
-    <target depends="build-project" name="build"/>
+    <target depends="build-project, build-documentation" name="build"/>
 
     <target depends="build-dependencies" name="build-project">
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>
@@ -100,6 +100,23 @@
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
         </javac>
+    </target>
+
+    <target name="build-documentation" depends="build-project">
+        <echo message="running OptionCollector..." level="info"/>
+
+        <!-- the output of OptionCollector is written into "doc/ConfigurationOptions.txt" -->
+        <java classname="org.sosy_lab.common.configuration.OptionCollector"
+            fork="true"
+            output="${class.dir}/org/sosy_lab/common/ConfigurationOptions.txt" append="false"
+            logError="true">
+
+            <classpath refid="classpath"/>
+
+            <!-- "-v" is a optional param for verbose output of OptionCollector -->
+            <!-- <arg value="-v"/> -->
+        </java>
+        <echo message="Options collected." level="info"/>
     </target>
 
     <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
