@@ -37,6 +37,9 @@ import java.util.TreeMap;
 
 import org.sosy_lab.common.Pair;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
@@ -77,8 +80,13 @@ public class OptionCollector {
     PrintStream originalStdOut = System.out;
     System.setOut(System.err);
 
+    boolean appendCommonOptions = true;
+
     for (Class<?> c : getClasses()) {
       collectOptions(c, map, verbose);
+      if (c.getPackage().getName().startsWith("org.sosy_lab.common")) {
+        appendCommonOptions = false;
+      }
     }
 
     // reset stdout redirection
@@ -89,6 +97,15 @@ public class OptionCollector {
     }
 
     final StringBuilder content = new StringBuilder();
+
+    // add options of this library
+    if (appendCommonOptions) {
+      try {
+        content.append(Resources.toString(Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt"), Charsets.UTF_8));
+      } catch (Exception e) {
+        System.err.println("Could not find options of org.sosy-lab.common classes: " + e.getMessage());
+      }
+    }
 
     String description = "";
     for (Pair<String, String> descriptionAndInfo : map.values()) {
