@@ -53,8 +53,11 @@ public enum BaseTypeConverter implements TypeConverter {
       return valueOf(type, optionName, valueStr);
 
     } else if (type.isEnum()) {
-      // all enums have valueOf method
-      return valueOf(type, optionName, valueStr);
+      try {
+        return convertEnum(type, valueStr);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidConfigurationException("Invalid value " + valueStr + " for option " + optionName);
+      }
 
     } else if (type.equals(String.class)) {
       return valueStr;
@@ -77,6 +80,11 @@ public enum BaseTypeConverter implements TypeConverter {
       Annotation pSecondaryOption) throws InvalidConfigurationException {
 
     return pValue;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Enum<T>> Object convertEnum(Class<?> cls, String value) {
+    return Enum.valueOf((Class<T>)cls, value);
   }
 
   /**
