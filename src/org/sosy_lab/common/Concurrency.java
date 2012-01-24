@@ -2,7 +2,7 @@
  *  SoSy-Lab Common is a library of useful utilities.
  *  This file is part of SoSy-Lab Common.
  *
- *  Copyright (C) 2007-2011  Dirk Beyer
+ *  Copyright (C) 2007-2012  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
