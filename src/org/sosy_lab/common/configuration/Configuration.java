@@ -170,19 +170,15 @@ public class Configuration {
      * Load options from an InputStream with a "key = value" format.
      * @see Properties#load(InputStream)
      *
-     * If this method is called, it has to be the first method call on this
-     * builder instance.
      * @throws IOException If the stream cannot be read.
      */
     public Builder loadFromStream(InputStream stream) throws IOException {
       Preconditions.checkNotNull(stream);
-      Preconditions.checkState(properties == null);
-      Preconditions.checkState(oldConfig == null);
+      setupProperties();
 
       Properties p = new Properties();
       p.load(stream);
 
-      properties = new HashMap<String, String>(p.size());
       for (Map.Entry<Object, Object> e : p.entrySet()) {
         properties.put((String)e.getKey(), (String)e.getValue());
       }
@@ -206,8 +202,6 @@ public class Configuration {
      * Load options from a file with a "key = value" format.
      * @see Properties#load(InputStream)
      *
-     * If this method is called, it has to be the first method call on this
-     * builder instance.
      * @throws IOException If the file cannot be read.
      */
     public Builder loadFromFile(File file) throws IOException {
