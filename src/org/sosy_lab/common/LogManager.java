@@ -244,6 +244,35 @@ public class LogManager {
     }
   }
 
+  public static interface LogManagerMXBean {
+
+    String getConsoleLevel();
+    void setConsoleLevel(String newLevel);
+  }
+
+  private class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
+
+    private final Handler consoleHandler;
+
+    public LogManagerBean(Handler pConsoleHandler) {
+      super("org.sosy_lab.common:type=LogManager", LogManager.this);
+      consoleHandler = pConsoleHandler;
+    }
+
+    @Override
+    public String getConsoleLevel() {
+      return consoleHandler.getLevel().toString();
+    }
+
+    @Override
+    public void setConsoleLevel(String pNewLevel) throws IllegalArgumentException {
+      Level newLevel = Level.parse(pNewLevel.toUpperCase());
+
+      consoleHandler.setLevel(newLevel);
+      logger.setLevel(getMinimumLevel(fileLevel, newLevel));
+    }
+  }
+
   public LogManager(Configuration config) throws InvalidConfigurationException {
     this(config, new ConsoleHandler());
   }
@@ -261,20 +290,9 @@ public class LogManager {
     Preconditions.checkNotNull(consoleOutputHandler);
     config.inject(this);
 
-    Level effectiveLogLevel;
-    if (fileLevel.intValue() > consoleLevel.intValue()) {
-      effectiveLogLevel = consoleLevel; // smaller level is more detailed logging
-    } else {
-      effectiveLogLevel = fileLevel;
-    }
-
     logger = Logger.getAnonymousLogger();
-    logger.setLevel(effectiveLogLevel);
+    logger.setLevel(getMinimumLevel(fileLevel, consoleLevel));
     logger.setUseParentHandlers(false);
-
-    if (effectiveLogLevel.equals(Level.OFF)) {
-      return;
-    }
 
     // create console logger
     setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
@@ -297,6 +315,10 @@ public class LogManager {
         logger.log(Level.WARNING, "Could not open log file " + e.getMessage() + ", redirecting log output to console");
       }
     }
+
+    // setup MXBean at the end (this might already log something!)
+    new LogManagerBean(consoleOutputHandler).register();
+    // don't store the MXBean, we wouldn't know when to unregister anyway
   }
 
   private void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) throws InvalidConfigurationException {
@@ -526,6 +548,14 @@ public class LogManager {
   public void close() {
     for (Handler handler : logger.getHandlers()) {
       handler.close();
+    }
+  }
+
+  private static Level getMinimumLevel(Level level1, Level level2) {
+    if (level1.intValue() > level2.intValue()) {
+      return level2; // smaller level is more detailed logging
+    } else {
+      return level1;
     }
   }
 }
