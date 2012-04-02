@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,9 +44,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.LogManager;
 import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
@@ -54,6 +56,7 @@ import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -456,6 +459,8 @@ public class Configuration {
   private final Set<String> unusedProperties;
   private final Set<String> deprecatedProperties;
 
+  private LogManager logger = null;
+
   /*
    * This constructor does not set the fields annotated with @Option!
    */
@@ -467,6 +472,11 @@ public class Configuration {
     converters = pConverters;
     unusedProperties = pUnusedProperties;
     deprecatedProperties = pDeprecatedProperties;
+  }
+
+  public void enableLogging(LogManager pLogger) {
+    checkState(logger == null, "Logging already enabled.");
+    logger = checkNotNull(pLogger);
   }
 
   /**
@@ -650,7 +660,16 @@ public class Configuration {
     final Object value = getValue(name, typedDefaultValue, type, genericType, option, field);
 
     // options which were not changed need not to be set
-    if (value == defaultValue) { return; }
+    if (value == defaultValue) {
+      if (logger != null) {
+        logger.log(Level.CONFIG, "Option:", name, "Class:", field.getDeclaringClass().getName(), "field:", field.getName(), "value: <DEFAULT>");
+      }
+      return;
+    }
+
+    if (logger != null) {
+      logger.log(Level.CONFIG, "Option:", name, "Class:", field.getDeclaringClass().getName(), "field:", field.getName(), "value:", value);
+    }
 
     // set value to field
     try {
@@ -693,6 +712,10 @@ public class Configuration {
     final Option option = method.getAnnotation(Option.class);
     final String name = getOptionName(options, method, option);
     final Object value = getValue(name, null, type, genericType, option, method);
+
+    if (logger != null) {
+      logger.log(Level.CONFIG, "Option:", name, "Class:", method.getDeclaringClass().getName(), "method:", method.getName(), "value:", value);
+    }
 
     // set value to field
     try {
@@ -1051,5 +1074,11 @@ public class Configuration {
       return null;
     }
     return Strings.emptyToNull(s.trim());
+  }
+
+  @Override
+  public String toString() {
+    return "Configuration" + (!prefix.isEmpty() ? " with prefix " + prefix : "")
+        + ": [" + Joiner.on(", ").withKeyValueSeparator("=").join(properties) + "]";
   }
 }
