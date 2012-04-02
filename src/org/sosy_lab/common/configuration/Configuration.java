@@ -67,7 +67,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.MapConstraint;
 import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Multiset;
@@ -480,7 +479,11 @@ public class Configuration {
   }
 
   /**
-   * @see Properties#getProperty(String)
+   * Get the value of an option.
+   * USE OF THIS METHOD IS NOT RECOMMENDED!
+   *
+   * If possible, use {@link Option} and {@link #inject(Object)}.
+   * This provides type safety, documentation, logging etc.
    */
   public String getProperty(String key) {
     String result = properties.get(prefix + key);
@@ -491,29 +494,6 @@ public class Configuration {
       unusedProperties.remove(key);
     }
     return result;
-  }
-
-  /**
-   * @see Properties#getProperty(String, String)
-   */
-  @Deprecated
-  public String getProperty(String key, String defaultValue) {
-    String result = getProperty(key);
-    if (result == null) {
-      result = defaultValue;
-    }
-    return result;
-  }
-
-  /**
-   * If there are a number of properties for a given key, this method will split them
-   * on commas (trimming the parts) and return the array of properties
-   * @param key the key for the property
-   * @return array of properties or empty array if property is not specified
-   */
-  public String[] getPropertiesArray(String key){
-    String s = getProperty(key);
-    return (s != null) ? Iterables.toArray(ARRAY_SPLITTER.split(s), String.class) : new String[0];
   }
 
   public Set<String> getUnusedProperties() {
