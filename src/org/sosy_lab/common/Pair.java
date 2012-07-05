@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.ArrayList;
@@ -61,15 +62,11 @@ public class Pair<A, B> {
         return "(" + first + ", " + second + ")";
     }
 
-    private static boolean equals(@Nullable Object x, @Nullable Object y) {
-        return (x == null && y == null) || (x != null && x.equals(y));
-    }
-
     @Override
     public boolean equals(@Nullable Object other) {
     return (other instanceof Pair<?,?>)
-        && equals(first,  ((Pair<?,?>)other).first)
-        && equals(second, ((Pair<?,?>)other).second);
+        && equal(first,  ((Pair<?,?>)other).first)
+        && equal(second, ((Pair<?,?>)other).second);
     }
 
     @Override
