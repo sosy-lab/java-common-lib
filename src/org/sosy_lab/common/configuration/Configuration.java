@@ -46,6 +46,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
 
+import javax.annotation.Nonnull;
+
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.LogManager;
@@ -433,7 +435,7 @@ public class Configuration {
         new MapConstraint<Class<?>, TypeConverter>() {
 
           @Override
-          public void checkKeyValue(Class<?> cls, TypeConverter pValue) {
+          public void checkKeyValue(@Nonnull Class<?> cls, @Nonnull TypeConverter pValue) {
             checkNotNull(cls);
             checkNotNull(pValue);
             if (cls.isAnnotation()

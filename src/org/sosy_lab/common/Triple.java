@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.common;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.base.Function;
 
 
@@ -30,35 +33,35 @@ import com.google.common.base.Function;
  * @param <C>
  */
 public class Triple<A, B, C> {
-    private final A first;
-    private final B second;
-    private final C third;
+    @Nullable private final A first;
+    @Nullable private final B second;
+    @Nullable private final C third;
 
-    public Triple(A first, B second, C third) {
+    public Triple(@Nullable A first, @Nullable B second, @Nullable C third) {
         this.first = first;
         this.second = second;
         this.third = third;
     }
 
-    public static <A, B, C> Triple<A, B, C> of(A first, B second, C third) {
+    public static <A, B, C> Triple<A, B, C> of(@Nullable A first, @Nullable B second, @Nullable C third) {
       return new Triple<A, B, C>(first, second, third);
     }
 
-    public final A getFirst() { return first; }
-    public final B getSecond() { return second; }
-    public final C getThird() { return third; }
+    @Nullable public final A getFirst() { return first; }
+    @Nullable public final B getSecond() { return second; }
+    @Nullable public final C getThird() { return third; }
 
     @Override
     public String toString() {
         return "(" + first + ", " + second + ", " + third + ")";
     }
 
-    private static boolean equals(Object x, Object y) {
+    private static boolean equals(@Nullable Object x, @Nullable Object y) {
         return (x == null && y == null) || (x != null && x.equals(y));
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
     return (other instanceof Triple<?,?,?>)
         && equals(first,  ((Triple<?,?,?>)other).first)
         && equals(second, ((Triple<?,?,?>)other).second)
@@ -113,21 +116,21 @@ public class Triple<A, B, C> {
 
       private final Function<Triple<? extends T, ?, ?>, T> PROJECTION_TO_FIRST = new Function<Triple<? extends T, ?, ?>, T>() {
         @Override
-        public T apply(Triple<? extends T, ?, ?> pArg0) {
+        public T apply(@Nonnull Triple<? extends T, ?, ?> pArg0) {
           return pArg0.getFirst();
         }
       };
 
       private final Function<Triple<?, ? extends T, ?>, T> PROJECTION_TO_SECOND = new Function<Triple<?, ? extends T, ?>, T>() {
         @Override
-        public T apply(Triple<?, ? extends T, ?> pArg0) {
+        public T apply(@Nonnull Triple<?, ? extends T, ?> pArg0) {
           return pArg0.getSecond();
         }
       };
 
       private final Function<Triple<?, ?, ? extends T>, T> PROJECTION_TO_THIRD = new Function<Triple<?, ?, ? extends T>, T>() {
         @Override
-        public T apply(Triple<?, ?, ? extends T> pArg0) {
+        public T apply(@Nonnull Triple<?, ?, ? extends T> pArg0) {
           return pArg0.getThird();
         }
       };

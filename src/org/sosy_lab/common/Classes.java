@@ -30,6 +30,8 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.concurrent.Callable;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 import com.google.common.base.Throwables;
@@ -134,7 +136,7 @@ public final class Classes {
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
-  public static <T, X extends Exception> T createInstance(Class<T> type, Class<? extends T> cls, Class<?>[] argumentTypes, Object[] argumentValues, Class<X> exceptionType) throws X, InvalidConfigurationException {
+  public static <T, X extends Exception> T createInstance(Class<T> type, Class<? extends T> cls, @Nullable Class<?>[] argumentTypes, Object[] argumentValues, Class<X> exceptionType) throws X, InvalidConfigurationException {
     if (argumentTypes == null) {
       // fill argumenTypes array
       argumentTypes = new Class<?>[argumentValues.length];

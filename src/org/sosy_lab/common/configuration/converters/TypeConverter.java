@@ -22,6 +22,8 @@ package org.sosy_lab.common.configuration.converters;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
@@ -62,8 +64,9 @@ public interface TypeConverter {
    * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
    * @throws InvalidConfigurationException If the user specified an invalid value.
    */
+  @Nullable
   Object convert(String optionName, String value, Class<?> type,
-      Type genericType, Annotation secondaryOption) throws InvalidConfigurationException;
+      @Nullable Type genericType, @Nullable Annotation secondaryOption) throws InvalidConfigurationException;
 
   /**
    * Optionally convert the default value for an option that was given in the
@@ -78,6 +81,7 @@ public interface TypeConverter {
    * @throws InvalidConfigurationException
    * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
    */
-  <T> T convertDefaultValue(String optionName, T value, Class<T> type,
-      Type genericType, Annotation secondaryOption) throws InvalidConfigurationException;
+  @Nullable
+  <T> T convertDefaultValue(String optionName, @Nullable T value, Class<T> type,
+      @Nullable Type genericType, @Nullable Annotation secondaryOption) throws InvalidConfigurationException;
 }

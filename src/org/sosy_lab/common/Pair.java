@@ -27,6 +27,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.base.Function;
 
 
@@ -38,32 +41,32 @@ import com.google.common.base.Function;
  * @param <B>
  */
 public class Pair<A, B> {
-    private final A first;
-    private final B second;
+    @Nullable private final A first;
+    @Nullable private final B second;
 
-    private Pair(A first, B second) {
+    private Pair(@Nullable A first, @Nullable B second) {
         this.first = first;
         this.second = second;
     }
 
-    public static <A, B> Pair<A, B> of(A first, B second) {
+    public static <A, B> Pair<A, B> of(@Nullable A first, @Nullable B second) {
       return new Pair<A, B>(first, second);
     }
 
-    public A getFirst() { return first; }
-    public B getSecond() { return second; }
+    @Nullable public A getFirst() { return first; }
+    @Nullable public B getSecond() { return second; }
 
     @Override
     public String toString() {
         return "(" + first + ", " + second + ")";
     }
 
-    private static boolean equals(Object x, Object y) {
+    private static boolean equals(@Nullable Object x, @Nullable Object y) {
         return (x == null && y == null) || (x != null && x.equals(y));
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
     return (other instanceof Pair<?,?>)
         && equals(first,  ((Pair<?,?>)other).first)
         && equals(second, ((Pair<?,?>)other).second);
@@ -108,14 +111,14 @@ public class Pair<A, B> {
 
       private final Function<Pair<? extends T, ?>, T> PROJECTION_TO_FIRST = new Function<Pair<? extends T, ?>, T>() {
         @Override
-        public T apply(Pair<? extends T, ?> pArg0) {
+        public T apply(@Nonnull Pair<? extends T, ?> pArg0) {
           return pArg0.getFirst();
         }
       };
 
       private final Function<Pair<?, ? extends T>, T> PROJECTION_TO_SECOND = new Function<Pair<?, ? extends T>, T>() {
         @Override
-        public T apply(Pair<?, ? extends T> pArg0) {
+        public T apply(@Nonnull Pair<?, ? extends T> pArg0) {
           return pArg0.getSecond();
         }
       };
@@ -123,7 +126,7 @@ public class Pair<A, B> {
       private final Function<Entry<? extends T, ? extends T2>, Pair<T, T2>> PAIR_FROM_MAP_ENTRY = new Function<Entry<? extends T, ? extends T2>, Pair<T, T2>>() {
         @Override
         public Pair<T, T2> apply(
-            Entry<? extends T, ? extends T2> pArg0) {
+            @Nonnull Entry<? extends T, ? extends T2> pArg0) {
           return Pair.<T, T2>of(pArg0.getKey(), pArg0.getValue());
         }
       };

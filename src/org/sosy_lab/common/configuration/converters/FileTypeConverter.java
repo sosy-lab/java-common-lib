@@ -28,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.Files;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -75,7 +77,7 @@ public class FileTypeConverter implements TypeConverter {
   }
 
 
-  private void checkApplicability(Class<?> type, Annotation secondaryOption, String optionName) {
+  private void checkApplicability(Class<?> type, @Nullable Annotation secondaryOption, String optionName) {
     if (!type.equals(File.class)
         || !(secondaryOption instanceof FileOption)) {
 

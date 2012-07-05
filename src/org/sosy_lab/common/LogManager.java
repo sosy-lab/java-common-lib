@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -422,7 +424,7 @@ public class LogManager {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  public void logUserException(Level priority, Throwable e, String additionalMessage) {
+  public void logUserException(Level priority, Throwable e, @Nullable String additionalMessage) {
     if (wouldBeLogged(priority)) {
       String logMessage = "";
       if (priority.equals(Level.SEVERE)) {
@@ -487,7 +489,7 @@ public class LogManager {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  public void logDebugException(Throwable e, String additionalMessage) {
+  public void logDebugException(Throwable e, @Nullable String additionalMessage) {
     logException(exceptionDebugLevel, e, additionalMessage);
   }
 
@@ -514,7 +516,7 @@ public class LogManager {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  public void logException(Level priority, Throwable e, String additionalMessage) {
+  public void logException(Level priority, Throwable e, @Nullable String additionalMessage) {
     if (wouldBeLogged(priority)) {
       String logMessage = "";
 
