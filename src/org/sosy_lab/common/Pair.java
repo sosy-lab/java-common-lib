@@ -186,4 +186,23 @@ public class Pair<A, B> {
         throw new UnsupportedOperationException();
       }
     }
+
+    /**
+     * Create a function which applies two other functions on the first and the
+     * second element of a pair, respectively, and returns a pair of the results.
+     * @param f1 The function applied to the first element of the pair.
+     * @param f2 The function applied to the second element of the pair.
+     * @return A component-wise composition of f1 and f2.
+     */
+    public static <A1, B1, A2, B2> Function<Pair<A1, A2>, Pair<B1, B2>>
+                  componentWise(final Function<? super A1, ? extends B1> f1,
+                                final Function<? super A2, ? extends B2> f2) {
+      return new Function<Pair<A1,A2>, Pair<B1,B2>>() {
+        @Override
+        public Pair<B1, B2> apply(Pair<A1, A2> pInput) {
+          return Pair.<B1, B2>of(f1.apply(pInput.getFirst()),
+                                 f2.apply(pInput.getSecond()));
+        }
+      };
+    }
 }
