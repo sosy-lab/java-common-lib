@@ -24,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -49,7 +51,7 @@ public final class Files {
    *          characters
    * @throws  IOException  If a file could not be created
    */
-  public static File createTempFile(String prefix, String suffix, String content) throws IOException {
+  public static File createTempFile(String prefix, String suffix, @Nullable String content) throws IOException {
     File file = File.createTempFile(prefix, suffix);
     file.deleteOnExit();
 

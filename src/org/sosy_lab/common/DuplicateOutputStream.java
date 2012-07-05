@@ -22,6 +22,8 @@ package org.sosy_lab.common;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 import com.google.common.io.NullOutputStream;
 
@@ -45,7 +47,7 @@ public class DuplicateOutputStream extends OutputStream {
    * Create an output stream that forwards to all given output streams,
    * ignoring null parameters.
    */
-  public static OutputStream mergeStreams(OutputStream stream1, OutputStream stream2) {
+  public static OutputStream mergeStreams(@Nullable OutputStream stream1, @Nullable OutputStream stream2) {
 
     if (stream1 == null) {
       if (stream2 == null) {
