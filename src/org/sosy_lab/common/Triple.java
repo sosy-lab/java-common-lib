@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Objects.equal;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -37,7 +39,7 @@ public class Triple<A, B, C> {
     @Nullable private final B second;
     @Nullable private final C third;
 
-    public Triple(@Nullable A first, @Nullable B second, @Nullable C third) {
+    private Triple(@Nullable A first, @Nullable B second, @Nullable C third) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -56,16 +58,12 @@ public class Triple<A, B, C> {
         return "(" + first + ", " + second + ", " + third + ")";
     }
 
-    private static boolean equals(@Nullable Object x, @Nullable Object y) {
-        return (x == null && y == null) || (x != null && x.equals(y));
-    }
-
     @Override
     public boolean equals(@Nullable Object other) {
     return (other instanceof Triple<?,?,?>)
-        && equals(first,  ((Triple<?,?,?>)other).first)
-        && equals(second, ((Triple<?,?,?>)other).second)
-        && equals(third,  ((Triple<?,?,?>)other).third);
+        && equal(first,  ((Triple<?,?,?>)other).first)
+        && equal(second, ((Triple<?,?,?>)other).second)
+        && equal(third,  ((Triple<?,?,?>)other).third);
     }
 
     @Override
