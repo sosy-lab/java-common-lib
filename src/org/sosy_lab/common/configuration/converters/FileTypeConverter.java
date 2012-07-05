@@ -141,7 +141,8 @@ public class FileTypeConverter implements TypeConverter {
     }
 
     if (file.isDirectory()) {
-      throw new InvalidConfigurationException("Option " + optionName + " needs to specify a file and not a directory");
+      throw new InvalidConfigurationException("Option " + optionName
+          + " specifies a directory instead of a file: " + file);
     }
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
