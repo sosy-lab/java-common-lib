@@ -133,4 +133,27 @@ public class Triple<A, B, C> {
         }
       };
     }
+
+    /**
+     * Create a function which applies three other functions on the first, the
+     * second, and the third element of a triple, respectively,
+     * and returns a triple of the results.
+     * @param f1 The function applied to the first element of the triple.
+     * @param f2 The function applied to the second element of the triple.
+     * @param f3 The function applied to the third element of the triple.
+     * @return A component-wise composition of f1, f2, and f3.
+     */
+    public static <A1, B1, A2, B2, A3, B3> Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>
+                  componentWise(final Function<? super A1, ? extends B1> f1,
+                                final Function<? super A2, ? extends B2> f2,
+                                final Function<? super A3, ? extends B3> f3) {
+      return new Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>() {
+        @Override
+        public Triple<B1, B2, B3> apply(Triple<A1, A2, A3> pInput) {
+          return Triple.<B1, B2, B3>of(f1.apply(pInput.getFirst()),
+                                        f2.apply(pInput.getSecond()),
+                                        f3.apply(pInput.getThird()));
+        }
+      };
+    }
 }
