@@ -465,7 +465,8 @@ public class LogManager {
       if (e instanceof InvalidConfigurationException) {
         // find first method outside of the Configuration class,
         // this is probably the most interesting trace element
-        while (trace[traceIndex].getClassName().equals(Configuration.class.getName())) {
+        String confPackage = Configuration.class.getPackage().getName();
+        while (trace[traceIndex].getClassName().startsWith(confPackage)) {
           traceIndex++;
         }
       }
