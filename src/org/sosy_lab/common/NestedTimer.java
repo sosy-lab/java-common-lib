@@ -42,6 +42,10 @@ public class NestedTimer {
   private long outerMaxTime           = 0;
   private long totalMaxTime           = 0;
 
+  /** The length of the last measured interval */
+  private long lastOuterIntervalLength = 0;
+  private long lastTotalIntervalLength = 0;
+
   /** The number of intervals. */
   private int  totalNumberOfIntervals = 0;
 
@@ -77,15 +81,15 @@ public class NestedTimer {
 
   private long stopOuter0(long endTime) {
     // calculate total time
-    long totalIntervallTime = endTime - outerStartTime;
-    totalMaxTime = Math.max(totalIntervallTime, totalMaxTime);
+    lastTotalIntervalLength = endTime - outerStartTime;
+    totalMaxTime = Math.max(lastTotalIntervalLength, totalMaxTime);
 
     long currentInnerSumTime = innerTimer.getSumTime();
 
     // calculate outer time
-    long outerIntervallTime = totalIntervallTime - currentInnerSumTime;
-    outerSumTime += outerIntervallTime;
-    outerMaxTime = Math.max(outerIntervallTime, outerMaxTime);
+    lastOuterIntervalLength = lastTotalIntervalLength - currentInnerSumTime;
+    outerSumTime += lastOuterIntervalLength;
+    outerMaxTime = Math.max(lastOuterIntervalLength, outerMaxTime);
 
     // update inner times
     innerSumTime += currentInnerSumTime;
@@ -95,7 +99,7 @@ public class NestedTimer {
     outerStartTime = 0;
     innerTimer = null;
 
-    return outerIntervallTime;
+    return lastOuterIntervalLength;
   }
 
   public final long stopBoth() {
@@ -179,6 +183,17 @@ public class NestedTimer {
    * @return number of intervals */
   public final int getNumberOfIntervals() {
     return totalNumberOfIntervals;
+  }
+
+  /** Return the length of the last measured outer interval.
+   * @return  length of interval.
+   */
+  public final long getLengthOfLastOuterInterval() {
+    return lastOuterIntervalLength;
+  }
+
+  public final long getLengthOfLastTotalInterval() {
+    return lastTotalIntervalLength;
   }
 
   /** Return the average of all intervals. If timer is running, return the

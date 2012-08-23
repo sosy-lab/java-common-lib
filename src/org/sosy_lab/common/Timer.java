@@ -124,10 +124,19 @@ public class Timer {
     return numberOfIntervals;
   }
 
-  /** Return the length of the laster measured interval.
+  /** Return the length of the last measured interval.
+   * @return  length of interval.
+   * @deprecated Use {@link #getLengthOfLastInterval()} instead
+   */
+  @Deprecated
+  public final long getLengthOfLasterInterval() {
+    return getLengthOfLastInterval();
+  }
+
+  /** Return the length of the last measured interval.
    * @return  length of interval.
    */
-  public final long getLengthOfLasterInterval() {
+  public final long getLengthOfLastInterval() {
     return this.lastIntervalLength;
   }
 
