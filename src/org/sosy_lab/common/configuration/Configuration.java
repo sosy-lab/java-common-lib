@@ -96,9 +96,10 @@ public class Configuration {
     private void setupProperties() {
       if (properties == null) {
         properties = new HashMap<String, String>();
-      }
-      if (oldConfig != null) {
-        properties.putAll(oldConfig.properties);
+
+        if (oldConfig != null) {
+          properties.putAll(oldConfig.properties);
+        }
       }
     }
 
