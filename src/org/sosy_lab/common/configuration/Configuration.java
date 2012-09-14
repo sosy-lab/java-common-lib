@@ -22,7 +22,6 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Preconditions.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -73,7 +72,6 @@ import com.google.common.collect.MapConstraint;
 import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
-import com.google.common.io.Closeables;
 import com.google.common.primitives.Primitives;
 
 
@@ -173,52 +171,61 @@ public class Configuration {
 
     /**
      * Load options from an InputStream with a "key = value" format.
-     * @see Properties#load(InputStream)
      *
+     * The stream remains open after this method returns.
+     *
+     * @param stream The stream to read from.
+     * @param basePath The directory where relative #include directives should be based on.
+     * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
      * @throws IOException If the stream cannot be read.
+     * @throws InvalidConfigurationException If the stream contains an invalid format.
      */
-    public Builder loadFromStream(InputStream stream) throws IOException {
+    public Builder loadFromStream(InputStream stream, String basePath, String source) throws IOException, InvalidConfigurationException {
       Preconditions.checkNotNull(stream);
       setupProperties();
 
-      Properties p = new Properties();
-      p.load(stream);
-
-      for (Map.Entry<Object, Object> e : p.entrySet()) {
-        properties.put((String)e.getKey(), (String)e.getValue());
-      }
+      properties.putAll(Parser.parse(stream, basePath, source));
 
       return this;
     }
 
     /**
-     * Load options from a file with a "key = value" format.
-     * @see Properties#load(InputStream)
+     * Load options from an InputStream with a "key = value" format.
      *
-     * If this method is called, it has to be the first method call on this
-     * builder instance.
-     * @throws IOException If the file cannot be read.
+     * The stream remains open after this method returns.
+     *
+     * @deprecated Use {@link #loadFromStream(InputStream, String, String)} instead.
+     * @param stream The stream to read from.
+     * @throws IOException If the stream cannot be read.
+     * @throws InvalidConfigurationException If the stream contains an invalid format.
      */
-    public Builder loadFromFile(String filename) throws IOException {
+    @Deprecated
+    public Builder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException {
+      return loadFromStream(stream, "", "unknown source");
+    }
+
+    /**
+     * Load options from a file with a "key = value" format.
+     *
+     * @throws IOException If the file cannot be read.
+     * @throws InvalidConfigurationException If the file contains an invalid format.
+     */
+    public Builder loadFromFile(String filename) throws IOException, InvalidConfigurationException {
       return loadFromFile(new File(filename));
     }
 
     /**
      * Load options from a file with a "key = value" format.
-     * @see Properties#load(InputStream)
      *
      * @throws IOException If the file cannot be read.
+     * @throws InvalidConfigurationException If the file contains an invalid format.
      */
-    public Builder loadFromFile(File file) throws IOException {
+    public Builder loadFromFile(File file) throws IOException, InvalidConfigurationException {
       Preconditions.checkNotNull(file);
+      setupProperties();
 
-      InputStream stream = null;
-      try {
-        stream = new FileInputStream(file);
-        loadFromStream(stream);
-      } finally {
-        Closeables.closeQuietly(stream);
-      }
+      properties.putAll(Parser.parse(file, ""));
+
       return this;
     }
 
