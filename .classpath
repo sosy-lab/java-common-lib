@@ -4,6 +4,8 @@
 	<classpathentry kind="lib" path="bin/"/>
 	<classpathentry kind="lib" path="lib/java/runtime/guava.jar" sourcepath="lib/java-contrib/guava-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/jsr305.jar"/>
+	<classpathentry kind="lib" path="lib/java/test/junit.jar"/>
+	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

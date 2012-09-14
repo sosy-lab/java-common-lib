@@ -14,7 +14,7 @@
     <path id="classpath">
         <pathelement location="${class.dir}"/>
         <fileset dir="lib" includes="*.jar"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar"/>
     </path>
 
     <available property="svn.isworkingcopy" file=".svn"/>
@@ -125,6 +125,35 @@
         <echo message="Options collected." level="info"/>
     </target>
 
+
+<!-- Tests -->
+    <!-- Load the JUnit plugin for Ant if it's not installed. -->
+    <condition property="ant.junit.available">
+        <typefound name="junit"/>
+    </condition>
+    <target name="load-junit" depends="resolve-dependencies" unless="ant.junit.available">
+        <taskdef name="junit"
+                 classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"
+                 classpath="${ivy.jar.dir}/ant-junit.jar"/>
+    </target>
+
+    <target description="Run all JUnit tests" depends="build, load-junit" name="tests">
+        <junit fork="true" printSummary="true" showOutput="false" haltonfailure="true" timeout="10000">
+            <assertions>
+            <enable />
+            </assertions>
+            <formatter type="plain"/>
+            <classpath refid="classpath"/>
+            <batchtest fork="true">
+                <fileset dir="${class.dir}">
+                    <include name="**/*Test.*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+
+<!-- Distribution and publishing -->
     <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
 
     <target name="jar" depends="build">
@@ -147,7 +176,7 @@
         </jar>
     </target>
 
-    <target name="publish" depends="jar,sources">
+    <target name="publish" depends="tests,jar,sources">
         <fail unless="version.publishable"
               message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
         <ivy:publish
