@@ -212,7 +212,7 @@ public class ProcessExecutor<E extends Exception> {
       @Override
       public void onFailure(Throwable e) {
         if (!processFuture.isCancelled()) {
-          logger.logUserException(Level.WARNING, e, "Killing " + name + " due to error in output handling");
+          logger.logUserException(Level.FINEST, e, "Killing " + name + " due to error in output handling");
           processFuture.cancel(true);
 
         } else {
