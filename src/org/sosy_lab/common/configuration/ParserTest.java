@@ -26,28 +26,43 @@ package org.sosy_lab.common.configuration;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.Files;
 import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 
 public class ParserTest {
 
+  private static final String TEST_FILE_SUFFIX = ".properties";
+  private static final String TEST_FILE_PREFIX = "SoSy-Lab_Common_ParserTest";
+
   public ParserTest() { }
 
-  private static Map<String, String> test(String content) throws IOException, InvalidConfigurationException {
-    InputStream stream = new ByteArrayInputStream(content.getBytes(Charsets.UTF_8));
+  private String basePath;
 
-    return Parser.parse(stream, "", "test");
+  @Before
+  public void resetBasePath() {
+    basePath = "";
   }
 
-  private static void testEmpty(String content) {
+  private Map<String, String> test(String content) throws IOException, InvalidConfigurationException {
+    InputStream stream = new ByteArrayInputStream(content.getBytes(Charsets.UTF_8));
+
+    return Parser.parse(stream, basePath, "test");
+  }
+
+  private void testEmpty(String content) {
     try {
       Map<String, String> parsedOptions = test(content);
 
@@ -58,7 +73,7 @@ public class ParserTest {
     }
   }
 
-  private static void testSingleOption(String content, String key, String value) {
+  private void testSingleOption(String content, String key, String value) {
     try {
       Map<String, String> parsedOptions = test(content);
 
@@ -248,5 +263,203 @@ public class ParserTest {
   @Test(expected=InvalidConfigurationFileException.class)
   public final void duplicateOption5() throws IOException, InvalidConfigurationException {
     test("[foo] \n bar=abc \n [] \n foo.bar=abc");
+  }
+
+  @Test
+  public final void simpleInclude() throws IOException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    try {
+      testSingleOption(" #include  " + included.getAbsolutePath() + "\t", "foo.bar", "abc");
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test
+  public final void includeWithSpecialCharsFilename() throws IOException {
+    File included = Files.createTempFile("SoSy-Lab Common\tParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
+    try {
+      testSingleOption(" #include " + included.getAbsolutePath() + "\t", "foo.bar", "abc");
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test
+  public final void includeDepthTwo() throws IOException {
+    File included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath());
+    try {
+      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "abc");
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
+  }
+
+  private static final int MAX_INCLUDE_TEST_DEPTH = 10;
+  @Test
+  public final void includeDepthN() throws IOException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+
+    List<File> allFiles = Lists.newArrayList();
+    allFiles.add(included);
+
+    for (int i = 0; i < MAX_INCLUDE_TEST_DEPTH; i++) {
+      included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.getAbsolutePath());
+      allFiles.add(included);
+    }
+
+    try {
+      testSingleOption("#include " + included.getAbsolutePath(), "foo.bar", "abc");
+    } finally {
+      for (File toDelete : allFiles) {
+        toDelete.delete();
+      }
+    }
+  }
+
+  @Test
+  public final void includeTwice() throws IOException, InvalidConfigurationException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    try {
+      testSingleOption("#include " + included.getAbsolutePath() + "\n#include " + included.getAbsolutePath(), "foo.bar", "abc");
+    } finally {
+      included.delete();
+    }
+  }
+
+
+  @Test(expected=InvalidConfigurationFileException.class)
+  public final void recursiveInclude() throws IOException, InvalidConfigurationException {
+    File included = File.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX);
+    Files.writeFile(included, "#include " + included.getAbsolutePath());
+    try {
+      test("#include " + included.getAbsolutePath());
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test(expected=InvalidConfigurationFileException.class)
+  public final void recursiveIncludeDepthTwo() throws IOException, InvalidConfigurationException {
+    File included1 = File.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX);
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath());
+    Files.writeFile(included1, "#include " + included2.getAbsolutePath());
+    try {
+      test("#include " + included1.getAbsolutePath());
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
+  }
+
+  private static final int MAX_RECURSIVE_INCLUDE_TEST_DEPTH = 10;
+  @Test(expected=InvalidConfigurationFileException.class)
+  public final void recursiveIncludeDepthN() throws IOException, InvalidConfigurationException {
+    File firstIncluded = File.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX);
+
+    List<File> allFiles = Lists.newArrayList();
+    allFiles.add(firstIncluded);
+    File included = firstIncluded;
+
+    for (int i = 0; i < MAX_RECURSIVE_INCLUDE_TEST_DEPTH; i++) {
+      included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.getAbsolutePath());
+      allFiles.add(included);
+    }
+
+    Files.writeFile(firstIncluded, "#include " + included.getAbsolutePath());
+
+    try {
+      test("#include " + included.getAbsolutePath());
+    } finally {
+      for (File toDelete : allFiles) {
+        toDelete.delete();
+      }
+    }
+  }
+
+
+  @Test
+  public final void overwriteIncludedOptionBefore() throws IOException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    try {
+      testSingleOption("foo.bar=123 \n#include " + included.getAbsolutePath(), "foo.bar", "123");
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test
+  public final void overwriteIncludedOptionAfter() throws IOException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    try {
+      testSingleOption("#include " + included.getAbsolutePath() + " \n foo.bar=123", "foo.bar", "123");
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test
+  public final void overwriteIncludedDepthTwo1() throws IOException {
+    File included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath() + "\n foo.bar=xyz");
+    try {
+      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "xyz");
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
+  }
+
+  @Test
+  public final void overwriteIncludedDepthTwo2() throws IOException {
+    File included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath() + "\n foo.bar=xyz");
+    try {
+      testSingleOption("foo.bar=123 \n#include " + included2.getAbsolutePath(), "foo.bar", "123");
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
+  }
+
+
+  @Test
+  public final void contradictoryIncludes() throws IOException {
+    File included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=xyz");
+    try {
+      testSingleOption("#include " + included1.getAbsolutePath() + "\n#include " + included2.getAbsolutePath(), "foo.bar", "xyz");
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
+  }
+
+
+  @Test
+  public final void relativePath1() throws IOException {
+    File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    basePath = included.getParent();
+
+    try {
+      testSingleOption("#include " + included.getName(), "foo.bar", "abc");
+    } finally {
+      included.delete();
+    }
+  }
+
+  @Test
+  public final void relativePath2() throws IOException {
+    File included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    File included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getName());
+
+    try {
+      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "abc");
+    } finally {
+      included1.delete();
+      included2.delete();
+    }
   }
 }
