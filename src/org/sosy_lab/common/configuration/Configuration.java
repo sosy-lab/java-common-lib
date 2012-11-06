@@ -34,6 +34,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -515,7 +516,18 @@ public class Configuration {
   }
 
   public String asPropertiesString() {
-    return Joiner.on('\n').withKeyValueSeparator(" = ").join(properties);
+    String[] lines = new String[properties.size()];
+    int i = 0;
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      lines[i++] = entry.getKey() + " = " + entry.getValue();
+    }
+    Arrays.sort(lines, String.CASE_INSENSITIVE_ORDER);
+    StringBuffer sb = new StringBuffer();
+    for (String line : lines) {
+      sb.append(line);
+      sb.append('\n');
+    }
+    return sb.toString();
   }
 
   /**
