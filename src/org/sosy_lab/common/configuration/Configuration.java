@@ -514,6 +514,10 @@ public class Configuration {
     return Collections.unmodifiableSet(deprecatedProperties);
   }
 
+  public String asPropertiesString() {
+    return Joiner.on('\n').withKeyValueSeparator(" = ").join(properties);
+  }
+
   /**
    * Inject the values of configuration options into an object.
    * The class of the object has to have a {@link Options} annotation, and each
