@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +41,7 @@ import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -84,7 +86,20 @@ public class ProcessExecutor<E extends Exception> {
   protected final LogManager logger;
 
   /**
-   * Create an instance and immediately execute the supplied command.
+   * @see #ProcessExecutor(LogManager, Class, String...)
+   */
+  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd) throws IOException {
+    this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
+  }
+
+  /**
+   * Create an instance and immediately execute the supplied command
+   * with the supplied environment variables.
+   *
+   * The map with the environment parameters will override the values from
+   * the default environment. Values in the map may be null,
+   * which means that this variable is removed from the environment.
+   * Null is not allowed as a key in the map.
    *
    * Whenever a line is read on stdout or stderr of the process,
    * the {@link #handleOutput(String)} or the {@link #handleErrorOutput(String)}
@@ -95,10 +110,14 @@ public class ProcessExecutor<E extends Exception> {
    * Also exceptions thrown by the handling methods would get swallowed.
    *
    * @see Runtime#exec(String[])
+   * @param logger A LogManager for debug output.
+   * @param exceptionClass The type of exception that the handler methods may throw.
+   * @param environmentOverride Map with environment variables to set.
    * @param cmd The command with arguments to execute.
    * @throws IOException If the process cannot be executed.
    */
-  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd) throws IOException {
+  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass,
+      Map<String, String> environmentOverride, String... cmd) throws IOException {
     Preconditions.checkNotNull(cmd);
     Preconditions.checkArgument(cmd.length > 0);
 
@@ -109,7 +128,17 @@ public class ProcessExecutor<E extends Exception> {
     logger.log(Level.FINEST, "Executing", name);
     logger.log(Level.ALL, (Object[])cmd);
 
-    final Process process = Runtime.getRuntime().exec(cmd);
+    ProcessBuilder proc = new ProcessBuilder(cmd);
+    Map<String, String> environment = proc.environment();
+    for (Map.Entry<String, String> entry : environmentOverride.entrySet()) {
+      if (entry.getValue() == null) {
+        environment.remove(entry.getKey());
+      } else {
+        environment.put(entry.getKey(), entry.getValue());
+      }
+    }
+
+    final Process process = proc.start();
     processFuture = executor.submit(new Callable<Integer>() {
 
       // this callable guarantees that when it finishes,
