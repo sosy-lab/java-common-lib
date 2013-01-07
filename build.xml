@@ -3,9 +3,9 @@
 <project basedir="." default="build" name="Sosy-Lab Common Library" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="source.format" value="1.6"/>
+    <property name="source.format" value="1.7"/>
     <property name="source.dir" value="src"/>
-    <property name="class.format" value="1.6"/>
+    <property name="class.format" value="1.7"/>
     <property name="class.dir" value="bin"/>
 
     <antversion property="ant.version.exact"/> <!-- Define property that contains the Ant version. -->
