@@ -78,8 +78,8 @@ public class ProcessExecutor<E extends Exception> {
   private final ListenableFuture<?> errFuture;
   private final ListenableFuture<Integer> processFuture;
 
-  private final List<String> output = new ArrayList<String>();
-  private final List<String> errorOutput = new ArrayList<String>();
+  private final List<String> output = new ArrayList<>();
+  private final List<String> errorOutput = new ArrayList<>();
 
   private boolean finished = false;
 

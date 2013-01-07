@@ -127,7 +127,7 @@ class Parser {
 
     Files.checkReadableFile(file);
 
-    includeStack = new HashSet<String>(includeStack);
+    includeStack = new HashSet<>(includeStack);
     boolean newFile = includeStack.add(file.getAbsolutePath());
     if (!newFile) {
       throw new InvalidConfigurationFileException("Circular inclusion of file " + file.getAbsolutePath());
