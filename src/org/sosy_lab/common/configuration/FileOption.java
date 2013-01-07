@@ -25,15 +25,16 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.file.Path;
 
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 
 /**
- * This is an annotation providing more features for options of type {@link File}.
+ * This is an annotation providing more features for options of types {@link File} and {@link Path}.
  * In order to use it, you need to register an instance of {@link FileTypeConverter}
  * as a converter for {@link FileOption}.
  */
-@OptionDetailAnnotation(applicableTo=File.class)
+@OptionDetailAnnotation(applicableTo={File.class, Path.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

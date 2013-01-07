@@ -466,9 +466,12 @@ public class OptionCollector {
           defaultValue = defaultValue.substring(0, defaultValue.indexOf("//"));
         }
 
-        // remove brckets from file: new File("example.txt") --> "example.txt"
+        // remove brackets from file: new File("example.txt") --> "example.txt"
         if (defaultValue.startsWith("new File(")) {
           defaultValue = defaultValue.substring("new File(".length(), defaultValue.length() - 1);
+        }
+        if (defaultValue.startsWith("Paths.get(")) {
+          defaultValue = defaultValue.substring("Paths.get(".length(), defaultValue.length() - 1);
         }
 
         if (defaultValue.startsWith("ImmutableSet.of(")) {

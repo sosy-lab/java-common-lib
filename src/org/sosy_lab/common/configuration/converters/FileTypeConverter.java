@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
@@ -37,8 +39,10 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
- * A {@link TypeConverter} for options of type {@link File} which offers some
+ * A {@link TypeConverter} for options of type {@link File} or {@link Path} which offers some
  * additional features like a common base directory for all output files.
  * In order to use these features, the options need to be annotated with
  * {@link FileOption}.
@@ -55,9 +59,11 @@ import org.sosy_lab.common.configuration.Options;
 @Options
 public class FileTypeConverter implements TypeConverter {
 
+  private static final ImmutableSet<Class<?>> SUPPORTED_TYPES = ImmutableSet.<Class<?>>of(File.class, Path.class);
 
   @Option(name="output.path", description="directory to put all output files in")
   private String outputDirectory = "output/";
+  private final Path outputPath;
 
   @Option(name="output.disable", description="disable all default output files"
     + "\n(any explicitly given file will still be written)")
@@ -66,19 +72,25 @@ public class FileTypeConverter implements TypeConverter {
   @Option (description="base directory for all input & output files"
     + "\n(except for the configuration file itself)")
   private String rootDirectory = ".";
-
+  private final Path rootPath;
 
   public FileTypeConverter(Configuration config) throws InvalidConfigurationException {
     config.inject(this, FileTypeConverter.class);
+
+    rootPath = Paths.get(rootDirectory);
+    outputPath = rootPath.resolve(outputDirectory);
   }
 
   public String getOutputDirectory() {
-    return outputDirectory;
+    return outputPath.toString();
   }
 
+  public Path getOutputPath() {
+    return outputPath;
+  }
 
   private void checkApplicability(Class<?> type, @Nullable Annotation secondaryOption, String optionName) {
-    if (!type.equals(File.class)
+    if (!SUPPORTED_TYPES.contains(type)
         || !(secondaryOption instanceof FileOption)) {
 
       throw new UnsupportedOperationException("A FileTypeConverter can handle only options of type File and with a @FileOption annotation, but " + optionName + " does not fit.");
@@ -86,23 +98,23 @@ public class FileTypeConverter implements TypeConverter {
   }
 
   @Override
-  public File convert(String optionName, String pValue, Class<?> pType, Type pGenericType,
+  public Object convert(String optionName, String pValue, Class<?> pType, Type pGenericType,
       Annotation secondaryOption) throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    return handleFileOption(optionName, new File(pValue), ((FileOption)secondaryOption).value());
+    return handleFileOption(optionName, Paths.get(pValue), ((FileOption)secondaryOption).value(), pType);
   }
 
   @Override
-  public <T> T convertDefaultValue(String optionName, T defaultValue, Class<T> pType, Type pGenericType,
+  public <T> T convertDefaultValue(String optionName, T pDefaultValue, Class<T> pType, Type pGenericType,
       Annotation secondaryOption) throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 
     FileOption.Type typeInfo = ((FileOption)secondaryOption).value();
 
-    if (defaultValue == null) {
+    if (pDefaultValue == null) {
       if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
         throw new UnsupportedOperationException("The option " + optionName + " specifies a required input file, but the option is neither required nor has a default value.");
       }
@@ -115,8 +127,15 @@ public class FileTypeConverter implements TypeConverter {
       return null;
     }
 
+    Path defaultValue;
+    if (pType.equals(File.class)) {
+      defaultValue = ((File)pDefaultValue).toPath();
+    } else {
+      defaultValue = (Path)pDefaultValue;
+    }
+
     @SuppressWarnings("unchecked")
-    T value = (T)handleFileOption(optionName, (File)defaultValue, typeInfo);
+    T value = (T)handleFileOption(optionName, defaultValue, typeInfo, pType);
     return value;
   }
 
@@ -127,20 +146,17 @@ public class FileTypeConverter implements TypeConverter {
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
-  private File handleFileOption(final String optionName, File file, final FileOption.Type typeInfo)
+  private Object handleFileOption(final String optionName, Path file, final FileOption.Type typeInfo,
+          final Class<?> targetType)
           throws InvalidConfigurationException {
 
     if (typeInfo == FileOption.Type.OUTPUT_FILE) {
-      if (!file.isAbsolute()) {
-        file = new File(outputDirectory, file.getPath());
-      }
+      file = outputPath.resolve(file);
+    } else {
+      file = rootPath.resolve(file);
     }
 
-    if (!file.isAbsolute()) {
-      file = new File(rootDirectory, file.getPath());
-    }
-
-    if (file.isDirectory()) {
+    if (java.nio.file.Files.isDirectory(file)) {
       throw new InvalidConfigurationException("Option " + optionName
           + " specifies a directory instead of a file: " + file);
     }
@@ -154,6 +170,11 @@ public class FileTypeConverter implements TypeConverter {
       }
     }
 
-    return file;
+    if (targetType.equals(File.class)) {
+      return file.toFile();
+    } else {
+      assert targetType.equals(Path.class);
+      return file;
+    }
   }
 }
