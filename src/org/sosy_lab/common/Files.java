@@ -19,10 +19,14 @@
  */
 package org.sosy_lab.common;
 
+import static java.nio.file.StandardOpenOption.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 
 import javax.annotation.Nullable;
 
@@ -57,7 +61,7 @@ public final class Files {
 
     if (!Strings.isNullOrEmpty(content)) {
       try {
-        com.google.common.io.Files.write(content, file, Charset.defaultCharset());
+        writeFile(file, content);
       } catch (IOException e) {
         file.delete();
 
@@ -74,8 +78,21 @@ public final class Files {
    * @throws IOException
    */
   public static void writeFile(File file, Object content) throws IOException {
-    com.google.common.io.Files.createParentDirs(file);
-    com.google.common.io.Files.write(content.toString(), file, Charset.defaultCharset());
+    writeFile(file.toPath(), content);
+  }
+
+  /**
+   * Writes content to a file.
+   * @param file The file.
+   * @param content The content which shall be written.
+   * @throws IOException
+   */
+  public static void writeFile(Path file, Object content) throws IOException {
+    java.nio.file.Files.createDirectories(file.getParent());
+
+    try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset())) {
+      w.write(content.toString());
+    }
   }
 
   /**
@@ -85,7 +102,22 @@ public final class Files {
    * @throws IOException
    */
   public static void appendToFile(File file, Object content) throws IOException {
-    com.google.common.io.Files.append(content.toString(), file, Charset.defaultCharset());
+    appendToFile(file.toPath(), content);
+  }
+
+  /**
+   * Writes content to a file.
+   * @param file The file.
+   * @param content The content which will be written to the end of the file.
+   * @throws IOException
+   */
+  public static void appendToFile(Path file, Object content) throws IOException {
+    java.nio.file.Files.createDirectories(file.getParent());
+
+    try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset(),
+        APPEND, CREATE)) {
+      w.write(content.toString());
+    }
   }
 
   /**
@@ -96,18 +128,30 @@ public final class Files {
    * @throws FileNotFoundException If one of the conditions is not true.
    */
   public static void checkReadableFile(File file) throws FileNotFoundException {
+    checkReadableFile(file.toPath());
+  }
+
+
+  /**
+   * Verifies if a file exists, is a normal file and is readable. If this is not
+   * the case, a FileNotFoundException with a nice message is thrown.
+   *
+   * @param file The file to check.
+   * @throws FileNotFoundException If one of the conditions is not true.
+   */
+  public static void checkReadableFile(Path file) throws FileNotFoundException {
     Preconditions.checkNotNull(file);
 
-    if (!file.exists()) {
-      throw new FileNotFoundException("File " + file.getAbsolutePath() + " does not exist!");
+    if (!java.nio.file.Files.exists(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " does not exist!");
     }
 
-    if (!file.isFile()) {
-      throw new FileNotFoundException("File " + file.getAbsolutePath() + " is not a normal file!");
+    if (!java.nio.file.Files.isRegularFile(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not a normal file!");
     }
 
-    if (!file.canRead()) {
-      throw new FileNotFoundException("File " + file.getAbsolutePath() + " is not readable!");
+    if (!java.nio.file.Files.isReadable(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not readable!");
     }
   }
 }
