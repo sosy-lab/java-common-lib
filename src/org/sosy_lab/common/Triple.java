@@ -46,7 +46,7 @@ public class Triple<A, B, C> {
     }
 
     public static <A, B, C> Triple<A, B, C> of(@Nullable A first, @Nullable B second, @Nullable C third) {
-      return new Triple<A, B, C>(first, second, third);
+      return new Triple<>(first, second, third);
     }
 
     @Nullable public final A getFirst() { return first; }

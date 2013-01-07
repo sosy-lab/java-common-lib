@@ -94,7 +94,7 @@ public class Configuration {
 
     private void setupProperties() {
       if (properties == null) {
-        properties = new HashMap<String, String>();
+        properties = new HashMap<>();
 
         if (oldConfig != null) {
           properties.putAll(oldConfig.properties);
@@ -319,8 +319,8 @@ public class Configuration {
         newUnusedProperties = oldConfig.unusedProperties;
         newDeprecatedProperties = oldConfig.deprecatedProperties;
       } else {
-        newUnusedProperties = new HashSet<String>(newProperties.keySet());
-        newDeprecatedProperties = new HashSet<String>(0);
+        newUnusedProperties = new HashSet<>(newProperties.keySet());
+        newDeprecatedProperties = new HashSet<>(0);
       }
 
       Configuration newConfig = new Configuration(newProperties, newPrefix,
@@ -540,7 +540,7 @@ public class Configuration {
    * - all enum types
    * - {@link String} and arrays of it
    * - {@link File} (the field {@link Option#type()} is required in this case!)
-   * - {@link Class<Something>}
+   * - {@link Class <Something>}
    * - {@link java.util.logging.Level}
    * - arrays of the above types
    * - collection types {@link Iterable}, {@link Collection}, {@link List},
@@ -1016,7 +1016,7 @@ public class Configuration {
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
 
-    List<Object> result = new ArrayList<Object>();
+    List<Object> result = new ArrayList<>();
 
     for (String item : values) {
       result.add(convertSingleValue(optionName, item, type, genericType, secondaryOption));

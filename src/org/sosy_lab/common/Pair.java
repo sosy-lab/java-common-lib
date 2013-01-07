@@ -51,7 +51,7 @@ public class Pair<A, B> {
     }
 
     public static <A, B> Pair<A, B> of(@Nullable A first, @Nullable B second) {
-      return new Pair<A, B>(first, second);
+      return new Pair<>(first, second);
     }
 
     @Nullable public A getFirst() { return first; }
@@ -130,7 +130,7 @@ public class Pair<A, B> {
     }
 
     public static <A, B> List<Pair<A, B>> zipList(Collection<? extends A> a, Collection<? extends B> b) {
-      List<Pair<A, B>> result = new ArrayList<Pair<A, B>>(a.size());
+      List<Pair<A, B>> result = new ArrayList<>(a.size());
 
       Iterator<? extends A> iteratorA = a.iterator();
       Iterator<? extends B> iteratorB = b.iterator();
@@ -148,7 +148,7 @@ public class Pair<A, B> {
       return new Iterable<Pair<A, B>>() {
         @Override
         public Iterator<Pair<A, B>> iterator() {
-          return new ZipIterator<A, B>(a.iterator(), b.iterator());
+          return new ZipIterator<>(a.iterator(), b.iterator());
         }
       };
     }

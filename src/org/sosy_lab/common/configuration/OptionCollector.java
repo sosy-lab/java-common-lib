@@ -44,7 +44,7 @@ import com.google.common.io.Resources;
 public class OptionCollector {
 
   private final static int CHARS_PER_LINE = 75; // for description
-  private final static HashSet<String> errorMessages = new LinkedHashSet<String>();
+  private final static HashSet<String> errorMessages = new LinkedHashSet<>();
   private static String sourcePath = "";
 
   /** The main-method collects all classes of a program and
@@ -72,8 +72,7 @@ public class OptionCollector {
     sourcePath = getSourcePath();
 
     // TreeMap for alphabetical order of keys
-    final SortedMap<String, Pair<String, String>> map =
-        new TreeMap<String, Pair<String, String>>();
+    final SortedMap<String, Pair<String, String>> map = new TreeMap<>();
 
     // redirect stdout to stderr so that error messages that are printed
     // when classes are loaded appear in stderr
@@ -270,7 +269,7 @@ public class OptionCollector {
     final String[] lines = text.split("\n");
 
     // split lines into more lines, if they are too long
-    final List<String> splittedLines = new ArrayList<String>();
+    final List<String> splittedLines = new ArrayList<>();
     for (String line : lines) {
       while (line.length() > CHARS_PER_LINE) {
 
@@ -621,7 +620,7 @@ public class OptionCollector {
   private static List<Class<?>> getClasses() {
     Enumeration<URL> resources = getClassLoaderResources();
 
-    final List<Class<?>> classes = new ArrayList<Class<?>>();
+    final List<Class<?>> classes = new ArrayList<>();
     while (resources.hasMoreElements()) {
       final File file = new File(resources.nextElement().getFile());
       collectClasses(file, "", classes);
