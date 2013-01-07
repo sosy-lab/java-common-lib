@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -130,12 +131,17 @@ public class OptionCollector {
     // and check, if the result is a folder.
     // '/src/org/sosy_lab/X' is the default location of program X.
     while (resources.hasMoreElements()) {
-      final File file = new File(resources.nextElement().getFile());
-      final String testPath =
-          file.toString().substring(0, file.toString().length() - 3);
-      if (new File(testPath + "src/org/sosy_lab").isDirectory()) {
-        return testPath + "src/";
+      try {
+        File file = new File(resources.nextElement().toURI());
+        final String testPath =
+            file.toString().substring(0, file.toString().length() - 3);
+        if (new File(testPath + "src/org/sosy_lab").isDirectory()) {
+          return testPath + "src/";
+        }
+      } catch (URISyntaxException e) {
+        // ignore, a warning will be printed later on if the source cannot be found
       }
+
     }
     return "";
   }
@@ -622,8 +628,13 @@ public class OptionCollector {
 
     final List<Class<?>> classes = new ArrayList<>();
     while (resources.hasMoreElements()) {
-      final File file = new File(resources.nextElement().getFile());
-      collectClasses(file, "", classes);
+      URL url = resources.nextElement();
+      try {
+        File file = new File(url.toURI());
+        collectClasses(file, "", classes);
+      } catch (URISyntaxException e) {
+        System.err.println("Ignoring files in " + url);
+      }
     }
 
     return classes;
