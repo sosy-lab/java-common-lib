@@ -24,12 +24,11 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1
@@ -46,12 +45,17 @@ public class JSON {
    * @throws IOException
    */
   public static void writeJSONString(Object value, File file, Charset charset) throws IOException {
-    Files.createParentDirs(file);
-    Writer out = Files.newWriter(file, charset);
-    try {
+    writeJSONString(value, file.toPath(), charset);
+  }
+
+  /**
+   * Encode an object into JSON text and write it to a file.
+   * @throws IOException
+   */
+  public static void writeJSONString(Object value, Path file, Charset charset) throws IOException {
+    Files.createDirectories(file.getParent());
+    try (Writer out = Files.newBufferedWriter(file, charset)) {
       writeJSONString(value, out);
-    } finally {
-      Closeables.closeQuietly(out);
     }
   }
 
