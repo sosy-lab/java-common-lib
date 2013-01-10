@@ -21,6 +21,7 @@ package org.sosy_lab.common;
 
 import static java.nio.file.StandardOpenOption.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -91,8 +92,14 @@ public final class Files {
     java.nio.file.Files.createDirectories(file.getParent());
 
     try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset())) {
-      w.write(content.toString());
+      Appenders.appendTo(w, content);
     }
+  }
+
+  public static BufferedWriter openOutputFile(Path file) throws IOException {
+    java.nio.file.Files.createDirectories(file.getParent());
+
+    return java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset());
   }
 
   /**
@@ -116,7 +123,7 @@ public final class Files {
 
     try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset(),
         APPEND, CREATE)) {
-      w.write(content.toString());
+      Appenders.appendTo(w, content);
     }
   }
 
