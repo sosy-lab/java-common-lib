@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 
 import javax.annotation.Nullable;
 
@@ -64,12 +66,97 @@ public final class Files {
       try {
         writeFile(file, content);
       } catch (IOException e) {
-        file.delete();
+        // creation was successful, but writing failed
+        // -> delete file
+        delete(file.toPath(), e);
 
         throw e;
       }
     }
     return file;
+  }
+
+  /**
+   * Create a temporary file similar to
+   * {@link java.nio.file.Files#createTempFile(String, String, FileAttribute...)}.
+   *
+   * The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseFile},
+   * which deletes the file as soon as {@link DeleteOnCloseFile#close()} is called.
+   *
+   * It is recommended to use the following pattern:
+   * <code>
+   * try (DeleteOnCloseFile tempFile = Files.createTempFile(...)) {
+   *   // use tempFile.toPath() for writing and reading of the temporary file
+   * }
+   * </code>
+   *
+   * The difference to using {@link StandardOpenOption#DELETE_ON_CLOSE} is that
+   * the file can be opened and closed multiple times,
+   * potentially from different processes.
+   *
+   * @param prefix
+   * @param suffix
+   * @return
+   * @throws IOException
+   */
+  public static DeleteOnCloseFile createTempFile(String prefix, String suffix,
+      FileAttribute<?>... attrs) throws IOException {
+    return new DeleteOnCloseFile(java.nio.file.Files.createTempFile(prefix, suffix, attrs));
+  }
+
+  /**
+   * A simple wrapper around {@link Path} that calls
+   * {@link java.nio.file.Files#delete(Path)} from {@link AutoCloseable#close()}.
+   */
+  public static class DeleteOnCloseFile implements AutoCloseable {
+
+    private Path file;
+
+    private DeleteOnCloseFile(Path pFile) {
+      file = pFile;
+    }
+
+    public Path toPath() {
+      return file;
+    }
+
+    @Override
+    public void close() throws IOException {
+      java.nio.file.Files.delete(file);
+    }
+  }
+
+  /**
+   * Try to delete a file by calling {@link java.nio.file.Files#delete(Path)}.
+   *
+   * If deleting fails, and an exception is given as second parameter,
+   * the exception from the deletion is added to the given exception,
+   * otherwise it is thrown.
+   *
+   * It is suggested to use this method as follows:
+   * <code>
+   * try {
+   *    // write to file "f"
+   * } catch (IOException e) {
+   *    Files.delete(f, e);
+   *    throw e;
+   * }
+   * </code>
+   *
+   * @param file The file to delete.
+   * @param pendingException An optional pending exception.
+   * @throws IOException If deletion fails and no pending exception was given.
+   */
+  public static void delete(Path file, @Nullable IOException pendingException) throws IOException {
+    try {
+      java.nio.file.Files.delete(file);
+    } catch (IOException deleteException) {
+      if (pendingException != null) {
+        pendingException.addSuppressed(deleteException);
+      } else {
+        throw deleteException;
+      }
+    }
   }
 
   /**
