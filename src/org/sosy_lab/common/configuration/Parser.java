@@ -25,7 +25,6 @@ package org.sosy_lab.common.configuration;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,7 +39,6 @@ import org.sosy_lab.common.Files;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
@@ -133,11 +131,8 @@ class Parser {
       throw new InvalidConfigurationFileException("Circular inclusion of file " + file.getAbsolutePath());
     }
 
-    InputStream is = new FileInputStream(file);
-    try {
+    try (InputStream is = java.nio.file.Files.newInputStream(file.toPath())) {
       return parse(is, file.getParent(), file.getPath(), includeStack);
-    } finally {
-      Closeables.closeQuietly(is);
     }
   }
 
