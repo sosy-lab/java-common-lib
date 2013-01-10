@@ -50,7 +50,7 @@ public class Appenders {
    * @return an {@link Appender} instance
    */
   public static Appender createAppender(@Nullable final Object o) {
-    if (o instanceof AbstractAppender) {
+    if (o instanceof Appender) {
       return (Appender)o;
     } else {
       return fromToStringMethod(o);
@@ -67,7 +67,7 @@ public class Appenders {
    * @throws IOException If the appendable throws an IOException
    */
   public static void appendTo(final Appendable output,  @Nullable final Object o) throws IOException {
-    if (o instanceof AbstractAppender) {
+    if (o instanceof Appender) {
       ((Appender)o).appendTo(output);
     } else {
       output.append(Objects.toString(o));
