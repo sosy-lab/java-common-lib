@@ -185,9 +185,8 @@ public class ProcessExecutor<E extends Exception> {
     outFuture = executor.submit(new Callable<Void>() {
           @Override
           public Void call() throws E, IOException {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+              String line;
               while ((line = reader.readLine()) != null) {
                 handleOutput(line);
               }
@@ -201,9 +200,6 @@ public class ProcessExecutor<E extends Exception> {
               } else {
                 throw e;
               }
-
-            } finally {
-              Closeables.closeQuietly(reader);
             }
             return null;
           }
@@ -212,8 +208,7 @@ public class ProcessExecutor<E extends Exception> {
     errFuture = executor.submit(new Callable<Void>() {
           @Override
           public Void call() throws E, IOException {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
               String line;
               while ((line = reader.readLine()) != null) {
                 handleErrorOutput(line);
@@ -228,9 +223,6 @@ public class ProcessExecutor<E extends Exception> {
               } else {
                 throw e;
               }
-
-            } finally {
-              Closeables.closeQuietly(reader);
             }
             return null;
           }
