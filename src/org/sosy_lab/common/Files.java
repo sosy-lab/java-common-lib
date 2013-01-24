@@ -184,7 +184,10 @@ public final class Files {
   }
 
   public static BufferedWriter openOutputFile(Path file) throws IOException {
-    java.nio.file.Files.createDirectories(file.getParent());
+    Path dir = file.getParent();
+    if (dir != null) {
+      java.nio.file.Files.createDirectories(dir);
+    }
 
     return java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset());
   }
