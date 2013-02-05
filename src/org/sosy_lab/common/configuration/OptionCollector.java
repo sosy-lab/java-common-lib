@@ -504,18 +504,13 @@ public class OptionCollector {
     // if the type is enum,
     // the allowed values can be extracted the enum-class
     if (type.isEnum()) {
-      try {
-        final Field[] enums =
-            Class.forName(type.toString().substring(6)).getFields();
-        final String[] enumTitles = new String[enums.length];
-        for (int i = 0; i < enums.length; i++) {
-          enumTitles[i] = enums[i].getName();
-        }
-        allowedValues =
-            "  enum:     " + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
-      } catch (ClassNotFoundException e) {
-        // ignore, exception should not happen
+      final Object[] enums = type.getEnumConstants();
+      final String[] enumTitles = new String[enums.length];
+      for (int i = 0; i < enums.length; i++) {
+        enumTitles[i] = ((Enum<?>)enums[i]).name();
       }
+      allowedValues =
+          "  enum:     " + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
     }
 
     allowedValues += getOptionValues(field, verbose);
