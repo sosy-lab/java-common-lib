@@ -28,8 +28,12 @@ import java.util.SortedSet;
 
 import javax.annotation.CheckReturnValue;
 
-
-public interface PersistentSortedMap<K extends Comparable<? super K>, V> extends PersistentMap<K, V>, SortedMap<K, V> {
+/**
+ * Sub-interface of {@link PersistentMap} analog to {@link SortedMap}.
+ * @param <K> The type of keys.
+ * @param <V> The type of values.
+ */
+public interface PersistentSortedMap<K, V> extends PersistentMap<K, V>, SortedMap<K, V> {
 
   @Override
   @CheckReturnValue
