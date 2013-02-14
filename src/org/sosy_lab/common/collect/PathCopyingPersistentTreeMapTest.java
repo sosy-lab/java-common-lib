@@ -25,9 +25,14 @@ package org.sosy_lab.common.collect;
 
 import static org.junit.Assert.*;
 
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
 
 
 public class PathCopyingPersistentTreeMapTest {
@@ -44,230 +49,243 @@ public class PathCopyingPersistentTreeMapTest {
     map = null;
   }
 
+  private void put(String key, String value) {
+    PersistentSortedMap<String, String> oldMap = map;
+    int oldMapSize = oldMap.size();
+    String oldMapStr = oldMap.toString();
+
+    map = map.putAndCopy(key, value);
+
+    assertEquals(oldMapSize, oldMap.size());
+    assertEquals(oldMapStr, oldMap.toString());
+
+    assertEquals(value, map.get(key));
+
+    if (oldMap.containsKey(key)) {
+      assertEquals(oldMap.size(), map.size());
+
+      if (oldMap.get(key).equals(value)) {
+        assertEquals(oldMap.toString(), map.toString());
+        assertEquals(oldMap.hashCode(), map.hashCode());
+        assertEquals(oldMap, map);
+      } else {
+        assertFalse(map.equals(oldMap));
+      }
+
+    } else {
+      assertEquals(oldMap.size()+1, map.size());
+      assertFalse(map.equals(oldMap));
+    }
+  }
+
+  private void remove(String key) {
+    PersistentSortedMap<String, String> oldMap = map;
+    int oldMapSize = oldMap.size();
+    String oldMapStr = oldMap.toString();
+
+    map = map.removeAndCopy(key);
+
+    assertEquals(oldMapSize, oldMap.size());
+    assertEquals(oldMapStr, oldMap.toString());
+
+    assertFalse(map.containsKey(key));
+
+    if (oldMap.containsKey(key)) {
+      assertEquals(oldMap.size()-1, map.size());
+      assertFalse(map.equals(oldMap));
+
+    } else {
+      assertEquals(oldMap.size(), map.size());
+      assertEquals(oldMap.toString(), map.toString());
+      assertEquals(oldMap.hashCode(), map.hashCode());
+      assertEquals(oldMap, map);
+    }
+  }
 
   @Test
-  public void testRightmostInsert() {
-    map = map.putAndCopy("a", "1");
+  public void testEmpty() {
+    assertEquals(map.toString(), "[]");
+    assertTrue(map.isEmpty());
+    assertEquals(0, map.size());
+    assertEquals(0, map.hashCode());
+  }
 
-    assertEquals(map.get("a"), "1");
+  @Test
+  public void putABCD() {
+    put("a", "1");
     assertEquals(map.toString(), "[a=1]");
 
-    map = map.putAndCopy("b", "2");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("b"), "2");
+    put("b", "2");
     assertEquals(map.toString(), "[a=1, b=2]");
 
-    map = map.putAndCopy("c", "3");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("b"), "2");
-    assertEquals(map.get("c"), "3");
+    put("c", "3");
     assertEquals(map.toString(), "[a=1, b=2, c=3]");
 
-    map = map.putAndCopy("d", "4");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("b"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("d"), "4");
+    put("d", "4");
     assertEquals(map.toString(), "[a=1, b=2, c=3, d=4]");
-
-    map = map.removeAndCopy("d");
-    assertFalse(map.containsKey("d"));
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("b"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.toString(), "[a=1, b=2, c=3]");
-
-    map = map.removeAndCopy("c");
-    assertFalse(map.containsKey("c"));
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("b"), "2");
-    assertEquals(map.toString(), "[a=1, b=2]");
-
-    map = map.removeAndCopy("b");
-    assertFalse(map.containsKey("b"));
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.toString(), "[a=1]");
-
-    map = map.removeAndCopy("a");
-    assertFalse(map.containsKey("a"));
-    assertTrue(map.isEmpty());
-    assertEquals(map.toString(), "[]");
   }
 
   @Test
-  public void testLeftmostInsert() {
-    map = map.putAndCopy("z", "1");
-
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.toString(), "[z=1]");
-
-    map = map.putAndCopy("y", "2");
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.get("y"), "2");
-    assertEquals(map.toString(), "[y=2, z=1]");
-
-    map = map.putAndCopy("x", "3");
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.get("y"), "2");
-    assertEquals(map.get("x"), "3");
-    assertEquals(map.toString(), "[x=3, y=2, z=1]");
-
-    map = map.putAndCopy("w", "4");
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.get("y"), "2");
-    assertEquals(map.get("x"), "3");
-    assertEquals(map.get("w"), "4");
-    assertEquals(map.toString(), "[w=4, x=3, y=2, z=1]");
-
-    map = map.removeAndCopy("w");
-    assertFalse(map.containsKey("w"));
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.get("y"), "2");
-    assertEquals(map.get("x"), "3");
-    assertEquals(map.toString(), "[x=3, y=2, z=1]");
-
-    map = map.removeAndCopy("x");
-    assertFalse(map.containsKey("x"));
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.get("y"), "2");
-    assertEquals(map.toString(), "[y=2, z=1]");
-
-    map = map.removeAndCopy("y");
-    assertFalse(map.containsKey("y"));
-    assertEquals(map.get("z"), "1");
-    assertEquals(map.toString(), "[z=1]");
-
-    map = map.removeAndCopy("z");
-    assertFalse(map.containsKey("z"));
-    assertTrue(map.isEmpty());
-    assertEquals(map.toString(), "[]");
+  public void removeDCBA() {
+    remove("d");
+    remove("c");
+    remove("b");
+    remove("a");
   }
 
   @Test
-  public void testInnerInsert() {
-    map = map.putAndCopy("a", "1");
+  public void putDCBA() {
+    put("d", "1");
+    assertEquals(map.toString(), "[d=1]");
 
-    assertEquals(map.get("a"), "1");
+    put("c", "2");
+    assertEquals(map.toString(), "[c=2, d=1]");
+
+    put("b", "3");
+    assertEquals(map.toString(), "[b=3, c=2, d=1]");
+
+    put("a", "4");
+    assertEquals(map.toString(), "[a=4, b=3, c=2, d=1]");
+  }
+
+  @Test
+  public void removeABCD() {
+    remove("a");
+    remove("b");
+    remove("c");
+    remove("d");
+  }
+
+  @Test
+  public void testRight() {
+    putABCD();
+    removeDCBA();
+    testEmpty();
+  }
+
+  @Test
+  public void testLeft() {
+    putDCBA();
+    removeABCD();
+    testEmpty();
+  }
+
+  @Test
+  public void testRightLeft() {
+    putABCD();
+    removeABCD();
+    testEmpty();
+  }
+
+  @Test
+  public void testLeftRight() {
+    putDCBA();
+    removeDCBA();
+    testEmpty();
+  }
+
+  @Test
+  public void testInner() {
+    put("a", "1");
     assertEquals(map.toString(), "[a=1]");
 
-    map = map.putAndCopy("z", "2");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
+    put("z", "2");
     assertEquals(map.toString(), "[a=1, z=2]");
 
-    map = map.putAndCopy("b", "3");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
+    put("b", "3");
     assertEquals(map.toString(), "[a=1, b=3, z=2]");
 
-    map = map.putAndCopy("y", "4");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
-    assertEquals(map.get("y"), "4");
+    put("y", "4");
     assertEquals(map.toString(), "[a=1, b=3, y=4, z=2]");
 
-    map = map.putAndCopy("c", "5");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
-    assertEquals(map.get("y"), "4");
-    assertEquals(map.get("c"), "5");
+    put("c", "5");
     assertEquals(map.toString(), "[a=1, b=3, c=5, y=4, z=2]");
 
-    map = map.putAndCopy("x", "6");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
-    assertEquals(map.get("y"), "4");
-    assertEquals(map.get("c"), "5");
-    assertEquals(map.get("x"), "6");
+    put("x", "6");
     assertEquals(map.toString(), "[a=1, b=3, c=5, x=6, y=4, z=2]");
 
-    map = map.putAndCopy("d", "7");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
-    assertEquals(map.get("y"), "4");
-    assertEquals(map.get("c"), "5");
-    assertEquals(map.get("x"), "6");
-    assertEquals(map.get("d"), "7");
+    put("d", "7");
     assertEquals(map.toString(), "[a=1, b=3, c=5, d=7, x=6, y=4, z=2]");
 
-    map = map.putAndCopy("w", "8");
-    assertEquals(map.get("a"), "1");
-    assertEquals(map.get("z"), "2");
-    assertEquals(map.get("b"), "3");
-    assertEquals(map.get("y"), "4");
-    assertEquals(map.get("c"), "5");
-    assertEquals(map.get("x"), "6");
-    assertEquals(map.get("d"), "7");
-    assertEquals(map.get("w"), "8");
+    put("w", "8");
     assertEquals(map.toString(), "[a=1, b=3, c=5, d=7, w=8, x=6, y=4, z=2]");
   }
 
   @Test
-  public void testOuterInsert() {
-    map = map.putAndCopy("d", "1");
-
-    assertEquals(map.get("d"), "1");
+  public void testOuter() {
+    put("d", "1");
     assertEquals(map.toString(), "[d=1]");
 
-    map = map.putAndCopy("w", "2");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
+    put("w", "2");
     assertEquals(map.toString(), "[d=1, w=2]");
 
-    map = map.putAndCopy("c", "3");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
+    put("c", "3");
     assertEquals(map.toString(), "[c=3, d=1, w=2]");
 
-    map = map.putAndCopy("x", "4");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("x"), "4");
+    put("x", "4");
     assertEquals(map.toString(), "[c=3, d=1, w=2, x=4]");
 
-    map = map.putAndCopy("b", "5");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("x"), "4");
-    assertEquals(map.get("b"), "5");
+    put("b", "5");
     assertEquals(map.toString(), "[b=5, c=3, d=1, w=2, x=4]");
 
-    map = map.putAndCopy("y", "6");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("x"), "4");
-    assertEquals(map.get("b"), "5");
-    assertEquals(map.get("y"), "6");
+    put("y", "6");
     assertEquals(map.toString(), "[b=5, c=3, d=1, w=2, x=4, y=6]");
 
-    map = map.putAndCopy("a", "7");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("x"), "4");
-    assertEquals(map.get("b"), "5");
-    assertEquals(map.get("y"), "6");
-    assertEquals(map.get("a"), "7");
+    put("a", "7");
     assertEquals(map.toString(), "[a=7, b=5, c=3, d=1, w=2, x=4, y=6]");
 
-    map = map.putAndCopy("z", "8");
-    assertEquals(map.get("d"), "1");
-    assertEquals(map.get("w"), "2");
-    assertEquals(map.get("c"), "3");
-    assertEquals(map.get("x"), "4");
-    assertEquals(map.get("b"), "5");
-    assertEquals(map.get("y"), "6");
-    assertEquals(map.get("a"), "7");
-    assertEquals(map.get("z"), "8");
+    put("z", "8");
     assertEquals(map.toString(), "[a=7, b=5, c=3, d=1, w=2, x=4, y=6, z=8]");
+  }
+
+  @Test
+  public void testRandom() {
+    Random rnd = new Random(3987432434L); // static seed for reproducibility
+    TreeMap<String, String> comparison = new TreeMap<>();
+
+    // Insert 1000 nodes
+    for (int i = 0; i < 1000; i++) {
+      String key = rnd.nextInt() + "";
+      String value = rnd.nextInt() + "";
+
+      put(key, value);
+      comparison.put(key, value);
+      checkEqualTo(comparison);
+    }
+
+    // 1000 random put/remove operations
+    for (int i = 0; i < 1000; i++) {
+      String key = rnd.nextInt() + "";
+
+      if (rnd.nextBoolean()) {
+        String value = rnd.nextInt() + "";
+        put(key, value);
+        comparison.put(key, value);
+      } else {
+        remove(key);
+        comparison.remove(key);
+      }
+
+      checkEqualTo(comparison);
+    }
+
+    // clear map
+    while (!map.isEmpty()) {
+      String key = rnd.nextBoolean() ? map.firstKey() : map.lastKey();
+      remove(key);
+      comparison.remove(key);
+      checkEqualTo(comparison);
+    }
+
+    testEmpty();
+  }
+
+  private void checkEqualTo(TreeMap<String, String> comparison) {
+    assertEquals(comparison, map);
+    assertEquals(comparison.size(), map.size());
+    assertEquals(comparison.hashCode(), map.hashCode());
+    assertTrue(Iterables.elementsEqual(comparison.entrySet(), map.entrySet()));
+    assertTrue(Iterables.elementsEqual(comparison.keySet(),   map.keySet()));
+    assertTrue(Iterables.elementsEqual(comparison.values(),   map.values()));
   }
 }
