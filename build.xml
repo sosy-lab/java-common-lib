@@ -105,6 +105,7 @@
                encoding="UTF-8">
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
+            <compilerarg value="-Xlint"/>
         </javac>
     </target>
 
