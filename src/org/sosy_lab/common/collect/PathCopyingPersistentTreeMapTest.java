@@ -37,7 +37,7 @@ import com.google.common.collect.Iterables;
 
 public class PathCopyingPersistentTreeMapTest {
 
-  PersistentSortedMap<String, String> map;
+  private PersistentSortedMap<String, String> map;
 
   @Before
   public void setupMap() {
@@ -55,6 +55,7 @@ public class PathCopyingPersistentTreeMapTest {
     String oldMapStr = oldMap.toString();
 
     map = map.putAndCopy(key, value);
+    ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
 
     assertEquals(oldMapSize, oldMap.size());
     assertEquals(oldMapStr, oldMap.toString());
@@ -84,6 +85,7 @@ public class PathCopyingPersistentTreeMapTest {
     String oldMapStr = oldMap.toString();
 
     map = map.removeAndCopy(key);
+    ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
 
     assertEquals(oldMapSize, oldMap.size());
     assertEquals(oldMapStr, oldMap.toString());
