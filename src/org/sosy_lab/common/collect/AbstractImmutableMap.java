@@ -28,21 +28,25 @@ import java.util.Map;
 
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
+  @Deprecated
   @Override
   public final void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Deprecated
   @Override
   public final V put(K key, V value) {
     throw new UnsupportedOperationException();
   }
 
+  @Deprecated
   @Override
   public final void putAll(Map<? extends K, ? extends V> pM) {
     throw new UnsupportedOperationException();
   }
 
+  @Deprecated
   @Override
   public final V remove(Object pKey) {
     throw new UnsupportedOperationException();
