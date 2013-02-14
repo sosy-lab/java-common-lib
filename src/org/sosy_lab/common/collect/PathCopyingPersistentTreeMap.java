@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -149,16 +150,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       } else {
         return new Node<>(getKey(), getValue(), left, newRight, isRed);
       }
-    }
-
-    static boolean deepEquals(@Nullable Node<?, ?> a, @Nullable Node<?, ?> b) {
-      if (a == b) {
-        return true;
-      }
-      return (a != null)
-           && a.equals(b)
-           && deepEquals(a.left, b.left)
-           && deepEquals(a.right, b.right);
     }
 
     static int countNodes(@Nullable Node<?, ?> n) {
@@ -350,6 +341,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public PersistentSortedMap<K, V> removeAndCopy(final K key) {
+    if (isEmpty()) {
+      return this;
+    }
     return mapFromTree(removeAndCopy0(checkNotNull(key), root));
   }
 
@@ -370,6 +364,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     if (comp < 0) {
       // key < current.data
+      if (current.left == null) {
+        // Target key is not in map.
+        return current;
+      }
+
       // Go down leftwards, keeping a red node.
 
       if (!Node.isRed(current.left) && !Node.isRed(current.left.left)) {
@@ -383,6 +382,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     } else {
       // key >= current.data
+      if ((comp > 0) && (current.right == null)) {
+        // Target key is not in map.
+        return current;
+      }
 
       if (Node.isRed(current.left)) {
         // First chance to push red to right.
@@ -708,7 +711,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         EntrySet<?, ?> other = (EntrySet<?, ?>)pO;
 
         // this is faster than the fallback check because it's O(n)
-        return Node.deepEquals(this.root, other.root);
+        return Iterables.elementsEqual(this, other);
       }
       return super.equals(pO); // delegate to AbstractSet
     }
