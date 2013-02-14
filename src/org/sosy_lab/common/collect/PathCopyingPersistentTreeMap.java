@@ -219,16 +219,28 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
-  private static <K, V> int checkColors(Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) {
     if (current == null) {
       return 0;
     }
+
+    // check property of binary search tree
+    if (current.left != null) {
+      assert current.getKey().compareTo(current.left.getKey()) > 0;
+    }
+    if (current.right != null) {
+      assert current.getKey().compareTo(current.right.getKey()) < 0;
+    }
+
+    // check coloring
     if (current.isRed()) {
       assert !Node.isBlack(current.left)  : "Red node with red left child";
       assert !Node.isBlack(current.right) : "Red node with red right child";
     }
-    int leftBlackHeight  = checkColors(current.left);
-    int rightBlackHeight = checkColors(current.right);
+
+    // check black height
+    int leftBlackHeight  = checkAssertions(current.left);
+    int rightBlackHeight = checkAssertions(current.right);
     assert leftBlackHeight == rightBlackHeight : "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight;
 
     int blackHeight = leftBlackHeight;
@@ -250,7 +262,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return this;
     } else {
       newRoot = newRoot.withColor(BLACK);
-      assert checkColors(newRoot) >= 0;
+      assert checkAssertions(newRoot) >= 0;
       return new PathCopyingPersistentTreeMap<>(newRoot);
     }
   }
@@ -376,7 +388,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     } else if (newRoot == null) {
       return of();
     } else {
-      assert checkColors(newRoot) >= 0;
+      assert checkAssertions(newRoot) >= 0;
       return new PathCopyingPersistentTreeMap<>(newRoot);
     }
   }
