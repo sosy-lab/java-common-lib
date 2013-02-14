@@ -338,12 +338,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return restoreInvariants(current);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public PersistentSortedMap<K, V> removeAndCopy(final K key) {
+  public PersistentSortedMap<K, V> removeAndCopy(final Object key) {
     if (isEmpty()) {
       return this;
     }
-    return mapFromTree(removeAndCopy0(checkNotNull(key), root));
+    return mapFromTree(removeAndCopy0((K)checkNotNull(key), root));
   }
 
   private static <K extends Comparable<? super K>, V> Node<K, V>  removeAndCopy0(final K key, Node<K, V> current) {

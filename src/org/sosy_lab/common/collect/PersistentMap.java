@@ -48,7 +48,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
   PersistentMap<K, V> putAndCopy(K key, V value);
 
   @CheckReturnValue
-  PersistentMap<K, V> removeAndCopy(K key);
+  PersistentMap<K, V> removeAndCopy(Object key);
 
   /**
    * @throws UnsupportedOperationException Always.
