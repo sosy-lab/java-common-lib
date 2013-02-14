@@ -23,16 +23,16 @@
  */
 package org.sosy_lab.common.collect;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 
-class PathCopyingPersistentTreeMapTest {
+public class PathCopyingPersistentTreeMapTest {
 
-  PersistentMap<String, String> map;
+  PersistentSortedMap<String, String> map;
 
   @Before
   public void setupMap() {
@@ -69,6 +69,29 @@ class PathCopyingPersistentTreeMapTest {
     assertEquals(map.get("c"), "3");
     assertEquals(map.get("d"), "4");
     assertEquals(map.toString(), "[a=1, b=2, c=3, d=4]");
+
+    map = map.removeAndCopy("d");
+    assertFalse(map.containsKey("d"));
+    assertEquals(map.get("a"), "1");
+    assertEquals(map.get("b"), "2");
+    assertEquals(map.get("c"), "3");
+    assertEquals(map.toString(), "[a=1, b=2, c=3]");
+
+    map = map.removeAndCopy("c");
+    assertFalse(map.containsKey("c"));
+    assertEquals(map.get("a"), "1");
+    assertEquals(map.get("b"), "2");
+    assertEquals(map.toString(), "[a=1, b=2]");
+
+    map = map.removeAndCopy("b");
+    assertFalse(map.containsKey("b"));
+    assertEquals(map.get("a"), "1");
+    assertEquals(map.toString(), "[a=1]");
+
+    map = map.removeAndCopy("a");
+    assertFalse(map.containsKey("a"));
+    assertTrue(map.isEmpty());
+    assertEquals(map.toString(), "[]");
   }
 
   @Test
@@ -95,6 +118,29 @@ class PathCopyingPersistentTreeMapTest {
     assertEquals(map.get("x"), "3");
     assertEquals(map.get("w"), "4");
     assertEquals(map.toString(), "[w=4, x=3, y=2, z=1]");
+
+    map = map.removeAndCopy("w");
+    assertFalse(map.containsKey("w"));
+    assertEquals(map.get("z"), "1");
+    assertEquals(map.get("y"), "2");
+    assertEquals(map.get("x"), "3");
+    assertEquals(map.toString(), "[x=3, y=2, z=1]");
+
+    map = map.removeAndCopy("x");
+    assertFalse(map.containsKey("x"));
+    assertEquals(map.get("z"), "1");
+    assertEquals(map.get("y"), "2");
+    assertEquals(map.toString(), "[y=2, z=1]");
+
+    map = map.removeAndCopy("y");
+    assertFalse(map.containsKey("y"));
+    assertEquals(map.get("z"), "1");
+    assertEquals(map.toString(), "[z=1]");
+
+    map = map.removeAndCopy("z");
+    assertFalse(map.containsKey("z"));
+    assertTrue(map.isEmpty());
+    assertEquals(map.toString(), "[]");
   }
 
   @Test

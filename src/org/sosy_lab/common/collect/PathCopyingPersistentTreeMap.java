@@ -34,9 +34,12 @@ import com.google.common.collect.UnmodifiableIterator;
  * The natural ordering of the keys needs to be consistent with equals.
  *
  * TODO Missing methods:
- * Currently not supported operations are {@link #remove(Object)},
+ * Currently not supported operations are
  * {{@link #headMap(Comparable)}, {@link #tailMap(Comparable)}, and {{@link #subMap(Comparable, Comparable)}}
  * as well as their counterparts in the collection views returned by methods of this class.
+ *
+ * TODO: The implementation of {@link #remove(Object)} currently does not shrink the tree,
+ * so it may stay larger than necessary.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
@@ -53,13 +56,20 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private final Node<K, V> left;
     private final Node<K, V> right;
-    private boolean isRed;
+    private final boolean isRed;
+    private final boolean isDeleted;
 
-    private Node(K pKey, V pValue, Node<K, V> pLeft, Node<K, V> pRight, boolean pRed) {
+    private Node(K pKey, V pValue, Node<K, V> pLeft, Node<K, V> pRight,
+        boolean pRed, boolean pDeleted) {
       super(pKey, pValue);
       left = pLeft;
       right = pRight;
       isRed = pRed;
+      isDeleted = pDeleted;
+    }
+
+    boolean isDeleted() {
+      return isDeleted;
     }
 
     boolean isRed() {
@@ -91,7 +101,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (isRed == color) {
         return this;
       } else {
-        return new Node<>(getKey(), getValue(), left, right, color);
+        return new Node<>(getKey(), getValue(), left, right, color, isDeleted);
       }
     }
 
@@ -109,7 +119,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (n == null) {
         return 0;
       }
-      return countNodes(n.left) + 1 + countNodes(n.right);
+      return countNodes(n.left)
+          + (n.isDeleted() ? 0 : 1)
+          + countNodes(n.right);
     }
 
     static <K> Function<Entry<K, ?>, K> getKeyFunction() {
@@ -197,8 +209,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       } else {
         // key == current.data
-
-        return current;
+        if (current.isDeleted) {
+          return null;
+        } else {
+          return current;
+        }
       }
     }
     return null;
@@ -244,7 +259,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     if (current == null) {
       // key was not in map
       // new nodes are red
-      return new Node<>(key, newValue, null, null, RED);
+      return new Node<>(key, newValue, null, null, RED, false);
     }
 
     int comp = key.compareTo(current.getKey());
@@ -275,7 +290,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (newValue == current.getValue()) {
         return current;
       } else {
-        return new Node<>(key, newValue, current.left, current.right, current.getColor());
+        return new Node<>(key, newValue, current.left, current.right, current.getColor(), false);
       }
     }
 
@@ -288,7 +303,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // Color children black and this one red
         Node<K, V> newLeftChild = leftChild.withColor(BLACK);
         Node<K, V> newRightChild = Node.isRed(rightChild) ? rightChild.withColor(BLACK) : rightChild;
-        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED);
+        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED, current.isDeleted());
       }
     }
     if (current.isBlack() && !Node.isBlack(leftChild) && Node.isRed(rightChild)) {
@@ -297,7 +312,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // Color children black and this one red
         Node<K, V> newLeftChild = Node.isRed(leftChild) ? leftChild.withColor(BLACK) : leftChild;
         Node<K, V> newRightChild = rightChild.withColor(BLACK);
-        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED);
+        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED, current.isDeleted());
       }
     }
 
@@ -320,7 +335,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // <3.2>
         // swap colors of current and its left child
         Node<K, V> newLeftChild = current.left.withColor(current.getColor());
-        return new Node<>(current.getKey(), current.getValue(), newLeftChild, current.right, current.left.getColor());
+        return new Node<>(current.getKey(), current.getValue(), newLeftChild, current.right, current.left.getColor(), current.isDeleted());
       }
     }
 
@@ -331,30 +346,81 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // <3.2>
         // swap colors of current its right child
         Node<K, V> newRightChild = current.right.withColor(current.getColor());
-        return new Node<>(current.getKey(), current.getValue(), current.left, newRightChild, current.right.getColor());
+        return new Node<>(current.getKey(), current.getValue(), current.left, newRightChild, current.right.getColor(), current.isDeleted());
       }
     }
 
-    return new Node<>(current.getKey(), current.getValue(), leftChild, rightChild, current.getColor());
+    return new Node<>(current.getKey(), current.getValue(), leftChild, rightChild, current.getColor(), current.isDeleted());
   }
 
   private static <K, V> Node<K, V> rotateClockwise(final Node<K, V> pCurrent, final Node<K, V> pLeft, final Node<K, V> pRight) {
     final Node<K, V> crossOverNode = pLeft.right; // the node that is moved between subtrees
-    final Node<K, V> newRight = new Node<>(pCurrent.getKey(), pCurrent.getValue(), crossOverNode, pRight, pCurrent.getColor());
-    return new Node<>(pLeft.getKey(), pLeft.getValue(), pLeft.left, newRight, pLeft.getColor());
+    final Node<K, V> newRight = new Node<>(pCurrent.getKey(), pCurrent.getValue(), crossOverNode, pRight, pCurrent.getColor(), pCurrent.isDeleted());
+    return new Node<>(pLeft.getKey(), pLeft.getValue(), pLeft.left, newRight, pLeft.getColor(), pLeft.isDeleted());
   }
 
   private static <K, V> Node<K, V> rotateCounterClockwise(final Node<K, V> pCurrent, final Node<K, V> pLeft, final Node<K, V> pRight) {
     final Node<K, V> crossoverNode = pRight.left; // the node that is moved between subtrees
-    final Node<K, V> newLeft = new Node<>(pCurrent.getKey(), pCurrent.getValue(), pLeft, crossoverNode, pCurrent.getColor());
-    return new Node<>(pRight.getKey(), pRight.getValue(), newLeft, pRight.right, pRight.getColor());
+    final Node<K, V> newLeft = new Node<>(pCurrent.getKey(), pCurrent.getValue(), pLeft, crossoverNode, pCurrent.getColor(), pCurrent.isDeleted());
+    return new Node<>(pRight.getKey(), pRight.getValue(), newLeft, pRight.right, pRight.getColor(), pRight.isDeleted());
   }
 
 
   @Override
   public PersistentSortedMap<K, V> removeAndCopy(K key) {
-    throw new UnsupportedOperationException();
+    checkNotNull(key);
+
+    Node<K, V> newRoot = remove0(key, root);
+    if (newRoot == root) {
+      return this;
+    } else if (newRoot == null) {
+      return of();
+    } else {
+      assert checkColors(newRoot) >= 0;
+      return new PathCopyingPersistentTreeMap<>(newRoot);
+    }
   }
+
+  private Node<K, V> remove0(K key, Node<K, V> current) {
+    if (current == null) {
+      // key was not in map
+      return null;
+    }
+
+    int comp = key.compareTo(current.getKey());
+
+    if (comp < 0) {
+      // key < current.data
+
+      final Node<K, V> newLeftChild = remove0(key, current.left);
+      if (newLeftChild == current.left) {
+        return current;
+      } else {
+        return new Node<>(current.getKey(), current.getValue(), newLeftChild, current.right, current.getColor(), current.isDeleted());
+      }
+
+    } else if (comp > 0) {
+      // key > current.data
+
+      final Node<K, V> newRightChild = remove0(key, current.right);
+      if (newRightChild == current.right) {
+        return current;
+      } else {
+        return new Node<>(current.getKey(), current.getValue(), current.left, newRightChild, current.getColor(), current.isDeleted());
+      }
+
+    } else {
+      // key == current.data
+
+      if (current.isRed() && current.isLeaf()) {
+        // red leafs can be deleted easily
+        return null;
+      }
+
+      return new Node<>(key, null, current.left, current.right, current.getColor(), true);
+    }
+  }
+
 /*
   @Override
   public PersistentMap<K, V> removeAndCopy(K key) {
@@ -485,7 +551,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public boolean isEmpty() {
-    return root == null;
+    return root == null || size() == 0;
   }
 
   @Override
@@ -604,7 +670,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public boolean isEmpty() {
-      return root == null;
+      return root == null || size() == 0;
     }
 
     @Override
@@ -693,6 +759,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (root != null) {
         pushLeftMostNodesOnStack(root);
       }
+      jumpOverDeletedNodes();
     }
 
     @Override
@@ -708,8 +775,18 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       stack.push(current);
     }
 
-    @Override
-    public Map.Entry<K, V> next() {
+    private void jumpOverDeletedNodes() {
+      while (hasNext()) {
+        Node<K, V> current = stack.peek();
+        if (!current.isDeleted()) {
+          return;
+        }
+
+        forward(); // forward iterator so that the deleted node is not seen
+      }
+    }
+
+    private Map.Entry<K, V> forward() {
       Node<K, V> current = stack.pop();
       // this is the element to be returned
 
@@ -720,6 +797,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
 
       return current;
+    }
+
+    @Override
+    public Map.Entry<K, V> next() {
+      Map.Entry<K, V> result = forward();
+      jumpOverDeletedNodes();
+      return result;
     }
   }
 }
