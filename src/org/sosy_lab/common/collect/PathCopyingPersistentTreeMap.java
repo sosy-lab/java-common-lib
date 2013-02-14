@@ -1,6 +1,6 @@
 package org.sosy_lab.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -26,20 +28,40 @@ import com.google.common.collect.UnmodifiableIterator;
 
 /**
  * This is an implementation of {@link PersistentSortedMap} that is based on
- * red-black trees and path copying.
+ * left-leaning red-black trees (LLRB) and path copying.
+ * Left-leaning red-black trees are similar to red-black trees and 2-3 trees,
+ * but are considerably easier to implement than red-black trees. They are
+ * described by Robert Sedgewick here:
+ * http://www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
  *
- * It does not support <code>null</code> keys (but <code>null</code> values)
+ * The operations insert, lookup, and remove are guaranteed to run in O(log n) time.
+ * Insert and remove allocate at most O(log n) memory.
+ * Traversal through all entries also allocates up to O(log n) memory.
+ * Per entry, this map needs memory for one object with 4 reference fields and 1 boolean.
+ * (This is a little bit less than {@link TreeMap} needs.)
+ *
+ * This implementation does not support <code>null</code> keys (but <code>null</code> values)
  * and always compares according to the natural ordering.
+ * All methods may throw {@link ClassCastException} is key objects are passed
+ * that do not implement {@link Comparable}.
  *
  * The natural ordering of the keys needs to be consistent with equals.
+ *
+ * As for all {@link PersistentMap}s, all collection views and all iterators
+ * are immutable. They do not reflect changes made to the map and all their
+ * modifying operations throw {@link UnsupportedOperationException}.
+ *
+ * All instances of this class are fully-thread safe.
+ * However, note that each modifying operation allocates a new instance
+ * whose reference needs to be published safely in order to be usable by other threads.
+ * Two concurrent accesses to a modifying operation on the same instance will
+ * create two new maps, each reflecting exactly the operation executed by the current thread,
+ * and not reflecting the operation executed by the other thread.
  *
  * TODO Missing methods:
  * Currently not supported operations are
  * {{@link #headMap(Comparable)}, {@link #tailMap(Comparable)}, and {{@link #subMap(Comparable, Comparable)}}
  * as well as their counterparts in the collection views returned by methods of this class.
- *
- * TODO: The implementation of {@link #remove(Object)} currently does not shrink the tree,
- * so it may stay larger than necessary.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
@@ -50,26 +72,37 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   private static final long serialVersionUID = 1041711151457528188L;
 
+  @SuppressWarnings("unused")
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
+
+    // Constants for isRed field
+    private static final boolean RED   = true;
+    private static final boolean BLACK = false;
 
     private static final long serialVersionUID = -7393505826652634501L;
 
     private final Node<K, V> left;
     private final Node<K, V> right;
     private final boolean isRed;
-    private final boolean isDeleted;
 
-    private Node(K pKey, V pValue, Node<K, V> pLeft, Node<K, V> pRight,
-        boolean pRed, boolean pDeleted) {
+    // Leaf node
+    Node(K pKey, V pValue) {
+      super(pKey, pValue);
+      left = null;
+      right = null;
+      isRed = RED;
+    }
+
+    // Any node
+    Node(K pKey, V pValue, Node<K, V> pLeft, Node<K, V> pRight, boolean pRed) {
       super(pKey, pValue);
       left = pLeft;
       right = pRight;
       isRed = pRed;
-      isDeleted = pDeleted;
     }
 
-    boolean isDeleted() {
-      return isDeleted;
+    boolean isLeaf() {
+      return left == null && right == null;
     }
 
     boolean isRed() {
@@ -92,16 +125,29 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return n != null && n.isBlack();
     }
 
-    @SuppressWarnings("unused")
-    boolean isLeaf() {
-      return left == null && right == null;
-    }
+    // Methods for creating new nodes based on current node.
 
     Node<K, V> withColor(boolean color) {
       if (isRed == color) {
         return this;
       } else {
-        return new Node<>(getKey(), getValue(), left, right, color, isDeleted);
+        return new Node<>(getKey(), getValue(), left, right, color);
+      }
+    }
+
+    Node<K, V> withLeftChild(Node<K, V> newLeft) {
+      if (newLeft == left) {
+        return this;
+      } else {
+        return new Node<>(getKey(), getValue(), newLeft, right, isRed);
+      }
+    }
+
+    Node<K, V> withRightChild(Node<K, V> newRight) {
+      if (newRight == right) {
+        return this;
+      } else {
+        return new Node<>(getKey(), getValue(), left, newRight, isRed);
       }
     }
 
@@ -119,9 +165,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (n == null) {
         return 0;
       }
-      return countNodes(n.left)
-          + (n.isDeleted() ? 0 : 1)
-          + countNodes(n.right);
+      return countNodes(n.left) + 1 + countNodes(n.right);
     }
 
     static <K> Function<Entry<K, ?>, K> getKeyFunction() {
@@ -142,9 +186,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         };
     }
   }
-
-  private static final boolean RED   = true;
-  private static final boolean BLACK = false;
 
 
   // static creation methods
@@ -209,39 +250,38 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       } else {
         // key == current.data
-        if (current.isDeleted) {
-          return null;
-        } else {
-          return current;
-        }
+
+        return current;
       }
     }
     return null;
   }
 
-  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) throws IllegalStateException {
     if (current == null) {
       return 0;
     }
 
     // check property of binary search tree
     if (current.left != null) {
-      assert current.getKey().compareTo(current.left.getKey()) > 0;
+      checkState(current.getKey().compareTo(current.left.getKey()) > 0, "Tree has left child that is not smaller.");
     }
     if (current.right != null) {
-      assert current.getKey().compareTo(current.right.getKey()) < 0;
+      checkState(current.getKey().compareTo(current.right.getKey()) < 0, "Tree has right child that is not bigger.");
     }
 
-    // check coloring
-    if (current.isRed()) {
-      assert !Node.isBlack(current.left)  : "Red node with red left child";
-      assert !Node.isBlack(current.right) : "Red node with red right child";
-    }
+    // Check LLRB invariants
+    // No red right child.
+    checkState(!Node.isRed(current.right), "LLRB has red right child");
+    // No more than two consecutive red nodes.
+    checkState(!Node.isRed(current) || !Node.isRed(current.left) || !Node.isRed(current.left.left), "LLRB has three red nodes in a row.");
 
-    // check black height
+    // Check recursively.
     int leftBlackHeight  = checkAssertions(current.left);
     int rightBlackHeight = checkAssertions(current.right);
-    assert leftBlackHeight == rightBlackHeight : "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight;
+
+    // Check black height balancing.
+    checkState(leftBlackHeight == rightBlackHeight, "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight);
 
     int blackHeight = leftBlackHeight;
     if (current.isBlack()) {
@@ -250,298 +290,249 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return blackHeight;
   }
 
+  @VisibleForTesting
+  void checkAssertions() throws IllegalStateException {
+    checkAssertions(root);
+  }
 
   // modifying methods
 
+  /**
+   * Create a map instance with a given root node.
+   * @param newRoot A node or null (meaning the empty tree).
+   * @return A map instance with the given tree.
+   */
+  private PersistentSortedMap<K, V> mapFromTree(Node<K, V> newRoot) {
+    if (newRoot == root) {
+      return this;
+    } else if (newRoot == null) {
+      return of();
+    } else {
+      // Root is always black.
+      newRoot = newRoot.withColor(Node.BLACK);
+      assert checkAssertions(newRoot) >= 0;
+      return new PathCopyingPersistentTreeMap<>(newRoot);
+    }
+  }
+
   @Override
   public PersistentSortedMap<K, V> putAndCopy(K key, V value) {
-    checkNotNull(key);
-
-    Node<K, V> newRoot = put0(key, value, root);
-    if (newRoot == root) {
-      return this;
-    } else {
-      newRoot = newRoot.withColor(BLACK);
-      assert checkAssertions(newRoot) >= 0;
-      return new PathCopyingPersistentTreeMap<>(newRoot);
-    }
+    return mapFromTree(putAndCopy0(checkNotNull(key), value, root));
   }
 
-  private static <K extends Comparable<? super K>, V> Node<K, V> put0(K key, V newValue, Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> Node<K, V> putAndCopy0(final K key, V value, Node<K, V> current) {
+    // Inserting is easy:
+    // We find the place where to insert,
+    // and afterwards fix the invariants by some rotations or re-colorings.
+
     if (current == null) {
-      // key was not in map
-      // new nodes are red
-      return new Node<>(key, newValue, null, null, RED, false);
+      return new Node<>(key, value);
     }
 
     int comp = key.compareTo(current.getKey());
-
-    final Node<K, V> leftChild;
-    final Node<K, V> rightChild;
     if (comp < 0) {
       // key < current.data
-
-      leftChild = put0(key, newValue, current.left);
-      if (leftChild == current.left) {
-        return current;
-      }
-      rightChild = current.right;
+      final Node<K, V> newLeft = putAndCopy0(key, value, current.left);
+      current = current.withLeftChild(newLeft);
 
     } else if (comp > 0) {
       // key > current.data
-
-      rightChild = put0(key, newValue, current.right);
-      if (rightChild == current.right) {
-        return current;
-      }
-      leftChild = current.left;
+      final Node<K, V> newRight = putAndCopy0(key, value, current.right);
+      current = current.withRightChild(newRight);
 
     } else {
-      // key == current.data
-
-      if (newValue == current.getValue()) {
-        return current;
-      } else {
-        return new Node<>(key, newValue, current.left, current.right, current.getColor(), false);
-      }
+      current = new Node<>(key, value, current.left, current.right, current.getColor());
     }
 
-    // This is implemented according to
-    // http://www.ece.uc.edu/~franco/C321/html/RedBlack/redblack.html
-    // All numbers relate to the example there.
-    if (current.isBlack() && Node.isRed(leftChild) && !Node.isBlack(rightChild)) {
-      if (Node.isRed(leftChild.left) || Node.isRed(leftChild.right)) {
-        // <1> double-red violation
-        // Color children black and this one red
-        Node<K, V> newLeftChild = leftChild.withColor(BLACK);
-        Node<K, V> newRightChild = Node.isRed(rightChild) ? rightChild.withColor(BLACK) : rightChild;
-        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED, current.isDeleted());
-      }
-    }
-    if (current.isBlack() && !Node.isBlack(leftChild) && Node.isRed(rightChild)) {
-      if (Node.isRed(rightChild.left) || Node.isRed(rightChild.right)) {
-        // <1> double-red violation inverted
-        // Color children black and this one red
-        Node<K, V> newLeftChild = Node.isRed(leftChild) ? leftChild.withColor(BLACK) : leftChild;
-        Node<K, V> newRightChild = rightChild.withColor(BLACK);
-        new Node<>(current.getKey(), current.getValue(), newLeftChild, newRightChild, RED, current.isDeleted());
-      }
-    }
-
-    //  30                 27                      40
-    if (current.isRed() && Node.isRed(leftChild) && Node.isBlack(rightChild)) {
-      // <2>
-      return rotateClockwise(current, leftChild, rightChild);
-    }
-
-    if (current.isRed() && Node.isBlack(leftChild) && Node.isRed(rightChild)) {
-      // <2>
-      return rotateCounterClockwise(current, leftChild, rightChild);
-    }
-
-    //  20                   10                        27
-    if (current.isBlack() && Node.isBlack(leftChild) && Node.isRed(rightChild)) {
-      if (Node.isRed(rightChild.left) || Node.isRed(rightChild.right)) {
-        // <3.1>
-        current = rotateCounterClockwise(current, leftChild, rightChild);
-        // <3.2>
-        // swap colors of current and its left child
-        Node<K, V> newLeftChild = current.left.withColor(current.getColor());
-        return new Node<>(current.getKey(), current.getValue(), newLeftChild, current.right, current.left.getColor(), current.isDeleted());
-      }
-    }
-
-    if (current.isBlack() && Node.isRed(leftChild) && Node.isBlack(rightChild)) {
-      if (Node.isRed(leftChild.left) || Node.isRed(leftChild.right)) {
-        // <3.1> inverted
-        current = rotateClockwise(current, leftChild, rightChild);
-        // <3.2>
-        // swap colors of current its right child
-        Node<K, V> newRightChild = current.right.withColor(current.getColor());
-        return new Node<>(current.getKey(), current.getValue(), current.left, newRightChild, current.right.getColor(), current.isDeleted());
-      }
-    }
-
-    return new Node<>(current.getKey(), current.getValue(), leftChild, rightChild, current.getColor(), current.isDeleted());
+    // restore invariants
+    return restoreInvariants(current);
   }
-
-  private static <K, V> Node<K, V> rotateClockwise(final Node<K, V> pCurrent, final Node<K, V> pLeft, final Node<K, V> pRight) {
-    final Node<K, V> crossOverNode = pLeft.right; // the node that is moved between subtrees
-    final Node<K, V> newRight = new Node<>(pCurrent.getKey(), pCurrent.getValue(), crossOverNode, pRight, pCurrent.getColor(), pCurrent.isDeleted());
-    return new Node<>(pLeft.getKey(), pLeft.getValue(), pLeft.left, newRight, pLeft.getColor(), pLeft.isDeleted());
-  }
-
-  private static <K, V> Node<K, V> rotateCounterClockwise(final Node<K, V> pCurrent, final Node<K, V> pLeft, final Node<K, V> pRight) {
-    final Node<K, V> crossoverNode = pRight.left; // the node that is moved between subtrees
-    final Node<K, V> newLeft = new Node<>(pCurrent.getKey(), pCurrent.getValue(), pLeft, crossoverNode, pCurrent.getColor(), pCurrent.isDeleted());
-    return new Node<>(pRight.getKey(), pRight.getValue(), newLeft, pRight.right, pRight.getColor(), pRight.isDeleted());
-  }
-
 
   @Override
-  public PersistentSortedMap<K, V> removeAndCopy(K key) {
-    checkNotNull(key);
-
-    Node<K, V> newRoot = remove0(key, root);
-    if (newRoot == root) {
-      return this;
-    } else if (newRoot == null) {
-      return of();
-    } else {
-      assert checkAssertions(newRoot) >= 0;
-      return new PathCopyingPersistentTreeMap<>(newRoot);
-    }
+  public PersistentSortedMap<K, V> removeAndCopy(final K key) {
+    return mapFromTree(removeAndCopy0(checkNotNull(key), root));
   }
 
-  private Node<K, V> remove0(K key, Node<K, V> current) {
-    if (current == null) {
-      // key was not in map
-      return null;
-    }
+  private static <K extends Comparable<? super K>, V> Node<K, V>  removeAndCopy0(final K key, Node<K, V> current) {
+    // Removing a node is more difficult.
+    // We can remove a leaf if it is red.
+    // So we try to always have a red node while going downwards.
+    // This is accomplished by calling moveRedLeft() when going downwards to the left
+    // or by calling moveRedRight() otherwise.
+    // If we found the node and it is a leaf, we can then delete it
+    // and do the usual adjustments for re-establishing the invariants (just like for insertion).
+    // If we found the node and it is not a leaf node,
+    // we can use a trick. We replace the node with the next greater node
+    // (the left-most node in the right subtree),
+    // and afterwards delete that node from the right subtree (otherwise it would be duplicate).
 
     int comp = key.compareTo(current.getKey());
 
     if (comp < 0) {
       // key < current.data
+      // Go down leftwards, keeping a red node.
 
-      final Node<K, V> newLeftChild = remove0(key, current.left);
-      if (newLeftChild == current.left) {
-        return current;
-      } else {
-        return new Node<>(current.getKey(), current.getValue(), newLeftChild, current.right, current.getColor(), current.isDeleted());
+      if (!Node.isRed(current.left) && !Node.isRed(current.left.left)) {
+        // Push red to left if necessary.
+        current = makeLeftRed(current);
       }
 
-    } else if (comp > 0) {
-      // key > current.data
-
-      final Node<K, V> newRightChild = remove0(key, current.right);
-      if (newRightChild == current.right) {
-        return current;
-      } else {
-        return new Node<>(current.getKey(), current.getValue(), current.left, newRightChild, current.getColor(), current.isDeleted());
-      }
+      // recursive descent
+      final Node<K, V> newLeft = removeAndCopy0(key, current.left);
+      current = current.withLeftChild(newLeft);
 
     } else {
-      // key == current.data
+      // key >= current.data
 
-      if (current.isRed() && current.isLeaf()) {
-        // red leafs can be deleted easily
+      if (Node.isRed(current.left)) {
+        // First chance to push red to right.
+        current = rotateClockwise(current);
+
+        // re-update comp
+        comp = key.compareTo(current.getKey());
+        assert comp >= 0;
+      }
+
+      if ((comp == 0) && (current.right == null)) {
+        assert current.left == null;
+        // We can delete the node easily, it's a leaf.
         return null;
       }
 
-      return new Node<>(key, null, current.left, current.right, current.getColor(), true);
+      if (!Node.isRed(current.right) && !Node.isRed(current.right.left)) {
+        // Push red to right.
+        current = makeRightRed(current);
+
+        // re-update comp
+        comp = key.compareTo(current.getKey());
+        assert comp >= 0;
+      }
+
+      if (comp == 0) {
+        // We have to delete current, but is has children.
+        // We replace current with the smallest node in the right subtree (the "successor"),
+        // and delete that (leaf) node there.
+
+        Node<K, V> successor = current.right;
+        while (successor.left != null) {
+          successor = successor.left;
+        }
+
+        // Delete the successor
+        Node<K, V> newRight = removeMininumNodeInTree(current.right);
+        // and replace current with it
+        current = new Node<>(successor.getKey(), successor.getValue(), current.left, newRight, current.getColor());
+
+      } else {
+        // key > current.data
+        // Go down rightwards.
+
+        final Node<K, V> newRight = removeAndCopy0(key, current.right);
+        current = current.withRightChild(newRight);
+      }
     }
+
+    return restoreInvariants(current);
   }
 
-/*
-  @Override
-  public PersistentMap<K, V> removeAndCopy(K key) {
-    checkNotNull(key);
-
-    Node<K, V> newRoot = remove0(key, root);
-    if (newRoot == root) {
-      return this;
-    } else if (newRoot == null) {
-      return of();
-    } else {
-      assert checkColors(newRoot) >= 0;
-      return new CopyOnWriteTreeMap<>(newRoot);
-    }
-  }
-
-  private Node<K, V> remove0(K key, Node<K, V> current) {
-    if (current == null) {
-      // key was not in map
+  /**
+   * Unconditionally delete the node with the smallest key in a given subtree.
+   * @return A new subtree reflecting the change.
+   */
+  private static <K, V> Node<K, V> removeMininumNodeInTree(Node<K, V> current) {
+    if (current.left == null) {
+      // This is the minium node to delete
       return null;
     }
 
-    int comp = key.compareTo(current.getKey());
-
-    Node<K, V> leftChild;
-    Node<K, V> rightChild;
-    if (comp < 0) {
-      // key < current.data
-
-      leftChild = remove0(key, current.left);
-      if (leftChild == current.left) {
-        return current;
-      }
-      rightChild = current.right;
-
-    } else if (comp > 0) {
-      // key > current.data
-
-      rightChild = remove0(key, current.right);
-      if (rightChild == current.right) {
-        return current;
-      }
-      leftChild = current.left;
-
-    } else {
-      // key == current.data
-
-      if (current.isRed() && current.isLeaf()) {
-        // [1] red leaf, delete it
-        return null;
-      }
-      leftChild = current.left;
-      rightChild = current.right;
+    if (!Node.isRed(current.left) && !Node.isRed(current.left.left)) {
+      // Push red to left if necessary (similar to general removal strategy).
+      current = makeLeftRed(current);
     }
 
+    // recursive descent
+    Node<K, V> newLeft = removeMininumNodeInTree(current.left);
+    current = current.withLeftChild(newLeft);
 
-
-    if (Node.isBlack(rightChild) && rightChild.isLeaf()) {
-      // [5]
-      if (leftChild.isRed()) {
-        // [5.1.1]
-        Node<K, V> newLeftChild = leftChild.withColor(BLACK);
-        Node<K, V> newCurrent = current.withColor(RED);
-        // [5.1.2]
-        newCurrent = rotateClockwise(newCurrent, newLeftChild, rightChild);
-        current = newCurrent;
-        leftChild = current.left;
-        rightChild = current.right;
-        assert Node.isBlack(rightChild) && rightChild.isLeaf();
-        assert !leftChild.isRed;
-      }
-
-      if (leftChild.isBlack() && Node.isBlack(leftChild.left) && Node.isBlack(leftChild.right)) {
-        // [5.2.1]
-        leftChild = leftChild.withColor(RED);
-
-      }
-    }
-
-
-
-    if (current.isRed()) {
-      if (current.left != null && current.right != null) {
-        // red with 2 children
-        // TODO
-      }
-
-      // [2] red with 1 child -> impossible
-      throw new AssertionError();
-
-    } else {
-      if (Node.isRed(current.left) && current.right == null) {
-        // [4] black with one red child
-        assert current.left.left == null && current.left.right == null;
-        return current.left.withColor(BLACK);
-      }
-      if (Node.isRed(current.right) && current.left == null) {
-        // [4] black with one red child
-        assert current.right.left == null && current.right.right == null;
-        return current.right.withColor(BLACK);
-      }
-
-      if (current.left == null && current.right == null) {
-
-      }
-
-    }
+    return restoreInvariants(current);
   }
-*/
+
+  /**
+   * Fix the LLRB invariants around a given node
+   * (regarding the node, its children, and grand-children).
+   * @return A new subtree with the same content that is a legal LLRB.
+   */
+  private static <K, V> Node<K, V> restoreInvariants(Node<K, V> current) {
+    if (Node.isRed(current.right)) {
+      // Right should not be red in a left-leaning red-black tree.
+      current = rotateCounterclockwise(current);
+    }
+
+    if (Node.isRed(current.left) && Node.isRed(current.left.left)) {
+      // Don't have consecutive red nodes.
+      current = rotateClockwise(current);
+    }
+
+    if (Node.isRed(current.left) && Node.isRed(current.right)) {
+      // Again, don't have red right children.
+      // We make both children black and this one red,
+      // so we pass the potential problem of having a red right upwards in the tree.
+      current = colorFlip(current);
+    }
+
+    return current;
+  }
+
+  /**
+   * Flip the colors of current and its two children.
+   * This is an operation that keeps the "black height".
+   * @param current A node with two children.
+   * @return The same subtree, but with inverted colors for the three top nodes.
+   */
+  private static <K, V> Node<K, V>  colorFlip(Node<K, V> current) {
+    final Node<K, V> newLeft  = current.left.withColor(!current.left.getColor());
+    final Node<K, V> newRight = current.right.withColor(!current.right.getColor());
+    return new Node<>(current.getKey(), current.getValue(), newLeft, newRight, !current.getColor());
+  }
+
+  private static <K, V> Node<K, V> rotateCounterclockwise(Node<K, V> current) {
+    final Node<K, V> crossoverNode = current.right.left; // the node that is moved between subtrees
+    final Node<K, V> newLeft = new Node<>(current.getKey(), current.getValue(), current.left, crossoverNode, Node.RED);
+    return new Node<>(current.right.getKey(), current.right.getValue(), newLeft, current.right.right, current.getColor());
+  }
+
+  private static <K, V> Node<K, V> rotateClockwise(Node<K, V> current) {
+    final Node<K, V> crossOverNode = current.left.right; // the node that is moved between subtrees
+    final Node<K, V> newRight = new Node<>(current.getKey(), current.getValue(), crossOverNode, current.right, Node.RED);
+    return new Node<>(current.left.getKey(), current.left.getValue(), current.left.left, newRight, current.getColor());
+  }
+
+  private static <K, V> Node<K, V> makeLeftRed(Node<K, V> current) {
+    // Make current.left or one of its children red
+    // (assuming that current is red and both current.left and current.left.left are black).
+
+    current = colorFlip(current);
+    if (Node.isRed(current.right.left)) {
+      Node<K, V> newRight = rotateClockwise(current.right);
+      current = new Node<>(current.getKey(), current.getValue(), current.left, newRight, current.getColor());
+
+      current = rotateCounterclockwise(current);
+      current = colorFlip(current);
+    }
+    return current;
+  }
+
+  private static <K, V> Node<K, V> makeRightRed(Node<K, V> current) {
+    // Make current.right or one of its children red
+    // (assuming that current is red and both current.right and current.right.left are black).
+
+    current = colorFlip(current);
+    if (Node.isRed(current.left.left)) {
+      current = rotateClockwise(current);
+      current = colorFlip(current);
+    }
+    return current;
+  }
 
   // read operations
 
@@ -563,7 +554,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public boolean isEmpty() {
-    return root == null || size() == 0;
+    return root == null;
   }
 
   @Override
@@ -647,8 +638,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private final Node<K, V> root;
 
+    // Cache size and hashCode
     private transient int size = -1;
-
     private transient int hashCode = 0;
 
     private EntrySet(Node<K, V> pRoot) {
@@ -682,7 +673,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public boolean isEmpty() {
-      return root == null || size() == 0;
+      return root == null;
     }
 
     @Override
@@ -764,14 +755,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     // stack.top is always the next element to be returned
     // (i.e., its left subtree has already been handled)
 
-    private Deque<Node<K, V>> stack;
+    private final Deque<Node<K, V>> stack;
 
     private EntryInOrderIterator(Node<K, V> root) {
       stack = new ArrayDeque<>();
       if (root != null) {
         pushLeftMostNodesOnStack(root);
       }
-      jumpOverDeletedNodes();
     }
 
     @Override
@@ -787,18 +777,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       stack.push(current);
     }
 
-    private void jumpOverDeletedNodes() {
-      while (hasNext()) {
-        Node<K, V> current = stack.peek();
-        if (!current.isDeleted()) {
-          return;
-        }
-
-        forward(); // forward iterator so that the deleted node is not seen
-      }
-    }
-
-    private Map.Entry<K, V> forward() {
+    @Override
+    public Map.Entry<K, V> next() {
       Node<K, V> current = stack.pop();
       // this is the element to be returned
 
@@ -809,13 +789,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
 
       return current;
-    }
-
-    @Override
-    public Map.Entry<K, V> next() {
-      Map.Entry<K, V> result = forward();
-      jumpOverDeletedNodes();
-      return result;
     }
   }
 }
