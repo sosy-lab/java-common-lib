@@ -540,6 +540,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   // read operations
 
   @Override
+  public PersistentSortedMap<K, V> empty() {
+    return of();
+  }
+
+  @Override
   public boolean containsKey(Object pObj) {
     return findNode(pObj, root) != null;
   }

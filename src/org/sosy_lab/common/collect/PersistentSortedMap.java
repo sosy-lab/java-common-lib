@@ -40,6 +40,10 @@ public interface PersistentSortedMap<K extends Comparable<? super K>, V> extends
   PersistentSortedMap<K, V> removeAndCopy(Object pKey);
 
   @Override
+  @CheckReturnValue
+  PersistentSortedMap<K, V> empty();
+
+  @Override
   SortedSet<Entry<K, V>> entrySet();
 
   @Override

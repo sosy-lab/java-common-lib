@@ -44,11 +44,25 @@ import javax.annotation.CheckReturnValue;
  */
 public interface PersistentMap<K, V> extends Map<K, V> {
 
+  /**
+   * Replacement for {{@link #put(Object, Object)} that returns a fresh instance.
+   */
   @CheckReturnValue
   PersistentMap<K, V> putAndCopy(K key, V value);
 
+  /**
+   * Replacement for {{@link #remove(Object)} that returns a fresh instance.
+   * @param key
+   * @return
+   */
   @CheckReturnValue
   PersistentMap<K, V> removeAndCopy(Object key);
+
+  /**
+   * Replacement for {{@link #clear()} that returns an empty instance.
+   */
+  @CheckReturnValue
+  PersistentMap<K, V> empty();
 
   /**
    * @throws UnsupportedOperationException Always.
