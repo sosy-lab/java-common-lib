@@ -181,7 +181,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   // static creation methods
 
-  private static final PersistentSortedMap<?, ?> emptyMap = new PathCopyingPersistentTreeMap<String, Object>(null);
+  private static final PathCopyingPersistentTreeMap<?, ?> emptyMap = new PathCopyingPersistentTreeMap<String, Object>(null);
 
   @SuppressWarnings("unchecked")
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> of() {
@@ -301,7 +301,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     } else {
       // Root is always black.
       newRoot = newRoot.withColor(Node.BLACK);
-      assert checkAssertions(newRoot) >= 0;
       return new PathCopyingPersistentTreeMap<>(newRoot);
     }
   }
