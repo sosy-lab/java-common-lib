@@ -42,7 +42,6 @@ import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -346,7 +345,12 @@ public class ProcessExecutor<E extends Exception> {
 
       Concurrency.waitForTermination(executor); // needed for memory visibility of the Callables
 
-      Closeables.closeQuietly(in);
+      try {
+        in.close();
+      } catch (IOException e) {
+        // Not expected to happen because process is already dead anyway.
+        // Don't hide any real exception by throwing this one.
+      }
 
       finished = true;
     }
