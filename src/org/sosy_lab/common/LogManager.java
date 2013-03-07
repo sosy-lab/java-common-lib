@@ -393,6 +393,7 @@ public class LogManager {
     String[] argsStr = new String[args.length];
     for (int i = 0; i < args.length; i++) {
       String arg = firstNonNull(args[i], "null").toString();
+      arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
         argsStr[i] = "<ARGUMENT OMITTED BECAUSE " + arg.length() + " CHARACTERS LONG>";
       } else {
