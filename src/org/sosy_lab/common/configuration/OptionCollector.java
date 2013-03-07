@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.sosy_lab.common.Pair;
 
@@ -44,6 +45,7 @@ import com.google.common.io.Resources;
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
+  private final static Pattern IGNORED_CLASSES = Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
   private final static int CHARS_PER_LINE = 75; // for description
   private final static HashSet<String> errorMessages = new LinkedHashSet<>();
   private static String sourcePath = "";
@@ -662,6 +664,9 @@ public class OptionCollector {
         } else if (fileName.endsWith(".class")) {
           final String nameOfClass = packageName + '.'
                 + fileName.substring(0, fileName.length() - 6);
+          if (IGNORED_CLASSES.matcher(nameOfClass).matches()) {
+            continue;
+          }
           try {
             final Class<?> foundClass = Class.forName(nameOfClass);
 
