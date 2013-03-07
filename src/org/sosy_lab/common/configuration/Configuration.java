@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -378,6 +379,8 @@ public class Configuration {
   static {
     ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder = ImmutableMap.builder();
 
+    putSafely(builder, EnumSet.class,    EnumSet.class); // Caution: needs special casing
+
     putSafely(builder, Iterable.class,   ImmutableList.class);
     putSafely(builder, Collection.class, ImmutableList.class);
     putSafely(builder, List.class,       ImmutableList.class);
@@ -544,7 +547,8 @@ public class Configuration {
    * - {@link java.util.logging.Level}
    * - arrays of the above types
    * - collection types {@link Iterable}, {@link Collection}, {@link List},
-   *   {@link Set}, {@link SortedSet} and {@link Multiset} of the above types
+   *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}
+   *   of the above types
    *
    * For the collection types an immutable instance will be created and injected.
    * Their type parameter has to be one of the other supported types.
@@ -967,6 +971,10 @@ public class Configuration {
 
       return values.toArray(result);
 
+    } else if (collectionClass == EnumSet.class) {
+      assert componentType.isEnum() : "";
+      return createEnumSetUnchecked(componentType, values);
+
     } else {
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
 
@@ -1080,6 +1088,13 @@ public class Configuration {
       return null;
     }
     return Strings.emptyToNull(s.trim());
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Enum<T>> EnumSet<?> createEnumSetUnchecked(Class<?> enumType, Collection<?> values) {
+    EnumSet<T> result = EnumSet.noneOf((Class<T>)enumType);
+    result.addAll((Collection<? extends T>) values);
+    return result;
   }
 
   @Override
