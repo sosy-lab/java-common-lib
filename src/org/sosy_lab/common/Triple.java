@@ -20,11 +20,15 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.collect.Ordering.from;
+
+import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
 
 
 /**
@@ -155,5 +159,32 @@ public class Triple<A, B, C> {
                                       f3.apply(pInput.getThird()));
       }
     };
+  }
+
+  /**
+   * Return a comparator for comparing triples lexicographically,
+   * if their component types define a natural ordering.
+   */
+  public static <A extends Comparable<? super A>,
+                  B extends Comparable<? super B>,
+                  C extends Comparable<? super C>>
+      Ordering<Triple<A, B, C>> lexicographicalNaturalComparator() {
+
+    return lexicographicalComparator(Ordering.<A>natural(),
+                                      Ordering.<B>natural(),
+                                      Ordering.<C>natural());
+  }
+
+  /**
+   * Return a comparator for comparing triples lexicographically,
+   * delegating the comparison of the components to three comparators.
+   */
+  public static <A, B, C> Ordering<Triple<A, B, C>> lexicographicalComparator(
+      Comparator<A> firstOrdering, Comparator<B> secondOrdering,
+      Comparator<C> thirdOrdering) {
+
+    return from(firstOrdering).onResultOf(Triple.<A>getProjectionToFirst())
+        .<Triple<? extends A, ? extends B, ?>>compound(from(secondOrdering).onResultOf(Triple.<B>getProjectionToSecond()))
+        .compound(from(thirdOrdering).onResultOf(Triple.<C>getProjectionToThird()));
   }
 }
