@@ -21,9 +21,11 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Ordering.from;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -32,6 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
 
 
 /**
@@ -204,5 +207,27 @@ public class Pair<A, B> {
                                f2.apply(pInput.getSecond()));
       }
     };
+  }
+
+  /**
+   * Return a comparator for comparing pairs lexicographically,
+   * if their component types define a natural ordering.
+   */
+  public static <A extends Comparable<? super A>,
+                  B extends Comparable<? super B>>
+      Ordering<Pair<A, B>> lexicographicalNaturalComparator() {
+
+    return lexicographicalComparator(Ordering.<A>natural(), Ordering.<B>natural());
+  }
+
+  /**
+   * Return a comparator for comparing pairs lexicographically,
+   * delegating the comparison of the components to two comparators.
+   */
+  public static <A, B> Ordering<Pair<A, B>> lexicographicalComparator(
+      Comparator<A> firstOrdering, Comparator<B> secondOrdering) {
+
+    return from(firstOrdering).onResultOf(Pair.<A>getProjectionToFirst())
+        .compound(from(secondOrdering).onResultOf(Pair.<B>getProjectionToSecond()));
   }
 }
