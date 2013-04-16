@@ -351,8 +351,12 @@ public class LogManager {
 
   /**
    * Logs any message occurring during program execution.
+   * The message is constructed lazily by concatenating the parts with " ".
+   * The caller should not use string concatenation to create the message
+   * in order to increase performance if the message is never logged.
+   *
    * @param priority the log level for the message
-   * @param args the message (can be an arbitrary number of objects containing any information), will be concatenated by " "
+   * @param args the parts of the message (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
    */
   public void log(Level priority, Object... args) {
 
@@ -361,6 +365,20 @@ public class LogManager {
     if (wouldBeLogged(priority))  {
 
       log0(priority, findCallingMethod(), buildMessageText(args));
+    }
+  }
+
+  /**
+   * Logs any message occurring during program execution.
+   * The message is constructed lazily from <code>String.format(format, args)</code>.
+   *
+   * @param priority the log level for the message
+   * @param format The format string.
+   * @param args The arguments for the format string.
+   */
+  public void logf(Level priority, String format, Object... args) {
+    if (wouldBeLogged(priority)) {
+      log0(priority, findCallingMethod(), String.format(format, args));
     }
   }
 
