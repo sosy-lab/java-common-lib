@@ -360,21 +360,32 @@ public class LogManager {
     //sufficiently high.
     if (wouldBeLogged(priority))  {
 
-      StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-      int traceIndex = 2; // first method in stacktrace is Thread#getStackTrace(), second is this method
-
-      // find the first interesting method in the stack trace
-      // (we assume that methods starting with "log" are helper methods for logging).
-      // Synthetic accessor methods are also excluded.
-      String methodName = trace[traceIndex].getMethodName();
-      while (methodName.startsWith("log")
-          || methodName.startsWith("access$")) {
-        traceIndex++;
-        methodName = trace[traceIndex].getMethodName();
-      }
-
-      log0(priority, trace[traceIndex], args);
+      log0(priority, findCallingMethod(), buildMessageText(args));
     }
+  }
+
+  /**
+   * Find the first interesting method in the current stack trace.
+   * We assume that methods starting with "log" are helper methods for logging
+   * and exclude them.
+   * Synthetic accessor methods are also excluded.
+   */
+  private StackTraceElement findCallingMethod() {
+    StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+
+    // First method in stacktrace is Thread#getStackTrace(),
+    // second is this method, third is the log() method.
+    // So we can skip 3 stack trace elements in any case.
+    int traceIndex = 3;
+
+    String methodName = trace[traceIndex].getMethodName();
+    while (methodName.startsWith("log")
+        || methodName.startsWith("access$")) {
+      traceIndex++;
+      methodName = trace[traceIndex].getMethodName();
+    }
+
+    return trace[traceIndex];
   }
 
   /**
@@ -386,10 +397,19 @@ public class LogManager {
    *
    * @param priority the log level for the message
    * @param trace the stack trace frame to use
-   * @param args the message (can be an arbitrary number of objects containing any information), will be concatenated by " "
+   * @param msg the message
    */
-  private void log0(Level priority, StackTraceElement stackElement, Object... args) {
+  private void log0(Level priority, StackTraceElement stackElement, String msg) {
 
+    LogRecord record = new LogRecord(priority, msg);
+
+    record.setSourceClassName(stackElement.getClassName());
+    record.setSourceMethodName(stackElement.getMethodName());
+
+    logger.log(record);
+  }
+
+  private String buildMessageText(Object... args) {
     String[] argsStr = new String[args.length];
     for (int i = 0; i < args.length; i++) {
       String arg = firstNonNull(args[i], "null").toString();
@@ -401,12 +421,8 @@ public class LogManager {
       }
     }
 
-    LogRecord record = new LogRecord(priority, messageFormat.join(argsStr));
-
-    record.setSourceClassName(stackElement.getClassName());
-    record.setSourceMethodName(stackElement.getMethodName());
-
-    logger.log(record);
+    String messageText = messageFormat.join(argsStr);
+    return messageText;
   }
 
   /**
