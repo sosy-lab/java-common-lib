@@ -59,7 +59,7 @@ public class ParserTest {
   private Map<String, String> test(String content) throws IOException, InvalidConfigurationException {
     InputStream stream = new ByteArrayInputStream(content.getBytes(Charsets.UTF_8));
 
-    return Parser.parse(stream, basePath, "test");
+    return Parser.parse(stream, basePath, "test").getFirst();
   }
 
   private void testEmpty(String content) {
