@@ -21,6 +21,7 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
 import javax.annotation.Nullable;
 
@@ -59,6 +60,8 @@ public interface TypeConverter {
    * @param genericType The generic target type (may be null if not available).
    * @param secondaryOption An optional second annotation for the option
    * (this is one of the annotations marked with {@link OptionDetailAnnotation}).
+   * @param source The file where the configuration option was read from.
+   * May contain a dummy value if the option was given somehow else.
    * @return An instance of the target type produced from the string representation-
    *
    * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
@@ -66,7 +69,8 @@ public interface TypeConverter {
    */
   @Nullable
   Object convert(String optionName, String value, Class<?> type,
-      @Nullable Type genericType, @Nullable Annotation secondaryOption) throws InvalidConfigurationException;
+      @Nullable Type genericType, @Nullable Annotation secondaryOption,
+      Path source) throws InvalidConfigurationException;
 
   /**
    * Optionally convert the default value for an option that was given in the

@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.sosy_lab.common.Files;
+import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -96,11 +99,11 @@ class Parser {
    *
    * @param filename The file to parse.
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @return A map with all configuration directives in this file.
+   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Map<String, String> parse(File file, String basePath)
+  static Pair<Map<String, String>, Map<String, Path>> parse(File file, String basePath)
       throws IOException, InvalidConfigurationException {
 
     return parse(file, basePath, Collections.<String>emptySet());
@@ -112,11 +115,11 @@ class Parser {
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
    * @param filename The file to parse.
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file.
+   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Map<String, String> parse(File file, String basePath,
+  private static Pair<Map<String, String>, Map<String, Path>> parse(File file, String basePath,
       Set<String> includeStack) throws IOException, InvalidConfigurationException {
 
     if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
@@ -146,11 +149,11 @@ class Parser {
    * @param is The stream to read the file from.
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
    * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
-   * @return A map with all configuration directives in this file.
+   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Map<String, String> parse(InputStream is, String basePath,
+  static Pair<Map<String, String>, Map<String, Path>> parse(InputStream is, String basePath,
       String source) throws IOException, InvalidConfigurationException {
 
     return parse(is, basePath, source, Collections.<String>emptySet());
@@ -167,11 +170,12 @@ class Parser {
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
    * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file.
+   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Map<String, String> parse(InputStream is, String basePath,
+  private static Pair<Map<String, String>, Map<String, Path>> parse(
+      InputStream is, String basePath,
       String source, Set<String> includeStack) throws IOException, InvalidConfigurationException {
 
     BufferedReader r = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
@@ -183,6 +187,7 @@ class Parser {
     String currentValue = null;
     Map<String, String> definedOptions = Maps.newHashMap();
     Map<String, String> includedOptions = Maps.newHashMap();
+    Map<String, Path> includedOptionsSources = Maps.newHashMap();
 
     while ((line = r.readLine()) != null) {
       lineno++;
@@ -214,7 +219,9 @@ class Parser {
           throw new InvalidConfigurationFileException("Include without filename", lineno, source, fullLine);
         }
 
-        includedOptions.putAll(parse(new File(line), basePath, includeStack));
+        final Pair<Map<String, String>, Map<String, Path>> includedContent = parse(new File(line), basePath, includeStack);
+        includedOptions.putAll(includedContent.getFirst());
+        includedOptionsSources.putAll(includedContent.getSecond());
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {
@@ -278,7 +285,12 @@ class Parser {
     // now overwrite included options with local ones
     includedOptions.putAll(definedOptions);
 
-    return includedOptions;
+    Path thisSource = Paths.get(source);
+    for (String name : definedOptions.keySet()) {
+      includedOptionsSources.put(name, thisSource);
+    }
+
+    return Pair.of(includedOptions, includedOptionsSources);
   }
 
 }

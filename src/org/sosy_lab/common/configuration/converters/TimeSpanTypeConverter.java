@@ -21,6 +21,7 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -45,7 +46,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> pType,
-      Type pGenericType, Annotation pOption) throws InvalidConfigurationException {
+      Type pGenericType, Annotation pOption, Path pSource) throws InvalidConfigurationException {
 
     if (!(pOption instanceof TimeSpanOption)) {
       throw new UnsupportedOperationException("Time span options need to be annotated with @TimeSpanOption");

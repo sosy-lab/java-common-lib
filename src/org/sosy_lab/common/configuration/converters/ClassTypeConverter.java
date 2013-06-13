@@ -21,6 +21,7 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
@@ -31,7 +32,7 @@ public class ClassTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String value, Class<?> type, Type genericType,
-      Annotation secondaryOption) throws InvalidConfigurationException {
+      Annotation secondaryOption, Path pSource) throws InvalidConfigurationException {
 
     // get optional package prefix
     String packagePrefix = "";

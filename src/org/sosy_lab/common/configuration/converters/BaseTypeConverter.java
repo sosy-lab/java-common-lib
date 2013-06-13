@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.logging.Level;
 
 import org.sosy_lab.common.configuration.Configuration;
@@ -46,7 +47,7 @@ public enum BaseTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> type, Type pGenericType,
-      Annotation pSecondaryOption) throws InvalidConfigurationException {
+      Annotation pSecondaryOption, Path pSource) throws InvalidConfigurationException {
 
     if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method

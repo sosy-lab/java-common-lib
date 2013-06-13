@@ -99,11 +99,12 @@ public class FileTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String pValue, Class<?> pType, Type pGenericType,
-      Annotation secondaryOption) throws InvalidConfigurationException {
+      Annotation secondaryOption, Path pSource) throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    return handleFileOption(optionName, Paths.get(pValue), ((FileOption)secondaryOption).value(), pType);
+    return handleFileOption(optionName, Paths.get(pValue),
+        ((FileOption)secondaryOption).value(), pType, pSource);
   }
 
   @Override
@@ -135,7 +136,7 @@ public class FileTypeConverter implements TypeConverter {
     }
 
     @SuppressWarnings("unchecked")
-    T value = (T)handleFileOption(optionName, defaultValue, typeInfo, pType);
+    T value = (T)handleFileOption(optionName, defaultValue, typeInfo, pType, null);
     return value;
   }
 
@@ -147,11 +148,16 @@ public class FileTypeConverter implements TypeConverter {
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
   private Object handleFileOption(final String optionName, Path file, final FileOption.Type typeInfo,
-          final Class<?> targetType)
+          final Class<?> targetType, final Path source)
           throws InvalidConfigurationException {
 
     if (typeInfo == FileOption.Type.OUTPUT_FILE) {
       file = outputPath.resolve(file);
+    } else if (source != null) {
+      Path baseDir = source.getParent();
+      if (baseDir != null) {
+        file = baseDir.resolve(file);
+      }
     } else {
       file = rootPath.resolve(file);
     }

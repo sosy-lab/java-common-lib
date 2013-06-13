@@ -33,6 +33,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,6 +89,7 @@ public class Configuration {
   public static class Builder {
 
     private Map<String, String> properties = null;
+    private Map<String, Path> sources = null;
     private Configuration oldConfig = null;
     private String prefix = null;
     private Map<Class<?>, TypeConverter> converters = null;
@@ -96,9 +99,11 @@ public class Configuration {
     private void setupProperties() {
       if (properties == null) {
         properties = new HashMap<>();
+        sources = new HashMap<>();
 
         if (oldConfig != null) {
           properties.putAll(oldConfig.properties);
+          sources.putAll(oldConfig.sources);
         }
       }
     }
@@ -112,6 +117,7 @@ public class Configuration {
       setupProperties();
 
       properties.put(name, value);
+      sources.put(name, Paths.get("manually set"));
 
       return this;
     }
@@ -124,6 +130,7 @@ public class Configuration {
       setupProperties();
 
       properties.remove(name);
+      sources.remove(name);
 
       return this;
     }
@@ -136,6 +143,9 @@ public class Configuration {
       setupProperties();
 
       properties.putAll(options);
+      for (String name : options.keySet()) {
+        sources.put(name, Paths.get("manually set"));
+      }
 
       return this;
     }
@@ -163,6 +173,7 @@ public class Configuration {
     public Builder copyFrom(Configuration oldConfig) {
       Preconditions.checkNotNull(oldConfig);
       Preconditions.checkState(this.properties == null);
+      Preconditions.checkState(this.sources == null);
       Preconditions.checkState(this.oldConfig == null);
       Preconditions.checkState(this.converters == null);
 
@@ -186,7 +197,9 @@ public class Configuration {
       Preconditions.checkNotNull(stream);
       setupProperties();
 
-      properties.putAll(Parser.parse(stream, basePath, source));
+      final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(stream, basePath, source);
+      properties.putAll(content.getFirst());
+      sources.putAll(content.getSecond());
 
       return this;
     }
@@ -226,7 +239,9 @@ public class Configuration {
       Preconditions.checkNotNull(file);
       setupProperties();
 
-      properties.putAll(Parser.parse(file, ""));
+      final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(file, "");
+      properties.putAll(content.getFirst());
+      sources.putAll(content.getSecond());
 
       return this;
     }
@@ -290,6 +305,18 @@ public class Configuration {
         newProperties = ImmutableMap.copyOf(properties);
       }
 
+      ImmutableMap<String, Path> newSources;
+      if (sources == null) {
+        // we can re-use the old sources instance because it is immutable
+        if (oldConfig != null) {
+          newSources = oldConfig.sources;
+        } else {
+          newSources = ImmutableMap.of();
+        }
+      } else {
+        newSources = ImmutableMap.copyOf(sources);
+      }
+
       String newPrefix;
       if (prefix == null) {
         if (oldConfig != null) {
@@ -324,7 +351,7 @@ public class Configuration {
         newDeprecatedProperties = new HashSet<>(0);
       }
 
-      Configuration newConfig = new Configuration(newProperties, newPrefix,
+      Configuration newConfig = new Configuration(newProperties, newSources, newPrefix,
           newConverters, newUnusedProperties, newDeprecatedProperties);
       newConfig.inject(newConfig);
 
@@ -348,7 +375,8 @@ public class Configuration {
    * Creates a configuration with all values set to default.
    */
   public static Configuration defaultConfiguration() {
-    return new Configuration(ImmutableMap.<String, String>of(), "",
+    return new Configuration(ImmutableMap.<String, String>of(),
+        ImmutableMap.<String, Path>of(), "",
         ImmutableMap.copyOf(DEFAULT_CONVERTERS), new HashSet<String>(0),
         new HashSet<String>(0));
   }
@@ -357,7 +385,8 @@ public class Configuration {
    * Creates a copy of a configuration with just the prefix set to a new value.
    */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
-    Configuration newConfig = new Configuration(oldConfig.properties, newPrefix,
+    Configuration newConfig = new Configuration(oldConfig.properties,
+        oldConfig.sources, newPrefix,
         oldConfig.converters, oldConfig.unusedProperties, oldConfig.deprecatedProperties);
 
     // instead of calling inject() set options manually
@@ -464,6 +493,7 @@ public class Configuration {
 
 
   private final ImmutableMap<String, String> properties;
+  private final ImmutableMap<String, Path> sources;
 
   private final String prefix;
 
@@ -477,10 +507,15 @@ public class Configuration {
   /*
    * This constructor does not set the fields annotated with @Option!
    */
-  private Configuration(ImmutableMap<String, String> pProperties, String pPrefix,
+  private Configuration(ImmutableMap<String, String> pProperties,
+      ImmutableMap<String, Path> pSources,
+      String pPrefix,
       ImmutableMap<Class<?>, TypeConverter> pConverters,
       Set<String> pUnusedProperties, Set<String> pDeprecatedProperties) {
+
+    assert pProperties.keySet().equals(pSources.keySet());
     properties = pProperties;
+    sources = pSources;
     prefix = (pPrefix.isEmpty() ? "" : (pPrefix + "."));
     converters = pConverters;
     unusedProperties = pUnusedProperties;
@@ -1003,7 +1038,8 @@ public class Configuration {
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
-    return converter.convert(optionName, valueStr, type, genericType, secondaryOption);
+    return converter.convert(optionName, valueStr, type, genericType, secondaryOption,
+        sources.get(optionName));
   }
 
   /**

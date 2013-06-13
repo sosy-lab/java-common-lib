@@ -21,6 +21,7 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
 import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,7 +34,7 @@ public class IntegerTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> type,
-      Type pGenericType, Annotation pOption) throws InvalidConfigurationException {
+      Type pGenericType, Annotation pOption, Path pSource) throws InvalidConfigurationException {
 
     if (!(pOption instanceof IntegerOption)) {
       throw new UnsupportedOperationException("IntegerTypeConverter needs otions annotated with @IntegerOption");
