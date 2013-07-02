@@ -32,6 +32,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Utility class providing {@link Appender}s for various cases.
@@ -153,6 +154,35 @@ public class Appenders {
       throw new AssertionError("StringBuilder threw IOException", e);
     }
     return sb;
+  }
+
+  /**
+   * Create a new {@link Appender} that consists of the sequential concatenation
+   * of multiple appenders.
+   * The given iterable is traversed once each time the resulting appender's
+   * {@link Appender#appendTo(Appendable)} method is called.
+   * The iterable may not contain nulls or be null itself..
+   */
+  public static Appender concat(final Iterable<Appender> pAppenders) {
+    checkNotNull(pAppenders);
+    return new AbstractAppender() {
+      @Override
+      public void appendTo(Appendable pAppendable) throws IOException {
+        for (Appender appender : pAppenders) {
+          appender.appendTo(pAppendable);
+        }
+      }
+    };
+  }
+
+  /**
+   * Create a new {@link Appender} that consists of the sequential concatenation
+   * of multiple appenders.
+   *
+   * @throws NullPointerException if any of the provided appendables is null
+   */
+  public static Appender concat(final Appender... pAppenders) {
+    return concat(ImmutableList.copyOf(pAppenders));
   }
 
   /**
