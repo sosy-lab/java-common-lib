@@ -32,7 +32,7 @@ import java.util.logging.LogRecord;
  */
 class FileLogFormatter extends Formatter {
 
-  private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
   @Override
   public String format(LogRecord lr) {
