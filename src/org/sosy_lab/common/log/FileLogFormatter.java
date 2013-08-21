@@ -21,11 +21,25 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.log;
+
+import java.text.SimpleDateFormat;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 /**
- * Interface for increasing compatibility with old code
- * that was written before LogManager was moved to its own package.
+ * Class to handle formatting for file output
  */
-public interface LogManager extends org.sosy_lab.common.log.LogManager {
+class FileLogFormatter extends Formatter {
+
+  private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
+  @Override
+  public String format(LogRecord lr) {
+
+    return dateFormat.format(lr.getMillis()) + "\t "
+        + "level: " + lr.getLevel().toString() + "\t "
+        + LogUtils.extractSimpleClassName(lr)  + "." + lr.getSourceMethodName()  + "\t "
+        + lr.getMessage() + "\n\n";
+  }
 }
