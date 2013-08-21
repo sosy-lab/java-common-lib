@@ -21,11 +21,26 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.log;
+
+import java.util.List;
+import java.util.logging.Filter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
- * Interface for increasing compatibility with old code
- * that was written before LogManager was moved to its own package.
+ * {@link Filter} implementation for blacklisting log levels.
  */
-public interface LogManager extends org.sosy_lab.common.log.LogManager {
+class LogLevelFilter implements Filter {
+
+  private final List<Level> excludeLevels;
+
+  public LogLevelFilter(List<Level> excludeLevels) {
+    this.excludeLevels = excludeLevels;
+  }
+
+  @Override
+  public boolean isLoggable(LogRecord pRecord) {
+    return !(excludeLevels.contains(pRecord.getLevel()));
+  }
 }

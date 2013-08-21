@@ -21,11 +21,27 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.log;
 
-/**
- * Interface for increasing compatibility with old code
- * that was written before LogManager was moved to its own package.
- */
-public interface LogManager extends org.sosy_lab.common.log.LogManager {
+import java.util.logging.LogRecord;
+
+class LogUtils {
+
+  private LogUtils() {}
+
+  /**
+   * Get the simple name of the source class of a log record.
+   */
+  static String extractSimpleClassName(LogRecord lr) {
+    String fullClassName = lr.getSourceClassName();
+    int dotIndex = fullClassName.lastIndexOf('.');
+    assert dotIndex < fullClassName.length() - 1 : "Last character in a class name cannot be a dot";
+  
+    // if no dot is contained, dotIndex is -1 so we get the substring from 0,
+    // i.e., the whole string (which is what we want)
+  
+    String className = fullClassName.substring(dotIndex+1);
+    return className;
+  }
+
 }
