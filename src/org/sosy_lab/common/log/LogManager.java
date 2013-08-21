@@ -36,7 +36,7 @@ import java.util.logging.Level;
  * The main advantage of this interface is that the arguments to the log methods
  * are only converted to strings, if the message is really logged.
  */
-public interface LogManager {
+public interface LogManager extends AutoCloseable {
 
   /**
    * Returns true if a message with the given log level would be logged.
@@ -121,6 +121,7 @@ public interface LogManager {
 
   void flush();
 
+  @Override
   void close();
 
 }
