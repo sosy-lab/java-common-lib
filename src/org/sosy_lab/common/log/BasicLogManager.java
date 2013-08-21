@@ -90,6 +90,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   private static final Level exceptionDebugLevel = Level.ALL;
   private static final Joiner messageFormat = Joiner.on(' ').useForNull("null");
   private final Logger logger;
+  private final LogManagerBean mxBean;
 
   public static interface LogManagerMXBean {
 
@@ -164,8 +165,8 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     }
 
     // setup MXBean at the end (this might already log something!)
-    new LogManagerBean(consoleOutputHandler).register();
-    // don't store the MXBean, we wouldn't know when to unregister anyway
+    mxBean = new LogManagerBean(consoleOutputHandler);
+    mxBean.register();
   }
 
   private void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) throws InvalidConfigurationException {
@@ -438,6 +439,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   }
   @Override
   public void close() {
+    mxBean.unregister();
     for (Handler handler : logger.getHandlers()) {
       handler.close();
     }
