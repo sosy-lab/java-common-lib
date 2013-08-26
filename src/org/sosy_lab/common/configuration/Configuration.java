@@ -580,6 +580,7 @@ public class Configuration {
    * - {@link File} (the field {@link Option#type()} is required in this case!)
    * - {@link Class <Something>}
    * - {@link java.util.logging.Level}
+   * - {@link java.util.regex.Pattern}
    * - arrays of the above types
    * - collection types {@link Iterable}, {@link Collection}, {@link List},
    *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}

@@ -23,11 +23,12 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.EnumSet;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -60,6 +61,41 @@ public class ConfigurationTest {
   @Test
   public void testEnumSetDefault() throws InvalidConfigurationException {
     testDefault(TestEnumSetOptions.class);
+  }
+
+
+  @Options
+  private static class TestPatternOptions {
+
+    @Option(description="Test injection of Pattern instances")
+    private Pattern regexp = Pattern.compile(".*");
+  }
+
+  @Test
+  public void testPattern() throws InvalidConfigurationException {
+    Configuration config = Configuration.builder()
+                           .setOption("regexp", "foo.*bar")
+                           .build();
+
+    TestPatternOptions options = new TestPatternOptions();
+    config.inject(options);
+    assertTrue(options.regexp.matcher("fooTESTbar").matches());
+    assertFalse(options.regexp.matcher("barTESTfoo").matches());
+  }
+
+  @Test(expected=InvalidConfigurationException.class)
+  public void testInvalidPattern() throws InvalidConfigurationException {
+    Configuration config = Configuration.builder()
+                           .setOption("regexp", "*foo.*bar")
+                           .build();
+
+    TestPatternOptions options = new TestPatternOptions();
+    config.inject(options);
+  }
+
+  @Test
+  public void testPatternDefault() throws InvalidConfigurationException {
+    testDefault(TestPatternOptions.class);
   }
 
   /**

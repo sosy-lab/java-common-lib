@@ -29,6 +29,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -37,7 +39,7 @@ import com.google.common.primitives.Primitives;
 
 /**
  * A {@link TypeConverter} which handles all the trivial cases like ints, Strings,
- * etc.
+ * log levels, regexps, etc.
  *
  * This class should not have any relevance outside the {@link Configuration} class.
  */
@@ -68,6 +70,13 @@ public enum BaseTypeConverter implements TypeConverter {
         return Level.parse(valueStr);
       } catch (IllegalArgumentException e) {
         throw new InvalidConfigurationException("Illegal log level " + valueStr + " in option " + optionName);
+      }
+
+    } else if (type.equals(Pattern.class)) {
+      try {
+        return Pattern.compile(valueStr);
+      } catch (PatternSyntaxException e) {
+        throw new InvalidConfigurationException("Illegal regular expression " + valueStr + " in option " + optionName + " (" + e.getMessage() + ")", e);
       }
 
     } else {
