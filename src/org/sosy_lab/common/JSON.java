@@ -26,9 +26,12 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import com.google.common.base.Strings;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1
@@ -38,13 +41,15 @@ import java.util.Map;
  *
  * Significant performance improvements were made compared to the library.
  */
-public class JSON {
+public final class JSON {
+
+  private JSON() { }
 
   /**
    * Encode an object into JSON text and write it to a file.
    * @throws IOException
    */
-  public static void writeJSONString(Object value, File file, Charset charset) throws IOException {
+  public static void writeJSONString(@Nullable Object value, File file, Charset charset) throws IOException {
     writeJSONString(value, file.toPath(), charset);
   }
 
@@ -52,8 +57,10 @@ public class JSON {
    * Encode an object into JSON text and write it to a file.
    * @throws IOException
    */
-  public static void writeJSONString(Object value, Path file, Charset charset) throws IOException {
-    Files.createDirectories(file.getParent());
+  public static void writeJSONString(@Nullable Object value, Path file, Charset charset) throws IOException {
+    if (file.getParent() != null) {
+      Files.createDirectories(file.getParent());
+    }
     try (Writer out = Files.newBufferedWriter(file, charset)) {
       writeJSONString(value, out);
     }
@@ -63,26 +70,28 @@ public class JSON {
    * Encode an object into JSON text and write it to out.
    * @throws IOException
    */
-  public static void writeJSONString(Object value, Appendable out) throws IOException {
+  public static void writeJSONString(@Nullable Object value, Appendable out) throws IOException {
     if (value == null) {
       out.append("null");
 
-    } else if (value instanceof String) {
+    } else if (value instanceof CharSequence) {
       out.append('\"');
-      escape((String)value, out);
+      escape((CharSequence)value, out);
       out.append('\"');
 
     } else if (value instanceof Double) {
-      if (((Double)value).isInfinite() || ((Double)value).isNaN())
+      if (((Double)value).isInfinite() || ((Double)value).isNaN()) {
         out.append("null");
-      else
+      } else {
         out.append(value.toString());
+      }
 
     } else if (value instanceof Float) {
-      if (((Float)value).isInfinite() || ((Float)value).isNaN())
+      if (((Float)value).isInfinite() || ((Float)value).isNaN()) {
         out.append("null");
-      else
+      } else {
         out.append(value.toString());
+      }
 
     } else if (value instanceof Number) {
       out.append(value.toString());
@@ -106,20 +115,13 @@ public class JSON {
    */
   private static void writeJSONString(List<?> list, Appendable out) throws IOException {
     boolean first = true;
-    Iterator<?> iter = list.iterator();
 
     out.append('[');
-    while (iter.hasNext()) {
+    for (Object value : list) {
       if (first) {
         first = false;
       } else {
         out.append(',');
-      }
-
-      Object value = iter.next();
-      if (value == null) {
-        out.append("null");
-        continue;
       }
 
       JSON.writeJSONString(value, out);
@@ -131,18 +133,16 @@ public class JSON {
   /**
    * Encode a map into JSON text and write it to out.
    */
-  private static <K,V> void writeJSONString(Map<K,V> map, Appendable out) throws IOException {
+  private static void writeJSONString(Map<?, ?> map, Appendable out) throws IOException {
     boolean first = true;
-    Iterator<Map.Entry<K,V>> iter = map.entrySet().iterator();
 
     out.append('{');
-    while (iter.hasNext()) {
+    for(Map.Entry<?, ?> entry : map.entrySet()) {
       if (first) {
         first = false;
       } else {
         out.append(',');
       }
-      Map.Entry<K,V> entry = iter.next();
       out.append('\"');
       escape(String.valueOf(entry.getKey()), out);
       out.append('\"');
@@ -154,10 +154,8 @@ public class JSON {
 
   /**
    * Escape quotes, \, /, \r, \n, \b, \f, \t and other control characters (U+0000 through U+001F).
-   * @param s Must not be null.
-   * @param out
    */
-  private static void escape(String s, Appendable out) throws IOException {
+  private static void escape(CharSequence s, Appendable out) throws IOException {
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);
       switch(ch) {
@@ -188,17 +186,14 @@ public class JSON {
       default:
         //Reference: http://www.unicode.org/versions/Unicode5.1.0/
         if ((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F') || (ch>='\u2000' && ch<='\u20FF')) {
-          String ss = Integer.toHexString(ch);
+          String ss = Integer.toHexString(ch)
+                             .toUpperCase();
           out.append("\\u");
-          for (int k=0;k<4-ss.length();k++) {
-            out.append('0');
-          }
-          out.append(ss.toUpperCase());
+          out.append(Strings.padStart(ss, 4, '0'));
         } else {
           out.append(ch);
         }
       }
-    }//for
+    }
   }
-
 }
