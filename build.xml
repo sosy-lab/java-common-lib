@@ -158,8 +158,11 @@
     <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
 
     <target name="jar" depends="build">
-        <jar basedir="${class.dir}/" includes="**" destfile="common-${version}.jar"
-                whenmanifestonly="fail">
+        <jar basedir="${class.dir}/" destfile="common-${version}.jar"
+                whenmanifestonly="fail"
+                includes="**"
+                excludes="**/*Test.class **/*Test$*.class"
+                >
             <manifest>
                     <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
                     <attribute name="Implementation-Version" value="${version}"/>
