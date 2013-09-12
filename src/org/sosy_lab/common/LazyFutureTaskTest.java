@@ -1,0 +1,129 @@
+/*
+ *  CPAchecker is a tool for configurable software verification.
+ *  This file is part of CPAchecker.
+ *
+ *  Copyright (C) 2007-2013  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+ *  CPAchecker web page:
+ *    http://cpachecker.sosy-lab.org
+ */
+package org.sosy_lab.common;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+public class LazyFutureTaskTest {
+
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
+
+  @Test
+  public void testRunnable() throws InterruptedException, ExecutionException {
+    final AtomicBoolean test = new AtomicBoolean(false);
+
+    Future<Boolean> f = new LazyFutureTask<>(new Runnable() {
+      @Override
+      public void run() {
+        test.set(true);
+      }
+    }, true);
+
+    assertEquals(true, f.get());
+    assertEquals(true, test.get());
+  }
+
+  @Test
+  public void testCallable() throws InterruptedException, ExecutionException {
+
+    Future<Boolean> f = new LazyFutureTask<>(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return true;
+      }
+    });
+
+    assertEquals(true, f.get());
+  }
+
+  @Test
+  public void testException() throws InterruptedException, ExecutionException {
+    final NullPointerException testException = new NullPointerException();
+
+    thrown.expect(ExecutionException.class);
+    thrown.expectCause(is(testException));
+
+    Future<Boolean> f = new LazyFutureTask<>(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        throw testException;
+      }
+    });
+
+    f.get();
+  }
+
+  @Test
+  public void testNoExecution() throws InterruptedException, ExecutionException {
+    final AtomicBoolean test = new AtomicBoolean(true);
+
+    new LazyFutureTask<Void>(new Runnable() {
+      @Override
+      public void run() {
+        test.set(false);
+      }
+    }, null);
+
+    // no call to f.get()
+    assertEquals(true, test.get());
+  }
+
+  @Test
+  public void testExceptionNoExecution() throws InterruptedException, ExecutionException {
+    new LazyFutureTask<>(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        throw new NullPointerException();
+      }
+    });
+
+    // no call to f.get()
+  }
+
+  @Test
+  public void testCancel() throws InterruptedException, ExecutionException {
+    thrown.expect(CancellationException.class);
+
+    Future<Void> f = new LazyFutureTask<>(new Runnable() {
+      @Override
+      public void run() {
+      }
+    }, null);
+
+    f.cancel(false);
+    f.get();
+  }
+}
