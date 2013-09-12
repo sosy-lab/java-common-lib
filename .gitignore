@@ -1,0 +1,9 @@
+/bin
+/ivy-*.xml
+/common-*.jar
+/TEST-*.txt
+
+# /lib/
+/lib
+/lib/java
+/lib/java-contrib
