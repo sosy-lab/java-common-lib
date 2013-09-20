@@ -87,6 +87,9 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   @Option(description="maximum size of log output strings before they will be truncated")
   private int truncateSize = 10000;
 
+  // Number of characters taken from the start of the original output strings when truncating
+  private final int truncateRemainingSize = 100;
+
   private static final Level exceptionDebugLevel = Level.ALL;
   private static final Joiner messageFormat = Joiner.on(' ').useForNull("null");
   private final Logger logger;
@@ -282,7 +285,8 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
       String arg = firstNonNull(args[i], "null").toString();
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
-        argsStr[i] = "<ARGUMENT OMITTED BECAUSE " + arg.length() + " CHARACTERS LONG>";
+        argsStr[i] = arg.substring(0, truncateRemainingSize)
+                   + "... <REMAINING ARGUMENT OMITTED BECAUSE " + arg.length() + " CHARACTERS LONG>";
       } else {
         argsStr[i] = arg;
       }
