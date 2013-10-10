@@ -782,7 +782,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class EntrySet<K extends Comparable<? super K>, V> extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
+  private static final class EntrySet<K extends Comparable<? super K>, V> extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
 
     private final Node<K, V> root;
 
@@ -818,10 +818,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (this.root == other.root) {
           return true;
         }
+      }
 
-        if (other.size() > this.size) {
-          return false;
-        }
+      if (pC.size() > this.size) {
+        return false;
       }
 
       // Arbitrary collection, delegate to AbstractSet
@@ -925,6 +925,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         EntrySet<?, ?> other = (EntrySet<?, ?>)pO;
         if (this.root == other.root) {
           return true;
+        }
+
+        if (this.size() != other.size()) {
+          return false;
         }
 
         // this is faster than the fallback check because it's O(n)
@@ -1336,6 +1340,15 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
 
         return (thisNode != null) && Objects.equal(thisNode.getValue(), other.getValue());
+      }
+
+      @Override
+      public boolean containsAll(Collection<?> pC) {
+        if (pC.size() > this.size) {
+          return false;
+        }
+
+        return super.containsAll(pC);
       }
 
       @Override
