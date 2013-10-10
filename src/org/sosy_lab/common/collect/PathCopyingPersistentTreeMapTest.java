@@ -25,7 +25,10 @@ package org.sosy_lab.common.collect;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
 import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.junit.After;
@@ -33,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 
 
 public class PathCopyingPersistentTreeMapTest {
@@ -261,18 +265,19 @@ public class PathCopyingPersistentTreeMapTest {
     Random rnd = new Random(3987432434L); // static seed for reproducibility
     TreeMap<String, String> comparison = new TreeMap<>();
 
-    // Insert 1000 nodes
-    for (int i = 0; i < 1000; i++) {
+    // Insert 500 nodes
+    for (int i = 0; i < 500; i++) {
       String key = rnd.nextInt() + "";
       String value = rnd.nextInt() + "";
 
       put(key, value);
       comparison.put(key, value);
       checkEqualTo(comparison);
+      checkPartialMaps(comparison, rnd);
     }
 
-    // 1000 random put/remove operations
-    for (int i = 0; i < 1000; i++) {
+    // 500 random put/remove operations
+    for (int i = 0; i < 500; i++) {
       String key = rnd.nextInt() + "";
 
       if (rnd.nextBoolean()) {
@@ -285,6 +290,7 @@ public class PathCopyingPersistentTreeMapTest {
       }
 
       checkEqualTo(comparison);
+      checkPartialMaps(comparison, rnd);
     }
 
     // clear map
@@ -293,21 +299,54 @@ public class PathCopyingPersistentTreeMapTest {
       remove(key);
       comparison.remove(key);
       checkEqualTo(comparison);
+      checkPartialMaps(comparison, rnd);
     }
 
     testEmpty();
   }
 
-  private void checkEqualTo(TreeMap<String, String> comparison) {
+  private void checkPartialMaps(SortedMap<String, String> comparison, Random rnd) {
+    String key1 = rnd.nextInt() + "";
+    String key2 = rnd.nextInt() + "";
+
+    checkEqualTo(comparison.tailMap(key1), map.tailMap(key1));
+    checkEqualTo(comparison.tailMap(key2), map.tailMap(key2));
+    checkEqualTo(comparison.headMap(key1), map.headMap(key1));
+    checkEqualTo(comparison.headMap(key2), map.headMap(key2));
+
+    String lowKey  = Ordering.natural().min(key1, key2);
+    String highKey = Ordering.natural().max(key1, key2);
+    checkEqualTo(comparison.subMap(lowKey, highKey), map.subMap(lowKey, highKey));
+  }
+
+  private void checkEqualTo(SortedMap<String, String> comparison) {
+    checkEqualTo(comparison, map);
+  }
+
+  private void checkEqualTo(SortedMap<String, String> comparison, SortedMap<String, String> map) {
     assertEquals(comparison, map);
+    assertEquals(comparison.isEmpty(), map.isEmpty());
     assertEquals(comparison.size(), map.size());
     assertEquals(comparison.hashCode(), map.hashCode());
-    assertTrue(Iterables.elementsEqual(comparison.entrySet(), map.entrySet()));
-    assertTrue(Iterables.elementsEqual(comparison.keySet(),   map.keySet()));
-    assertTrue(Iterables.elementsEqual(comparison.values(),   map.values()));
+    checkEqualTo(comparison.entrySet(), map.entrySet());
+    checkEqualTo(comparison.keySet(),   map.keySet());
+    checkEqualTo(comparison.values(),   map.values());
     if (!comparison.isEmpty()) {
       assertEquals(comparison.firstKey(), map.firstKey());
       assertEquals(comparison.lastKey(), map.lastKey());
     }
+  }
+
+  private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
+    assertEquals(comparison, set);
+    assertEquals(comparison.hashCode(), set.hashCode());
+    checkEqualTo((Collection<T>)comparison, (Collection<T>)set);
+  }
+
+  private <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {
+    // equals() and hashCode() is undefined for Collections
+    assertEquals(comparison.isEmpty(), set.isEmpty());
+    assertEquals(comparison.size(), set.size());
+    assertTrue(Iterables.elementsEqual(comparison, set));
   }
 }

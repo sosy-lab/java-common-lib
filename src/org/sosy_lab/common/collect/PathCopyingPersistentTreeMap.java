@@ -24,6 +24,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -58,11 +59,6 @@ import com.google.common.collect.UnmodifiableIterator;
  * Two concurrent accesses to a modifying operation on the same instance will
  * create two new maps, each reflecting exactly the operation executed by the current thread,
  * and not reflecting the operation executed by the other thread.
- *
- * TODO Missing methods:
- * Currently not supported operations are
- * {{@link #headMap(Comparable)}, {@link #tailMap(Comparable)}, and {{@link #subMap(Comparable, Comparable)}}
- * as well as their counterparts in the collection views returned by methods of this class.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
@@ -274,6 +270,115 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       current = current.right;
     }
     return current;
+  }
+
+  /**
+   * Given a key and a tree, find the node in the tree with the given key,
+   * or (if there is no such node) the node with the smallest key
+   * that is still greater than the key to look for.
+   * In terms of SortedMap operations, this returns the node for
+   * map.tailMap(key).first() (tailMap() has an inclusive bound).
+   * Returns null if the tree is empty or there is no node that matches
+   * (i.e., key is larger than the largest key in the map).
+   * @param key The key to search for.
+   * @param root The tree to look in.
+   * @return A node or null.
+   */
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextGreaterOrEqualNode(K key, Node<K, V> root) {
+    Preconditions.checkNotNull(key);
+
+    Node<K, V> result = null; // this is always greater than or equal to key
+
+    Node<K, V> current = root;
+    while (current != null) {
+      int comp = key.compareTo(current.getKey());
+
+      if (comp < 0) {
+        // key < current.data
+        // All nodes to the right of current are irrelevant because they are too big.
+        // current is the best candidate we have found so far, so it becomes the new result
+        // (current is always smaller than the previous result and still bigger than key).
+
+        result = current;
+        current = current.left;
+
+      } else if (comp > 0) {
+        // key > current.data
+        // All nodes to the left of current are irrelevant because they are too small.
+        // current itself is too small, too.
+
+        current = current.right;
+
+      } else {
+        // key == current.data
+
+        return current;
+      }
+
+      if (current == null) {
+        // We have reached a leaf without finding the element.
+        return result;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Given a key and a tree, find the node with the largest key
+   * that is still strictly smaller than the key to look for.
+   * In terms of SortedMap operations, this returns the node for
+   * map.headMap(key).last() (heapMap() has an exclusive bound).
+   * Returns null if the tree is empty or there is no node that matches
+   * (i.e., key is smaller than or equal to the smallest key in the map).
+   * @param key The key to search for.
+   * @param root The tree to look in.
+   * @return A node or null.
+   */
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextStrictlySmallerNode(K key, Node<K, V> root) {
+    Preconditions.checkNotNull(key);
+
+    Node<K, V> result = null; // this is always smaller than key
+
+    Node<K, V> current = root;
+    while (current != null) {
+      int comp = key.compareTo(current.getKey());
+
+      if (comp < 0) {
+        // key < current.data
+        // All nodes to the right of current are irrelevant because they are too big.
+        // current itself is too big, too.
+
+        current = current.left;
+
+      } else if (comp > 0) {
+        // key > current.data
+        // All nodes to the left of current are irrelevant because they are too small.
+        // current is the best candidate we have found so far, so it becomes the new result
+        // (current is always bigger than the previous result and still smaller than key).
+
+        result = current;
+        current = current.right;
+
+      } else {
+        // key == current.data
+        // All nodes to the right of current are irrelevant because they are too big.
+        // current itself is too big, too.
+        // The right-most node in the left subtree of child is the result.
+
+        if (current.left == null) {
+          // no node smaller than key
+          return null;
+        } else {
+          return findLargestNode(current.left);
+        }
+      }
+
+      if (current == null) {
+        // We have reached a leaf without finding the element.
+        return result;
+      }
+    }
+    return null;
   }
 
   private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) throws IllegalStateException {
@@ -651,17 +756,24 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public SortedMap<K, V> subMap(K pFromKey, K pToKey) {
-    throw new UnsupportedOperationException();
+    checkNotNull(pFromKey);
+    checkNotNull(pToKey);
+
+    return PartialSortedMap.create(root, pFromKey, pToKey);
   }
 
   @Override
   public SortedMap<K, V> headMap(K pToKey) {
-    throw new UnsupportedOperationException();
+    checkNotNull(pToKey);
+
+    return PartialSortedMap.create(root, null, pToKey);
   }
 
   @Override
   public SortedMap<K, V> tailMap(K pFromKey) {
-    throw new UnsupportedOperationException();
+    checkNotNull(pFromKey);
+
+    return PartialSortedMap.create(root, pFromKey, null);
   }
 
   /**
@@ -684,7 +796,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public Iterator<Map.Entry<K, V>> iterator() {
-      return new EntryInOrderIterator<>(root);
+      return EntryInOrderIterator.create(root);
     }
 
     @Override
@@ -839,26 +951,43 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public SortedSet<Entry<K, V>> subSet(Entry<K, V> pFromElement,
         Entry<K, V> pToElement) {
-      throw new UnsupportedOperationException();
+      K fromKey = pFromElement.getKey();
+      K toKey = pToElement.getKey();
+
+      checkNotNull(fromKey);
+      checkNotNull(toKey);
+
+      return PartialSortedMap.create(root, fromKey, toKey).entrySet();
     }
 
     @Override
     public SortedSet<Entry<K, V>> headSet(Entry<K, V> pToElement) {
-      throw new UnsupportedOperationException();
+      K toKey = pToElement.getKey();
+
+      checkNotNull(toKey);
+
+      return PartialSortedMap.create(root, null, toKey).entrySet();
     }
 
     @Override
     public SortedSet<Entry<K, V>> tailSet(Entry<K, V> pFromElement) {
-      throw new UnsupportedOperationException();
+      K fromKey = pFromElement.getKey();
+
+      checkNotNull(fromKey);
+
+      return PartialSortedMap.create(root, fromKey, null).entrySet();
     }
   }
 
   /**
-   * Tree iterator with in-order iteration returning node objects.
+   * Tree iterator with in-order iteration returning node objects,
+   * with possibility for lower and upper bound.
+   * The lower bound (if present) needs to exist in the set and is inclusive,
+   * the upper bound is exclusive.
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class EntryInOrderIterator<K, V> extends UnmodifiableIterator<Map.Entry<K, V>> {
+  private static class EntryInOrderIterator<K extends Comparable<? super K>, V> extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:
     // stack.top is always the next element to be returned
@@ -866,11 +995,42 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private final Deque<Node<K, V>> stack;
 
-    private EntryInOrderIterator(Node<K, V> root) {
-      stack = new ArrayDeque<>();
-      if (root != null) {
-        pushLeftMostNodesOnStack(root);
+    // If not null, iteration stops at this key.
+    private final @Nullable K highKey; // exclusive
+
+    static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>>
+    create(@Nullable Node<K, V> root) {
+      if (root == null) {
+        return Iterators.emptyIterator();
+      } else {
+        return new EntryInOrderIterator<>(root, null, null);
       }
+    }
+
+    /**
+     * Create a new iterator with an optional lower and upper bound.
+     * @param pFromKey null or inclusive lower bound that needs to exist in the map
+     * @param pToKey null or exclusive lower bound
+     */
+    static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>>
+    createWithBounds(@Nullable Node<K, V> root, @Nullable K pFromKey, @Nullable K pToKey) {
+      if (root == null) {
+        return Iterators.emptyIterator();
+      } else {
+        return new EntryInOrderIterator<>(root, pFromKey, pToKey);
+      }
+    }
+
+    private EntryInOrderIterator(Node<K, V> root, @Nullable K pLowKey, @Nullable K pHighKey) {
+      stack = new ArrayDeque<>();
+      highKey = pHighKey;
+
+      if (pLowKey == null) {
+        pushLeftMostNodesOnStack(root);
+      } else {
+        pushNodesToKeyOnStack(root, pLowKey);
+      }
+      stopFurtherIterationIfOutOfRange();
     }
 
     @Override
@@ -886,6 +1046,34 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       stack.push(current);
     }
 
+    private void pushNodesToKeyOnStack(Node<K, V> current, K key) {
+      while (current != null) {
+        int comp = key.compareTo(current.getKey());
+
+        if (comp < 0) {
+          stack.push(current);
+          current = current.left;
+
+        } else if (comp > 0) {
+          // This node and it's left subtree can be ignored completely.
+          current = current.right;
+
+        } else {
+          stack.push(current);
+          return;
+        }
+      }
+      throw new AssertionError("PartialEntryInOrderIterator created with lower bound that is not in map");
+    }
+
+    private void stopFurtherIterationIfOutOfRange() {
+      if (highKey != null && !stack.isEmpty()
+          && stack.peek().getKey().compareTo(highKey) >= 0) {
+        // We have reached the end, next element would already be too large
+        stack.clear();
+      }
+    }
+
     @Override
     public Map.Entry<K, V> next() {
       Node<K, V> current = stack.pop();
@@ -897,7 +1085,318 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         pushLeftMostNodesOnStack(current.right);
       }
 
+      stopFurtherIterationIfOutOfRange();
+
       return current;
+    }
+  }
+
+  /**
+   * Partial map implementation for {@link SortedMap#subMap(Object, Object)} etc.
+   * At least one bound (upper/lower) needs to be present.
+   * The lower bound (if present) needs to exist in the map and is inclusive,
+   * the upper bound is exclusive.
+   * The range needs to contain at least one mapping.
+   * @param <K> The type of keys.
+   * @param <V> The type of values.
+   */
+  private static class PartialSortedMap<K extends Comparable<? super K>, V> extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V> {
+
+    static <K extends Comparable<? super K>, V> OurSortedMap<K, V>
+    create(Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
+      checkArgument(pFromKey != null || pToKey != null);
+
+      Node<K, V> root = findBestRoot(pRoot, pFromKey, pToKey);
+      if (root == null) {
+        return EmptyImmutableOurSortedMap.<K, V>of();
+      }
+
+      if (pFromKey != null && pToKey != null) {
+        int comp = pFromKey.compareTo(pToKey);
+        if (comp == 0) {
+          return EmptyImmutableOurSortedMap.<K, V>of();
+        }
+        checkArgument(comp < 0, "fromKey > toKey");
+      }
+
+      K fromKey = pFromKey;
+      Node<K, V> lowestNode = null;
+      if (pFromKey != null) {
+        lowestNode = findNextGreaterOrEqualNode(pFromKey, root);
+        if (lowestNode == null) {
+          return EmptyImmutableOurSortedMap.<K, V>of();
+        }
+        fromKey = lowestNode.getKey();
+      }
+
+      Node<K, V> highestNode = null;
+      if (pToKey != null) {
+        highestNode = findNextStrictlySmallerNode(pToKey, root);
+        if (highestNode == null) {
+          return EmptyImmutableOurSortedMap.<K, V>of();
+        }
+      }
+
+      if (pFromKey != null && pToKey != null) {
+        // [pFromKey; pToKey[ == [lowestNode; pToKey[ == [lowestNode; highestNode]
+
+        if (lowestNode.getKey().compareTo(highestNode.getKey()) > 0) {
+          // no mappings in [pFromKey; pToKey[
+          return EmptyImmutableOurSortedMap.<K, V>of();
+        }
+      }
+
+
+      return new PartialSortedMap<>(root, fromKey, pToKey);
+    }
+
+    // Find the best root for a given set of bounds
+    // (the lowest node in the tree that represents the complete range).
+    // Not using root directly but potentially only a subtree is more efficient.
+    private static @Nullable <K extends Comparable<? super K>, V> Node<K, V>
+    findBestRoot(@Nullable Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
+
+      Node<K, V> current = pRoot;
+      while (current != null) {
+
+        if (pFromKey != null && current.getKey().compareTo(pFromKey) < 0) {
+          // current < fromKey -> current and left subtree can be ignored
+          current = current.right;
+        } else if (pToKey != null && current.getKey().compareTo(pToKey) >= 0) {
+          // current -> toKey -> current and right subtree can be ignored
+          current = current.left;
+        } else {
+          // current is in range
+          return current;
+        }
+      }
+
+      return null; // no mapping in range
+    }
+
+    // Invariant: This map is never empty.
+
+    private final Node<K, V> root;
+
+    // null if there is no according bound
+    private final @Nullable K fromKey;  // inclusive
+    private final @Nullable K toKey; // exclusive
+
+    private transient SortedSet<Map.Entry<K, V>> entrySet;
+
+    private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
+      root = pRoot;
+      fromKey = pLowKey;
+      toKey = pHighKey;
+
+      // check non-emptiness invariant
+      assert root != null;
+      assert pLowKey == null || containsKey(pLowKey);
+      assert pHighKey == null || containsKey(findNextStrictlySmallerNode(pHighKey, pRoot).getKey());
+    }
+
+    private boolean inRange(K key) {
+      return !tooLow(key) && !tooHigh(key);
+    }
+
+    private boolean tooLow(K key) {
+      return fromKey != null && key.compareTo(fromKey) < 0;
+    }
+
+    private boolean tooHigh(K key) {
+      return toKey != null && key.compareTo(toKey) >= 0;
+    }
+
+    @Override
+    public boolean containsKey(Object pKey) {
+      @SuppressWarnings("unchecked")
+      K key = (K)checkNotNull(pKey);
+      return inRange(key) && findNode(key, root) != null;
+    }
+
+    @Override
+    public V get(Object pKey) {
+      @SuppressWarnings("unchecked")
+      K key = (K)checkNotNull(pKey);
+      return inRange(key) ? findNode(key, root).getValue() : null;
+    }
+
+    @Override
+    public boolean containsValue(Object pValue) {
+      return values().contains(pValue);
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return false;
+    }
+
+    @Override
+    public int size() {
+      return entrySet().size();
+    }
+
+
+    @Override
+    public String toString() {
+      return entrySet().toString();
+    }
+
+    @Override
+    public Comparator<? super K> comparator() {
+      return null;
+    }
+
+    @Override
+    public K firstKey() {
+      return entrySet().first().getKey();
+    }
+
+    @Override
+    public K lastKey() {
+      return entrySet().last().getKey();
+    }
+
+    @Override
+    public boolean equals(Object pObj) {
+      if (pObj instanceof Map<?, ?>) {
+        return entrySet().equals(((Map<?, ?>)pObj).entrySet());
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return entrySet().hashCode();
+    }
+
+    @Override
+    public SortedSet<Entry<K, V>> entrySet() {
+      if (entrySet == null) {
+        entrySet = new PartialEntrySet();
+      }
+      return entrySet;
+    }
+
+    @Override
+    public SortedSet<K> keySet() {
+      return new SortedMapKeySet<>(this);
+    }
+
+    @Override
+    public Collection<V> values() {
+      return Collections2.transform(entrySet(), Node.<V>getValueFunction());
+    }
+
+    @Override
+    public OurSortedMap<K, V> subMap(K pFromKey, K pToKey) {
+      checkNotNull(pFromKey);
+      checkNotNull(pToKey);
+
+      checkArgument(inRange(pFromKey));
+      checkArgument(inRange(pToKey));
+
+      return PartialSortedMap.create(root, pFromKey, pToKey);
+    }
+
+    @Override
+    public OurSortedMap<K, V> headMap(K pToKey) {
+      checkNotNull(pToKey);
+      checkArgument(inRange(pToKey));
+
+      return PartialSortedMap.create(root, fromKey, pToKey);
+    }
+
+    @Override
+    public OurSortedMap<K, V> tailMap(K pFromKey) {
+      checkNotNull(pFromKey);
+      checkArgument(inRange(pFromKey));
+
+      return PartialSortedMap.create(root, pFromKey, toKey);
+    }
+
+    /**
+     * Entry set implementation.
+     * The lower bound (if present) needs to exist in the map and is inclusive,
+     * the upper bound is exclusive.
+     * The range needs to contain at least one mapping.
+     */
+    private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
+
+      private transient int size;
+
+      @Override
+      public Iterator<Map.Entry<K, V>> iterator() {
+        return EntryInOrderIterator.createWithBounds(root, fromKey, toKey);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public boolean contains(Object pO) {
+        if (!(pO instanceof Map.Entry<?, ?>)) {
+          return false;
+        }
+        // pO is not null here
+        Map.Entry<?, ?> other = (Map.Entry<?, ?>)pO;
+        if (!inRange((K) other.getKey())) {
+          return false;
+        }
+        Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
+
+        return (thisNode != null) && Objects.equal(thisNode.getValue(), other.getValue());
+      }
+
+      @Override
+      public boolean isEmpty() {
+        return false;
+      }
+
+      @Override
+      public int size() {
+        if (size == 0) {
+          size = Iterators.size(iterator());
+        }
+        return size;
+      }
+
+      @Override
+      public Map.Entry<K, V> first() {
+        if (fromKey == null) {
+          return findSmallestNode(root);
+        } else {
+          return findNextGreaterOrEqualNode(fromKey, root);
+        }
+      }
+
+      @Override
+      public Map.Entry<K, V> last() {
+        if (toKey == null) {
+          return findLargestNode(root);
+        } else {
+          return findNextStrictlySmallerNode(toKey, root);
+        }
+      }
+
+      @Override
+      public Comparator<? super Entry<K, V>> comparator() {
+        return Ordering.natural().onResultOf(Node.<K>getKeyFunction());
+      }
+
+      @Override
+      public SortedSet<Entry<K, V>> subSet(Entry<K, V> pFromElement,
+          Entry<K, V> pToElement) {
+        return subMap(pFromElement.getKey(), pToElement.getKey()).entrySet();
+      }
+
+      @Override
+      public SortedSet<Entry<K, V>> headSet(Entry<K, V> pToElement) {
+        return headMap(pToElement.getKey()).entrySet();
+      }
+
+      @Override
+      public SortedSet<Entry<K, V>> tailSet(Entry<K, V> pFromElement) {
+        return tailMap(pFromElement.getKey()).entrySet();
+      }
     }
   }
 }
