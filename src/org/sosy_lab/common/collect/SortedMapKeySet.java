@@ -91,16 +91,16 @@ class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K> im
 
   @Override
   public SortedSet<K> subSet(K pFromElement, K pToElement) {
-    throw new UnsupportedOperationException();
+    return new SortedMapKeySet<>(map.subMap(pFromElement, pToElement));
   }
 
   @Override
   public SortedSet<K> headSet(K pToElement) {
-    throw new UnsupportedOperationException();
+    return new SortedMapKeySet<>(map.headMap(pToElement));
   }
 
   @Override
   public SortedSet<K> tailSet(K pFromElement) {
-    throw new UnsupportedOperationException();
+    return new SortedMapKeySet<>(map.tailMap(pFromElement));
   }
 }
