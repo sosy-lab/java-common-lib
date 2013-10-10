@@ -116,15 +116,23 @@ public class PathCopyingPersistentTreeMapTest {
   public void putABCD() {
     put("a", "1");
     assertEquals(map.toString(), "[a=1]");
+    assertEquals("a", map.firstKey());
+    assertEquals("a", map.lastKey());
 
     put("b", "2");
     assertEquals(map.toString(), "[a=1, b=2]");
+    assertEquals("a", map.firstKey());
+    assertEquals("b", map.lastKey());
 
     put("c", "3");
     assertEquals(map.toString(), "[a=1, b=2, c=3]");
+    assertEquals("a", map.firstKey());
+    assertEquals("c", map.lastKey());
 
     put("d", "4");
     assertEquals(map.toString(), "[a=1, b=2, c=3, d=4]");
+    assertEquals("a", map.firstKey());
+    assertEquals("d", map.lastKey());
   }
 
   @Test
@@ -139,15 +147,23 @@ public class PathCopyingPersistentTreeMapTest {
   public void putDCBA() {
     put("d", "1");
     assertEquals(map.toString(), "[d=1]");
+    assertEquals("d", map.firstKey());
+    assertEquals("d", map.lastKey());
 
     put("c", "2");
     assertEquals(map.toString(), "[c=2, d=1]");
+    assertEquals("c", map.firstKey());
+    assertEquals("d", map.lastKey());
 
     put("b", "3");
     assertEquals(map.toString(), "[b=3, c=2, d=1]");
+    assertEquals("b", map.firstKey());
+    assertEquals("d", map.lastKey());
 
     put("a", "4");
     assertEquals(map.toString(), "[a=4, b=3, c=2, d=1]");
+    assertEquals("a", map.firstKey());
+    assertEquals("d", map.lastKey());
   }
 
   @Test
@@ -289,5 +305,9 @@ public class PathCopyingPersistentTreeMapTest {
     assertTrue(Iterables.elementsEqual(comparison.entrySet(), map.entrySet()));
     assertTrue(Iterables.elementsEqual(comparison.keySet(),   map.keySet()));
     assertTrue(Iterables.elementsEqual(comparison.values(),   map.values()));
+    if (!comparison.isEmpty()) {
+      assertEquals(comparison.firstKey(), map.firstKey());
+      assertEquals(comparison.lastKey(), map.lastKey());
+    }
   }
 }
