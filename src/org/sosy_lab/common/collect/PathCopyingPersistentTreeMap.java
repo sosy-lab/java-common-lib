@@ -786,9 +786,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private final Node<K, V> root;
 
-    // Cache size and hashCode
+    // Cache size
     private transient int size = -1;
-    private transient int hashCode = 0;
 
     private EntrySet(Node<K, V> pRoot) {
       root = pRoot;
@@ -934,14 +933,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return super.equals(pO); // delegate to AbstractSet
     }
 
-    @Override
-    public int hashCode() {
-      // cache hashCode
-      if (hashCode == 0 && !isEmpty()) {
-        hashCode = super.hashCode(); // delegate to AbstractSet
-      }
-      return hashCode;
-    }
+    // hashCode() delegates to AbstractSet
 
     @Override
     public Comparator<? super Entry<K, V>> comparator() {
