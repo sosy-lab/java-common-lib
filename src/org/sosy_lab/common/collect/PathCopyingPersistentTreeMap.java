@@ -248,6 +248,34 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
+  /**
+   * Find the node with the smallest key in a given non-empty subtree.
+   * @param root The subtree to search in.
+   * @return The node with the smallest key.
+   * @throws NullPointerException If tree is empty.
+   */
+  private static <K extends Comparable<? super K>, V> Node<K, V> findSmallestNode(Node<K, V> root) {
+    Node<K, V> current = root;
+    while (current.left != null) {
+      current = current.left;
+    }
+    return current;
+  }
+
+  /**
+   * Find the node with the largest key in a given non-empty subtree.
+   * @param root The subtree to search in.
+   * @return The node with the largest key.
+   * @throws NullPointerException If tree is empty.
+   */
+  private static <K extends Comparable<? super K>, V> Node<K, V> findLargestNode(Node<K, V> root) {
+    Node<K, V> current = root;
+    while (current.right != null) {
+      current = current.right;
+    }
+    return current;
+  }
+
   private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) throws IllegalStateException {
     if (current == null) {
       return 0;
@@ -768,11 +796,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         throw new NoSuchElementException();
       }
 
-      Node<K, V> current = root;
-      while (current.left != null) {
-        current = current.left;
-      }
-      return current;
+      return findSmallestNode(root);
     }
 
     @Override
@@ -781,11 +805,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         throw new NoSuchElementException();
       }
 
-      Node<K, V> current = root;
-      while (current.right != null) {
-        current = current.right;
-      }
-      return current;
+      return findLargestNode(root);
     }
 
     @Override
