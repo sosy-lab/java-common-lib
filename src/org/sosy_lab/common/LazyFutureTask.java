@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 /**
  * Future implementation that can be used when a task should be executed
  * only lazily at the first time {@link #get()} is called.
@@ -52,7 +54,7 @@ public class LazyFutureTask<V> extends FutureTask<V> {
     super(pCallable);
   }
 
-  public LazyFutureTask(Runnable pRunnable, V pResult) {
+  public LazyFutureTask(Runnable pRunnable, @Nullable V pResult) {
     super(pRunnable, pResult);
   }
 
@@ -62,7 +64,7 @@ public class LazyFutureTask<V> extends FutureTask<V> {
   }
 
   @Override
-  public V get() throws InterruptedException, ExecutionException {
+  public @Nullable V get() throws InterruptedException, ExecutionException {
     if (!isDone()) {
       // Note that two threads calling this method at the same time is safe
       // (the task won't actually be executed twice)

@@ -193,7 +193,7 @@ public final class Classes {
    * @return The class object for  name  or  prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
-  public static Class<?> forName(String name, String prefix) throws ClassNotFoundException, SecurityException {
+  public static Class<?> forName(String name, @Nullable String prefix) throws ClassNotFoundException, SecurityException {
     return forName(name, prefix, null);
   }
 
@@ -208,7 +208,7 @@ public final class Classes {
    * @return The class object for  name  or  prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
-  private static Class<?> forName(String name, String prefix, ClassLoader cl) throws ClassNotFoundException, SecurityException {
+  private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl) throws ClassNotFoundException, SecurityException {
     if (cl == null) {
       // use the class loader of this class to simulate the behaviour
       // of Class#forName(String)
@@ -240,7 +240,7 @@ public final class Classes {
    * @param allowedExceptionType The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static String verifyDeclaredExceptions(Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(constructor.getExceptionTypes(), allowedExceptionTypes);
   }
 
@@ -254,11 +254,11 @@ public final class Classes {
    * @param allowedExceptionType The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static String verifyDeclaredExceptions(Method method, Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(Method method, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(method.getExceptionTypes(), allowedExceptionTypes);
   }
 
-  private static String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
+  private static @Nullable String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
     for (Class<?> declaredException : declaredExceptionTypes) {
 
       if (Exception.class.isAssignableFrom(declaredException)) {

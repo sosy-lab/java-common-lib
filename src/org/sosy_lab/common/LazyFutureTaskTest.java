@@ -87,7 +87,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  public void testNoExecution() throws InterruptedException, ExecutionException {
+  public void testNoExecution() {
     final AtomicBoolean test = new AtomicBoolean(true);
 
     new LazyFutureTask<Void>(new Runnable() {
@@ -102,7 +102,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  public void testExceptionNoExecution() throws InterruptedException, ExecutionException {
+  public void testExceptionNoExecution() {
     new LazyFutureTask<>(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {

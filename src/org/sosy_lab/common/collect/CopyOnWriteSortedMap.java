@@ -30,6 +30,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ForwardingCollection;
 import com.google.common.collect.ForwardingSortedMap;
 import com.google.common.collect.ForwardingSortedSet;
@@ -141,7 +143,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * modifying operations.
    */
   @Override
-  public V remove(Object pKey) {
+  public @Nullable V remove(Object pKey) {
     PersistentSortedMap<K, V> oldMap;
     PersistentSortedMap<K, V> newMap;
 
