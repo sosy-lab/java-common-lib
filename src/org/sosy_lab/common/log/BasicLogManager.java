@@ -172,7 +172,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     mxBean.register();
   }
 
-  private void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) throws InvalidConfigurationException {
+  private void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));

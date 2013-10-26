@@ -382,6 +382,7 @@ public class ProcessExecutor<E extends Exception> {
    * throws an exception (but client implementations may do so).
    *
    * This method will be called in a new thread.
+   * @throws E Overwriting methods may throw this exception which will be propagated.
    */
   protected void handleOutput(String line) throws E {
     logger.log(Level.ALL, name, "output:", line);
@@ -395,6 +396,7 @@ public class ProcessExecutor<E extends Exception> {
    * throws an exception (but client implementations may do so).
    *
    * This method will be called in a new thread.
+   * @throws E Overwriting methods may throw this exception which will be propagated.
    */
   protected void handleErrorOutput(String line) throws E {
     logger.log(Level.WARNING, name, "error output:", line);
@@ -407,6 +409,7 @@ public class ProcessExecutor<E extends Exception> {
    * it is non-zero.
    *
    * This method will be called in a new thread.
+   * @throws E Overwriting methods may throw this exception which will be propagated.
    */
   protected void handleExitCode(int code) throws E {
     if (code != 0) {

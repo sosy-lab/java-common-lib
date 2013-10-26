@@ -21,6 +21,8 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import javax.annotation.Nullable;
+
 public class NestedTimer {
 
   /**
@@ -35,7 +37,7 @@ public class NestedTimer {
 //private long totalSumTime           = 0; // not necessary, is equal to sum of inner and outer
 
   /** Volatile to make {@link #isRunning()} thread-safe. */
-  private volatile Timer innerTimer = null;
+  private volatile @Nullable Timer innerTimer = null;
 
   /** The maximal time of all intervals. */
   private long innerMaxTime           = 0;

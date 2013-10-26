@@ -320,7 +320,7 @@ public class ParserTest {
   }
 
   @Test
-  public final void includeTwice() throws IOException, InvalidConfigurationException {
+  public final void includeTwice() throws IOException {
     File included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption("#include " + included.getAbsolutePath() + "\n#include " + included.getAbsolutePath(), "foo.bar", "abc");

@@ -1134,6 +1134,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
 
       if (pFromKey != null && pToKey != null) {
+        assert lowestNode != null && highestNode != null;
         // [pFromKey; pToKey[ == [lowestNode; pToKey[ == [lowestNode; highestNode]
 
         if (lowestNode.getKey().compareTo(highestNode.getKey()) > 0) {
