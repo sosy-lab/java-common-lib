@@ -19,18 +19,20 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
 /**
@@ -46,22 +48,31 @@ public final class JSON {
   private JSON() { }
 
   /**
-   * Encode an object into JSON text and write it to a file.
-   * @throws IOException
+   * Use {@link #writeJSONString(Object, Path)} instead.
    */
-  public static void writeJSONString(@Nullable Object value, File file, Charset charset) throws IOException {
-    writeJSONString(value, file.toPath(), charset);
+  @Deprecated
+  public static void writeJSONString(@Nullable Object value, File file,
+      @SuppressWarnings("unused") Charset charset) throws IOException {
+    checkNotNull(charset);
+    writeJSONString(value, file.toPath());
+  }
+
+  /**
+   * Use {@link #writeJSONString(Object, Path)} instead.
+   */
+  @Deprecated
+  public static void writeJSONString(@Nullable Object value, Path file,
+      @SuppressWarnings("unused") Charset charset) throws IOException {
+    checkNotNull(charset);
+    writeJSONString(value, file);
   }
 
   /**
    * Encode an object into JSON text and write it to a file.
    * @throws IOException
    */
-  public static void writeJSONString(@Nullable Object value, Path file, Charset charset) throws IOException {
-    if (file.getParent() != null) {
-      Files.createDirectories(file.getParent());
-    }
-    try (Writer out = Files.newBufferedWriter(file, charset)) {
+  public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
+    try (Writer out = Files.openOutputFile(file, Charsets.US_ASCII)) { // We escape everything, so pure ASCII remains
       writeJSONString(value, out);
     }
   }
