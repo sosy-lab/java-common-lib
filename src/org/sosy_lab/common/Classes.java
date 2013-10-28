@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.lang.reflect.Constructor;
@@ -84,13 +84,13 @@ public final class Classes {
    * @param argumentTypes Array with the types of the parameters of the desired constructor.
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param type The return type (has to be a super type of the class, of course).
-   * @param cl An optional class loader to load the class (may be null).
    * @throws ClassInstantiationException If something goes wrong (like class cannot be found or has no constructor).
    * @throws InvocationTargetException If the constructor throws an exception.
    */
   public static <T> T createInstance(Class<? extends T> cls,
-      Class<?>[] argumentTypes, Object[] argumentValues, Class<T> type)
+      @Nullable Class<?>[] argumentTypes, @Nullable Object[] argumentValues, Class<T> type)
       throws ClassInstantiationException, InvocationTargetException {
+    checkNotNull(type);
     try {
       Constructor<? extends T> ct = cls.getConstructor(argumentTypes);
       return ct.newInstance(argumentValues);
@@ -119,7 +119,8 @@ public final class Classes {
    * @param argumentTypes Array with the types of the parameters of the desired constructor (optional).
    * @param argumentValues Array with the values that will be passed to the constructor.
    */
-  public static <T> T createInstance(Class<T> type, Class<? extends T> cls, Class<?>[] argumentTypes, Object[] argumentValues) throws InvalidConfigurationException {
+  public static <T> T createInstance(Class<T> type, Class<? extends T> cls,
+      @Nullable Class<?>[] argumentTypes, Object[] argumentValues) throws InvalidConfigurationException {
     return createInstance(type, cls, argumentTypes, argumentValues, RuntimeException.class);
   }
 
@@ -136,7 +137,10 @@ public final class Classes {
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
-  public static <T, X extends Exception> T createInstance(Class<T> type, Class<? extends T> cls, @Nullable Class<?>[] argumentTypes, Object[] argumentValues, Class<X> exceptionType) throws X, InvalidConfigurationException {
+  public static <T, X extends Exception> T createInstance(Class<T> type, Class<? extends T> cls,
+      @Nullable Class<?>[] argumentTypes, Object[] argumentValues,
+      Class<X> exceptionType) throws X, InvalidConfigurationException {
+    checkNotNull(exceptionType);
     if (argumentTypes == null) {
       // fill argumenTypes array
       argumentTypes = new Class<?>[argumentValues.length];
@@ -259,6 +263,7 @@ public final class Classes {
   }
 
   private static @Nullable String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
+    checkNotNull(allowedExceptionTypes);
     for (Class<?> declaredException : declaredExceptionTypes) {
 
       if (Exception.class.isAssignableFrom(declaredException)) {
@@ -298,6 +303,7 @@ public final class Classes {
    * @return A tuple of a class object and a ParameterizedType object (the latter is null if the type is not generic)
    */
   public static Pair<Class<?>, ParameterizedType> getComponentType(final Type type) {
+    checkNotNull(type);
     checkArgument(type instanceof ParameterizedType, "Cannot extract generic parameter from non-parameterized type %s", type);
 
     ParameterizedType pType = (ParameterizedType)type;
@@ -335,6 +341,7 @@ public final class Classes {
    * @return The type or its simplification.
    */
   public static Type extractUpperBoundFromType(Type type) {
+    checkNotNull(type);
     if (type instanceof WildcardType) {
       WildcardType wcType = (WildcardType)type;
       if (wcType.getLowerBounds().length > 0) {

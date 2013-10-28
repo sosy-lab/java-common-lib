@@ -20,7 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Objects.equal;
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.collect.Ordering.from;
 
 import java.util.ArrayList;
@@ -148,6 +148,8 @@ public class Pair<A, B> {
   }
 
   public static <A, B> Iterable<Pair<A, B>> zipWithPadding(final Iterable<? extends A> a, final Iterable<? extends B> b) {
+    checkNotNull(a);
+    checkNotNull(b);
     return new Iterable<Pair<A, B>>() {
       @Override
       public Iterator<Pair<A, B>> iterator() {
@@ -200,6 +202,9 @@ public class Pair<A, B> {
   public static <A1, B1, A2, B2> Function<Pair<A1, A2>, Pair<B1, B2>>
                 componentWise(final Function<? super A1, ? extends B1> f1,
                               final Function<? super A2, ? extends B2> f2) {
+    checkNotNull(f1);
+    checkNotNull(f2);
+
     return new Function<Pair<A1,A2>, Pair<B1,B2>>() {
       @Override
       public Pair<B1, B2> apply(Pair<A1, A2> pInput) {

@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -269,6 +271,7 @@ public class OptionCollector {
 
   /** This function formats text and splits lines, if they are too long. */
   public static String formatText(final String text, final String lineStart, final boolean useLineStartInFirstLine) {
+    checkNotNull(lineStart);
     if (text.isEmpty()) {
       return text;
     }

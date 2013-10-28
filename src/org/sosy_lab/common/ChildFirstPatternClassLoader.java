@@ -54,7 +54,7 @@ public class ChildFirstPatternClassLoader extends URLClassLoader {
    * @param pParent The parent class loader.
    */
   public ChildFirstPatternClassLoader(Pattern pClassPattern, URL[] pUrls, ClassLoader pParent) {
-    super(pUrls, pParent);
+    super(pUrls, checkNotNull(pParent));
     classPattern = checkNotNull(pClassPattern);
   }
 

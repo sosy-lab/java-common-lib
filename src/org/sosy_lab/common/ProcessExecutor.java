@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -257,6 +257,7 @@ public class ProcessExecutor<E extends Exception> {
    * @throws IOException
    */
   public void println(String s) throws IOException {
+    checkNotNull(s);
     print(s + "\n");
   }
 
@@ -266,6 +267,7 @@ public class ProcessExecutor<E extends Exception> {
    * @throws IOException
    */
   public void print(String s) throws IOException {
+    checkNotNull(s);
     checkState(!finished, "Cannot write to process that has already terminated.");
 
     in.write(s);
@@ -385,6 +387,7 @@ public class ProcessExecutor<E extends Exception> {
    * @throws E Overwriting methods may throw this exception which will be propagated.
    */
   protected void handleOutput(String line) throws E {
+    checkNotNull(line);
     logger.log(Level.ALL, name, "output:", line);
     output.add(line);
   }
@@ -399,6 +402,7 @@ public class ProcessExecutor<E extends Exception> {
    * @throws E Overwriting methods may throw this exception which will be propagated.
    */
   protected void handleErrorOutput(String line) throws E {
+    checkNotNull(line);
     logger.log(Level.WARNING, name, "error output:", line);
     errorOutput.add(line);
   }

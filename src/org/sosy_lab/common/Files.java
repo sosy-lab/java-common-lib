@@ -58,7 +58,7 @@ public final class Files {
    *          characters
    * @throws  IOException  If a file could not be created
    */
-  public static File createTempFile(String prefix, String suffix, @Nullable String content) throws IOException {
+  public static File createTempFile(String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
     File file = File.createTempFile(prefix, suffix);
     file.deleteOnExit();
 
@@ -99,7 +99,7 @@ public final class Files {
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(String prefix, String suffix,
+  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix,
       FileAttribute<?>... attrs) throws IOException {
     return new DeleteOnCloseFile(java.nio.file.Files.createTempFile(prefix, suffix, attrs));
   }
