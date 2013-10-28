@@ -366,8 +366,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // The right-most node in the left subtree of child is the result.
 
         if (current.left == null) {
-          // no node smaller than key
-          return null;
+          // no node smaller than key in this subtree
+          return result;
         } else {
           return findLargestNode(current.left);
         }
