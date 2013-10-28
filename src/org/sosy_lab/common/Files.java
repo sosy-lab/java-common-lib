@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.file.StandardOpenOption.*;
 
 import java.io.BufferedWriter;
@@ -27,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
@@ -110,7 +112,7 @@ public final class Files {
    */
   public static class DeleteOnCloseFile implements AutoCloseable {
 
-    private Path file;
+    private final Path file;
 
     private DeleteOnCloseFile(Path pFile) {
       file = pFile;
@@ -176,24 +178,46 @@ public final class Files {
    * @throws IOException
    */
   public static void writeFile(Path file, Object content) throws IOException {
-    java.nio.file.Files.createDirectories(file.getParent());
-
-    try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset())) {
+    checkNotNull(content);
+    try (Writer w = openOutputFile(file)) {
       Appenders.appendTo(w, content);
     }
   }
 
-  public static BufferedWriter openOutputFile(Path file) throws IOException {
+  /**
+   * Open a BufferedWriter to a file with the default charset.
+   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
+   * this method creates necessary parent directories first.
+   *
+   * Note that using the default charset is often not a good idea,
+   * because it varies from platform to platform.
+   * Consider using {@link #openOutputFile(Path, Charset, OpenOption...)}
+   * and explicitly specifying a charset.
+   *
+   * TODO should we use UTF8 here instead?
+   */
+  public static BufferedWriter openOutputFile(Path file, OpenOption... options) throws IOException {
+    return openOutputFile(file, Charset.defaultCharset(), options);
+  }
+
+  /**
+   * Open a BufferedWriter to a file.
+   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
+   * this method creates necessary parent directories first.
+   */
+  public static BufferedWriter openOutputFile(Path file, Charset charset,
+      OpenOption... options) throws IOException {
     Path dir = file.getParent();
     if (dir != null) {
       java.nio.file.Files.createDirectories(dir);
     }
 
-    return java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset());
+    return java.nio.file.Files.newBufferedWriter(file, charset, options);
   }
 
   /**
-   * Writes content to a file.
+   * Appends content to a file (without overwriting the file,
+   * but creating it if necessary).
    * @param file The file.
    * @param content The content which will be written to the end of the file.
    * @throws IOException
@@ -203,16 +227,15 @@ public final class Files {
   }
 
   /**
-   * Writes content to a file.
+   * Appends content to a file (without overwriting the file,
+   * but creating it if necessary).
    * @param file The file.
    * @param content The content which will be written to the end of the file.
    * @throws IOException
    */
   public static void appendToFile(Path file, Object content) throws IOException {
-    java.nio.file.Files.createDirectories(file.getParent());
-
-    try (Writer w = java.nio.file.Files.newBufferedWriter(file, Charset.defaultCharset(),
-        APPEND, CREATE)) {
+    checkNotNull(content);
+    try (Writer w = openOutputFile(file, APPEND, CREATE)) {
       Appenders.appendTo(w, content);
     }
   }
