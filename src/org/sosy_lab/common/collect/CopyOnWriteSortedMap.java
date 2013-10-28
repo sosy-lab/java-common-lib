@@ -179,6 +179,14 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
     }
   }
 
+  /**
+   * @see Map#clear()
+   */
+  @Override
+  public void clear() {
+    map.set(map.get().empty());
+  }
+
   // Override the collection view methods
   // so that they return also live views and not immutable snapshots.
 
