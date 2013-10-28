@@ -23,13 +23,15 @@
  */
 package org.sosy_lab.common.collect;
 
-import static org.junit.Assert.*;
-
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,19 +39,56 @@ import org.junit.Test;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
+import com.google.common.collect.testing.TestStringSortedMapGenerator;
+import com.google.common.collect.testing.features.CollectionFeature;
+import com.google.common.collect.testing.features.CollectionSize;
+import com.google.common.collect.testing.features.MapFeature;
+import com.google.common.collect.testing.testers.MapEntrySetTester;
 
+public class PathCopyingPersistentTreeMapTest extends TestCase {
 
-public class PathCopyingPersistentTreeMapTest {
+  private static final TestStringSortedMapGenerator mapGenerator = new TestStringSortedMapGenerator() {
+
+    @Override
+    protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
+      PersistentSortedMap<String, String> result = PathCopyingPersistentTreeMap.of();
+      for (Entry<String, String> entry : pEntries) {
+        result = result.putAndCopy(entry.getKey(), entry.getValue());
+      }
+      return result;
+    }
+  };
+
+  public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
+    TestSuite suite = new TestSuite();
+    suite.addTestSuite(PathCopyingPersistentTreeMapTest.class);
+
+    suite.addTest(SortedMapTestSuiteBuilder.using(mapGenerator)
+        .named("PathCopyingPersistentTreeMap")
+        .withFeatures(MapFeature.ALLOWS_NULL_VALUES,
+                      CollectionFeature.KNOWN_ORDER,
+                      CollectionSize.ANY)
+
+        // We throw ClassCastException as allowed by the JavaDoc of SortedMap
+        .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
+
+        .createTestSuite());
+
+    return suite;
+  }
 
   private PersistentSortedMap<String, String> map;
 
+  @Override
   @Before
-  public void setupMap() {
+  public void setUp() {
     map = PathCopyingPersistentTreeMap.of();
   }
 
+  @Override
   @After
-  public void deleteMap() {
+  public void tearDown() {
     map = null;
   }
 
