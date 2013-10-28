@@ -149,7 +149,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   @Test
   public void testEmpty() {
-    assertEquals(map.toString(), "[]");
+    assertEquals(map.toString(), "{}");
     assertTrue(map.isEmpty());
     assertEquals(0, map.size());
     assertEquals(0, map.hashCode());
@@ -158,22 +158,22 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   @Test
   public void putABCD() {
     put("a", "1");
-    assertEquals(map.toString(), "[a=1]");
+    assertEquals(map.toString(), "{a=1}");
     assertEquals("a", map.firstKey());
     assertEquals("a", map.lastKey());
 
     put("b", "2");
-    assertEquals(map.toString(), "[a=1, b=2]");
+    assertEquals(map.toString(), "{a=1, b=2}");
     assertEquals("a", map.firstKey());
     assertEquals("b", map.lastKey());
 
     put("c", "3");
-    assertEquals(map.toString(), "[a=1, b=2, c=3]");
+    assertEquals(map.toString(), "{a=1, b=2, c=3}");
     assertEquals("a", map.firstKey());
     assertEquals("c", map.lastKey());
 
     put("d", "4");
-    assertEquals(map.toString(), "[a=1, b=2, c=3, d=4]");
+    assertEquals(map.toString(), "{a=1, b=2, c=3, d=4}");
     assertEquals("a", map.firstKey());
     assertEquals("d", map.lastKey());
   }
@@ -189,22 +189,22 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   @Test
   public void putDCBA() {
     put("d", "1");
-    assertEquals(map.toString(), "[d=1]");
+    assertEquals(map.toString(), "{d=1}");
     assertEquals("d", map.firstKey());
     assertEquals("d", map.lastKey());
 
     put("c", "2");
-    assertEquals(map.toString(), "[c=2, d=1]");
+    assertEquals(map.toString(), "{c=2, d=1}");
     assertEquals("c", map.firstKey());
     assertEquals("d", map.lastKey());
 
     put("b", "3");
-    assertEquals(map.toString(), "[b=3, c=2, d=1]");
+    assertEquals(map.toString(), "{b=3, c=2, d=1}");
     assertEquals("b", map.firstKey());
     assertEquals("d", map.lastKey());
 
     put("a", "4");
-    assertEquals(map.toString(), "[a=4, b=3, c=2, d=1]");
+    assertEquals(map.toString(), "{a=4, b=3, c=2, d=1}");
     assertEquals("a", map.firstKey());
     assertEquals("d", map.lastKey());
   }
@@ -248,55 +248,55 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   @Test
   public void testInner() {
     put("a", "1");
-    assertEquals(map.toString(), "[a=1]");
+    assertEquals(map.toString(), "{a=1}");
 
     put("z", "2");
-    assertEquals(map.toString(), "[a=1, z=2]");
+    assertEquals(map.toString(), "{a=1, z=2}");
 
     put("b", "3");
-    assertEquals(map.toString(), "[a=1, b=3, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, z=2}");
 
     put("y", "4");
-    assertEquals(map.toString(), "[a=1, b=3, y=4, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, y=4, z=2}");
 
     put("c", "5");
-    assertEquals(map.toString(), "[a=1, b=3, c=5, y=4, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, c=5, y=4, z=2}");
 
     put("x", "6");
-    assertEquals(map.toString(), "[a=1, b=3, c=5, x=6, y=4, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, c=5, x=6, y=4, z=2}");
 
     put("d", "7");
-    assertEquals(map.toString(), "[a=1, b=3, c=5, d=7, x=6, y=4, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, c=5, d=7, x=6, y=4, z=2}");
 
     put("w", "8");
-    assertEquals(map.toString(), "[a=1, b=3, c=5, d=7, w=8, x=6, y=4, z=2]");
+    assertEquals(map.toString(), "{a=1, b=3, c=5, d=7, w=8, x=6, y=4, z=2}");
   }
 
   @Test
   public void testOuter() {
     put("d", "1");
-    assertEquals(map.toString(), "[d=1]");
+    assertEquals(map.toString(), "{d=1}");
 
     put("w", "2");
-    assertEquals(map.toString(), "[d=1, w=2]");
+    assertEquals(map.toString(), "{d=1, w=2}");
 
     put("c", "3");
-    assertEquals(map.toString(), "[c=3, d=1, w=2]");
+    assertEquals(map.toString(), "{c=3, d=1, w=2}");
 
     put("x", "4");
-    assertEquals(map.toString(), "[c=3, d=1, w=2, x=4]");
+    assertEquals(map.toString(), "{c=3, d=1, w=2, x=4}");
 
     put("b", "5");
-    assertEquals(map.toString(), "[b=5, c=3, d=1, w=2, x=4]");
+    assertEquals(map.toString(), "{b=5, c=3, d=1, w=2, x=4}");
 
     put("y", "6");
-    assertEquals(map.toString(), "[b=5, c=3, d=1, w=2, x=4, y=6]");
+    assertEquals(map.toString(), "{b=5, c=3, d=1, w=2, x=4, y=6}");
 
     put("a", "7");
-    assertEquals(map.toString(), "[a=7, b=5, c=3, d=1, w=2, x=4, y=6]");
+    assertEquals(map.toString(), "{a=7, b=5, c=3, d=1, w=2, x=4, y=6}");
 
     put("z", "8");
-    assertEquals(map.toString(), "[a=7, b=5, c=3, d=1, w=2, x=4, y=6, z=8]");
+    assertEquals(map.toString(), "{a=7, b=5, c=3, d=1, w=2, x=4, y=6, z=8}");
   }
 
   @Test

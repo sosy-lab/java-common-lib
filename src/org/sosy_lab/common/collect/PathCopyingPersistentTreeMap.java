@@ -704,11 +704,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public String toString() {
-    return entrySet().toString();
-  }
-
-  @Override
   public Comparator<? super K> comparator() {
     return null;
   }
@@ -1231,12 +1226,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public int size() {
       return entrySet().size();
-    }
-
-
-    @Override
-    public String toString() {
-      return entrySet().toString();
     }
 
     @Override

@@ -133,5 +133,10 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
     public SortedSet<Map.Entry<K, V>> entrySet() {
       return ImmutableSortedSet.of();
     }
+
+    @Override
+    public String toString() {
+      return "{}";
+    }
   }
 }

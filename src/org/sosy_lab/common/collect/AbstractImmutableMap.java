@@ -25,6 +25,8 @@ package org.sosy_lab.common.collect;
 
 import java.util.Map;
 
+import com.google.common.base.Joiner;
+
 
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
@@ -50,5 +52,17 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   @Override
   public final V remove(Object pKey) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String toString() {
+    if (isEmpty()) {
+      return "{}";
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    Joiner.on(", ").withKeyValueSeparator("=").useForNull("null").appendTo(sb, this);
+    sb.append('}');
+    return sb.toString();
   }
 }
