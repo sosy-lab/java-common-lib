@@ -815,7 +815,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
       }
 
-      if (pC.size() > this.size) {
+      if (pC.size() > this.size()) {
         return false;
       }
 
@@ -1334,7 +1334,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Override
       public boolean containsAll(Collection<?> pC) {
-        if (pC.size() > this.size) {
+        if (pC.size() > this.size()) {
           return false;
         }
 
