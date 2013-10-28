@@ -20,6 +20,7 @@
 package org.sosy_lab.common.log;
 
 import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -210,6 +211,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    */
   @Override
   public void log(Level priority, Object... args) {
+    checkNotNull(args);
 
     //Since some toString() methods may be rather costly, only log if the level is
     //sufficiently high.
@@ -229,6 +231,8 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    */
   @Override
   public void logf(Level priority, String format, Object... args) {
+    checkNotNull(format);
+    checkNotNull(args);
     if (wouldBeLogged(priority)) {
       log0(priority, findCallingMethod(), String.format(format, args));
     }
@@ -409,6 +413,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    */
   @Override
   public void logException(Level priority, Throwable e, @Nullable String additionalMessage) {
+    checkNotNull(e);
     if (wouldBeLogged(priority)) {
       String logMessage = "";
 

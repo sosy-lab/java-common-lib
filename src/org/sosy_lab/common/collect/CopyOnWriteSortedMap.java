@@ -23,6 +23,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,7 +74,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
   private final AtomicReference<PersistentSortedMap<K, V>> map;
 
   private CopyOnWriteSortedMap(PersistentSortedMap<K, V> pMap) {
-    map = new AtomicReference<>(pMap);
+    map = new AtomicReference<>(checkNotNull(pMap));
   }
 
   /**
@@ -225,6 +227,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
 
   @Override
   public SortedMap<K, V> headMap(final K pToKey) {
+    checkNotNull(pToKey);
     return new ForwardingSortedMap<K,V>() {
 
       @Override
@@ -236,6 +239,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
 
   @Override
   public SortedMap<K, V> tailMap(final K pFromKey) {
+    checkNotNull(pFromKey);
     return new ForwardingSortedMap<K,V>() {
 
       @Override
@@ -247,6 +251,8 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
 
   @Override
   public SortedMap<K, V> subMap(final K pFromKey, final K pToKey) {
+    checkNotNull(pFromKey);
+    checkNotNull(pToKey);
     return new ForwardingSortedMap<K,V>() {
 
       @Override

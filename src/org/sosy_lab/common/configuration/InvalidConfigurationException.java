@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Exception class to signal that something is wrong in the user-specified
  * configuration.
@@ -28,10 +30,10 @@ public class InvalidConfigurationException extends Exception {
   private static final long serialVersionUID = -2482555561027049741L;
 
   public InvalidConfigurationException(String msg) {
-    super(msg);
+    super(checkNotNull(msg));
   }
 
   public InvalidConfigurationException(String msg, Throwable source) {
-    super(msg, source);
+    super(checkNotNull(msg), checkNotNull(source));
   }
 }

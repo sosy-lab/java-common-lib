@@ -23,6 +23,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -45,7 +47,7 @@ class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K> im
   private final SortedMap<K, ?> map;
 
   SortedMapKeySet(SortedMap<K, ?> pMap) {
-    map = pMap;
+    map = checkNotNull(pMap);
   }
 
   @Override

@@ -64,6 +64,7 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager
    * or too many log messages may be ignored.
    */
   public void logOnce(Level pPriority, Object... pArgs) {
+    checkNotNull(pArgs);
     if (wouldBeLogged(pPriority)) {
 
       if (seenMessages.add(ImmutableList.copyOf(pArgs))) {
@@ -86,6 +87,8 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager
    * or too many log messages may be ignored.
    */
   public void logfOnce(Level pPriority, String pFormat, Object... pArgs) {
+    checkNotNull(pFormat);
+    checkNotNull(pArgs);
     if (wouldBeLogged(pPriority)) {
 
       ImmutableList.Builder<Object> args = ImmutableList.builder();

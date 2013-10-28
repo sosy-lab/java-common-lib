@@ -23,6 +23,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Collections;
 import java.util.SortedMap;
 
@@ -46,6 +48,9 @@ public class Collections3 {
    * @return A partial map of the input.
    */
   public static <V> SortedMap<String, V> subMapWithPrefix(SortedMap<String, V> map, String prefix) {
+    checkNotNull(map);
+    checkArgument(!prefix.isEmpty());
+
     // As the end marker of the set, create the string that is
     // the next bigger string than all possible strings with the given prefix
     // by taking the prefix and incrementing the value of the last character by one.

@@ -535,6 +535,7 @@ public class Configuration {
    * This provides type safety, documentation, logging etc.
    */
   public String getProperty(String key) {
+    checkNotNull(key);
     String result = properties.get(prefix + key);
     unusedProperties.remove(prefix + key);
 

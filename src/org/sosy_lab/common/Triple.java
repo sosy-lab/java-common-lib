@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
 
 import java.util.Comparator;
@@ -151,6 +152,10 @@ public class Triple<A, B, C> {
                 componentWise(final Function<? super A1, ? extends B1> f1,
                               final Function<? super A2, ? extends B2> f2,
                               final Function<? super A3, ? extends B3> f3) {
+    checkNotNull(f1);
+    checkNotNull(f2);
+    checkNotNull(f3);
+
     return new Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>() {
       @Override
       public Triple<B1, B2, B3> apply(Triple<A1, A2, A3> pInput) {
