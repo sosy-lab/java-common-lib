@@ -1210,7 +1210,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     public V get(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K)checkNotNull(pKey);
-      return inRange(key) ? findNode(key, root).getValue() : null;
+      if (!inRange(key)) {
+        return null;
+      }
+      Node<K, V> node = findNode(key, root);
+      return node == null ? null : node.getValue();
     }
 
     @Override
