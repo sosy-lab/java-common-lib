@@ -23,12 +23,24 @@
  */
 package org.sosy_lab.common.collect;
 
+import java.util.Collection;
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 
 
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
+
+  static <V> Function<Entry<?, V>, V> getValueFunction() {
+    return new Function<Map.Entry<?, V>, V>() {
+        @Override
+        public V apply(Map.Entry<?, V> input) {
+          return input.getValue();
+        }
+      };
+  }
 
   @Deprecated
   @Override
@@ -52,6 +64,34 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   @Override
   public final V remove(Object pKey) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean containsValue(Object pValue) {
+    return values().contains(pValue);
+  }
+
+  @Override
+  public int size() {
+    return entrySet().size();
+  }
+
+  @Override
+  public Collection<V> values() {
+    return Collections2.transform(entrySet(), AbstractImmutableMap.<V>getValueFunction());
+  }
+
+  @Override
+  public boolean equals(Object pObj) {
+    if (pObj instanceof Map<?, ?>) {
+      return entrySet().equals(((Map<?, ?>)pObj).entrySet());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return entrySet().hashCode();
   }
 
   @Override

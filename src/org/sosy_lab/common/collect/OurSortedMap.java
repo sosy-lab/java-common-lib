@@ -24,7 +24,6 @@
 package org.sosy_lab.common.collect;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
@@ -45,18 +44,14 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
   @Override
   SortedSet<Map.Entry<K, V>> entrySet();
 
-  static class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V> extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V> {
+  static class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
+                                           extends AbstractImmutableSortedMap<K, V> {
 
     private static final OurSortedMap<?, ?> INSTANCE = new EmptyImmutableOurSortedMap<>();
 
     @SuppressWarnings("unchecked")
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> of() {
       return (OurSortedMap<K, V>) INSTANCE;
-    }
-
-    @Override
-    public Comparator<? super K> comparator() {
-      return null;
     }
 
     @Override
