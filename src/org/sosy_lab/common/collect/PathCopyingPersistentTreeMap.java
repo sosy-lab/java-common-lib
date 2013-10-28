@@ -1097,17 +1097,17 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     create(Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
       checkArgument(pFromKey != null || pToKey != null);
 
-      Node<K, V> root = findBestRoot(pRoot, pFromKey, pToKey);
-      if (root == null) {
-        return EmptyImmutableOurSortedMap.<K, V>of();
-      }
-
       if (pFromKey != null && pToKey != null) {
         int comp = pFromKey.compareTo(pToKey);
         if (comp == 0) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
         checkArgument(comp < 0, "fromKey > toKey");
+      }
+
+      Node<K, V> root = findBestRoot(pRoot, pFromKey, pToKey);
+      if (root == null) {
+        return EmptyImmutableOurSortedMap.<K, V>of();
       }
 
       K fromKey = pFromKey;
