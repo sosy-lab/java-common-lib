@@ -22,7 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
@@ -64,7 +63,7 @@ import com.google.common.collect.UnmodifiableIterator;
  * @param <V> The type of values.
  */
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
-    extends AbstractImmutableMap<K, V>
+    extends AbstractImmutableSortedMap<K, V>
     implements PersistentSortedMap<K, V>, Serializable {
 
   private static final long serialVersionUID = 1041711151457528188L;
@@ -160,15 +159,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
           @Override
           public K apply(Map.Entry<K, ?> input) {
             return input.getKey();
-          }
-        };
-    }
-
-    static <V> Function<Entry<?, V>, V> getValueFunction() {
-      return new Function<Map.Entry<?, V>, V>() {
-          @Override
-          public V apply(Map.Entry<?, V> input) {
-            return input.getValue();
           }
         };
     }
@@ -689,46 +679,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public boolean containsValue(Object pValue) {
-    return values().contains(pValue);
-  }
-
-  @Override
   public boolean isEmpty() {
     return root == null;
-  }
-
-  @Override
-  public int size() {
-    return entrySet().size();
-  }
-
-  @Override
-  public Comparator<? super K> comparator() {
-    return null;
-  }
-
-  @Override
-  public K firstKey() {
-    return entrySet().first().getKey();
-  }
-
-  @Override
-  public K lastKey() {
-    return entrySet().last().getKey();
-  }
-
-  @Override
-  public boolean equals(Object pObj) {
-    if (pObj instanceof Map<?, ?>) {
-      return entrySet().equals(((Map<?, ?>)pObj).entrySet());
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return entrySet().hashCode();
   }
 
   @Override
@@ -737,16 +689,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       entrySet = new EntrySet<>(root);
     }
     return entrySet;
-  }
-
-  @Override
-  public SortedSet<K> keySet() {
-    return new SortedMapKeySet<>(this);
-  }
-
-  @Override
-  public Collection<V> values() {
-    return Collections2.transform(entrySet(), Node.<V>getValueFunction());
   }
 
   @Override
@@ -1091,7 +1033,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class PartialSortedMap<K extends Comparable<? super K>, V> extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V> {
+  private static class PartialSortedMap<K extends Comparable<? super K>, V>
+                                          extends AbstractImmutableSortedMap<K, V>
+                                          implements OurSortedMap<K, V> {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V>
     create(Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
@@ -1218,46 +1162,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public boolean containsValue(Object pValue) {
-      return values().contains(pValue);
-    }
-
-    @Override
     public boolean isEmpty() {
       return false;
-    }
-
-    @Override
-    public int size() {
-      return entrySet().size();
-    }
-
-    @Override
-    public Comparator<? super K> comparator() {
-      return null;
-    }
-
-    @Override
-    public K firstKey() {
-      return entrySet().first().getKey();
-    }
-
-    @Override
-    public K lastKey() {
-      return entrySet().last().getKey();
-    }
-
-    @Override
-    public boolean equals(Object pObj) {
-      if (pObj instanceof Map<?, ?>) {
-        return entrySet().equals(((Map<?, ?>)pObj).entrySet());
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return entrySet().hashCode();
     }
 
     @Override
@@ -1266,16 +1172,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         entrySet = new PartialEntrySet();
       }
       return entrySet;
-    }
-
-    @Override
-    public SortedSet<K> keySet() {
-      return new SortedMapKeySet<>(this);
-    }
-
-    @Override
-    public Collection<V> values() {
-      return Collections2.transform(entrySet(), Node.<V>getValueFunction());
     }
 
     @Override
