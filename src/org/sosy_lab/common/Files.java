@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.io.FileWriteMode;
 
 /**
  * Provides helper functions for file access.
@@ -164,7 +165,7 @@ public final class Files {
    * @throws IOException
    */
   public static void writeFile(File file, Object content) throws IOException {
-    writeFile(file.toPath(), content);
+    writeFile(Path.fromFile(file), content);
   }
 
   /**
@@ -182,33 +183,30 @@ public final class Files {
 
   /**
    * Open a BufferedWriter to a file with the default charset.
-   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
-   * this method creates necessary parent directories first.
+   * This method creates necessary parent directories beforehand.
    *
    * Note that using the default charset is often not a good idea,
    * because it varies from platform to platform.
-   * Consider using {@link #openOutputFile(Path, Charset, OpenOption...)}
-   * and explicitly specifying a charset.
+   * Consider explicitly specifying a charset.
    *
    * TODO should we use UTF8 here instead?
    */
-  public static BufferedWriter openOutputFile(Path file, OpenOption... options) throws IOException {
+  public static BufferedWriter openOutputFile(Path file, FileWriteMode... options) throws IOException {
     return openOutputFile(file, Charset.defaultCharset(), options);
   }
 
   /**
    * Open a BufferedWriter to a file.
-   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
-   * this method creates necessary parent directories first.
+   * This method creates necessary parent directories beforehand.
    */
   public static BufferedWriter openOutputFile(Path file, Charset charset,
-      OpenOption... options) throws IOException {
+      FileWriteMode... options) throws IOException {
     Path dir = file.getParent();
     if (dir != null) {
-      java.nio.file.Files.createDirectories(dir);
+      dir.toFile().mkdirs();
     }
 
-    return java.nio.file.Files.newBufferedWriter(file, charset, options);
+    return (BufferedWriter) file.asCharSink(charset, options).openBufferedStream();
   }
 
   /**
@@ -219,7 +217,7 @@ public final class Files {
    * @throws IOException
    */
   public static void appendToFile(File file, Object content) throws IOException {
-    appendToFile(file.toPath(), content);
+    appendToFile(Path.fromFile(file), content);
   }
 
   /**
@@ -231,7 +229,7 @@ public final class Files {
    */
   public static void appendToFile(Path file, Object content) throws IOException {
     checkNotNull(content);
-    try (Writer w = openOutputFile(file, APPEND, CREATE)) {
+    try (Writer w = openOutputFile(file, FileWriteMode.APPEND)) {
       Appenders.appendTo(w, content);
     }
   }
