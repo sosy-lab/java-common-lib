@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,6 +40,7 @@ import javax.annotation.Nullable;
 
 import org.sosy_lab.common.Files;
 import org.sosy_lab.common.Pair;
+import org.sosy_lab.common.Path;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -290,7 +289,7 @@ class Parser {
     // now overwrite included options with local ones
     includedOptions.putAll(definedOptions);
 
-    Path thisSource = Paths.get(source);
+    Path thisSource = new Path(source);
     for (String name : definedOptions.keySet()) {
       includedOptionsSources.put(name, thisSource);
     }
