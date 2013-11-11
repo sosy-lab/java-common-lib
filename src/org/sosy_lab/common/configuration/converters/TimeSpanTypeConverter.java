@@ -21,9 +21,9 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
 

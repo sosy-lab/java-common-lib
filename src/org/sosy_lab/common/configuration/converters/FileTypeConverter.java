@@ -27,12 +27,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
 import org.sosy_lab.common.Files;
+import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -77,7 +76,7 @@ public class FileTypeConverter implements TypeConverter {
   public FileTypeConverter(Configuration config) throws InvalidConfigurationException {
     config.inject(this, FileTypeConverter.class);
 
-    rootPath = Paths.get(rootDirectory);
+    rootPath = new Path(rootDirectory);
     outputPath = rootPath.resolve(outputDirectory);
   }
 
@@ -103,7 +102,7 @@ public class FileTypeConverter implements TypeConverter {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    return handleFileOption(optionName, Paths.get(pValue),
+    return handleFileOption(optionName, new Path(pValue),
         ((FileOption)secondaryOption).value(), pType, pSource);
   }
 
@@ -130,7 +129,7 @@ public class FileTypeConverter implements TypeConverter {
 
     Path defaultValue;
     if (pType.equals(File.class)) {
-      defaultValue = ((File)pDefaultValue).toPath();
+      defaultValue =  Path.fromFile((File) pDefaultValue);
     } else {
       defaultValue = (Path)pDefaultValue;
     }
@@ -162,7 +161,7 @@ public class FileTypeConverter implements TypeConverter {
       file = rootPath.resolve(file);
     }
 
-    if (java.nio.file.Files.isDirectory(file)) {
+    if (file.toFile().isDirectory()) {
       throw new InvalidConfigurationException("Option " + optionName
           + " specifies a directory instead of a file: " + file);
     }
