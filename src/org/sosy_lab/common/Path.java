@@ -42,8 +42,8 @@ import com.google.common.io.Files;
  */
 public class Path {
 
-  private String path;
-  private File fileInstance;
+  private String path = "";
+  private File fileInstance = null;
 
   public Path(String path, String... more) {
     if (more.length == 0) {
