@@ -165,7 +165,18 @@ public class Path {
     // TODO How can a path be not absolute and still have a root component?
 
     // other has no root component
-    return new Path(toAbsolutePath() + other.getOriginalPath());
+    Path absolutePath;
+    if (toFile().isFile()) {
+      System.out.println("is file");
+      absolutePath = getParent().toAbsolutePath();
+      System.out.println("abs: "+absolutePath);
+    } else {
+      System.out.println("no file");
+      absolutePath = toAbsolutePath();
+      System.out.println("abs: "+absolutePath);
+    }
+
+    return new Path(absolutePath + File.separator + other.getOriginalPath());
   }
 
   /**
