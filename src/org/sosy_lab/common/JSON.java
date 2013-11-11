@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +53,7 @@ public final class JSON {
   public static void writeJSONString(@Nullable Object value, File file,
       @SuppressWarnings("unused") Charset charset) throws IOException {
     checkNotNull(charset);
-    writeJSONString(value, file.toPath());
+    writeJSONString(value, Path.fromFile(file));
   }
 
   /**
@@ -72,7 +71,7 @@ public final class JSON {
    * @throws IOException
    */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
-    try (Writer out = Files.openOutputFile(file, Charsets.US_ASCII)) { // We escape everything, so pure ASCII remains
+    try (Writer out = file.asCharSink(Charsets.US_ASCII).openStream()) { // We escape everything, so pure ASCII remains
       writeJSONString(value, out);
     }
   }
