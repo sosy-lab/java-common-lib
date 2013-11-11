@@ -72,6 +72,15 @@ public class Path {
   }
 
   /**
+   * Returns the name of the file or directory represented by this path.
+   *
+   * @return The name of the file or directory.
+   */
+  public String getName() {
+    return toFile().getName();
+  }
+
+  /**
    * Returns the absolute path.
    * {@link java.io.File#getAbsolutePath()}
    *
