@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,12 +28,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 
 import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.io.FileWriteMode;
 
 /**
  * Provides helper functions for file access.
@@ -66,7 +70,7 @@ public final class Files {
       } catch (IOException e) {
         // creation was successful, but writing failed
         // -> delete file
-        delete(Path.fromFile(file), e);
+        delete(file.toPath(), e);
 
         throw e;
       }
@@ -76,7 +80,7 @@ public final class Files {
 
   /**
    * Create a temporary file similar to
-   * {@link java.io.File#createTempFile(String, String)}.
+   * {@link java.nio.file.Files#createTempFile(String, String, FileAttribute...)}.
    *
    * The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseFile},
    * which deletes the file as soon as {@link DeleteOnCloseFile#close()} is called.
@@ -88,42 +92,44 @@ public final class Files {
    * }
    * </code>
    *
-   * The file can be opened and closed multiple times, potentially from different processes.
+   * The difference to using {@link StandardOpenOption#DELETE_ON_CLOSE} is that
+   * the file can be opened and closed multiple times,
+   * potentially from different processes.
    *
    * @param prefix
    * @param suffix
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix) throws IOException {
-    Path tempFile = Path.fromFile(File.createTempFile(prefix, suffix));
-    return new DeleteOnCloseFile(tempFile);
+  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix,
+      FileAttribute<?>... attrs) throws IOException {
+    return new DeleteOnCloseFile(java.nio.file.Files.createTempFile(prefix, suffix, attrs));
   }
 
   /**
    * A simple wrapper around {@link Path} that calls
-   * {@link java.io.File#delete()} from {@link AutoCloseable#close()}.
+   * {@link java.nio.file.Files#delete(Path)} from {@link AutoCloseable#close()}.
    */
   public static class DeleteOnCloseFile implements AutoCloseable {
 
-    private final Path path;
+    private final Path file;
 
     private DeleteOnCloseFile(Path pFile) {
-      path = pFile;
+      file = pFile;
     }
 
     public Path toPath() {
-      return path;
+      return file;
     }
 
     @Override
     public void close() throws IOException {
-      path.toFile().delete();
+      java.nio.file.Files.delete(file);
     }
   }
 
   /**
-   * Try to delete a file.
+   * Try to delete a file by calling {@link java.nio.file.Files#delete(Path)}.
    *
    * If deleting fails, and an exception is given as second parameter,
    * the exception from the deletion is added to the given exception,
@@ -139,17 +145,14 @@ public final class Files {
    * }
    * </code>
    *
-   * @param path The file to delete.
+   * @param file The file to delete.
    * @param pendingException An optional pending exception.
    * @throws IOException If deletion fails and no pending exception was given.
    */
-  public static void delete(Path path, @Nullable IOException pendingException) throws IOException {
-    File file = path.toFile();
-    boolean deletionSucceeded = file.delete();
-
-    if (!deletionSucceeded) {
-      IOException deleteException = new IOException("The file " + file + " could not be deleted.");
-
+  public static void delete(Path file, @Nullable IOException pendingException) throws IOException {
+    try {
+      java.nio.file.Files.delete(file);
+    } catch (IOException deleteException) {
       if (pendingException != null) {
         pendingException.addSuppressed(deleteException);
       } else {
@@ -165,7 +168,7 @@ public final class Files {
    * @throws IOException
    */
   public static void writeFile(File file, Object content) throws IOException {
-    writeFile(Path.fromFile(file), content);
+    writeFile(file.toPath(), content);
   }
 
   /**
@@ -183,30 +186,33 @@ public final class Files {
 
   /**
    * Open a BufferedWriter to a file with the default charset.
-   * This method creates necessary parent directories beforehand.
+   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
+   * this method creates necessary parent directories first.
    *
    * Note that using the default charset is often not a good idea,
    * because it varies from platform to platform.
-   * Consider explicitly specifying a charset.
+   * Consider using {@link #openOutputFile(Path, Charset, OpenOption...)}
+   * and explicitly specifying a charset.
    *
    * TODO should we use UTF8 here instead?
    */
-  public static BufferedWriter openOutputFile(Path file, FileWriteMode... options) throws IOException {
+  public static BufferedWriter openOutputFile(Path file, OpenOption... options) throws IOException {
     return openOutputFile(file, Charset.defaultCharset(), options);
   }
 
   /**
    * Open a BufferedWriter to a file.
-   * This method creates necessary parent directories beforehand.
+   * In addition to {@link java.nio.file.Files#newBufferedWriter(Path, Charset, OpenOption...)},
+   * this method creates necessary parent directories first.
    */
   public static BufferedWriter openOutputFile(Path file, Charset charset,
-      FileWriteMode... options) throws IOException {
+      OpenOption... options) throws IOException {
     Path dir = file.getParent();
     if (dir != null) {
-      dir.toFile().mkdirs();
+      java.nio.file.Files.createDirectories(dir);
     }
 
-    return (BufferedWriter) file.asCharSink(charset, options).openBufferedStream();
+    return java.nio.file.Files.newBufferedWriter(file, charset, options);
   }
 
   /**
@@ -217,7 +223,7 @@ public final class Files {
    * @throws IOException
    */
   public static void appendToFile(File file, Object content) throws IOException {
-    appendToFile(Path.fromFile(file), content);
+    appendToFile(file.toPath(), content);
   }
 
   /**
@@ -229,7 +235,7 @@ public final class Files {
    */
   public static void appendToFile(Path file, Object content) throws IOException {
     checkNotNull(content);
-    try (Writer w = openOutputFile(file, FileWriteMode.APPEND)) {
+    try (Writer w = openOutputFile(file, APPEND, CREATE)) {
       Appenders.appendTo(w, content);
     }
   }
@@ -242,7 +248,7 @@ public final class Files {
    * @throws FileNotFoundException If one of the conditions is not true.
    */
   public static void checkReadableFile(File file) throws FileNotFoundException {
-    checkReadableFile(org.sosy_lab.common.Path.fromFile(file));
+    checkReadableFile(file.toPath());
   }
 
 
@@ -250,22 +256,22 @@ public final class Files {
    * Verifies if a file exists, is a normal file and is readable. If this is not
    * the case, a FileNotFoundException with a nice message is thrown.
    *
-   * @param path The file to check.
+   * @param file The file to check.
    * @throws FileNotFoundException If one of the conditions is not true.
    */
-  public static void checkReadableFile(org.sosy_lab.common.Path path) throws FileNotFoundException {
-    Preconditions.checkNotNull(path);
+  public static void checkReadableFile(Path file) throws FileNotFoundException {
+    Preconditions.checkNotNull(file);
 
-    if (!path.toFile().exists()) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " does not exist!");
+    if (!java.nio.file.Files.exists(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " does not exist!");
     }
 
-    if (!path.toFile().isFile()) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not a normal file!");
+    if (!java.nio.file.Files.isRegularFile(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not a normal file!");
     }
 
-    if (!path.toFile().canRead()) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
+    if (!java.nio.file.Files.isReadable(file)) {
+      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not readable!");
     }
   }
 }
