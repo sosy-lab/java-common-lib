@@ -77,8 +77,8 @@ public class Path {
    *
    * @return The absolute path
    */
-  public String toAbsolutePath() {
-    return toFile().getAbsolutePath();
+  public Path toAbsolutePath() {
+    return new Path(toFile().getAbsolutePath());
   }
 
   /**
