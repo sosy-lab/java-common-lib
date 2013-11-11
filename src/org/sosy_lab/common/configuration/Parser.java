@@ -27,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -137,7 +138,7 @@ class Parser {
       throw new InvalidConfigurationFileException("Circular inclusion of file " + file.getAbsolutePath());
     }
 
-    try (InputStream is = java.nio.file.Files.newInputStream(file.toPath())) {
+    try (InputStream is = new FileInputStream(file)) {
       return parse(is, file.getParent(), file.getPath(), includeStack);
     }
   }
