@@ -213,7 +213,7 @@ public class Path {
   /**
    * Indicates whether the path is empty.
    *
-   * @return True, of the path is empty, false otherwise.
+   * @return True, if the path is empty, false otherwise.
    */
   public boolean isEmpty() {
     return path.isEmpty();
