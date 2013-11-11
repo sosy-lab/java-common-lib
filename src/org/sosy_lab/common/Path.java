@@ -48,6 +48,10 @@ public class Path {
     this.path = path;
   }
 
+  public static Path fromFile(File file) {
+    return new Path(file.getPath());
+  }
+
   public File toFile() {
     // Reuse the File object since it is immutable anyway. And also the path cannot be changed.
     if (fileInstance == null) {
