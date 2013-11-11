@@ -27,6 +27,7 @@ package org.sosy_lab.common;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
@@ -44,8 +45,21 @@ public class Path {
   private String path;
   private File fileInstance;
 
-  public Path(String path) {
-    this.path = path;
+  public Path(String path, String... more) {
+    if (more.length == 0) {
+      this.path = path;
+    } else if (path.isEmpty() && more.length == 0) {
+      this.path = "";
+    } else {
+      char separatorChar = File.separatorChar;
+      Joiner joiner = Joiner.on(separatorChar).skipNulls();
+
+      if (path.isEmpty()) {
+        this.path = joiner.join(more);
+      } else {
+        this.path = path + separatorChar + joiner.join(more);
+      }
+    }
   }
 
   public static Path fromFile(File file) {
