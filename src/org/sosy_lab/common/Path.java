@@ -87,8 +87,8 @@ public class Path {
    *
    * @return The parent
    */
-  public String getParent() {
-    return toFile().getParent();
+  public Path getParent() {
+    return new Path(toFile().getParent());
   }
 
   /**
