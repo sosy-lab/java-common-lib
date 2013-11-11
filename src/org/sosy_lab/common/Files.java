@@ -75,7 +75,7 @@ public final class Files {
 
   /**
    * Create a temporary file similar to
-   * {@link java.nio.file.Files#createTempFile(String, String, FileAttribute...)}.
+   * {@link java.io.File#createTempFile(String, String)}.
    *
    * The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseFile},
    * which deletes the file as soon as {@link DeleteOnCloseFile#close()} is called.
@@ -87,18 +87,16 @@ public final class Files {
    * }
    * </code>
    *
-   * The difference to using {@link StandardOpenOption#DELETE_ON_CLOSE} is that
-   * the file can be opened and closed multiple times,
-   * potentially from different processes.
+   * The file can be opened and closed multiple times, potentially from different processes.
    *
    * @param prefix
    * @param suffix
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix,
-      FileAttribute<?>... attrs) throws IOException {
-    return new DeleteOnCloseFile(java.nio.file.Files.createTempFile(prefix, suffix, attrs));
+  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix) throws IOException {
+    Path tempFile = Path.fromFile(File.createTempFile(prefix, suffix));
+    return new DeleteOnCloseFile(tempFile);
   }
 
   /**
