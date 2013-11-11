@@ -20,7 +20,6 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.file.StandardOpenOption.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,10 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
 
 import javax.annotation.Nullable;
 
@@ -70,7 +65,7 @@ public final class Files {
       } catch (IOException e) {
         // creation was successful, but writing failed
         // -> delete file
-        delete(file.toPath(), e);
+        delete(Path.fromFile(file), e);
 
         throw e;
       }
@@ -108,28 +103,28 @@ public final class Files {
 
   /**
    * A simple wrapper around {@link Path} that calls
-   * {@link java.nio.file.Files#delete(Path)} from {@link AutoCloseable#close()}.
+   * {@link java.io.File#delete()} from {@link AutoCloseable#close()}.
    */
   public static class DeleteOnCloseFile implements AutoCloseable {
 
-    private final Path file;
+    private final Path path;
 
     private DeleteOnCloseFile(Path pFile) {
-      file = pFile;
+      path = pFile;
     }
 
     public Path toPath() {
-      return file;
+      return path;
     }
 
     @Override
     public void close() throws IOException {
-      java.nio.file.Files.delete(file);
+      path.toFile().delete();
     }
   }
 
   /**
-   * Try to delete a file by calling {@link java.nio.file.Files#delete(Path)}.
+   * Try to delete a file.
    *
    * If deleting fails, and an exception is given as second parameter,
    * the exception from the deletion is added to the given exception,
@@ -145,14 +140,17 @@ public final class Files {
    * }
    * </code>
    *
-   * @param file The file to delete.
+   * @param path The file to delete.
    * @param pendingException An optional pending exception.
    * @throws IOException If deletion fails and no pending exception was given.
    */
-  public static void delete(Path file, @Nullable IOException pendingException) throws IOException {
-    try {
-      java.nio.file.Files.delete(file);
-    } catch (IOException deleteException) {
+  public static void delete(Path path, @Nullable IOException pendingException) throws IOException {
+    File file = path.toFile();
+    boolean deletionSucceeded = file.delete();
+
+    if (!deletionSucceeded) {
+      IOException deleteException = new IOException("The file " + file + " could not be deleted.");
+
       if (pendingException != null) {
         pendingException.addSuppressed(deleteException);
       } else {
