@@ -25,8 +25,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.file.Path;
 
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 
 /**

@@ -21,8 +21,8 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
