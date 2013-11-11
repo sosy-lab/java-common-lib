@@ -60,6 +60,14 @@ public class Path {
         this.path = path + separatorChar + joiner.join(more);
       }
     }
+
+    /*
+     * new File() will throw a NullPointerException if the path is null.
+     * Therefore use the empty path instead to prevent nasty exceptions.
+     */
+    if (path == null) {
+      this.path = "";
+    }
   }
 
   public static Path fromFile(File file) {
