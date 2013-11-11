@@ -248,7 +248,7 @@ public final class Files {
    * @throws FileNotFoundException If one of the conditions is not true.
    */
   public static void checkReadableFile(File file) throws FileNotFoundException {
-    checkReadableFile(file.toPath());
+    checkReadableFile(org.sosy_lab.common.Path.fromFile(file));
   }
 
 
@@ -256,22 +256,22 @@ public final class Files {
    * Verifies if a file exists, is a normal file and is readable. If this is not
    * the case, a FileNotFoundException with a nice message is thrown.
    *
-   * @param file The file to check.
+   * @param path The file to check.
    * @throws FileNotFoundException If one of the conditions is not true.
    */
-  public static void checkReadableFile(Path file) throws FileNotFoundException {
-    Preconditions.checkNotNull(file);
+  public static void checkReadableFile(org.sosy_lab.common.Path path) throws FileNotFoundException {
+    Preconditions.checkNotNull(path);
 
-    if (!java.nio.file.Files.exists(file)) {
-      throw new FileNotFoundException("File " + file.toAbsolutePath() + " does not exist!");
+    if (!path.toFile().exists()) {
+      throw new FileNotFoundException("File " + path.toAbsolutePath() + " does not exist!");
     }
 
-    if (!java.nio.file.Files.isRegularFile(file)) {
-      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not a normal file!");
+    if (!path.toFile().isFile()) {
+      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not a normal file!");
     }
 
-    if (!java.nio.file.Files.isReadable(file)) {
-      throw new FileNotFoundException("File " + file.toAbsolutePath() + " is not readable!");
+    if (!path.toFile().canRead()) {
+      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
     }
   }
 }
