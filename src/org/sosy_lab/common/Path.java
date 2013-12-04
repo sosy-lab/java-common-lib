@@ -45,6 +45,12 @@ public class Path {
   private String path = "";
   private File fileInstance = null;
 
+  /**
+   * Creates a new Path object from one or more path strings.
+   *
+   * @param path The path string to create the Path object from.
+   * @param more Additional path strings to use when creating the Path object.
+   */
   public Path(String path, String... more) {
     if (more.length == 0) {
       this.path = path;
@@ -70,10 +76,21 @@ public class Path {
     }
   }
 
+  /**
+   * Creates a Path object from a File object.
+   *
+   * @param file The File object used to create the Path object.
+   * @return A Path object created from a File.
+   */
   public static Path fromFile(File file) {
     return new Path(file.getPath());
   }
 
+  /**
+   * Returns a File object representing the path object.
+   *
+   * @return A File object representing the path.
+   */
   public File toFile() {
     // Reuse the File object since it is immutable anyway. And also the path cannot be changed.
     if (fileInstance == null) {
