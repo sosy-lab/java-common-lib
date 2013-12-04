@@ -25,6 +25,7 @@ package org.sosy_lab.common;
 
 
 import java.io.File;
+import java.net.URI;
 import java.nio.charset.Charset;
 
 import com.google.common.base.Joiner;
@@ -84,6 +85,16 @@ public class Path {
    */
   public static Path fromFile(File file) {
     return new Path(file.getPath());
+  }
+
+  /**
+   * Creates a Path object from a URI object.
+   *
+   * @param uri The URI object used to create the Path object.
+   * @return A Path object created from a URI.
+   */
+  public static Path fromURI(URI uri) {
+    return Path.fromFile(new File(uri));
   }
 
   /**
