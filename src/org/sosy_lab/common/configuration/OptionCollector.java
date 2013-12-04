@@ -478,6 +478,9 @@ public class OptionCollector {
         if (defaultValue.startsWith("Paths.get(")) {
           defaultValue = defaultValue.substring("Paths.get(".length(), defaultValue.length() - 1);
         }
+        if (defaultValue.startsWith("new Path(")) {
+          defaultValue = defaultValue.substring("new Path(".length(), defaultValue.length() - 1);
+        }
         if (defaultValue.startsWith("Pattern.compile(")) {
           defaultValue = defaultValue.substring("Pattern.compile(".length(), defaultValue.length() - 1);
         }
