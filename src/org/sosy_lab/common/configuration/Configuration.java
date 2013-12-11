@@ -638,12 +638,20 @@ public class Configuration {
         + " must have @Options annotation.  If you used inject(Object), try"
         + " inject(Object, Class) instead.");
 
-    // get all injectable memebers and override their final & private modifiers
+    /*
+     * Get all injectable members and override their final & private modifiers.
+     * Do not use Field.setAccessible(Object[], boolean) to do so as it will not work
+     * on the Google App Engine!
+     */
     final Field[] fields = cls.getDeclaredFields();
-    Field.setAccessible(fields, true);
+    for (Field field : fields) {
+      field.setAccessible(true);
+    }
 
     final Method[] methods = cls.getDeclaredMethods();
-    Method.setAccessible(methods, true);
+    for (Method method : methods) {
+      method.setAccessible(true);
+    }
 
     try {
       for (final Field field : fields) {
