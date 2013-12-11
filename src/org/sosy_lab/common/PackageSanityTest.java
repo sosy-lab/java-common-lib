@@ -37,6 +37,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(String[].class, new String[]{"test"});
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
+    setDefault(Path.class, new Path(""));
     try {
       setDefault(Constructor.class, PackageSanityTest.class.getConstructor());
       setDefault(Method.class, PackageSanityTest.class.getDeclaredMethod("defaultMethod"));

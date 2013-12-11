@@ -28,6 +28,8 @@ import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Joiner;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
@@ -52,7 +54,15 @@ public class Path {
    * @param path The path string to create the Path object from.
    * @param more Additional path strings to use when creating the Path object.
    */
-  public Path(String path, String... more) {
+  public Path(@Nullable String path, String... more) {
+    /*
+     * new File() will throw a NullPointerException if the path is null.
+     * Therefore use the empty path instead to prevent nasty exceptions.
+     */
+    if (path == null) {
+      path = "";
+    }
+
     if (more.length == 0) {
       this.path = path;
     } else if (path.isEmpty() && more.length == 0) {
@@ -66,14 +76,6 @@ public class Path {
       } else {
         this.path = path + separatorChar + joiner.join(more);
       }
-    }
-
-    /*
-     * new File() will throw a NullPointerException if the path is null.
-     * Therefore use the empty path instead to prevent nasty exceptions.
-     */
-    if (path == null) {
-      this.path = "";
     }
   }
 
@@ -168,7 +170,7 @@ public class Path {
    *
    * @return The resolved path
    */
-  public Path resolve(String other) {
+  public Path resolve(@Nullable String other) {
     return resolve(new Path(other));
   }
 
