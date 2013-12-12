@@ -25,25 +25,61 @@ package org.sosy_lab.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Paths;
+
+import org.junit.Before;
 import org.junit.Test;
 
 
 public class PathTest {
 
+  private java.nio.file.Path nioPath;
+  private Path commonPath;
+
+  @Before
+  public void before() {
+    String filePath = "/src/org.sosy_lab.common/Path.java";
+    nioPath = Paths.get(filePath);
+    commonPath = new Path(filePath);
+  }
+
   @Test
   public void resolveDirectoryEndingInSeparator() throws Exception {
-    Path dirA = new Path("/some/directory/with/separator/");
-    Path dirB = new Path("some/directory");
+    String dirPathA = "/some/directory/with/separator/";
+    String dirPathB = "some/directory";
 
-    assertEquals("/some/directory/with/separator/some/directory", dirA.resolve(dirB).toFile().getPath());
+    java.nio.file.Path nioDirA = Paths.get(dirPathA);
+    java.nio.file.Path nioDirB = Paths.get(dirPathB);
+    java.nio.file.Path resolvedNioPath = nioDirA.resolve(nioDirB);
+
+    Path commonDirA = new Path(dirPathA);
+    Path commonDirB = new Path(dirPathB);
+    Path resolvedCommonPath = commonDirA.resolve(commonDirB);
+
+    assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
   }
 
   @Test
   public void resolveDirectoryNotEndingInSeparator() throws Exception {
-    Path dirA = new Path("/some/directory/without/separator");
-    Path dirB = new Path("some/directory");
+    String dirPathA = "/some/directory/without/separator";
+    String dirPathB = "some/directory";
 
-    assertEquals("/some/directory/without/separator/some/directory", dirA.resolve(dirB).toFile().getPath());
+    java.nio.file.Path nioDirA = Paths.get(dirPathA);
+    java.nio.file.Path nioDirB = Paths.get(dirPathB);
+    java.nio.file.Path resolvedNioPath = nioDirA.resolve(nioDirB);
+
+    Path commonDirA = new Path(dirPathA);
+    Path commonDirB = new Path(dirPathB);
+    Path resolvedCommonPath = commonDirA.resolve(commonDirB);
+
+    assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
+  }
+
+  @Test
+  public void resolveTwoFiles() throws Exception {
+    java.nio.file.Path nioOther = Paths.get("PathTest.java");
+    Path commonOther = new Path("PathTest.java");
+    assertEquals(nioPath.resolve(nioOther).toString(), commonPath.resolve(commonOther).toString());
   }
 
   @Test
@@ -78,6 +114,31 @@ public class PathTest {
     path.toFile();
 
     assertEquals("", path.getOriginalPath());
+  }
+
+  @Test
+  public void getParent() throws Exception {
+    assertEquals(nioPath.getParent().toString(), commonPath.getParent().toString());
+  }
+
+  @Test
+  public void toAbsolutePath() throws Exception {
+    assertEquals(nioPath.toAbsolutePath().toString(), commonPath.toAbsolutePath().toString());
+  }
+
+  @Test
+  public void getFileName() throws Exception {
+    assertEquals(nioPath.getFileName().toString(), commonPath.getFileName().toString());
+  }
+
+  @Test
+  public void isAbsolute() throws Exception {
+    assertEquals(nioPath.isAbsolute(), commonPath.isAbsolute());
+  }
+
+  @Test
+  public void toStringTest() throws Exception {
+    assertEquals(nioPath.toString(), commonPath.toString());
   }
 
 }
