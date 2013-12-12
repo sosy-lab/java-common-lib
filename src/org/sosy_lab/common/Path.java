@@ -128,7 +128,7 @@ public class Path {
    *
    * @return The name of the file or directory.
    */
-  public String getName() {
+  public String getFileName() {
     return toFile().getName();
   }
 
