@@ -27,11 +27,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.AbstractSequentialList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.annotation.concurrent.Immutable;
 
-import com.google.common.base.Joiner;
+import com.google.common.collect.UnmodifiableIterator;
 
 /**
 * A linked-list implementation of {@link PersistentList}.
@@ -156,50 +157,31 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return of();
   }
 
-  /** Note: O(N) */
   @Override
-  public boolean contains(final Object value) {
-    for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail) {
-      if (value.equals(list.head())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(final Object other) {
+    // Reimplementation of AbstractList#equals(Object) using iterator()
+    // instead of listIterator()
     if (this == other) {
       return true;
     }
-    if (!(other instanceof PersistentLinkedList)) {
+
+    if (!(other instanceof List)) {
       return false;
     }
-    PersistentLinkedList<? extends Object> x = this;
-    PersistentLinkedList<Object> y = (PersistentLinkedList<Object>) other;
-    for (; x != EMPTY && y != EMPTY; x = x.tail(), y = y.tail()) {
-      if (!x.head().equals(y.head())) {
+
+    Iterator<T> e1 = iterator();
+    Iterator<?> e2 = ((List<?>) other).iterator();
+    while (e1.hasNext() && e2.hasNext()) {
+      T o1 = e1.next();
+      Object o2 = e2.next();
+      if (!(o1==null ? o2==null : o1.equals(o2))) {
         return false;
       }
     }
-    return x == EMPTY && y == EMPTY;
+    return !(e1.hasNext() || e2.hasNext());
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 3571;
-    int result = 0;
-    for (PersistentLinkedList<T> p = this; p != EMPTY; p = p.tail) {
-      result = result * prime + p.head.hashCode();
-    }
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "[" + Joiner.on(", ").join(this) + "]";
-  }
+  // hashCode provided by AbstractList
 
   /**
    * Returns the number of elements in the list.
@@ -310,7 +292,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return new Iter<>(this);
   }
 
-  private static class Iter<T> implements Iterator<T> {
+  private static class Iter<T> extends UnmodifiableIterator<T> {
 
     private Iter(PersistentLinkedList<T> list) {
       this.list = new PersistentLinkedList<>(null, list);
@@ -325,11 +307,6 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     public T next() {
       list = list.tail();
       return list.head();
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
     }
 
     private PersistentLinkedList<T> list;
