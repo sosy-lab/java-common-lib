@@ -45,18 +45,21 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * Replacement for {@link #add(Object)} that returns a fresh new instance.
+   * The position of insertion is not specified.
    */
   @CheckReturnValue
   PersistentList<T> with(T value);
 
   /**
    * Replacement for {@link #addAll(Iterable)} that returns a fresh new instance.
+   * The position of insertion is not specified.
    */
   @CheckReturnValue
   PersistentList<T> withAll(List<T> values);
 
   /**
    * Replacement for {@link #remove(Object)} that returns a fresh new instance.
+   * If the value occurs several times, only the first occurrence is removed.
    */
   @CheckReturnValue
   PersistentList<T> without(T value);
