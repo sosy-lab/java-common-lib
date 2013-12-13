@@ -37,7 +37,8 @@ import javax.annotation.concurrent.Immutable;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.collect.Lists;
+import com.google.common.collect.UnmodifiableListIterator;
 
 /**
 * A linked-list implementation of {@link PersistentList}.
@@ -193,32 +194,6 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return of();
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    // Reimplementation of AbstractList#equals(Object) using iterator()
-    // instead of listIterator()
-    if (this == other) {
-      return true;
-    }
-
-    if (!(other instanceof List)) {
-      return false;
-    }
-
-    Iterator<T> e1 = iterator();
-    Iterator<?> e2 = ((List<?>) other).iterator();
-    while (e1.hasNext() && e2.hasNext()) {
-      T o1 = e1.next();
-      Object o2 = e2.next();
-      if (!(o1==null ? o2==null : o1.equals(o2))) {
-        return false;
-      }
-    }
-    return !(e1.hasNext() || e2.hasNext());
-  }
-
-  // hashCode provided by AbstractList
-
   /**
    * Returns the number of elements in the list.
    * Note: O(N)
@@ -254,9 +229,23 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return new Iter<>(this);
   }
 
-  private static class Iter<T> extends UnmodifiableIterator<T> {
+  @Override
+  public ListIterator<T> listIterator(final int index) {
+    checkArgument(index >= 0);
+    ListIterator<T> it = new Iter<>(this);
+    for (int i = 0; i < index; i++) {
+      if (!it.hasNext()) {
+        throw new IndexOutOfBoundsException();
+      }
+      it.next();
+    }
+    return it;
+  }
+
+  private static class Iter<T> extends UnmodifiableListIterator<T> {
 
     private PersistentLinkedList<T> list;
+    private int nextIndex = 0;
 
     private Iter(PersistentLinkedList<T> list) {
       this.list = list;
@@ -272,15 +261,31 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
       if (list == EMPTY) {
         throw new NoSuchElementException();
       }
+      nextIndex++;
       T result = list.head;
       list = list.tail;
       return result;
     }
-  }
 
-  @Override
-  public ListIterator<T> listIterator(final int index) {
-    throw new UnsupportedOperationException();
+    @Override
+    public int nextIndex() {
+      return nextIndex;
+    }
+
+    @Override
+    public int previousIndex() {
+      return nextIndex-1;
+    }
+
+    @Override
+    public boolean hasPrevious() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public T previous() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   private final T head;
