@@ -88,11 +88,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of(final T v1, final T ... values) {
-    PersistentLinkedList<T> result = of(v1);
-    for (T value : values) {
-      result = result.with(value);
-    }
-    return result;
+    return copyOf(values).with(v1);
   }
 
   /** Returns a list containing the specified values.
@@ -105,9 +101,9 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   /** Returns A new list with the values from the Iterable.
    *  @return A new list with the values from the Iterable */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> copyOf(final Iterable<T> values) {
+  public static <T> PersistentLinkedList<T> copyOf(final List<T> values) {
     PersistentLinkedList<T> result = EMPTY;
-    for (T value : values) {
+    for (T value : Lists.reverse(values)) {
       result = result.with(value);
     }
     return result;
@@ -138,9 +134,9 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   /** Returns a new list with values as the head and the old list as the tail.
    *  @return A new list with value sas the head and the old list as the tail */
   @Override
-  public PersistentLinkedList<T> withAll(final Iterable<T> values) {
+  public PersistentLinkedList<T> withAll(final List<T> values) {
     PersistentLinkedList<T> result = this;
-    for (T value : values) {
+    for (T value : Lists.reverse(values)) {
       result = result.with(value);
     }
     return result;

@@ -53,7 +53,7 @@ public interface PersistentList<T> extends List<T> {
    * Replacement for {@link #addAll(Iterable)} that returns a fresh new instance.
    */
   @CheckReturnValue
-  PersistentList<T> withAll(Iterable<T> values);
+  PersistentList<T> withAll(List<T> values);
 
   /**
    * Replacement for {@link #remove(Object)} that returns a fresh new instance.
