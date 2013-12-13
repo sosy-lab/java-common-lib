@@ -139,7 +139,7 @@
     </target>
 
     <target description="Run all JUnit tests" depends="build, load-junit" name="tests">
-        <junit fork="true" printSummary="true" showOutput="false" haltonfailure="true" timeout="10000">
+        <junit fork="true" printSummary="true" showOutput="false" haltonfailure="true" timeout="100000">
             <assertions>
             <enable />
             </assertions>
