@@ -23,15 +23,20 @@
  */
 package org.sosy_lab.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.collect.FluentIterable.from;
 
 import java.util.AbstractSequentialList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
 
 /**
@@ -47,9 +52,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static PersistentLinkedList makeEmpty() {
-    PersistentLinkedList empty = new PersistentLinkedList(null, null);
-    empty.tail = empty;
-    return empty;
+    return new PersistentLinkedList(null, null);
   }
 
   /** Returns the empty list.
@@ -83,29 +86,43 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> of(final T ... values) {
-    PersistentLinkedList<T> result = EMPTY;
-    for (int i = values.length - 1; i >= 0; --i) {
-      result = result.with(values[i]);
+  public static <T> PersistentLinkedList<T> of(final T v1, final T ... values) {
+    PersistentLinkedList<T> result = of(v1);
+    for (T value : values) {
+      result = result.with(value);
     }
     return result;
   }
 
+  /** Returns a list containing the specified values.
+   *  @return A list containing the specified values */
+  @SuppressWarnings("unchecked")
+  public static <T> PersistentLinkedList<T> copyOf(final T ... values) {
+    return copyOf(Arrays.asList(values));
+  }
+
   /** Returns A new list with the values from the Iterable.
    *  @return A new list with the values from the Iterable */
+  @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> copyOf(final Iterable<T> values) {
-    return new Builder<T>().addAll(values).build();
+    PersistentLinkedList<T> result = EMPTY;
+    for (T value : values) {
+      result = result.with(value);
+    }
+    return result;
   }
 
   /** Returns the value at the start of the list.
    *  @return The value at the start of the list */
   public T head() {
+    checkState(head != null);
     return head;
   }
 
   /** Returns the remainder of the list without the first element.
    *  @return The remainder of the list without the first element */
   public PersistentLinkedList<T> tail() {
+    checkState(tail != null);
     return tail;
   }
 
@@ -117,12 +134,23 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return new PersistentLinkedList<>(value, this);
   }
 
+  /** Returns a new list with values as the head and the old list as the tail.
+   *  @return A new list with value sas the head and the old list as the tail */
+  @Override
+  public PersistentLinkedList<T> withAll(final Iterable<T> values) {
+    PersistentLinkedList<T> result = this;
+    for (T value : values) {
+      result = result.with(value);
+    }
+    return result;
+  }
+
   @Override
   public T get(int i) {
     if (i >= 0) {
       for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail()) {
         if (i-- == 0) {
-          return list.head();
+          return list.head;
         }
       }
     }
@@ -135,21 +163,29 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
    */
   @Override
   public PersistentLinkedList<T> without(final T value) {
-    if (!contains(value)) {
-      return this;
+    PersistentLinkedList<T> suffix = of(); // remainder of list after value
+
+    // find position of value and update suffix
+    int pos = 0;
+    for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail()) {
+      if (Objects.equal(value, list.head)) {
+        suffix = list.tail;
+        break;
+      }
+      pos++;
     }
-    final Builder<T> head = new Builder<>();
-    PersistentLinkedList<T> list = this;
-    do {
-      for (; list != EMPTY && !value.equals(list.head()); list = list.tail()) {
-        head.add(list.head());
-      }
-      while (list != EMPTY && value.equals(list.head())) {
-        list = list.tail();
-      }
-    } while (list.contains(value));
-    // list is now the longest tail that doesn't contain x
-    return head.buildOnto(list);
+
+    // get start of list until value
+    // into a separate list so we can iterate in reverse
+    ImmutableList<T> prefix = from(this).limit(pos).toList();
+
+    // concatenate prefix and suffix
+    PersistentLinkedList<T> result = suffix;
+    for (T v : prefix.reverse()) {
+      result = result.with(v);
+    }
+
+    return result;
   }
 
   @Override
@@ -213,80 +249,6 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     return result;
   }
 
-  /**
-   * Returns concatenation of the list with the given list,
-   * updating the tail of the last element of this list.
-   * Note: updating operating, not persistent!
-   * @return Concatenation of this list with the given list
-   */
-  public PersistentLinkedList<T> destructiveBuildOnto(PersistentLinkedList<T> newTail) {
-    PersistentLinkedList<T> last = this;
-    for (PersistentLinkedList<T> p = tail; p != empty(); p = p.tail) {
-      last = p;
-    }
-    last.tail = newTail;
-    return this;
-  }
-
-  public static class Builder<T> {
-
-    public Builder<T> add(final T value) {
-      list = list.with(value);
-      return this;
-    }
-
-    public Builder<T> addAll(final Iterable<? extends T> values) {
-      for (T value : values) {
-        add(value);
-      }
-      return this;
-    }
-
-    /**
-     * The Builder cannot be used after calling build()
-     * @return The list
-     */
-    @SuppressWarnings("unchecked")
-    public PersistentLinkedList<T> build() {
-      return list;
-    }
-
-    public PersistentLinkedList<T> buildOnto(final PersistentLinkedList<T> tail) {
-      if (list == EMPTY) {
-        return tail;
-      }
-      PersistentLinkedList<T> last = list;
-      for (PersistentLinkedList<T> p = list.tail; p != EMPTY; p = p.tail) {
-        last = p;
-      }
-      last.tail = tail;
-      return list;
-    }
-
-    /**
-     * The Builder cannot be used after calling build()
-     * @return The list
-     */
-    @SuppressWarnings("unchecked")
-    public PersistentLinkedList<T> buildReversed() {
-      return buildReversedOnto((PersistentLinkedList<T>) of());
-    }
-
-    public PersistentLinkedList<T> buildReversedOnto(PersistentLinkedList<T> tail) {
-      // reverse in place by changing pointers (no allocation)
-      for (PersistentLinkedList<T> p = list; p != of();) {
-        final PersistentLinkedList<T> next = p.tail;
-        p.tail = tail;
-        tail = p;
-        p = next;
-      }
-      list = null;
-      return tail;
-    }
-
-    private PersistentLinkedList<T> list = of();
-  }
-
   @Override
   public Iterator<T> iterator() {
     return new Iter<>(this);
@@ -294,22 +256,26 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   private static class Iter<T> extends UnmodifiableIterator<T> {
 
+    private PersistentLinkedList<T> list;
+
     private Iter(PersistentLinkedList<T> list) {
-      this.list = new PersistentLinkedList<>(null, list);
+      this.list = list;
     }
 
     @Override
     public boolean hasNext() {
-      return list.tail() != EMPTY;
+      return list != EMPTY;
     }
 
     @Override
     public T next() {
-      list = list.tail();
-      return list.head();
+      if (list == EMPTY) {
+        throw new NoSuchElementException();
+      }
+      T result = list.head;
+      list = list.tail;
+      return result;
     }
-
-    private PersistentLinkedList<T> list;
   }
 
   @Override
@@ -318,8 +284,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   }
 
   private final T head;
-  // Builder uses mutable private copies
-  private PersistentLinkedList<T> tail;
+  private final PersistentLinkedList<T> tail;
 
   @SuppressWarnings({ "rawtypes" })
   private static final PersistentLinkedList EMPTY = makeEmpty();
