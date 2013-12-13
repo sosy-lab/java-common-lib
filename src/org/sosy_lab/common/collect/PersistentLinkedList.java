@@ -41,15 +41,36 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
 
 /**
-* A linked-list implementation of {@link PersistentList}.
+ * A single-linked-list implementation of {@link PersistentList}.
+ * Null values are supported.
+ *
+ * Adding to the front of the list needs only O(1) time and memory.
+ *
+ * This implementation supports almost all operations, except for the
+ * {@link ListIterator#hasPrevious()} and {@link ListIterator#previous()} methods
+ * of its list iterator.
+ * This means you cannot traverse this list in reverse order.
+ *
+ * All instances of this class are fully-thread safe.
+ * However, note that each modifying operation allocates a new instance
+ * whose reference needs to be published safely in order to be usable by other threads.
+ * Two concurrent accesses to a modifying operation on the same instance will
+ * create two new maps, each reflecting exactly the operation executed by the current thread,
+ * and not reflecting the operation executed by the other thread.
 */
 @Immutable
 public class PersistentLinkedList<T> extends AbstractSequentialList<T> implements PersistentList<T> {
+
+  private final T head;
+  private final PersistentLinkedList<T> tail;
 
   private PersistentLinkedList(final T head, final PersistentLinkedList<T> tail) {
     this.head = head;
     this.tail = tail;
   }
+
+  @SuppressWarnings({ "rawtypes" })
+  private static final PersistentLinkedList EMPTY = makeEmpty();
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static PersistentLinkedList makeEmpty() {
@@ -65,23 +86,20 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns a list containing the specified value.
    *  @return A list containing the specified value */
-  @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of(final T value) {
-    return new PersistentLinkedList<>(value, EMPTY);
+    return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of(final T v1, final T v2) {
-    return EMPTY.with(v2).with(v1);
+    return of(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of(final T v1, final T v2, final T v3) {
-    return EMPTY.with(v3).with(v2).with(v1);
+    return of(v3).with(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
@@ -100,9 +118,11 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns A new list with the values from the Iterable.
    *  @return A new list with the values from the Iterable */
-  @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> copyOf(final List<T> values) {
-    PersistentLinkedList<T> result = EMPTY;
+    if (values instanceof PersistentLinkedList<?>) {
+      return (PersistentLinkedList<T>)values;
+    }
+    PersistentLinkedList<T> result = PersistentLinkedList.<T>of();
     for (T value : Lists.reverse(values)) {
       result = result.with(value);
     }
@@ -134,24 +154,16 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   /** Returns a new list with values as the head and the old list as the tail.
    *  @return A new list with value sas the head and the old list as the tail */
   @Override
-  public PersistentLinkedList<T> withAll(final List<T> values) {
+  public PersistentLinkedList<T> withAll(List<T> values) {
     PersistentLinkedList<T> result = this;
+    if (values instanceof PersistentLinkedList<?>) {
+      // does not support listIterator() and thus fails on Lists.reverse()
+      values = ImmutableList.copyOf(values);
+    }
     for (T value : Lists.reverse(values)) {
       result = result.with(value);
     }
     return result;
-  }
-
-  @Override
-  public T get(int i) {
-    if (i >= 0) {
-      for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail()) {
-        if (i-- == 0) {
-          return list.head;
-        }
-      }
-    }
-    throw new IndexOutOfBoundsException();
   }
 
   /** Returns a new list omitting the specified value.
@@ -164,7 +176,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
     // find position of value and update suffix
     int pos = 0;
-    for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail()) {
+    for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
       if (Objects.equal(value, list.head)) {
         suffix = list.tail;
         break;
@@ -198,7 +210,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   @Override
   public int size() {
     int size = 0;
-    for (PersistentLinkedList<T> list = this; list != EMPTY; list = list.tail) {
+    for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
       ++size;
     }
     return size;
@@ -210,11 +222,12 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   }
 
   /** Returns a new list with the elements in the reverse order.
+   *  This operation runs in O(n).
    *  @return A new list with the elements in the reverse order */
   @Override
   public PersistentLinkedList<T> reversed() {
     PersistentLinkedList<T> result = empty();
-    for (PersistentLinkedList<T> p = this; p != EMPTY; p = p.tail) {
+    for (PersistentLinkedList<T> p = this; !p.isEmpty(); p = p.tail) {
       result = result.with(p.head);
     }
     return result;
@@ -227,7 +240,9 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   @Override
   public ListIterator<T> listIterator(final int index) {
-    checkArgument(index >= 0);
+    if (index < 0) {
+      throw new IndexOutOfBoundsException();
+    }
     ListIterator<T> it = new Iter<>(this);
     for (int i = 0; i < index; i++) {
       if (!it.hasNext()) {
@@ -249,12 +264,12 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
     @Override
     public boolean hasNext() {
-      return list != EMPTY;
+      return !list.isEmpty();
     }
 
     @Override
     public T next() {
-      if (list == EMPTY) {
+      if (list.isEmpty()) {
         throw new NoSuchElementException();
       }
       nextIndex++;
@@ -283,10 +298,4 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
       throw new UnsupportedOperationException();
     }
   }
-
-  private final T head;
-  private final PersistentLinkedList<T> tail;
-
-  @SuppressWarnings({ "rawtypes" })
-  private static final PersistentLinkedList EMPTY = makeEmpty();
 }
