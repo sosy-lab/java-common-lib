@@ -29,6 +29,7 @@ import com.google.common.testing.AbstractPackageSanityTests;
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
+    setDefault(PersistentLinkedList.class, PersistentLinkedList.of());
     ignoreClasses(Predicates.<Class<?>>equalTo(SortedMapKeySet.class));
   }
 }

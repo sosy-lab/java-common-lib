@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import com.google.common.base.Objects;
@@ -86,26 +87,26 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns a list containing the specified value.
    *  @return A list containing the specified value */
-  public static <T> PersistentLinkedList<T> of(final T value) {
+  public static <T> PersistentLinkedList<T> of(final @Nullable T value) {
     return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  public static <T> PersistentLinkedList<T> of(final T v1, final T v2) {
+  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final @Nullable T v2) {
     return of(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  public static <T> PersistentLinkedList<T> of(final T v1, final T v2, final T v3) {
+  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final @Nullable T v2, final @Nullable T v3) {
     return of(v3).with(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> of(final T v1, final T ... values) {
+  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final T ... values) {
     return copyOf(values).with(v1);
   }
 
@@ -131,7 +132,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns the value at the start of the list.
    *  @return The value at the start of the list */
-  public T head() {
+  public @Nullable T head() {
     checkState(head != null);
     return head;
   }
@@ -146,7 +147,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
   /** Returns a new list with value as the head and the old list as the tail.
    *  @return A new list with value as the head and the old list as the tail */
   @Override
-  public PersistentLinkedList<T> with(final T value) {
+  public PersistentLinkedList<T> with(final @Nullable T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, this);
   }
@@ -171,7 +172,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
    *  @return A new list omitting the specified value
    */
   @Override
-  public PersistentLinkedList<T> without(final T value) {
+  public PersistentLinkedList<T> without(final @Nullable T value) {
     PersistentLinkedList<T> suffix = of(); // remainder of list after value
 
     // find position of value and update suffix
