@@ -49,6 +49,14 @@ public class AbstractMBean {
       // ignore exception because we cannot handle it here
       return null;
     }
+    /*
+     * Google App Engine does not allow to use classes from the package java.lang.management.
+     * Therefore it throws a NoClassDefFoundError if this is attempted regardless. To prevent
+     * CPAChecker from crashing in this case we catch the error and log the event.
+     */
+    catch (NoClassDefFoundError e) {
+      return null;
+    }
   }
 
   private ObjectName oname = null;

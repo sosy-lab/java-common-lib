@@ -33,8 +33,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,6 +53,7 @@ import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.LogManager;
 import org.sosy_lab.common.Pair;
+import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
 import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
@@ -117,7 +116,7 @@ public class Configuration {
       setupProperties();
 
       properties.put(name, value);
-      sources.put(name, Paths.get("manually set"));
+      sources.put(name, new Path("manually set"));
 
       return this;
     }
@@ -144,7 +143,7 @@ public class Configuration {
 
       properties.putAll(options);
       for (String name : options.keySet()) {
-        sources.put(name, Paths.get("manually set"));
+        sources.put(name, new Path("manually set"));
       }
 
       return this;
@@ -639,12 +638,20 @@ public class Configuration {
         + " must have @Options annotation.  If you used inject(Object), try"
         + " inject(Object, Class) instead.");
 
-    // get all injectable memebers and override their final & private modifiers
+    /*
+     * Get all injectable members and override their final & private modifiers.
+     * Do not use Field.setAccessible(Object[], boolean) to do so as it will not work
+     * on the Google App Engine!
+     */
     final Field[] fields = cls.getDeclaredFields();
-    Field.setAccessible(fields, true);
+    for (Field field : fields) {
+      field.setAccessible(true);
+    }
 
     final Method[] methods = cls.getDeclaredMethods();
-    Method.setAccessible(methods, true);
+    for (Method method : methods) {
+      method.setAccessible(true);
+    }
 
     try {
       for (final Field field : fields) {
