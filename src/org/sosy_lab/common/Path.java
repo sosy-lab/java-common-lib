@@ -25,6 +25,7 @@ package org.sosy_lab.common;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -143,6 +144,25 @@ public class Path {
   }
 
   /**
+   * Returns the path as canonical path.
+   *
+   * @return The canonical path.
+   * @throws IOException
+   */
+  public String getCanonicalPath() throws IOException {
+    return toFile().getCanonicalPath();
+  }
+
+  /**
+   * Returns a list containing the names of paths and directories contained within the current path.
+   *
+   * @return The contained files and directories
+   */
+  public String[] list() {
+    return toFile().list();
+  }
+
+  /**
    * Returns the path's parent.
    * {@link java.io.File#getParent()}
    *
@@ -223,6 +243,7 @@ public class Path {
    * @return A CharSource
    */
   public CharSource asCharSource(Charset charset) {
+    System.out.println("SOURCE: "+toAbsolutePath().toString());
     return Files.asCharSource(toFile(), charset);
   }
 
@@ -237,6 +258,7 @@ public class Path {
    * @return A CharSink
    */
   public CharSink asCharSink(Charset charset, FileWriteMode... writeModes) {
+    System.out.println("SINK: "+toAbsolutePath().toString());
     return Files.asCharSink(toFile(), charset, writeModes);
   }
 
@@ -247,6 +269,42 @@ public class Path {
    */
   public boolean isEmpty() {
     return path.isEmpty();
+  }
+
+  /**
+   * Indicates whether the path exists.
+   *
+   * @return True, if the path exists, false otherwise
+   */
+  public boolean exists() {
+    return toFile().exists();
+  }
+
+  /**
+   * Indicates whether the path is a directory.
+   *
+   * @return True, if the path is a directory, false otherwise
+   */
+  public boolean isDirectory() {
+    return toFile().isDirectory();
+  }
+
+  /**
+   * Indicates whether the path is a file.
+   *
+   * @return True, if the path is a file, false otherwise
+   */
+  public boolean isFile() {
+    return toFile().isFile();
+  }
+
+  /**
+   * Indicates whether the path can be read.
+   *
+   * @return True, if the path can be read, false otherwise
+   */
+  public boolean canRead() {
+    return toFile().canRead();
   }
 
   /**
