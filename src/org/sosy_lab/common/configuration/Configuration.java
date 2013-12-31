@@ -53,12 +53,13 @@ import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.LogManager;
 import org.sosy_lab.common.Pair;
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
 import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -116,7 +117,7 @@ public class Configuration {
       setupProperties();
 
       properties.put(name, value);
-      sources.put(name, new Path("manually set"));
+      sources.put(name, Paths.get("manually set"));
 
       return this;
     }
@@ -143,7 +144,7 @@ public class Configuration {
 
       properties.putAll(options);
       for (String name : options.keySet()) {
-        sources.put(name, new Path("manually set"));
+        sources.put(name, Paths.get("manually set"));
       }
 
       return this;
@@ -225,7 +226,7 @@ public class Configuration {
      * @throws InvalidConfigurationException If the file contains an invalid format.
      */
     public Builder loadFromFile(String filename) throws IOException, InvalidConfigurationException {
-      return loadFromFile(new File(filename));
+      return loadFromFile(Paths.get(filename));
     }
 
     /**
@@ -234,7 +235,7 @@ public class Configuration {
      * @throws IOException If the file cannot be read.
      * @throws InvalidConfigurationException If the file contains an invalid format.
      */
-    public Builder loadFromFile(File file) throws IOException, InvalidConfigurationException {
+    public Builder loadFromFile(Path file) throws IOException, InvalidConfigurationException {
       Preconditions.checkNotNull(file);
       setupProperties();
 
