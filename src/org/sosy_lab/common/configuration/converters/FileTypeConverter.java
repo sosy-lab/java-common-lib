@@ -30,13 +30,14 @@ import java.lang.reflect.Type;
 
 import javax.annotation.Nullable;
 
-import org.sosy_lab.common.Files;
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.io.Files;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -76,7 +77,7 @@ public class FileTypeConverter implements TypeConverter {
   public FileTypeConverter(Configuration config) throws InvalidConfigurationException {
     config.inject(this, FileTypeConverter.class);
 
-    rootPath = new Path(rootDirectory);
+    rootPath = Paths.get(rootDirectory);
     outputPath = rootPath.resolve(outputDirectory);
   }
 
@@ -102,7 +103,7 @@ public class FileTypeConverter implements TypeConverter {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    return handleFileOption(optionName, new Path(pValue),
+    return handleFileOption(optionName, Paths.get(pValue),
         ((FileOption)secondaryOption).value(), pType, pSource);
   }
 
@@ -129,7 +130,7 @@ public class FileTypeConverter implements TypeConverter {
 
     Path defaultValue;
     if (pType.equals(File.class)) {
-      defaultValue =  Path.fromFile((File) pDefaultValue);
+      defaultValue =  Paths.get((File) pDefaultValue);
     } else {
       defaultValue = (Path)pDefaultValue;
     }
@@ -161,7 +162,7 @@ public class FileTypeConverter implements TypeConverter {
       file = rootPath.resolve(file);
     }
 
-    if (file.toFile().isDirectory()) {
+    if (file.isDirectory()) {
       throw new InvalidConfigurationException("Option " + optionName
           + " specifies a directory instead of a file: " + file);
     }
