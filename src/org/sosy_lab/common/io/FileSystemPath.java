@@ -45,7 +45,7 @@ import com.google.common.io.Files;
  */
 public class FileSystemPath implements Path {
 
-  private String path = "";
+  protected String path = "";
   private File fileInstance = null;
 
   /**
