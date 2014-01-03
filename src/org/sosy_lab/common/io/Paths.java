@@ -23,53 +23,21 @@
  */
 package org.sosy_lab.common.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
 
 public class Paths {
 
-  /**
-   * Represents the environment the application is running on.
-   */
-  public static enum Environment {
-    /**
-     * The application can use the file system.
-     */
-    FILE_SYSTEM,
-
-    /**
-     * The application is running on Google App Engine and can use the file system only for reads.
-     */
-    APP_ENGINE
-  }
-
-  private static Environment environment = null;
-  private static Map<Environment, Class<? extends Path>> implementations = new HashMap<>();
+  private static AbstractPathFactory factory = null;
 
   /**
    * Prevent instantiation.
    */
   private Paths() {}
-
-  /**
-   * Sets the environment the application is running on.
-   * This affects which implementation of {@link Path} will be used.
-   *
-   * @param env The environment
-   */
-  public static void setEnvironment(@Nullable Environment env) {
-    environment = env;
-  }
 
   /**
    * Returns a Path instance created from a file.
@@ -92,18 +60,6 @@ public class Paths {
   }
 
   /**
-   * Registers an implementation of {@link Path} with an {@link Environment}.
-   *
-   * @param env The environment
-   * @param pathImpl The Path implementation.
-   */
-  public static void registerImplementation(Environment env, Class<? extends Path> pathImpl) {
-    checkNotNull(env);
-    checkNotNull(pathImpl);
-    implementations.put(env, pathImpl);
-  }
-
-  /**
    * Returns a Path instance created from one or more path names.
    *
    * @param pathName The path name
@@ -111,69 +67,36 @@ public class Paths {
    * @return A Path instance created from a path name
    */
   public static Path get(@Nullable String pathName, @Nullable String... more) {
-    // set FILE_SYSTEM as default environment
-    if (environment == null) {
-      setEnvironment(Environment.FILE_SYSTEM);
-    }
-
-    // register file system implementation if not yet done
-    if (environment == Environment.FILE_SYSTEM && !implementations.containsKey(Environment.FILE_SYSTEM)) {
-      registerImplementation(Environment.FILE_SYSTEM, FileSystemPath.class);
-    }
-
-    // TODO handle case if no fitting imp is registered
-
-    Path path = null;
-    try {
-      Constructor<? extends Path> constructor = implementations.get(environment).getConstructor(String.class, String[].class);
-      path = constructor.newInstance(pathName, more);
-    } catch (NoSuchMethodException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (SecurityException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalArgumentException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-    return path;
+    return getFactory().getPath(pathName, more);
   }
 
   /**
+   * Sets the factory to be used for creating Path instances.
    *
-   * @param prefix
-   * @param suffix
-   * @return
-   * @throws IOException
+   * @param pathFactory The path factory. If null {@link FileSystemPathFactory} will be used.
+   */
+  public static void setFactory(@Nullable AbstractPathFactory pathFactory) {
+    factory = pathFactory;
+  }
+
+  /**
+   * Returns the factory used to create instances.
+   * If none was set a {@link FileSystemPathFactory} instance will be returned.
+   *
+   * @return The path factory
+   */
+  public static AbstractPathFactory getFactory() {
+    if (factory == null) {
+      factory = new FileSystemPathFactory();
+    }
+
+    return factory;
+  }
+
+  /**
+   * @see AbstractPathFactory#getTempPath(String, String)
    */
   public static Path createTempPath(String prefix, @Nullable String suffix) throws IOException {
-
-    // TODO handle different environments
-
-    checkNotNull(prefix);
-    if (prefix.length() < 3) {
-      throw new IllegalArgumentException("The prefix must at least be three characters long.");
-    }
-
-    if (suffix == null) {
-      suffix = ".tmp";
-    }
-
-//    String fileName = prefix + suffix;
-//    SecurityManager securityManager = new SecurityManager();
-//    securityManager.checkWrite(fileName);
-
-    return get(File.createTempFile(prefix, suffix));
+    return getFactory().getTempPath(prefix, suffix);
   }
 }

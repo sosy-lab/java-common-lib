@@ -51,7 +51,7 @@ public class FileSystemPath implements Path {
   /**
    * Creates a new Path object from one or more path strings.
    *
-   * @param path The path string to create the Path object from.
+   * @param path The path string to create the Path object from. If null the empty string will be used.
    * @param more Additional path strings to use when creating the Path object.
    */
   public FileSystemPath(@Nullable String path, @Nullable String... more) {
