@@ -21,11 +21,15 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -137,7 +142,19 @@ public class ProcessExecutor<E extends Exception> {
       }
     }
 
+    /*
+     * The input file has to be piped to the process because Google App Engine does not allow
+     * writes to the file system and therefore the input file is stored elsewhere.
+     */
+    proc.redirectInput(Redirect.PIPE);
     final Process process = proc.start();
+    OutputStream out = new BufferedOutputStream(process.getOutputStream());
+    try (InputStream fileIn = Paths.get(cmd[cmd.length-1]).asByteSource().openBufferedStream()) {
+      int b;
+      while((b = fileIn.read()) != -1) {
+        out.write(b);
+      }
+    }
     processFuture = executor.submit(new Callable<Integer>() {
 
       // this callable guarantees that when it finishes,
