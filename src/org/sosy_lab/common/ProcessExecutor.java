@@ -42,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Preconditions;
@@ -148,11 +149,14 @@ public class ProcessExecutor<E extends Exception> {
      */
     proc.redirectInput(Redirect.PIPE);
     final Process process = proc.start();
-    OutputStream out = new BufferedOutputStream(process.getOutputStream());
-    try (InputStream fileIn = Paths.get(cmd[cmd.length-1]).asByteSource().openBufferedStream()) {
-      int b;
-      while((b = fileIn.read()) != -1) {
-        out.write(b);
+    Path path = Paths.get(cmd[cmd.length-1]);
+    if (path.exists()) {
+      OutputStream out = new BufferedOutputStream(process.getOutputStream());
+      try (InputStream fileIn = path.asByteSource().openBufferedStream()) {
+        int b;
+        while((b = fileIn.read()) != -1) {
+          out.write(b);
+        }
       }
     }
     processFuture = executor.submit(new Callable<Integer>() {
