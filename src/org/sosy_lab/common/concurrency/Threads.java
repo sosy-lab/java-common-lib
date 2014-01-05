@@ -57,7 +57,7 @@ public class Threads {
    */
   public static Thread newThread(Runnable r, String name) {
     Thread thread = factory.newThread(r);
-    thread.setName(name);
+//    thread.setName(name);
     return thread;
   }
 
