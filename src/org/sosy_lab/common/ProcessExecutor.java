@@ -42,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.concurrency.Concurrency;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
