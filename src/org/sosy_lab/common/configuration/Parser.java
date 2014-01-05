@@ -26,8 +26,6 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,9 +37,10 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-import org.sosy_lab.common.Files;
 import org.sosy_lab.common.Pair;
-import org.sosy_lab.common.Path;
+import org.sosy_lab.common.io.Files;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -107,7 +106,7 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Pair<Map<String, String>, Map<String, Path>> parse(File file, @Nullable String basePath)
+  static Pair<Map<String, String>, Map<String, Path>> parse(Path file, @Nullable String basePath)
       throws IOException, InvalidConfigurationException {
 
     return parse(file, basePath, Collections.<String>emptySet());
@@ -123,23 +122,23 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Pair<Map<String, String>, Map<String, Path>> parse(File file, @Nullable String basePath,
+  private static Pair<Map<String, String>, Map<String, Path>> parse(Path file, @Nullable String basePath,
       Set<String> includeStack) throws IOException, InvalidConfigurationException {
 
     if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
-      file = new File(basePath, file.getPath());
+      file = Paths.get(basePath, file.getPath());
     }
 
     Files.checkReadableFile(file);
 
     includeStack = new HashSet<>(includeStack);
-    boolean newFile = includeStack.add(file.getAbsolutePath());
+    boolean newFile = includeStack.add(file.toAbsolutePath().getPath());
     if (!newFile) {
-      throw new InvalidConfigurationFileException("Circular inclusion of file " + file.getAbsolutePath());
+      throw new InvalidConfigurationFileException("Circular inclusion of file " + file.toAbsolutePath());
     }
 
-    try (InputStream is = new FileInputStream(file)) {
-      return parse(is, file.getParent(), file.getPath(), includeStack);
+    try (InputStream is = file.asByteSource().openStream()) {
+      return parse(is, file.getParent().getPath(), file.getPath(), includeStack);
     }
   }
 
@@ -224,7 +223,7 @@ class Parser {
           throw new InvalidConfigurationFileException("Include without filename", lineno, source, fullLine);
         }
 
-        final Pair<Map<String, String>, Map<String, Path>> includedContent = parse(new File(line), basePath, includeStack);
+        final Pair<Map<String, String>, Map<String, Path>> includedContent = parse(Paths.get(line), basePath, includeStack);
         includedOptions.putAll(includedContent.getFirst());
         includedOptionsSources.putAll(includedContent.getSecond());
         continue;
@@ -290,7 +289,7 @@ class Parser {
     // now overwrite included options with local ones
     includedOptions.putAll(definedOptions);
 
-    Path thisSource = new Path(source);
+    Path thisSource = Paths.get(source);
     for (String name : definedOptions.keySet()) {
       includedOptionsSources.put(name, thisSource);
     }

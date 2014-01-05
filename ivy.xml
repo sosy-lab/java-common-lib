@@ -52,5 +52,7 @@
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
         <dependency org="org.apache.ant" name="ant-junit" rev="${ant.version.exact}" transitive="false" conf="build->default"/>
+        
+        <dependency name="mockito-core" org="org.mockito" rev="1.9.5" conf="test->default; contrib->sources" />
     </dependencies>
 </ivy-module>
