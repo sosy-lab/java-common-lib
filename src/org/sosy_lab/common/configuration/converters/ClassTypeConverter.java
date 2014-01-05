@@ -23,9 +23,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.Path;
 
 
 public class ClassTypeConverter implements TypeConverter {

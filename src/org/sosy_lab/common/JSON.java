@@ -31,6 +31,9 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
@@ -53,7 +56,7 @@ public final class JSON {
   public static void writeJSONString(@Nullable Object value, File file,
       @SuppressWarnings("unused") Charset charset) throws IOException {
     checkNotNull(charset);
-    writeJSONString(value, Path.fromFile(file));
+    writeJSONString(value, Paths.get(file));
   }
 
   /**

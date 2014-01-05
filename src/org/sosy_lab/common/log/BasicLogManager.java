@@ -22,7 +22,6 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -41,13 +40,14 @@ import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
 
 
 /**
@@ -83,7 +83,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   @Option(name="file",
       description="name of the log file")
   @FileOption(FileOption.Type.OUTPUT_FILE)
-  private File outputFile = new File("CPALog.txt");
+  private Path outputFile = Paths.get("CPALog.txt");
 
   @Option(description="maximum size of log output strings before they will be truncated")
   private int truncateSize = 10000;
@@ -152,7 +152,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     // create file logger
     if (!fileLevel.equals(Level.OFF) && outputFile != null) {
       try {
-        Files.createParentDirs(outputFile);
+        org.sosy_lab.common.io.Files.createParentDirs(outputFile);
 
         Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
 

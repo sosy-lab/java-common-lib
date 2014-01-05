@@ -21,7 +21,7 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.io;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,16 +31,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class PathTest {
+public class FileSystemPathTest {
 
   private java.nio.file.Path nioPath;
-  private Path commonPath;
+  private FileSystemPath commonPath;
 
   @Before
   public void before() {
     String filePath = "/src/org.sosy_lab.common/Path.java";
     nioPath = Paths.get(filePath);
-    commonPath = new Path(filePath);
+    commonPath = new FileSystemPath(filePath);
   }
 
   @Test
@@ -52,8 +52,8 @@ public class PathTest {
     java.nio.file.Path nioDirB = Paths.get(dirPathB);
     java.nio.file.Path resolvedNioPath = nioDirA.resolve(nioDirB);
 
-    Path commonDirA = new Path(dirPathA);
-    Path commonDirB = new Path(dirPathB);
+    FileSystemPath commonDirA = new FileSystemPath(dirPathA);
+    FileSystemPath commonDirB = new FileSystemPath(dirPathB);
     Path resolvedCommonPath = commonDirA.resolve(commonDirB);
 
     assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
@@ -68,8 +68,8 @@ public class PathTest {
     java.nio.file.Path nioDirB = Paths.get(dirPathB);
     java.nio.file.Path resolvedNioPath = nioDirA.resolve(nioDirB);
 
-    Path commonDirA = new Path(dirPathA);
-    Path commonDirB = new Path(dirPathB);
+    FileSystemPath commonDirA = new FileSystemPath(dirPathA);
+    FileSystemPath commonDirB = new FileSystemPath(dirPathB);
     Path resolvedCommonPath = commonDirA.resolve(commonDirB);
 
     assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
@@ -78,39 +78,39 @@ public class PathTest {
   @Test
   public void resolveTwoFiles() throws Exception {
     java.nio.file.Path nioOther = Paths.get("PathTest.java");
-    Path commonOther = new Path("PathTest.java");
+    FileSystemPath commonOther = new FileSystemPath("PathTest.java");
     assertEquals(nioPath.resolve(nioOther).toString(), commonPath.resolve(commonOther).toString());
   }
 
   @Test
   public void constructorWithEmptyPath() throws Exception {
-    Path path = new Path("");
+    FileSystemPath path = new FileSystemPath("");
     assertEquals("", path.getOriginalPath());
   }
 
   @Test
   public void constructorWithSinglePath() throws Exception {
-    Path path = new Path("foo");
+    FileSystemPath path = new FileSystemPath("foo");
     assertEquals("foo", path.getOriginalPath());
   }
 
   @Test
   public void constructorWithMultiplePaths() throws Exception {
-    Path path = new Path("foo", "bar", "baz");
+    FileSystemPath path = new FileSystemPath("foo", "bar", "baz");
 
     assertEquals("foo/bar/baz", path.getOriginalPath());
   }
 
   @Test
   public void constructorWithEmptyPathButMorePaths() throws Exception {
-    Path path = new Path("", "bar", "baz");
+    FileSystemPath path = new FileSystemPath("", "bar", "baz");
 
     assertEquals("bar/baz", path.getOriginalPath());
   }
 
   @Test
   public void constructorWithNullPath() {
-    Path path = new Path(null);
+    FileSystemPath path = new FileSystemPath(null);
     path.toFile();
 
     assertEquals("", path.getOriginalPath());
@@ -128,7 +128,7 @@ public class PathTest {
 
   @Test
   public void getFileName() throws Exception {
-    assertEquals(nioPath.getFileName().toString(), commonPath.getFileName().toString());
+    assertEquals(nioPath.getFileName().toString(), commonPath.getName().toString());
   }
 
   @Test

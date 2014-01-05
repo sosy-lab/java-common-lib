@@ -17,20 +17,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Preconditions;
+import org.sosy_lab.common.Appenders;
+
 import com.google.common.base.Strings;
 import com.google.common.io.FileWriteMode;
 
@@ -56,22 +60,22 @@ public final class Files {
    *          characters
    * @throws  IOException  If a file could not be created
    */
-  public static File createTempFile(String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
-    File file = File.createTempFile(prefix, suffix);
-    file.deleteOnExit();
+  public static Path createTempFile(String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
+    Path path = Paths.createTempPath(prefix, suffix);
+    path.deleteOnExit();
 
     if (!Strings.isNullOrEmpty(content)) {
       try {
-        writeFile(file, content);
+        writeFile(path, content);
       } catch (IOException e) {
         // creation was successful, but writing failed
         // -> delete file
-        delete(Path.fromFile(file), e);
+        delete(path, e);
 
         throw e;
       }
     }
-    return file;
+    return path;
   }
 
   /**
@@ -95,14 +99,14 @@ public final class Files {
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(@Nullable String prefix, @Nullable String suffix) throws IOException {
-    Path tempFile = Path.fromFile(File.createTempFile(prefix, suffix));
+  public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix) throws IOException {
+    Path tempFile = Paths.createTempPath(prefix, suffix);
     return new DeleteOnCloseFile(tempFile);
   }
 
   /**
    * A simple wrapper around {@link Path} that calls
-   * {@link java.io.File#delete()} from {@link AutoCloseable#close()}.
+   * {@link Path#delete()} from {@link AutoCloseable#close()}.
    */
   public static class DeleteOnCloseFile implements AutoCloseable {
 
@@ -118,7 +122,7 @@ public final class Files {
 
     @Override
     public void close() throws IOException {
-      path.toFile().delete();
+      path.delete();
     }
   }
 
@@ -144,11 +148,10 @@ public final class Files {
    * @throws IOException If deletion fails and no pending exception was given.
    */
   public static void delete(Path path, @Nullable IOException pendingException) throws IOException {
-    File file = path.toFile();
-    boolean deletionSucceeded = file.delete();
+    boolean deletionSucceeded = path.delete();
 
     if (!deletionSucceeded) {
-      IOException deleteException = new IOException("The file " + file + " could not be deleted.");
+      IOException deleteException = new IOException("The file " + path + " could not be deleted.");
 
       if (pendingException != null) {
         pendingException.addSuppressed(deleteException);
@@ -165,7 +168,7 @@ public final class Files {
    * @throws IOException
    */
   public static void writeFile(File file, Object content) throws IOException {
-    writeFile(Path.fromFile(file), content);
+    writeFile(Paths.get(file), content);
   }
 
   /**
@@ -203,10 +206,10 @@ public final class Files {
       FileWriteMode... options) throws IOException {
     Path dir = file.getParent();
     if (dir != null) {
-      dir.toFile().mkdirs();
+      dir.mkdirs();
     }
 
-    return (BufferedWriter) file.asCharSink(charset, options).openBufferedStream();
+    return new BufferedWriter(file.asCharSink(charset, options).openBufferedStream());
   }
 
   /**
@@ -217,7 +220,7 @@ public final class Files {
    * @throws IOException
    */
   public static void appendToFile(File file, Object content) throws IOException {
-    appendToFile(Path.fromFile(file), content);
+    appendToFile(Paths.get(file), content);
   }
 
   /**
@@ -242,7 +245,7 @@ public final class Files {
    * @throws FileNotFoundException If one of the conditions is not true.
    */
   public static void checkReadableFile(File file) throws FileNotFoundException {
-    checkReadableFile(org.sosy_lab.common.Path.fromFile(file));
+    checkReadableFile(Paths.get(file));
   }
 
 
@@ -253,19 +256,51 @@ public final class Files {
    * @param path The file to check.
    * @throws FileNotFoundException If one of the conditions is not true.
    */
-  public static void checkReadableFile(org.sosy_lab.common.Path path) throws FileNotFoundException {
-    Preconditions.checkNotNull(path);
+  public static void checkReadableFile(Path path) throws FileNotFoundException {
+    checkNotNull(path);
 
-    if (!path.toFile().exists()) {
+    if (!path.exists()) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " does not exist!");
     }
 
-    if (!path.toFile().isFile()) {
+    if (!path.isFile()) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not a normal file!");
     }
 
-    if (!path.toFile().canRead()) {
+    if (!path.canRead()) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
+    }
+  }
+
+  @SuppressWarnings("resource")
+  public static List<String> readLines(Path path, Charset charset) throws IOException {
+    List<String> lines = new ArrayList<>();
+    BufferedReader reader = path.asCharSource(charset).openBufferedStream();
+    String line;
+    while ((line = reader.readLine()) != null) {
+      lines.add(line);
+    }
+    reader.close();
+
+    return lines;
+  }
+
+  /**
+   * {@link com.google.common.io.Files#createParentDirs(File)}
+   *
+   * @param path
+   * @throws IOException
+   */
+  public static void createParentDirs(Path path) throws IOException {
+    checkNotNull(path);
+    Path parent = path.getParent();
+    if (parent == null) {
+      // the parent is the root directory and therefore exists or cannot be created.
+      return;
+    }
+    parent.mkdirs();
+    if (!parent.isDirectory()) {
+      throw new IOException("Unable to create parent directories of "+path);
     }
   }
 }

@@ -22,9 +22,9 @@ package org.sosy_lab.common.configuration.converters;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import org.sosy_lab.common.Path;
 import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.Path;
 
 /**
  * Type converter for options of types Integer/Long annotated
