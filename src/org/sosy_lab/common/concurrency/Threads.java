@@ -45,7 +45,7 @@ public class Threads {
    * @return A new Thread instance.
    */
   public static Thread newThread(Runnable r) {
-    return factory.newThread(r);
+    return Threads.threadFactory().newThread(r);
   }
 
   /**
@@ -56,7 +56,7 @@ public class Threads {
    * @return A new Thread instance.
    */
   public static Thread newThread(Runnable r, String name) {
-    Thread thread = factory.newThread(r);
+    Thread thread = Threads.threadFactory().newThread(r);
 //    thread.setName(name);
     return thread;
   }
