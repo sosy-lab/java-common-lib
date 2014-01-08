@@ -40,6 +40,7 @@ import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
@@ -93,7 +94,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
 
   private static final Level exceptionDebugLevel = Level.ALL;
   private static final Joiner messageFormat = Joiner.on(' ').useForNull("null");
-  private final Logger logger;
+  protected final Logger logger;
   private final LogManagerBean mxBean;
 
   public static interface LogManagerMXBean {
@@ -139,8 +140,26 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    * @param consoleOutputHandler A handler, may not be null.
    */
   public BasicLogManager(Configuration config, Handler consoleOutputHandler) throws InvalidConfigurationException {
+    this(config, consoleOutputHandler, null);
+  }
+
+  /**
+   * Constructor which allows to customize where the console output of the
+   * LogManager is written to and also allows to customize where the file output
+   * of the LogManager is written to.
+   *
+   * If fileOutputHandler is set to null a handler of type {@link FileHandler}
+   * will be used. If the instantiation of this handler fails log messages will be automatically
+   * redirected to the consoleOutputHandler.
+   *
+   * The level, filter and formatter of the handlers are set by this class.
+   *
+   * @param consoleOutputHandler A handler, may not be null.
+   * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
+   */
+  public BasicLogManager(Configuration config, Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
     Preconditions.checkNotNull(consoleOutputHandler);
-    config.inject(this);
+    config.inject(this, BasicLogManager.class);
 
     logger = Logger.getAnonymousLogger();
     logger.setLevel(getMinimumLevel(fileLevel, consoleLevel));
@@ -150,22 +169,24 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
 
     // create file logger
-    if (!fileLevel.equals(Level.OFF) && outputFile != null) {
-      try {
-        org.sosy_lab.common.io.Files.createParentDirs(outputFile);
+    if (fileOutputHandler == null) {
+      if (!fileLevel.equals(Level.OFF) && outputFile != null) {
+        try {
+          Files.createParentDirs(outputFile);
 
-        Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
+          Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
+          setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, fileExclude);
+        } catch (IOException e) {
+          // redirect log messages to console
+          if (consoleLevel.intValue() > fileLevel.intValue()) {
+            logger.getHandlers()[0].setLevel(fileLevel);
+          }
 
-        setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, fileExclude);
-
-      } catch (IOException e) {
-        // redirect log messages to console
-        if (consoleLevel.intValue() > fileLevel.intValue()) {
-          logger.getHandlers()[0].setLevel(fileLevel);
+          logger.log(Level.WARNING, "Could not open log file " + e.getMessage() + ", redirecting log output to console");
         }
-
-        logger.log(Level.WARNING, "Could not open log file " + e.getMessage() + ", redirecting log output to console");
       }
+    } else {
+      setupHandler(fileOutputHandler, new FileLogFormatter(), fileLevel, fileExclude);
     }
 
     // setup MXBean at the end (this might already log something!)
@@ -173,7 +194,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     mxBean.register();
   }
 
-  private void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
+  protected void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
