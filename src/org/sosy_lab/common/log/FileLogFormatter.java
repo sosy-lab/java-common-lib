@@ -30,7 +30,7 @@ import java.util.logging.LogRecord;
 /**
  * Class to handle formatting for file output
  */
-class FileLogFormatter extends Formatter {
+public class FileLogFormatter extends Formatter {
 
   private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
