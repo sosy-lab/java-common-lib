@@ -23,6 +23,8 @@
  */
 package org.sosy_lab.common.concurrency;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
@@ -45,6 +47,7 @@ public class Threads {
    * @return A new Thread instance.
    */
   public static Thread newThread(Runnable r) {
+    checkNotNull(r);
     return Threads.threadFactory().newThread(r);
   }
 
@@ -56,6 +59,8 @@ public class Threads {
    * @return A new Thread instance.
    */
   public static Thread newThread(Runnable r, String name) {
+    checkNotNull(r);
+    checkNotNull(name);
     Thread thread = Threads.threadFactory().newThread(r);
 //    thread.setName(name);
     return thread;
