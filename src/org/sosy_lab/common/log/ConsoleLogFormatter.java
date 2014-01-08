@@ -50,9 +50,11 @@ public class ConsoleLogFormatter extends Formatter {
     // is a way to determine whether stdout is connected to a terminal.
     // We assume that most users only redirect stderr if they also redirect
     // stdout, so this should be ok.
-    if ((System.console() == null)
-        || System.getProperty("os.name", "").startsWith("Windows")) {
-      useColors = false;
+    if (useColors) {
+      if ((System.console() == null)
+          || System.getProperty("os.name", "").startsWith("Windows")) {
+        useColors = false;
+      }
     }
   }
 
