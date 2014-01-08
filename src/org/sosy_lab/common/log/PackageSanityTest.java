@@ -23,8 +23,10 @@
  */
 package org.sosy_lab.common.log;
 
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.SimpleFormatter;
 
 import org.sosy_lab.common.configuration.Configuration;
 
@@ -35,6 +37,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   {
     setDefault(Handler.class, new StringBuildingLogHandler());
     setDefault(Level.class, Level.ALL);
+    setDefault(Formatter.class, new SimpleFormatter());
 
     setDefault(Configuration.class, Configuration.defaultConfiguration());
   }
