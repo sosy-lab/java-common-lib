@@ -180,7 +180,7 @@
         </jar>
     </target>
 
-    <target name="publish" depends="tests,jar,sources">
+    <target name="publish" depends="jar,sources">
         <fail unless="version.publishable"
               message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
         <ivy:publish
