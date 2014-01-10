@@ -21,16 +21,15 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.ProcessBuilder.Redirect;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -134,6 +133,10 @@ public class ProcessExecutor<E extends Exception> {
     logger.log(Level.FINEST, "Executing", name);
     logger.log(Level.ALL, (Object[])cmd);
 
+    String program = cmd[cmd.length-1];
+    String cmdTmp[] = Arrays.copyOfRange(cmd, 0, cmd.length-1);
+    cmd = cmdTmp;
+
     ProcessBuilder proc = new ProcessBuilder(cmd);
     Map<String, String> environment = proc.environment();
     for (Map.Entry<String, String> entry : environmentOverride.entrySet()) {
@@ -148,16 +151,20 @@ public class ProcessExecutor<E extends Exception> {
      * The input file has to be piped to the process because Google App Engine does not allow
      * writes to the file system and therefore the input file is stored elsewhere.
      */
-    proc.redirectInput(Redirect.PIPE);
+//    proc.redirectInput(Redirect.PIPE);
     final Process process = proc.start();
-    Path path = Paths.get(cmd[cmd.length-1]);
-    if (path.exists()) {
-      OutputStream out = new BufferedOutputStream(process.getOutputStream());
-      try (InputStream fileIn = path.asByteSource().openBufferedStream()) {
-        int b;
-        while((b = fileIn.read()) != -1) {
-          out.write(b);
-        }
+    Path programFile = Paths.get(program);
+    if (programFile.exists()) {
+      try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+          BufferedReader inputFile = programFile.asCharSource(Charset.defaultCharset()).openBufferedStream()) {
+          String currInputLine = null;
+          while ((currInputLine = inputFile.readLine()) != null) {
+            bw.write(currInputLine);
+            bw.newLine();
+          }
+          bw.close();
+      } catch (IOException e) {
+        logger.logDebugException(e, "IOException when trying to read input file "+program);
       }
     }
     processFuture = executor.submit(new Callable<Integer>() {
