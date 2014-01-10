@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +95,7 @@ public class ProcessExecutor<E extends Exception> {
    * @see #ProcessExecutor(LogManager, Class, String...)
    */
   public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd) throws IOException {
-    this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
+    this(logger, exceptionClass, ImmutableMap.<String, String> of(), cmd);
   }
 
   /**
@@ -131,11 +132,13 @@ public class ProcessExecutor<E extends Exception> {
     this.name = cmd[0];
 
     logger.log(Level.FINEST, "Executing", name);
-    logger.log(Level.ALL, (Object[])cmd);
+    logger.log(Level.ALL, (Object[]) cmd);
 
-    String program = cmd[cmd.length-1];
-    String cmdTmp[] = Arrays.copyOfRange(cmd, 0, cmd.length-1);
-    cmd = cmdTmp;
+    // retrieve the input file's name and remove it from the argument list
+    Path program = Paths.get(cmd[cmd.length - 1]);
+    if (program.exists() && cmd.length >= 2) {
+      cmd = Arrays.copyOfRange(cmd, 0, cmd.length - 1);
+    }
 
     ProcessBuilder proc = new ProcessBuilder(cmd);
     Map<String, String> environment = proc.environment();
@@ -149,22 +152,23 @@ public class ProcessExecutor<E extends Exception> {
 
     /*
      * The input file has to be piped to the process because Google App Engine does not allow
-     * writes to the file system and therefore the input file is stored elsewhere.
+     * writes to the file system and therefore the input file might not be stored on the file system.
      */
-//    proc.redirectInput(Redirect.PIPE);
+    if (program.exists()) {
+      proc.redirectInput(Redirect.PIPE);
+    }
     final Process process = proc.start();
-    Path programFile = Paths.get(program);
-    if (programFile.exists()) {
+    if (program.exists()) {
       try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-          BufferedReader inputFile = programFile.asCharSource(Charset.defaultCharset()).openBufferedStream()) {
-          String currInputLine = null;
-          while ((currInputLine = inputFile.readLine()) != null) {
-            bw.write(currInputLine);
-            bw.newLine();
-          }
-          bw.close();
+          BufferedReader inputFile = program.asCharSource(Charset.defaultCharset()).openBufferedStream()) {
+        String currInputLine = null;
+        while ((currInputLine = inputFile.readLine()) != null) {
+          bw.write(currInputLine);
+          bw.newLine();
+        }
+        bw.close();
       } catch (IOException e) {
-        logger.logDebugException(e, "IOException when trying to read input file "+program);
+        logger.logDebugException(e, "IOException when trying to read input file " + program.getPath());
       }
     }
     processFuture = executor.submit(new Callable<Integer>() {
@@ -200,7 +204,8 @@ public class ProcessExecutor<E extends Exception> {
               Thread.currentThread().interrupt();
               return exitCode;
 
-            } catch (InterruptedException _) { /* ignore, we will call interrupt() */ }
+            } catch (InterruptedException _) { /* ignore, we will call interrupt() */
+            }
           }
         }
       }
@@ -211,50 +216,52 @@ public class ProcessExecutor<E extends Exception> {
     // wrap both output handling callables in CancellingCallables so that
     // exceptions thrown by the handling methods terminate the process immediately
     outFuture = executor.submit(new Callable<Void>() {
-          @Override
-          public Void call() throws E, IOException {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-              String line;
-              while ((line = reader.readLine()) != null) {
-                handleOutput(line);
-              }
 
-            } catch (IOException e) {
-              if (processFuture.isCancelled()) {
-                // IOExceptions after a killed process are no suprise
-                // Log and ignore so they don't mask the real cause
-                // why we killed the process.
-                logger.logDebugException(e, "IOException after process was killed");
-              } else {
-                throw e;
-              }
-            }
-            return null;
+      @Override
+      public Void call() throws E, IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            handleOutput(line);
           }
-        });
+
+        } catch (IOException e) {
+          if (processFuture.isCancelled()) {
+            // IOExceptions after a killed process are no suprise
+            // Log and ignore so they don't mask the real cause
+            // why we killed the process.
+            logger.logDebugException(e, "IOException after process was killed");
+          } else {
+            throw e;
+          }
+        }
+        return null;
+      }
+    });
 
     errFuture = executor.submit(new Callable<Void>() {
-          @Override
-          public Void call() throws E, IOException {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-              String line;
-              while ((line = reader.readLine()) != null) {
-                handleErrorOutput(line);
-              }
 
-            } catch (IOException e) {
-              if (processFuture.isCancelled()) {
-                // IOExceptions after a killed process are no suprise
-                // Log and ignore so they don't mask the real cause
-                // why we killed the process.
-                logger.logDebugException(e, "IOException after process was killed");
-              } else {
-                throw e;
-              }
-            }
-            return null;
+      @Override
+      public Void call() throws E, IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            handleErrorOutput(line);
           }
-        });
+
+        } catch (IOException e) {
+          if (processFuture.isCancelled()) {
+            // IOExceptions after a killed process are no suprise
+            // Log and ignore so they don't mask the real cause
+            // why we killed the process.
+            logger.logDebugException(e, "IOException after process was killed");
+          } else {
+            throw e;
+          }
+        }
+        return null;
+      }
+    });
 
     FutureCallback<Object> cancelProcessOnFailure = new FutureCallback<Object>() {
 
@@ -270,7 +277,7 @@ public class ProcessExecutor<E extends Exception> {
       }
 
       @Override
-      public void onSuccess(Object pArg0) { }
+      public void onSuccess(Object pArg0) {}
 
     };
 
