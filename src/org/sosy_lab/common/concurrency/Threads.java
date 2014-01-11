@@ -62,7 +62,11 @@ public class Threads {
     checkNotNull(r);
     checkNotNull(name);
     Thread thread = Threads.threadFactory().newThread(r);
-//    thread.setName(name);
+    try {
+      thread.setName(name);
+    } catch (Exception e) {
+      // could not set name, never mind
+    }
     return thread;
   }
 
