@@ -78,6 +78,8 @@ public class FileSystemPath implements Path {
           this.path = path + separatorChar + joiner.join(more);
         }
       }
+    } else {
+      this.path = path;
     }
   }
 
@@ -230,28 +232,29 @@ public class FileSystemPath implements Path {
     return toFile().toString();
   }
 
+  /**
+   * @see File#hashCode()
+   */
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((path == null) ? 0 : path.hashCode());
-    return result;
+    return toFile().hashCode();
   }
 
+  /**
+   * @see File#equals(Object)
+   */
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
+  public boolean equals(@Nullable Object obj) {
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     FileSystemPath other = (FileSystemPath) obj;
-    if (path == null) {
-      if (other.path != null)
-        return false;
-    } else if (!path.equals(other.path))
-      return false;
-    return true;
+    return toFile().equals(other.toFile());
   }
 }
