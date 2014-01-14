@@ -174,6 +174,8 @@ public class OptionCollector {
    * @param verbose short or long output? */
   private static void collectOptions(final Class<?> c,
       final SortedMap<String, Pair<String, String>> map, final boolean verbose) {
+    String classSource = getContentOfFile(c);
+
     for (final Field field : c.getDeclaredFields()) {
 
       if (field.isAnnotationPresent(Option.class)) {
@@ -182,7 +184,7 @@ public class OptionCollector {
 
         // get info about option
         final String optionName = getOptionName(c, field);
-        final String defaultValue = getDefaultValue(field);
+        final String defaultValue = getDefaultValue(field, classSource);
         final StringBuilder optionInfo = new StringBuilder();
         optionInfo.append(optionName);
 
@@ -357,8 +359,7 @@ public class OptionCollector {
    * This part only works, if you have the source code.
    *
    * @param field where to get the default value */
-  private static String getDefaultValue(final Field field) {
-    final String content = getContentOfFile(field);
+  private static String getDefaultValue(final Field field, final String classSource) {
 
     // get declaration of field from file
     // example fieldString: 'private boolean shouldCheck'
@@ -391,7 +392,7 @@ public class OptionCollector {
     fieldString += "\\s+" + typeString;
     fieldString += "\\s+" + field.getName();
 
-    String defaultValue = getDefaultValueFromContent(content, fieldString);
+    String defaultValue = getDefaultValueFromContent(classSource, fieldString);
 
     // enums can be written with the whole classname, example:
     // 'Waitlist.TraversalMethod traversalMethod = ...;'
@@ -403,7 +404,7 @@ public class OptionCollector {
         fieldString =
             Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+"
                 + field.getName();
-        defaultValue = getDefaultValueFromContent(content, fieldString);
+        defaultValue = getDefaultValueFromContent(classSource, fieldString);
       }
       if (defaultValue.contains(".")) {
         defaultValue =
@@ -420,11 +421,11 @@ public class OptionCollector {
   /** This function returns the content of a sourcefile as String.
    *
    * @param field the field, the sourcefile belongs to */
-  private static String getContentOfFile(final Field field) {
+  private static String getContentOfFile(final Class<?> cls) {
 
     // get name of sourcefile, remove prefix 'class_'
     String filename =
-        field.getDeclaringClass().toString().substring(6).replace(".", "/");
+        cls.toString().substring(6).replace(".", "/");
 
     // encapsulated classes have a "$" in filename
     if (filename.contains("$")) {
