@@ -19,20 +19,15 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -48,26 +43,6 @@ import com.google.common.base.Strings;
 public final class JSON {
 
   private JSON() { }
-
-  /**
-   * Use {@link #writeJSONString(Object, Path)} instead.
-   */
-  @Deprecated
-  public static void writeJSONString(@Nullable Object value, File file,
-      @SuppressWarnings("unused") Charset charset) throws IOException {
-    checkNotNull(charset);
-    writeJSONString(value, Paths.get(file));
-  }
-
-  /**
-   * Use {@link #writeJSONString(Object, Path)} instead.
-   */
-  @Deprecated
-  public static void writeJSONString(@Nullable Object value, Path file,
-      @SuppressWarnings("unused") Charset charset) throws IOException {
-    checkNotNull(charset);
-    writeJSONString(value, file);
-  }
 
   /**
    * Encode an object into JSON text and write it to a file.

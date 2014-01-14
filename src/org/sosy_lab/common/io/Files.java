@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
@@ -167,16 +166,6 @@ public final class Files {
    * @param content The content which shall be written.
    * @throws IOException
    */
-  public static void writeFile(File file, Object content) throws IOException {
-    writeFile(Paths.get(file), content);
-  }
-
-  /**
-   * Writes content to a file.
-   * @param file The file.
-   * @param content The content which shall be written.
-   * @throws IOException
-   */
   public static void writeFile(Path file, Object content) throws IOException {
     checkNotNull(content);
     try (Writer w = openOutputFile(file)) {
@@ -219,33 +208,11 @@ public final class Files {
    * @param content The content which will be written to the end of the file.
    * @throws IOException
    */
-  public static void appendToFile(File file, Object content) throws IOException {
-    appendToFile(Paths.get(file), content);
-  }
-
-  /**
-   * Appends content to a file (without overwriting the file,
-   * but creating it if necessary).
-   * @param file The file.
-   * @param content The content which will be written to the end of the file.
-   * @throws IOException
-   */
   public static void appendToFile(Path file, Object content) throws IOException {
     checkNotNull(content);
     try (Writer w = openOutputFile(file, FileWriteMode.APPEND)) {
       Appenders.appendTo(w, content);
     }
-  }
-
-  /**
-   * Verifies if a file exists, is a normal file and is readable. If this is not
-   * the case, a FileNotFoundException with a nice message is thrown.
-   *
-   * @param file The file to check.
-   * @throws FileNotFoundException If one of the conditions is not true.
-   */
-  public static void checkReadableFile(File file) throws FileNotFoundException {
-    checkReadableFile(Paths.get(file));
   }
 
 
@@ -286,7 +253,7 @@ public final class Files {
   }
 
   /**
-   * {@link com.google.common.io.Files#createParentDirs(File)}
+   * {@link com.google.common.io.Files#createParentDirs(java.io.File)}
    *
    * @param path
    * @throws IOException
