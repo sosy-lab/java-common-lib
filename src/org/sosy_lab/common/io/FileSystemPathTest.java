@@ -23,7 +23,7 @@
  */
 package org.sosy_lab.common.io;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.nio.file.Paths;
 
@@ -139,6 +139,29 @@ public class FileSystemPathTest {
   @Test
   public void toStringTest() throws Exception {
     assertEquals(nioPath.toString(), commonPath.toString());
+  }
+
+  @Test
+  public void testEquals() throws Exception {
+    Path pathA = new FileSystemPath("1", (String[]) null);
+    Path pathB = new FileSystemPath(null, "1");
+    assertEquals(pathA, pathB);
+
+    pathA = new FileSystemPath("1", "1");
+    pathB = new FileSystemPath(null, "1", "1");
+    assertEquals(pathA, pathB);
+
+    pathA = new FileSystemPath("");
+    pathB = new FileSystemPath(null, "");
+    assertEquals(pathA, pathB);
+
+    pathA = new FileSystemPath("pathA");
+    pathB = new FileSystemPath("pathB");
+    assertNotEquals(pathA, pathB);
+
+    pathA = new FileSystemPath("pathA");
+    pathB = pathA;
+    assertEquals(pathA, pathB);
   }
 
 }
