@@ -365,29 +365,30 @@ public class OptionCollector {
     String fieldString = Modifier.toString(field.getModifiers());
 
     // genericType: "boolean" or "java.util.List<java.util.logging.Level>"
-    String genericType = field.getGenericType().toString();
-    if (genericType.matches(".*<.*>")) {
+    String typeString = field.getGenericType().toString();
+    if (typeString.matches(".*<.*>")) {
 
       // remove package-definition at front:
       // java.util.List<?> --> List<?>
-      genericType = genericType.replaceAll("^[^<]*\\.", "");
+      typeString = typeString.replaceAll("^[^<]*\\.", "");
 
       // remove package-definition in middle:
       // List<package.name.X> --> List<X>
       // (without special case "? extends X", that is handled below)
-      genericType = genericType.replaceAll("<[^\\?][^<]*\\.", "<");
+      typeString = typeString.replaceAll("<[^\\?][^<]*\\.", "<");
 
       // remove package-definition in middle:
       // List<? extends package.name.X> --> List<? extends X>
       // we use the string as regex later, so we use 4 "\" in the string.
-      genericType = genericType.replaceAll("<\\?[^<]*\\.", "<\\\\?\\\\s+extends\\\\s+");
-
-      fieldString += "\\s+" + genericType;
+      typeString = typeString.replaceAll("<\\?[^<]*\\.", "<\\\\?\\\\s+extends\\\\s+");
 
     } else {
-      fieldString += "\\s+" + field.getType().getSimpleName();
+      typeString = field.getType().getSimpleName();
     }
 
+    typeString = typeString.replaceAll("[^<>, ]*\\$([^<>, $]*)", "$1"); // remove prefix of inner classes
+
+    fieldString += "\\s+" + typeString;
     fieldString += "\\s+" + field.getName();
 
     String defaultValue = getDefaultValueFromContent(content, fieldString);
