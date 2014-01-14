@@ -87,7 +87,9 @@ public class OptionCollector {
     boolean appendCommonOptions = true;
 
     for (Class<?> c : getClasses()) {
-      collectOptions(c, map, verbose);
+      if (c.isAnnotationPresent(Options.class)) {
+        collectOptions(c, map, verbose);
+      }
       if (c.getPackage().getName().startsWith("org.sosy_lab.common")) {
         appendCommonOptions = false;
       }
