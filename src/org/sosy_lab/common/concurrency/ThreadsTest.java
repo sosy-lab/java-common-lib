@@ -23,12 +23,12 @@
  */
 package org.sosy_lab.common.concurrency;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ThreadFactory;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -39,7 +39,7 @@ public class ThreadsTest {
     Threads.setThreadFactory(null);
     ThreadFactory factory = Threads.threadFactory();
 
-    assertTrue(factory != null);
+    Assert.assertNotNull(factory);
   }
 
   @Test
@@ -50,6 +50,17 @@ public class ThreadsTest {
 
     Threads.setThreadFactory(stubFactory);
 
-    assertTrue(Threads.newThread(mock(Runnable.class)).equals(mockThread));
+    Assert.assertEquals(mockThread, Threads.newThread(mock(Runnable.class)));
+  }
+
+  @Test
+  public void shouldUseCustomFactoryInThreadFactoryBuilder() throws Exception {
+    ThreadFactory stubFactory = mock(ThreadFactory.class);
+    Thread mockThread = mock(Thread.class);
+    when(stubFactory.newThread(any(Runnable.class))).thenReturn(mockThread);
+
+    Threads.setThreadFactory(stubFactory);
+
+    Assert.assertEquals(mockThread, Threads.threadFactoryBuilder().build().newThread(mock(Runnable.class)));
   }
 }

@@ -30,6 +30,8 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nullable;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 
 public class Threads {
 
@@ -92,5 +94,14 @@ public class Threads {
    */
   public static void setThreadFactory(@Nullable ThreadFactory threadFactory) {
     factory = threadFactory;
+  }
+
+  /**
+   * Return a {@link ThreadFactoryBuilder} that already has the correct
+   * backing {@link ThreadFactory} set.
+   * @return A fresh {@link ThreadFactoryBuilder} instance.
+   */
+  public static ThreadFactoryBuilder threadFactoryBuilder() {
+    return new ThreadFactoryBuilder().setThreadFactory(threadFactory());
   }
 }
