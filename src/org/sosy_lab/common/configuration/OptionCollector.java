@@ -491,6 +491,11 @@ public class OptionCollector {
           defaultValue = "{" + defaultValue.substring(
               "ImmutableSet.of(".length(), defaultValue.length() - 1) + "}";
         }
+
+        if (defaultValue.startsWith("ImmutableList.of(")) {
+          defaultValue = "[" + defaultValue.substring(
+              "ImmutableList.of(".length(), defaultValue.length() - 1) + "]";
+        }
       }
     } else {
 
