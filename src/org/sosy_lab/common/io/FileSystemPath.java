@@ -43,7 +43,7 @@ import com.google.common.io.Files;
  * This class provides operations on a file path by backing the path
  * with the {@link java.io.File} implementation.
  */
-class FileSystemPath implements Path {
+public class FileSystemPath implements Path {
 
   protected String path = "";
   private File fileInstance = null;
