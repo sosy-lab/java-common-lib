@@ -67,7 +67,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   /**
    * @see CatchSecurityViolationThreadFactoryBuilder#setPriority(int)
    */
-  public CatchSecurityViolationThreadFactoryBuilder setPriority(int pPriority) {
+  public CatchSecurityViolationThreadFactoryBuilder setPriority(Integer pPriority) {
     priority =  pPriority;
     return this;
   }
@@ -83,7 +83,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   /**
    * @see CatchSecurityViolationThreadFactoryBuilder#setDaemon(boolean)
    */
-  public CatchSecurityViolationThreadFactoryBuilder setDaemon(boolean pDaemon) {
+  public CatchSecurityViolationThreadFactoryBuilder setDaemon(Boolean pDaemon) {
     daemon = pDaemon;
     return this;
   }

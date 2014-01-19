@@ -74,10 +74,19 @@ public class Threads {
    */
   public static Thread newThread(Runnable r, @Nullable String name, @Nullable Boolean daemon, @Nullable Integer priority) {
     checkNotNull(r);
+    CatchSecurityViolationThreadFactoryBuilder builder = threadFactoryBuilder();
+
+    if (name != null) {
+      builder.setNameFormat(name);
+    }
+    if (daemon != null) {
+      builder.setDaemon(daemon);
+    }
+    if (priority != null) {
+      builder.setPriority(priority);
+    }
+
     return threadFactoryBuilder()
-        .setDaemon(daemon)
-        .setPriority(priority)
-        .setNameFormat(name)
         .build()
         .newThread(r);
   }
