@@ -43,14 +43,24 @@ public class Threads {
   private Threads() {}
 
   /**
-   * Returns a new Thread instance created by the underlying ThreadFactory.
-   *
-   * @param r The Runnable to be executed by the Thread
-   * @return A new Thread instance.
+   * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
   public static Thread newThread(Runnable r) {
-    checkNotNull(r);
-    return Threads.threadFactory().newThread(r);
+    return newThread(r, null, null, null);
+  }
+
+  /**
+   * @see Threads#newThread(Runnable, String, Boolean, Integer)
+   */
+  public static Thread newThread(Runnable r, String name) {
+    return newThread(r, name, null, null);
+  }
+
+  /**
+   * @see Threads#newThread(Runnable, String, Boolean, Integer)
+   */
+  public static Thread newThread(Runnable r, String name, Boolean daemon) {
+    return newThread(r, name, daemon, null);
   }
 
   /**
@@ -58,18 +68,18 @@ public class Threads {
    *
    * @param r The Runnable to be executed by the Thread
    * @param name The name of the new thread
+   * @param daemon True, if the new thread should be a daemon, false otherwise
+   * @param priority The priority of the new thread.
    * @return A new Thread instance.
    */
-  public static Thread newThread(Runnable r, String name) {
+  public static Thread newThread(Runnable r, @Nullable String name, @Nullable Boolean daemon, @Nullable Integer priority) {
     checkNotNull(r);
-    checkNotNull(name);
-    Thread thread = Threads.threadFactory().newThread(r);
-    try {
-      thread.setName(name);
-    } catch (Exception e) {
-      // could not set name, never mind
-    }
-    return thread;
+    return threadFactoryBuilder()
+        .setDaemon(daemon)
+        .setPriority(priority)
+        .setNameFormat(name)
+        .build()
+        .newThread(r);
   }
 
   /**
@@ -97,11 +107,12 @@ public class Threads {
   }
 
   /**
-   * Return a {@link ThreadFactoryBuilder} that already has the correct
+   * Return a {@link CatchSecurityViolationThreadFactoryBuilder} that already has the correct
    * backing {@link ThreadFactory} set.
-   * @return A fresh {@link ThreadFactoryBuilder} instance.
+   * @see ThreadFactoryBuilder
+   * @return A fresh {@link CatchSecurityViolationThreadFactoryBuilder} instance.
    */
-  public static ThreadFactoryBuilder threadFactoryBuilder() {
-    return new ThreadFactoryBuilder().setThreadFactory(threadFactory());
+  public static CatchSecurityViolationThreadFactoryBuilder threadFactoryBuilder() {
+    return new CatchSecurityViolationThreadFactoryBuilder().setThreadFactory(threadFactory());
   }
 }

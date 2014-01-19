@@ -43,17 +43,6 @@ public class ThreadsTest {
   }
 
   @Test
-  public void shouldUseCustomFactory() throws Exception {
-    ThreadFactory stubFactory = mock(ThreadFactory.class);
-    Thread mockThread = mock(Thread.class);
-    when(stubFactory.newThread(any(Runnable.class))).thenReturn(mockThread);
-
-    Threads.setThreadFactory(stubFactory);
-
-    Assert.assertEquals(mockThread, Threads.newThread(mock(Runnable.class)));
-  }
-
-  @Test
   public void shouldUseCustomFactoryInThreadFactoryBuilder() throws Exception {
     ThreadFactory stubFactory = mock(ThreadFactory.class);
     Thread mockThread = mock(Thread.class);
