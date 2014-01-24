@@ -53,14 +53,14 @@ public class Threads {
    * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
   public static Thread newThread(Runnable r, String name) {
-    return newThread(r, name, null, null);
+    return newThread(r, checkNotNull(name), null, null);
   }
 
   /**
    * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
-  public static Thread newThread(Runnable r, String name, Boolean daemon) {
-    return newThread(r, name, daemon, null);
+  public static Thread newThread(Runnable r, String name, boolean daemon) {
+    return newThread(r, checkNotNull(name), daemon, null);
   }
 
   /**
