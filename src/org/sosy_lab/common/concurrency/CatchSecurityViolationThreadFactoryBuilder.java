@@ -30,9 +30,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 /**
  * This class implements the builder pattern to create a {@link ThreadFactory} with certain
- * preset properties. The implementation behaves like {@link CatchSecurityViolationThreadFactoryBuilder} but with
+ * preset properties. The implementation behaves like {@link ThreadFactoryBuilder} but with
  * an important difference:
  * When trying to modify the thread (setting its name, priority,...) any occurring {@link SecurityException}
  * will be silently caught. This is important to make threading work on Google App Engine.
@@ -57,7 +59,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#setUncaughtExceptionHandler(UncaughtExceptionHandler)
+   * @see ThreadFactoryBuilder#setUncaughtExceptionHandler(UncaughtExceptionHandler)
    */
   public CatchSecurityViolationThreadFactoryBuilder setUncaughtExceptionHandler(UncaughtExceptionHandler pHandler) {
     handler = checkNotNull(pHandler);
@@ -65,7 +67,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#setPriority(int)
+   * @see ThreadFactoryBuilder#setPriority(int)
    */
   public CatchSecurityViolationThreadFactoryBuilder setPriority(int pPriority) {
     priority =  pPriority;
@@ -73,7 +75,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#setNameFormat(String)
+   * @see ThreadFactoryBuilder#setNameFormat(String)
    */
   public CatchSecurityViolationThreadFactoryBuilder setNameFormat(String pNamingFormat) {
     nameFormat = checkNotNull(pNamingFormat);
@@ -81,7 +83,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#setDaemon(boolean)
+   * @see ThreadFactoryBuilder#setDaemon(boolean)
    */
   public CatchSecurityViolationThreadFactoryBuilder setDaemon(boolean pDaemon) {
     daemon = pDaemon;
@@ -89,7 +91,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#build()
+   * @see ThreadFactoryBuilder#build()
    */
   public ThreadFactory build() {
     return build(this);
