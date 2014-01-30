@@ -86,7 +86,7 @@ public class Threads {
       builder.setPriority(priority);
     }
 
-    return threadFactoryBuilder()
+    return builder
         .build()
         .newThread(r);
   }

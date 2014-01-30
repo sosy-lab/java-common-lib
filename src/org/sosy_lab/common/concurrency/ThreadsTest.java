@@ -23,6 +23,7 @@
  */
 package org.sosy_lab.common.concurrency;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,6 +34,8 @@ import org.junit.Test;
 
 
 public class ThreadsTest {
+
+  private Runnable mockRunnable = mock(Runnable.class);
 
   @Test
   public void shouldReturnDefaultThreadFactory() throws Exception {
@@ -51,5 +54,23 @@ public class ThreadsTest {
     Threads.setThreadFactory(stubFactory);
 
     Assert.assertEquals(mockThread, Threads.threadFactoryBuilder().build().newThread(mock(Runnable.class)));
+  }
+
+  @Test
+  public void shouldSetDaemon() throws Exception {
+    Thread t = Threads.newThread(mockRunnable, "t", true);
+    assertTrue(t.isDaemon());
+  }
+
+  @Test
+  public void shouldUseNameFormat() throws Exception {
+    Thread t1 = Threads.newThread(mockRunnable, "test-%d");
+    assertEquals("test-0", t1.getName());
+  }
+
+  @Test
+  public void shouldSetPriority() throws Exception {
+    Thread t = Threads.newThread(mockRunnable, "t", false, Thread.MAX_PRIORITY);
+    assertEquals(Thread.MAX_PRIORITY, t.getPriority());
   }
 }
