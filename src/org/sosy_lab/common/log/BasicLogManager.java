@@ -45,7 +45,6 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -114,20 +113,33 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
 
     @Override
     public String getConsoleLevel() {
-      return consoleHandler.getLevel().toString();
+      if (consoleHandler != null) {
+        return consoleHandler.getLevel().toString();
+      }
+
+      return "";
     }
 
     @Override
     public void setConsoleLevel(String pNewLevel) throws IllegalArgumentException {
       Level newLevel = Level.parse(pNewLevel.toUpperCase());
 
-      consoleHandler.setLevel(newLevel);
-      logger.setLevel(getMinimumLevel(fileLevel, newLevel));
+      if (consoleHandler != null) {
+        try {
+          consoleHandler.setLevel(newLevel);
+          logger.setLevel(getMinimumLevel(fileLevel, newLevel));
+        } catch (SecurityException e) {
+          // on Google App Engine calling setLevel() is forbidden.
+        }
+      }
     }
   }
 
+  /**
+   * @see #BasicLogManager(Configuration, Handler)
+   */
   public BasicLogManager(Configuration config) throws InvalidConfigurationException {
-    this(config, new ConsoleHandler());
+    this(config, null, null);
   }
 
   /**
@@ -137,9 +149,12 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    *
    * The level, filter and formatter of that handler are set by this class.
    *
-   * @param consoleOutputHandler A handler, may not be null.
+   * @param consoleOutputHandler A handler. If null a {@link ConsoleHandler}
+   * instance will be used.
+   *
+   * @see #BasicLogManager(Configuration, Handler, Handler)
    */
-  public BasicLogManager(Configuration config, Handler consoleOutputHandler) throws InvalidConfigurationException {
+  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler) throws InvalidConfigurationException {
     this(config, consoleOutputHandler, null);
   }
 
@@ -154,11 +169,18 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    *
    * The level, filter and formatter of the handlers are set by this class.
    *
-   * @param consoleOutputHandler A handler, may not be null.
+   * @param consoleOutputHandler A handler. If null a {@link ConsoleHandler}
+   * instance will be used.
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
    */
-  public BasicLogManager(Configuration config, Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
-    Preconditions.checkNotNull(consoleOutputHandler);
+  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
+    if (consoleOutputHandler == null) {
+      try {
+        consoleOutputHandler = new ConsoleHandler();
+      } catch (NoClassDefFoundError e) {
+        // on Google App Engine ConsoleHandler() is not allowed.
+      }
+    }
     config.inject(this, BasicLogManager.class);
 
     logger = Logger.getAnonymousLogger();
@@ -194,7 +216,17 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     mxBean.register();
   }
 
-  protected void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
+  /**
+   * Sets up the given handler. If the handler is null it will not be set up.
+   *
+   * @param handler The handler to set up.
+   * @param formatter The formatter to use with the handler.
+   * @param level The level to use with the handler.
+   * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
+   */
+  protected void setupHandler(@Nullable Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
+    if (handler == null) { return; }
+
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
