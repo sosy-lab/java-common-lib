@@ -2,7 +2,7 @@
  *  CPAchecker is a tool for configurable software verification.
  *  This file is part of CPAchecker.
  *
- *  Copyright (C) 2007-2013  Dirk Beyer
+ *  Copyright (C) 2007-2014  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,16 +23,6 @@
  */
 package org.sosy_lab.common.configuration;
 
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
-
-import com.google.common.testing.AbstractPackageSanityTests;
-
-public class PackageSanityTest extends AbstractPackageSanityTests {
-
-  {
-    setDefault(String[].class, new String[]{"test"});
-    setDefault(Path.class, Paths.get("test"));
-    setDefault(Configuration.class, Configuration.defaultConfiguration());
-  }
+public interface AbstractBuilderFactory  {
+  public ConfigurationBuilder getBuilder();
 }
