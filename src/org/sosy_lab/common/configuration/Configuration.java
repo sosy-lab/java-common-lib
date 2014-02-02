@@ -22,8 +22,6 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Preconditions.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -59,7 +57,6 @@ import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -86,289 +83,42 @@ import com.google.common.primitives.Primitives;
 @Options
 public class Configuration {
 
-  public static class Builder {
-
-    private Map<String, String> properties = null;
-    private Map<String, Path> sources = null;
-    private Configuration oldConfig = null;
-    private String prefix = null;
-    private Map<Class<?>, TypeConverter> converters = null;
-
-    private Builder() { }
-
-    private void setupProperties() {
-      if (properties == null) {
-        properties = new HashMap<>();
-        sources = new HashMap<>();
-
-        if (oldConfig != null) {
-          properties.putAll(oldConfig.properties);
-          sources.putAll(oldConfig.sources);
-        }
-      }
-    }
-
-    /**
-     * Set a single option.
-     */
-    public Builder setOption(String name, String value) {
-      Preconditions.checkNotNull(name);
-      Preconditions.checkNotNull(value);
-      setupProperties();
-
-      properties.put(name, value);
-      sources.put(name, Paths.get("manually set"));
-
-      return this;
-    }
-
-    /**
-     * Reset a single option to its default value.
-     */
-    public Builder clearOption(String name) {
-      Preconditions.checkNotNull(name);
-      setupProperties();
-
-      properties.remove(name);
-      sources.remove(name);
-
-      return this;
-    }
-
-    /**
-     * Add all options from a map.
-     */
-    public Builder setOptions(Map<String, String> options) {
-      Preconditions.checkNotNull(options);
-      setupProperties();
-
-      properties.putAll(options);
-      for (String name : options.keySet()) {
-        sources.put(name, Paths.get("manually set"));
-      }
-
-      return this;
-    }
-
-    /**
-     * Set the optional prefix for new configuration.
-     */
-    public Builder setPrefix(String prefix) {
-      Preconditions.checkNotNull(prefix);
-
-      this.prefix = prefix;
-
-      return this;
-    }
-
-    /**
-     * Copy everything from an existing Configuration instance. This also means
-     * that the new configuration object created by this builder will share the
-     * set of unused properties with the configuration instance passed to this
-     * class.
-     *
-     * If this method is called, it has to be the first method call on this
-     * builder instance.
-     */
-    public Builder copyFrom(Configuration oldConfig) {
-      Preconditions.checkNotNull(oldConfig);
-      Preconditions.checkState(this.properties == null);
-      Preconditions.checkState(this.sources == null);
-      Preconditions.checkState(this.oldConfig == null);
-      Preconditions.checkState(this.converters == null);
-
-      this.oldConfig = oldConfig;
-
-      return this;
-    }
-
-    /**
-     * Load options from an InputStream with a "key = value" format.
-     *
-     * The stream remains open after this method returns.
-     *
-     * @param stream The stream to read from.
-     * @param basePath The directory where relative #include directives should be based on.
-     * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
-     * @throws IOException If the stream cannot be read.
-     * @throws InvalidConfigurationException If the stream contains an invalid format.
-     */
-    public Builder loadFromStream(InputStream stream, String basePath, String source) throws IOException, InvalidConfigurationException {
-      Preconditions.checkNotNull(stream);
-      setupProperties();
-
-      final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(stream, basePath, source);
-      properties.putAll(content.getFirst());
-      sources.putAll(content.getSecond());
-
-      return this;
-    }
-
-    /**
-     * Load options from an InputStream with a "key = value" format.
-     *
-     * The stream remains open after this method returns.
-     *
-     * @deprecated Use {@link #loadFromStream(InputStream, String, String)} instead.
-     * @param stream The stream to read from.
-     * @throws IOException If the stream cannot be read.
-     * @throws InvalidConfigurationException If the stream contains an invalid format.
-     */
-    @Deprecated
-    public Builder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException {
-      return loadFromStream(stream, "", "unknown source");
-    }
-
-    /**
-     * Load options from a file with a "key = value" format.
-     *
-     * @throws IOException If the file cannot be read.
-     * @throws InvalidConfigurationException If the file contains an invalid format.
-     */
-    public Builder loadFromFile(String filename) throws IOException, InvalidConfigurationException {
-      return loadFromFile(Paths.get(filename));
-    }
-
-    /**
-     * Load options from a file with a "key = value" format.
-     *
-     * @throws IOException If the file cannot be read.
-     * @throws InvalidConfigurationException If the file contains an invalid format.
-     */
-    public Builder loadFromFile(Path file) throws IOException, InvalidConfigurationException {
-      Preconditions.checkNotNull(file);
-      setupProperties();
-
-      final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(file, "");
-      properties.putAll(content.getFirst());
-      sources.putAll(content.getSecond());
-
-      return this;
-    }
-
-    /**
-     * Add a type converter for options with a certain type.
-     * This will enable the Configuration instance to parse strings into values
-     * of the given type and inject them just as the base option types.
-     *
-     * As an alternative, the type of an option detail annotation
-     * ({@link OptionDetailAnnotation}) can be given. In this case, the type
-     * converter will be called for options annotated with this type.
-     *
-     * Previous type converters for the same type will be overwritten
-     * (this also works for types usually handled by the Configuration class,
-     * however not for collection and array types).
-     *
-     * The same converter may be used for several types.
-     *
-     * @param cls The type the type converter handles.
-     * @param converter A converter instance.
-     * @return this
-     */
-    public Builder addConverter(Class<?> cls, TypeConverter converter) {
-      Preconditions.checkNotNull(cls);
-      Preconditions.checkNotNull(converter);
-
-      if (converters == null) {
-        converters = createConverterMap();
-        if (oldConfig != null) {
-          converters.putAll(oldConfig.converters);
-        } else {
-          converters.putAll(DEFAULT_CONVERTERS);
-        }
-      }
-
-      converters.put(cls, converter);
-
-      return this;
-    }
-
-    /**
-     * Create a Configuration instance with the settings specified by method
-     * calls on this builder instance.
-     *
-     * This method resets the builder instance, so that after this method has
-     * returned it is exactly in the same state as directly after instantiation.
-     *
-     * @throws InvalidConfigurationException if the settings contained invalid values for the configuration options of the Configuration class
-     */
-    public Configuration build() throws InvalidConfigurationException {
-      ImmutableMap<String, String> newProperties;
-      if (properties == null) {
-        // we can re-use the old properties instance because it is immutable
-        if (oldConfig != null) {
-          newProperties = oldConfig.properties;
-        } else {
-          newProperties = ImmutableMap.of();
-        }
-      } else {
-        newProperties = ImmutableMap.copyOf(properties);
-      }
-
-      ImmutableMap<String, Path> newSources;
-      if (sources == null) {
-        // we can re-use the old sources instance because it is immutable
-        if (oldConfig != null) {
-          newSources = oldConfig.sources;
-        } else {
-          newSources = ImmutableMap.of();
-        }
-      } else {
-        newSources = ImmutableMap.copyOf(sources);
-      }
-
-      String newPrefix;
-      if (prefix == null) {
-        if (oldConfig != null) {
-          newPrefix = oldConfig.prefix;
-        } else {
-          newPrefix = "";
-        }
-      } else {
-        newPrefix = prefix;
-      }
-
-      ImmutableMap<Class<?>, TypeConverter> newConverters;
-      if (converters == null) {
-        // we can re-use the old converters instance because it is immutable
-        if (oldConfig != null) {
-          newConverters = oldConfig.converters;
-        } else {
-          newConverters = ImmutableMap.copyOf(DEFAULT_CONVERTERS);
-        }
-      } else {
-        newConverters = ImmutableMap.copyOf(converters);
-      }
-
-      Set<String> newUnusedProperties;
-      Set<String> newDeprecatedProperties;
-      if (oldConfig != null) {
-        // share the same set of unused properties
-        newUnusedProperties = oldConfig.unusedProperties;
-        newDeprecatedProperties = oldConfig.deprecatedProperties;
-      } else {
-        newUnusedProperties = new HashSet<>(newProperties.keySet());
-        newDeprecatedProperties = new HashSet<>(0);
-      }
-
-      Configuration newConfig = new Configuration(newProperties, newSources, newPrefix,
-          newConverters, newUnusedProperties, newDeprecatedProperties);
-      newConfig.inject(newConfig);
-
-      // reset builder instance so that it may be re-used
-      properties = null;
-      prefix = null;
-      oldConfig = null;
-
-      return newConfig;
-    }
-  }
+  private static AbstractBuilderFactory builderFactory;
 
   /**
    * Create a new Builder instance.
    */
-  public static Builder builder() {
-    return new Builder();
+  public static ConfigurationBuilder builder() {
+    return getBuilderFactory().getBuilder();
+  }
+
+  /**
+   * Sets the factory that will be used to create a {@link ConfigurationBuilder}
+   * instance.
+   *
+   * @param factory The factory to use
+   */
+  public static void setBuilderFactory(AbstractBuilderFactory factory) {
+    builderFactory = checkNotNull(factory);
+  }
+
+  /**
+   * Returns the factory that is used to create {@link ConfigurationBuilder}
+   * instances.
+   *
+   * @return The factory.
+   */
+  public static AbstractBuilderFactory getBuilderFactory() {
+    if (builderFactory == null) {
+      builderFactory = new AbstractBuilderFactory() {
+        @Override
+        public ConfigurationBuilder getBuilder() {
+          return new Builder();
+        }
+      };
+    }
+
+    return builderFactory;
   }
 
   /**
@@ -438,7 +188,7 @@ public class Configuration {
 
   // Mutable static state on purpose here!
   // See below for explanation.
-  private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = Collections.synchronizedMap(createConverterMap());
+  static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = Collections.synchronizedMap(createConverterMap());
   static {
     DEFAULT_CONVERTERS.put(Class.class, new ClassTypeConverter());
     DEFAULT_CONVERTERS.put(IntegerOption.class, new IntegerTypeConverter());
@@ -471,7 +221,7 @@ public class Configuration {
    * additional checks on the entries.
    * @return A new map.
    */
-  private static Map<Class<?>, TypeConverter> createConverterMap() {
+  static Map<Class<?>, TypeConverter> createConverterMap() {
     return MapConstraints.constrainedMap(new HashMap<Class<?>, TypeConverter>(),
         new MapConstraint<Class<?>, TypeConverter>() {
 
@@ -492,34 +242,38 @@ public class Configuration {
   }
 
 
-  private final ImmutableMap<String, String> properties;
-  private final ImmutableMap<String, Path> sources;
+  final ImmutableMap<String, String> properties;
+  final ImmutableMap<String, Path> sources;
 
-  private final String prefix;
+  final String prefix;
 
-  private final ImmutableMap<Class<?>, TypeConverter> converters;
+  final ImmutableMap<Class<?>, TypeConverter> converters;
 
-  private final Set<String> unusedProperties;
-  private final Set<String> deprecatedProperties;
+  final Set<String> unusedProperties;
+  final Set<String> deprecatedProperties;
 
   private LogManager logger = null;
 
   /*
    * This constructor does not set the fields annotated with @Option!
    */
-  private Configuration(ImmutableMap<String, String> pProperties,
+  protected Configuration(ImmutableMap<String, String> pProperties,
       ImmutableMap<String, Path> pSources,
       String pPrefix,
       ImmutableMap<Class<?>, TypeConverter> pConverters,
       Set<String> pUnusedProperties, Set<String> pDeprecatedProperties) {
 
+    checkNotNull(pProperties);
+    checkNotNull(pSources);
+    checkNotNull(pPrefix);
+
     assert pProperties.keySet().equals(pSources.keySet());
     properties = pProperties;
     sources = pSources;
     prefix = (pPrefix.isEmpty() ? "" : (pPrefix + "."));
-    converters = pConverters;
-    unusedProperties = pUnusedProperties;
-    deprecatedProperties = pDeprecatedProperties;
+    converters = checkNotNull(pConverters);
+    unusedProperties = checkNotNull(pUnusedProperties);
+    deprecatedProperties = checkNotNull(pDeprecatedProperties);
   }
 
   public void enableLogging(LogManager pLogger) {
