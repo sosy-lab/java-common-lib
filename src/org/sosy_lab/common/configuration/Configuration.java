@@ -46,6 +46,7 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
@@ -95,11 +96,13 @@ public class Configuration {
   /**
    * Sets the factory that will be used to create a {@link ConfigurationBuilder}
    * instance.
+   * If set to null a default factory will be used that returns {@link Builder}
+   * instances.
    *
-   * @param factory The factory to use
+   * @param factory The factory to use or null.
    */
-  public static void setBuilderFactory(AbstractBuilderFactory factory) {
-    builderFactory = checkNotNull(factory);
+  public static void setBuilderFactory(@Nullable AbstractBuilderFactory factory) {
+    builderFactory = factory;
   }
 
   /**
