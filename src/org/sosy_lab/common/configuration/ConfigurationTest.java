@@ -24,12 +24,14 @@
 package org.sosy_lab.common.configuration;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.regex.Pattern;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Throwables;
@@ -45,6 +47,11 @@ public class ConfigurationTest {
 
     @Option(description="Test injection of EnumSet")
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
+  }
+
+  @Before
+  public void setUp() {
+    Configuration.setBuilderFactory(null);
   }
 
   @Test
@@ -96,6 +103,32 @@ public class ConfigurationTest {
   @Test
   public void testPatternDefault() throws InvalidConfigurationException {
     testDefault(TestPatternOptions.class);
+  }
+
+  @Test
+  public void shouldReturnCustomFactory() throws Exception {
+    AbstractBuilderFactory mockFactory = mock(AbstractBuilderFactory.class);
+    Configuration.setBuilderFactory(mockFactory);
+
+    assertEquals(mockFactory, Configuration.getBuilderFactory());
+  }
+
+  @Test
+  public void shouldReturnDefaultBuilder() throws Exception {
+    ConfigurationBuilder builder = Configuration.builder();
+
+    assertTrue(builder instanceof Builder);
+  }
+
+  @Test
+  public void shouldReturnCustomBuilder() throws Exception {
+    ConfigurationBuilder mockBuilder = mock(ConfigurationBuilder.class);
+    AbstractBuilderFactory stubFactory = mock(AbstractBuilderFactory.class);
+    when(stubFactory.getBuilder()).thenReturn(mockBuilder);
+
+    Configuration.setBuilderFactory(stubFactory);
+
+    assertEquals(mockBuilder, Configuration.builder());
   }
 
   /**
