@@ -107,7 +107,7 @@ public class ConfigurationTest {
 
   @Test
   public void shouldReturnCustomFactory() throws Exception {
-    AbstractBuilderFactory mockFactory = mock(AbstractBuilderFactory.class);
+    AbstractConfigurationBuilderFactory mockFactory = mock(AbstractConfigurationBuilderFactory.class);
     Configuration.setBuilderFactory(mockFactory);
 
     assertEquals(mockFactory, Configuration.getBuilderFactory());
@@ -123,7 +123,7 @@ public class ConfigurationTest {
   @Test
   public void shouldReturnCustomBuilder() throws Exception {
     ConfigurationBuilder mockBuilder = mock(ConfigurationBuilder.class);
-    AbstractBuilderFactory stubFactory = mock(AbstractBuilderFactory.class);
+    AbstractConfigurationBuilderFactory stubFactory = mock(AbstractConfigurationBuilderFactory.class);
     when(stubFactory.getBuilder()).thenReturn(mockBuilder);
 
     Configuration.setBuilderFactory(stubFactory);

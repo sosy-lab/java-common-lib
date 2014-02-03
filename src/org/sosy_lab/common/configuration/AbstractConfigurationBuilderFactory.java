@@ -23,6 +23,6 @@
  */
 package org.sosy_lab.common.configuration;
 
-public interface AbstractBuilderFactory  {
+public interface AbstractConfigurationBuilderFactory  {
   public ConfigurationBuilder getBuilder();
 }
