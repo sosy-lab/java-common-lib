@@ -84,7 +84,7 @@ import com.google.common.primitives.Primitives;
 @Options
 public class Configuration {
 
-  private static AbstractBuilderFactory builderFactory;
+  private static AbstractConfigurationBuilderFactory builderFactory;
 
   /**
    * Create a new Builder instance.
@@ -101,7 +101,7 @@ public class Configuration {
    *
    * @param factory The factory to use or null.
    */
-  public static void setBuilderFactory(@Nullable AbstractBuilderFactory factory) {
+  public static void setBuilderFactory(@Nullable AbstractConfigurationBuilderFactory factory) {
     builderFactory = factory;
   }
 
@@ -111,9 +111,9 @@ public class Configuration {
    *
    * @return The factory.
    */
-  public static AbstractBuilderFactory getBuilderFactory() {
+  public static AbstractConfigurationBuilderFactory getBuilderFactory() {
     if (builderFactory == null) {
-      builderFactory = new AbstractBuilderFactory() {
+      builderFactory = new AbstractConfigurationBuilderFactory() {
         @Override
         public ConfigurationBuilder getBuilder() {
           return new Builder();
