@@ -174,13 +174,6 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
    */
   public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
-    if (consoleOutputHandler == null) {
-      try {
-        consoleOutputHandler = new ConsoleHandler();
-      } catch (NoClassDefFoundError e) {
-        // on Google App Engine ConsoleHandler() is not allowed.
-      }
-    }
     config.inject(this, BasicLogManager.class);
 
     logger = Logger.getAnonymousLogger();
@@ -188,7 +181,12 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
     logger.setUseParentHandlers(false);
 
     // create console logger
-    setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
+    if (!consoleLevel.equals(Level.OFF)) {
+      if (consoleOutputHandler == null) {
+        consoleOutputHandler = new ConsoleHandler();
+      }
+      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
+    }
 
     // create file logger
     if (fileOutputHandler == null) {
@@ -217,16 +215,14 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   }
 
   /**
-   * Sets up the given handler. If the handler is null it will not be set up.
+   * Sets up the given handler.
    *
    * @param handler The handler to set up.
    * @param formatter The formatter to use with the handler.
    * @param level The level to use with the handler.
    * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
    */
-  protected void setupHandler(@Nullable Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
-    if (handler == null) { return; }
-
+  protected void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
