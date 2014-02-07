@@ -25,6 +25,8 @@ package org.sosy_lab.common.log;
 
 import java.util.logging.Level;
 
+import javax.annotation.Nullable;
+
 /**
  * Main interface for basic logging framework.
  *
@@ -82,7 +84,7 @@ public interface LogManager extends AutoCloseable {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  void logUserException(Level priority, Throwable e, String additionalMessage);
+  void logUserException(Level priority, Throwable e, @Nullable String additionalMessage);
 
   /**
    * Log an exception solely for the purpose of debugging.
@@ -94,7 +96,7 @@ public interface LogManager extends AutoCloseable {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  void logDebugException(Throwable e, String additionalMessage);
+  void logDebugException(Throwable e, @Nullable String additionalMessage);
 
   /**
    * Log an exception solely for the purpose of debugging.
@@ -117,7 +119,7 @@ public interface LogManager extends AutoCloseable {
    * @param e the occurred exception
    * @param additionalMessage an optional message
    */
-  void logException(Level priority, Throwable e, String additionalMessage);
+  void logException(Level priority, Throwable e, @Nullable String additionalMessage);
 
   void flush();
 
