@@ -85,6 +85,7 @@ public interface ConfigurationBuilder {
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
+  @Deprecated
   public ConfigurationBuilder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException;
 
   /**

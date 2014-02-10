@@ -56,6 +56,7 @@ import com.google.common.collect.UnmodifiableListIterator;
  * and not reflecting the operation executed by the other thread.
 */
 @Immutable
+@SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
 public class PersistentLinkedList<T> extends AbstractSequentialList<T> implements PersistentList<T> {
 
   private final T head;
