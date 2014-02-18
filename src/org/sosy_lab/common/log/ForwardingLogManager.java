@@ -21,6 +21,8 @@ package org.sosy_lab.common.log;
 
 import java.util.logging.Level;
 
+import javax.annotation.Nullable;
+
 public abstract class ForwardingLogManager implements LogManager {
 
   protected abstract LogManager delegate();
@@ -41,12 +43,12 @@ public abstract class ForwardingLogManager implements LogManager {
   }
 
   @Override
-  public void logUserException(Level pPriority, Throwable pE, String pAdditionalMessage) {
+  public void logUserException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
     delegate().logUserException(pPriority, pE, pAdditionalMessage);
   }
 
   @Override
-  public void logDebugException(Throwable pE, String pAdditionalMessage) {
+  public void logDebugException(Throwable pE, @Nullable String pAdditionalMessage) {
     delegate().logDebugException(pE, pAdditionalMessage);
   }
 
@@ -56,7 +58,7 @@ public abstract class ForwardingLogManager implements LogManager {
   }
 
   @Override
-  public void logException(Level pPriority, Throwable pE, String pAdditionalMessage) {
+  public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
     delegate().logException(pPriority, pE, pAdditionalMessage);
   }
 
