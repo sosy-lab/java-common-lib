@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
 import java.util.SortedMap;
+import java.util.SortedSet;
 
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Chars;
@@ -48,14 +49,39 @@ public class Collections3 {
     checkArgument(!prefix.isEmpty());
 
     // As the end marker of the set, create the string that is
-    // the next bigger string than all possible strings with the given prefix
-    // by taking the prefix and incrementing the value of the last character by one.
+    // the next bigger string than all possible strings with the given prefix.
+    String end = incrementStringByOne(prefix);
+    return map.subMap(prefix, end);
+  }
+
+  /**
+   * Given a {@link SortedSet} of {@link String},
+   * return a set (similar to {@link SortedSet#subSet(Object)})
+   * of all entries that have a given prefix.
+   *
+   * @param set The set to filter.
+   * @param prefix The prefix that all keys in the result need to have.
+   * @return A subset of the input.
+   */
+  public static SortedSet<String> subSetWithPrefix(SortedSet<String> set, String prefix) {
+    checkNotNull(set);
+    checkArgument(!prefix.isEmpty());
+
+    // As the end marker of the set, create the string that is
+    // the next bigger string than all possible strings with the given prefix.
+    String end = incrementStringByOne(prefix);
+    return set.subSet(prefix, end);
+  }
+
+  private static String incrementStringByOne(String prefix) {
+    // To create the next bigger string than all strings with the same prefix,
+    // take the prefix and increment the value of the last character by one.
     StringBuilder end = new StringBuilder(prefix);
 
     int lastPos = end.length()-1;
     // This is basically end[lastPos] += 1
     end.setCharAt(lastPos, Chars.checkedCast((end.charAt(lastPos) + 1)));
 
-    return map.subMap(prefix, end.toString());
+    return end.toString();
   }
 }
