@@ -20,7 +20,9 @@
 package org.sosy_lab.common.collect;
 
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,5 +48,26 @@ public class Collections3Test {
     testMap.put("ca", null);
 
     Assert.assertEquals(resultMap, Collections3.subMapWithPrefix(testMap, "b"));
+  }
+
+  @Test
+  public void testSubSetWithPrefix() {
+    SortedSet<String> resultSet = new TreeSet<>();
+    resultSet.add("b");
+    resultSet.add("b" + 0);
+    resultSet.add("b1");
+    resultSet.add("b2");
+    resultSet.add("b" + Character.MAX_VALUE);
+
+    SortedSet<String> testSet = new TreeSet<>();
+    testSet.addAll(resultSet);
+    testSet.add("");
+    testSet.add("a");
+    testSet.add("a" + Character.MAX_VALUE);
+    testSet.add("c");
+    testSet.add("c" + 0);
+    testSet.add("ca");
+
+    Assert.assertEquals(resultSet, Collections3.subSetWithPrefix(testSet, "b"));
   }
 }
