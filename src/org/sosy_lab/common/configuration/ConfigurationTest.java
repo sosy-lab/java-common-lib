@@ -24,12 +24,14 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 
 public class ConfigurationTest {
@@ -66,6 +68,41 @@ public class ConfigurationTest {
     testDefault(TestEnumSetOptions.class);
   }
 
+
+  @Options
+  private static class TestCharsetOptions {
+
+    @Option(description="Test injection of Charset instances")
+    private Charset charset = Charset.defaultCharset();
+  }
+
+  @Test
+  public void testCharset() throws InvalidConfigurationException {
+    Configuration config = Configuration.builder()
+                           .setOption("charset", "utf8")
+                           .build();
+    TestCharsetOptions options = new TestCharsetOptions();
+    config.inject(options);
+    assertEquals(Charsets.UTF_8, options.charset);
+  }
+
+  @Test(expected=InvalidConfigurationException.class)
+  public void testInvalidCharsetName() throws InvalidConfigurationException {
+    Configuration config = Configuration.builder()
+                           .setOption("charset", "invalid;name")
+                           .build();
+    TestCharsetOptions options = new TestCharsetOptions();
+    config.inject(options);
+  }
+
+  @Test(expected=InvalidConfigurationException.class)
+  public void testUnsupportedCharset() throws InvalidConfigurationException {
+    Configuration config = Configuration.builder()
+                           .setOption("charset", "foo-bar")
+                           .build();
+    TestCharsetOptions options = new TestCharsetOptions();
+    config.inject(options);
+  }
 
   @Options
   private static class TestPatternOptions {

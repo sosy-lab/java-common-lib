@@ -337,6 +337,7 @@ public class Configuration {
    * - {@link String} and arrays of it
    * - {@link File} (the field {@link Option#type()} is required in this case!)
    * - {@link Class <Something>}
+   * - {@link java.nio.Charset}
    * - {@link java.util.logging.Level}
    * - {@link java.util.regex.Pattern}
    * - arrays of the above types

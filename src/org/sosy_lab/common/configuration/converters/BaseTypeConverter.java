@@ -23,6 +23,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -60,6 +63,15 @@ public enum BaseTypeConverter implements TypeConverter {
 
     } else if (type.equals(String.class)) {
       return valueStr;
+
+    } else if (type.equals(Charset.class)) {
+      try {
+        return Charset.forName(valueStr);
+      } catch (IllegalCharsetNameException e) {
+        throw new InvalidConfigurationException("Illegal charset '" + valueStr + "' in option " + optionName, e);
+      } catch (UnsupportedCharsetException e) {
+        throw new InvalidConfigurationException("Unsupported charset " + valueStr + " in option " + optionName, e);
+      }
 
     } else if (type.equals(Level.class)) {
       try {
