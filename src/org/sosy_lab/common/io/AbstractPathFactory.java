@@ -21,6 +21,8 @@ package org.sosy_lab.common.io;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 public interface AbstractPathFactory {
 
   /**
@@ -31,7 +33,7 @@ public interface AbstractPathFactory {
    *
    * @return A Path instance
    */
-  public Path getPath(String pathName, String... more);
+  public Path getPath(@Nullable String pathName, @Nullable String... more);
 
   /**
   * Creates a temporary path and returns the according Path instance.
@@ -45,5 +47,5 @@ public interface AbstractPathFactory {
   * @throws NullPointerException If the prefix is null.
   * @throws IllegalArgumentException if the prefix is shorter than 3 characters.
   */
-  public Path getTempPath(String prefix, String suffix) throws IOException;
+  public Path getTempPath(String prefix, @Nullable String suffix) throws IOException;
 }
