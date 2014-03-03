@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
 /** This class collects all {@link Option}s of a program. */
@@ -699,7 +700,7 @@ public class OptionCollector {
             // OctWrapper throws this error,
             // running cpa.sh in terminal does not throw this error
             errorMessages.add("INFO: Could not load '" + fileName
-                + "' for getting Option-annotations: " + e.getMessage());
+                + "' for getting Option annotations: " + e.getMessage());
           } catch (NoClassDefFoundError e) {
             // this error is thrown, if there is more than one classpath
             // and one of them did not map the package-strukture,
@@ -707,6 +708,10 @@ public class OptionCollector {
             return;
 
             //System.out.println("no classDef found for: " + nameOfClass);
+          } catch (ExceptionInInitializerError e) {
+            errorMessages.add("INFO: Cloud not load '" + fileName
+                + "' for getting Option annotations because of exception in class initializer: "
+                + Throwables.getStackTraceAsString(e.getCause()));
           }
         }
         /*
