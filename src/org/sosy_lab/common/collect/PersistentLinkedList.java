@@ -39,7 +39,7 @@ import com.google.common.collect.UnmodifiableListIterator;
 
 /**
  * A single-linked-list implementation of {@link PersistentList}.
- * Null values are supported.
+ * Null values are not supported (similarly to {@link ImmutableList}).
  *
  * Adding to the front of the list needs only O(1) time and memory.
  *
@@ -59,8 +59,8 @@ import com.google.common.collect.UnmodifiableListIterator;
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
 public class PersistentLinkedList<T> extends AbstractSequentialList<T> implements PersistentList<T> {
 
-  private final T head;
-  private final PersistentLinkedList<T> tail;
+  private final T head; // only null for the empty list
+  private final PersistentLinkedList<T> tail; // only null for the empty list
 
   private PersistentLinkedList(final T head, final PersistentLinkedList<T> tail) {
     this.head = head;
@@ -84,26 +84,27 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns a list containing the specified value.
    *  @return A list containing the specified value */
-  public static <T> PersistentLinkedList<T> of(final @Nullable T value) {
+  public static <T> PersistentLinkedList<T> of(final T value) {
+    checkNotNull(value);
     return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final @Nullable T v2) {
+  public static <T> PersistentLinkedList<T> of(final T v1, final T v2) {
     return of(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
-  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final @Nullable T v2, final @Nullable T v3) {
+  public static <T> PersistentLinkedList<T> of(final T v1, final T v2, final T v3) {
     return of(v3).with(v2).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> of(final @Nullable T v1, final T ... values) {
+  public static <T> PersistentLinkedList<T> of(final T v1, final T ... values) {
     return copyOf(values).with(v1);
   }
 
@@ -129,22 +130,22 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
   /** Returns the value at the start of the list.
    *  @return The value at the start of the list */
-  public @Nullable T head() {
-    checkState(head != null);
+  public T head() {
+    checkState(!isEmpty());
     return head;
   }
 
   /** Returns the remainder of the list without the first element.
    *  @return The remainder of the list without the first element */
   public PersistentLinkedList<T> tail() {
-    checkState(tail != null);
+    checkState(!isEmpty());
     return tail;
   }
 
   /** Returns a new list with value as the head and the old list as the tail.
    *  @return A new list with value as the head and the old list as the tail */
   @Override
-  public PersistentLinkedList<T> with(final @Nullable T value) {
+  public PersistentLinkedList<T> with(final T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, this);
   }
