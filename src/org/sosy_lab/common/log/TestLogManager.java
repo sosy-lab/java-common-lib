@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 import java.util.logging.Level;
 
@@ -54,6 +54,7 @@ public enum TestLogManager implements LogManager {
   public void log(Level pPriority, Object... pArgs) {
     checkNotNull(pPriority);
     checkNotNull(pArgs);
+    checkArgument(pArgs.length != 0);
   }
 
   @Override
@@ -61,7 +62,7 @@ public enum TestLogManager implements LogManager {
     checkNotNull(pPriority);
     checkNotNull(pFormat);
     checkNotNull(pArgs);
-    String.format(pFormat, pArgs);
+    checkArgument(!String.format(pFormat, pArgs).isEmpty());
   }
 
   @Override
