@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +180,8 @@ public class ProcessExecutor<E extends Exception> {
       }
     });
 
-    in = new OutputStreamWriter(process.getOutputStream());
+    // platform charset is what processes usually use for communication
+    in = new OutputStreamWriter(process.getOutputStream(), Charset.defaultCharset());
 
     // wrap both output handling callables in CancellingCallables so that
     // exceptions thrown by the handling methods terminate the process immediately
@@ -187,7 +189,9 @@ public class ProcessExecutor<E extends Exception> {
 
       @Override
       public Void call() throws E, IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(
+            // platform charset is what processes usually use for communication
+            new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
           String line;
           while ((line = reader.readLine()) != null) {
             handleOutput(line);
@@ -211,7 +215,9 @@ public class ProcessExecutor<E extends Exception> {
 
       @Override
       public Void call() throws E, IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+        try (BufferedReader reader = new BufferedReader(
+            // platform charset is what processes usually use for communication
+            new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
           String line;
           while ((line = reader.readLine()) != null) {
             handleErrorOutput(line);
