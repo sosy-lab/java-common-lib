@@ -74,6 +74,7 @@ import com.google.common.collect.MapConstraint;
 import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 
 
@@ -773,10 +774,18 @@ public class Configuration {
       T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
       return values.toArray(result);
+    }
+    assert collectionClass != null;
 
-    } else if (collectionClass == EnumSet.class) {
+    if (collectionClass == EnumSet.class) {
       assert componentType.isEnum() : "";
       return createEnumSetUnchecked(componentType, values);
+
+    } else if (componentType.isEnum()
+        && (collectionClass == Set.class || collectionClass == ImmutableSet.class)) {
+      // There is a specialized ImmutableSet for enums in Guava that is more efficient.
+      // We use it if we can.
+      return BaseTypeConverter.invokeStaticMethod(Sets.class, "immutableEnumSet", Iterable.class, values, optionName);
 
     } else {
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it

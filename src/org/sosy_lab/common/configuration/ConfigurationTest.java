@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -26,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
@@ -33,6 +35,7 @@ import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 
 public class ConfigurationTest {
 
@@ -47,6 +50,12 @@ public class ConfigurationTest {
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
   }
 
+  private Configuration enumTestConfiguration() throws InvalidConfigurationException {
+    return Configuration.builder()
+                        .setOption("values", "E3, E2")
+                        .build();
+  }
+
   @Before
   public void setUp() {
     Configuration.setBuilderFactory(null);
@@ -54,18 +63,48 @@ public class ConfigurationTest {
 
   @Test
   public void testEnumSet() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("values", "E3, E2")
-                           .build();
-
     TestEnumSetOptions options = new TestEnumSetOptions();
-    config.inject(options);
+    enumTestConfiguration().inject(options);
     assertEquals(EnumSet.of(TestEnum.E2, TestEnum.E3), options.values);
   }
 
   @Test
   public void testEnumSetDefault() throws InvalidConfigurationException {
     testDefault(TestEnumSetOptions.class);
+  }
+
+
+  @Options
+  private static class TestSetOfEnumsOptions {
+
+    @Option(description="Test injection of a set of enum values")
+    private Set<TestEnum> values = Sets.immutableEnumSet(TestEnum.E1, TestEnum.E3);
+  }
+
+  @Test
+  public void testSetOfEnums() throws InvalidConfigurationException {
+    TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
+    enumTestConfiguration().inject(options);
+    assertEquals(EnumSet.of(TestEnum.E2, TestEnum.E3), options.values);
+  }
+
+  @Test(expected=UnsupportedOperationException.class)
+  public void testSetOfEnumsIsImmutable() throws InvalidConfigurationException {
+    TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
+    enumTestConfiguration().inject(options);
+    options.values.add(TestEnum.E1);
+  }
+
+  @Test
+  public void testSetOfEnumsIsOptimizedGuavaClass() throws InvalidConfigurationException {
+    TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
+    enumTestConfiguration().inject(options);
+    assertThat(options.values.getClass().getName(), containsString("ImmutableEnumSet"));
+  }
+
+  @Test
+  public void testSetOfEnumsDefault() throws InvalidConfigurationException {
+    testDefault(TestSetOfEnumsOptions.class);
   }
 
 
