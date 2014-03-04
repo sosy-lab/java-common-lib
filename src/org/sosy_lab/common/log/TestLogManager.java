@@ -21,6 +21,7 @@ package org.sosy_lab.common.log;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -55,6 +56,8 @@ public enum TestLogManager implements LogManager {
     checkNotNull(pPriority);
     checkNotNull(pArgs);
     checkArgument(pArgs.length != 0);
+    // Convert arguments array to string to check that no toString() method throws an exception.
+    checkArgument(!Arrays.deepToString(pArgs).isEmpty());
   }
 
   @Override
