@@ -23,6 +23,7 @@ import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nonnull;
@@ -39,7 +40,10 @@ import com.google.common.collect.Ordering;
  * @param <B>
  * @param <C>
  */
-public class Triple<A, B, C> {
+public class Triple<A, B, C> implements Serializable {
+
+  private static final long serialVersionUID = 1272029955865151903L;
+
   @Nullable private final A first;
   @Nullable private final B second;
   @Nullable private final C third;
