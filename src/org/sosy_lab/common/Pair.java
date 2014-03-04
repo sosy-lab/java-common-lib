@@ -23,6 +23,7 @@ import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.collect.Ordering.from;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,7 +45,10 @@ import com.google.common.collect.Ordering;
  * @param <A>
  * @param <B>
  */
-public class Pair<A, B> {
+public class Pair<A, B> implements Serializable {
+
+  private static final long serialVersionUID = -8410959888808077296L;
+
   @Nullable private final A first;
   @Nullable private final B second;
 
