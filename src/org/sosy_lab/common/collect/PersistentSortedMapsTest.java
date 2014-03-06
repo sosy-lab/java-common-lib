@@ -80,7 +80,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", null, "1"),
       Triple.of("b", null, "2"),
@@ -104,7 +104,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", "1", null),
       Triple.of("b", "2", null),
@@ -128,7 +128,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("b", null, "2"),
       Triple.of("d", null, "4")
@@ -150,7 +150,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", null, "1"),
       Triple.of("c", null, "3")
@@ -172,7 +172,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("b", "2", null),
       Triple.of("d", "4", null)
@@ -194,7 +194,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", "1", null),
       Triple.of("c", "3", null)
@@ -216,7 +216,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", "1", null),
       Triple.of("b", null, "2"),
@@ -240,7 +240,7 @@ public class PersistentSortedMapsTest {
 
     assertEquals(FULL_MAP, result);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Triple<String, String, String>[] expectedDifferences = new Triple[] {
       Triple.of("a", null, "1"),
       Triple.of("b", "2", null),
