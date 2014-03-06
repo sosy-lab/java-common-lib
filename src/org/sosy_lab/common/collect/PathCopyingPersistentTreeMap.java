@@ -35,6 +35,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -176,7 +177,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     static <K> Function<Entry<K, ?>, K> getKeyFunction() {
       return new Function<Map.Entry<K, ?>, K>() {
           @Override
-          public K apply(Map.Entry<K, ?> input) {
+          public K apply(@Nonnull Map.Entry<K, ?> input) {
             return input.getKey();
           }
         };

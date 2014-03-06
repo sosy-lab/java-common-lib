@@ -162,7 +162,7 @@ public class Triple<A, B, C> implements Serializable {
 
     return new Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>() {
       @Override
-      public Triple<B1, B2, B3> apply(Triple<A1, A2, A3> pInput) {
+      public Triple<B1, B2, B3> apply(@Nonnull Triple<A1, A2, A3> pInput) {
         return Triple.<B1, B2, B3>of(f1.apply(pInput.getFirst()),
                                       f2.apply(pInput.getSecond()),
                                       f3.apply(pInput.getThird()));

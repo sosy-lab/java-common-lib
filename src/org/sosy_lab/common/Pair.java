@@ -211,7 +211,7 @@ public class Pair<A, B> implements Serializable {
 
     return new Function<Pair<A1,A2>, Pair<B1,B2>>() {
       @Override
-      public Pair<B1, B2> apply(Pair<A1, A2> pInput) {
+      public Pair<B1, B2> apply(@Nonnull Pair<A1, A2> pInput) {
         return Pair.<B1, B2>of(f1.apply(pInput.getFirst()),
                                f2.apply(pInput.getSecond()));
       }
