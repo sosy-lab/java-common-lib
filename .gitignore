@@ -1,8 +1,11 @@
 /bin
+/lib
 /ivy-*.xml
 /common-*.jar
 /TEST-*.txt
-
-# /lib/
-/lib/java
-/lib/java-contrib
+/junit
+/JUnit.html
+/FindBugs.html
+/FindBugs.xml
+/FindBugs.diff.html
+/FindBugs.diff.xml
