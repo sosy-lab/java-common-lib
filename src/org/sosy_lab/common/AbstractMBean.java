@@ -29,6 +29,8 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.sosy_lab.common.log.LogManager;
+
 /**
  * Abstract class that encapsulates the registration of an MBean with the
  * {@link MBeanServer}.

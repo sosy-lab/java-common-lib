@@ -40,6 +40,7 @@ import java.util.logging.Level;
 
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.concurrency.Concurrency;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
