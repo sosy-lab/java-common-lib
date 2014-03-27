@@ -66,6 +66,7 @@ import com.google.common.collect.ImmutableList;
     + "\nALL:      debugging information"
     + "\nCare must be taken with levels of FINER or lower, as output files may "
     + "become quite large and memory usage might become an issue.")
+@SuppressWarnings("deprecation")
 public class BasicLogManager implements org.sosy_lab.common.LogManager {
 
   @Option(name="level", toUppercase=true, description="log level of file output")
