@@ -23,5 +23,6 @@ package org.sosy_lab.common;
  * Interface for increasing compatibility with old code
  * that was written before LogManager was moved to its own package.
  */
+@Deprecated
 public interface LogManager extends org.sosy_lab.common.log.LogManager {
 }
