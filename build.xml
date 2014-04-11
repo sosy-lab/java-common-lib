@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab : -->
 <project basedir="." default="build" name="Sosy-Lab Common Library" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <!-- Include a file in which all properties can be overridden.
+         This file won't get checked in and can be used to change properties
+         locally for one machine if necessary. -->
+    <property file="build.properties"/>
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="source.format" value="1.7"/>
@@ -48,6 +52,7 @@
     <target depends="clean" name="cleanall"/>
 
     <property name="ivy.version" value="2.3.0"/> <!-- Change version number here to use a newer version of Ivy. -->
+    <!-- <property name="ivy.disable" value=""/> --> <!-- Disable ivy completely. -->
     <property name="ivy.repo.url" value="http://www.sosy-lab.org/ivy"/>
     <property name="ivy.jar.dir" value="${ivy.lib.dir}/build"/>
     <property name="ivy.jar.file" value="ivy.jar"/>
@@ -70,7 +75,7 @@
     </target>
 
     <!-- Ask Ivy to get all the dependencies for us -->
-    <target name="resolve-dependencies" depends="load-ivy, update-contrib">
+    <target name="resolve-dependencies" depends="load-ivy, update-contrib" unless="ivy.disable">
         <echo message="Downloading and installing dependencies with Ivy..."/>
         <ivy:resolve conf="build, runtime, test"/>
         <ivy:retrieve sync="true" overwriteMode="different" pattern="${ivy.lib.dir}/[conf]/[artifact](-[classifier]).[ext]"/>
@@ -85,7 +90,7 @@
         <antcall target="install-contrib"/>
     </target>
 
-    <target name="install-contrib" depends="load-ivy" description="retrieve sources and docs for external libraries">
+    <target name="install-contrib" depends="load-ivy" description="retrieve sources and docs for external libraries" unless="ivy.disable">
         <ivy:resolve conf="contrib"/>
         <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
     </target>
