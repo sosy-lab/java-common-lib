@@ -21,8 +21,6 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
@@ -174,7 +172,7 @@ public final class Files {
   }
 
   /**
-   * Open a BufferedWriter to a file with the default charset.
+   * Open a buffered Writer to a file with the default charset.
    * This method creates necessary parent directories beforehand.
    *
    * Note that using the default charset is often not a good idea,
@@ -183,22 +181,22 @@ public final class Files {
    *
    * TODO should we use UTF8 here instead?
    */
-  public static BufferedWriter openOutputFile(Path file, FileWriteMode... options) throws IOException {
+  public static Writer openOutputFile(Path file, FileWriteMode... options) throws IOException {
     return openOutputFile(file, Charset.defaultCharset(), options);
   }
 
   /**
-   * Open a BufferedWriter to a file.
+   * Open a buffered Writer to a file.
    * This method creates necessary parent directories beforehand.
    */
-  public static BufferedWriter openOutputFile(Path file, Charset charset,
+  public static Writer openOutputFile(Path file, Charset charset,
       FileWriteMode... options) throws IOException {
     Path dir = file.getParent();
     if (dir != null) {
       dir.mkdirs();
     }
 
-    return new BufferedWriter(file.asCharSink(charset, options).openBufferedStream());
+    return file.asCharSink(charset, options).openBufferedStream();
   }
 
   /**
