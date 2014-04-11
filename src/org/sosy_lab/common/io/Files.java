@@ -189,6 +189,8 @@ public final class Files {
    */
   public static Writer openOutputFile(Path file, Charset charset,
       FileWriteMode... options) throws IOException {
+    checkNotNull(charset);
+    checkNotNull(options);
     createParentDirs(file);
     return file.asCharSink(charset, options).openBufferedStream();
   }
@@ -238,7 +240,6 @@ public final class Files {
    * @throws IOException
    */
   public static void createParentDirs(Path path) throws IOException {
-    checkNotNull(path);
     Path parent = path.getParent();
     if (parent == null) {
       // the parent is the root directory and therefore exists or cannot be created.
