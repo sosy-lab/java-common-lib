@@ -189,11 +189,7 @@ public final class Files {
    */
   public static Writer openOutputFile(Path file, Charset charset,
       FileWriteMode... options) throws IOException {
-    Path dir = file.getParent();
-    if (dir != null) {
-      dir.mkdirs();
-    }
-
+    createParentDirs(file);
     return file.asCharSink(charset, options).openBufferedStream();
   }
 
