@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -234,10 +233,6 @@ public final class Files {
     if (!path.canRead()) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
     }
-  }
-
-  public static List<String> readLines(Path path, Charset charset) throws IOException {
-    return path.asCharSource(charset).readLines();
   }
 
   /**
