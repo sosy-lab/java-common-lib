@@ -17,5 +17,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/**
+ * This class contains component for injecting configuration options
+ * decentrally into the code that needs them.
+ * The main class of this package is {@link org.sosy_lab.common.configuration.Configuration}.
+ */
 @javax.annotation.ParametersAreNonnullByDefault
 package org.sosy_lab.common.configuration;

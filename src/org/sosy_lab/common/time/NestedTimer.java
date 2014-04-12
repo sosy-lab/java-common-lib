@@ -67,7 +67,7 @@ public final class NestedTimer {
   private long innerMaxTime           = 0;
   private long outerMaxTime           = 0;
 
-  /** The length of the last measured interval */
+  /** The length of the last measured interval. */
   private long lastOuterIntervalLength = 0;
 
   /**

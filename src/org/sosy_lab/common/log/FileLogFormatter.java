@@ -24,7 +24,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * Class to handle formatting for file output
+ * Class to handle formatting for file output.
  */
 public class FileLogFormatter extends Formatter {
 

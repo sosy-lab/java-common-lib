@@ -17,5 +17,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/**
+ * This package provides a logging framework.
+ * It is based on the JDK-internal logging,
+ * but provides many additional features such as lazy log message creation,
+ * and convenience methods for exceptions.
+ */
 @javax.annotation.ParametersAreNonnullByDefault
 package org.sosy_lab.common.log;

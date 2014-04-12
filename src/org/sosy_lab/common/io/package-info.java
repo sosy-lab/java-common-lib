@@ -17,5 +17,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/**
+ * This package contains an abstraction layer for file-system access.
+ * It provides the interface {@link org.sosy_lab.common.io.Path}
+ * which is a replacement for {@link java.nio.file.Path},
+ * and a default implementation that delegates to the JDK IO classes.
+ * However, alternative implementations of {@link org.sosy_lab.common.io.Path}
+ * can be used by registering the appropriate {@link org.sosy_lab.common.io.AbstractPathFactory}
+ * with {@link org.sosy_lab.common.io.Paths#getFactory()}.
+ */
 @javax.annotation.ParametersAreNonnullByDefault
 package org.sosy_lab.common.io;

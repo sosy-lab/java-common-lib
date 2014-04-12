@@ -17,5 +17,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/**
+ * This package contains helpful utilities for concurrent code.
+ */
 @javax.annotation.ParametersAreNonnullByDefault
 package org.sosy_lab.common.concurrency;

@@ -234,10 +234,7 @@ public final class Files {
   }
 
   /**
-   * {@link com.google.common.io.Files#createParentDirs(java.io.File)}
-   *
-   * @param path
-   * @throws IOException
+   * @see com.google.common.io.Files#createParentDirs(java.io.File)
    */
   public static void createParentDirs(Path path) throws IOException {
     Path parent = path.getParent();
