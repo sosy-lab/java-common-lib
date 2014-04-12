@@ -80,6 +80,10 @@ public class OptionCollector {
   private final String sourcePath;
   private final boolean verbose;
 
+  // The map where we will collect all options.
+  // TreeMap for alphabetical order of keys
+  private final SortedMap<String, Pair<String, String>> options = new TreeMap<>();
+
   /**
    * @param pVerbose short or long output?
    */
@@ -93,9 +97,6 @@ public class OptionCollector {
    * and returns a formatted String.
    */
   public String getCollectedOptions() {
-    // TreeMap for alphabetical order of keys
-    final SortedMap<String, Pair<String, String>> map = new TreeMap<>();
-
     // redirect stdout to stderr so that error messages that are printed
     // when classes are loaded appear in stderr
     PrintStream originalStdOut = System.out;
@@ -105,7 +106,7 @@ public class OptionCollector {
 
     for (Class<?> c : getClasses()) {
       if (c.isAnnotationPresent(Options.class)) {
-        collectOptions(c, map);
+        collectOptions(c);
       }
       if (c.getPackage().getName().startsWith("org.sosy_lab.common")) {
         appendCommonOptions = false;
@@ -131,7 +132,7 @@ public class OptionCollector {
     }
 
     String description = "";
-    for (Pair<String, String> descriptionAndInfo : map.values()) {
+    for (Pair<String, String> descriptionAndInfo : options.values()) {
       if (descriptionAndInfo.getFirst().isEmpty()
           || !description.equals(descriptionAndInfo.getFirst())) {
         content.append("\n");
@@ -187,17 +188,15 @@ public class OptionCollector {
   /** This method collects every {@link Option} of a class.
    *
    * @param c class where to take the Option from
-   * @param map map with collected Options
    */
-  private void collectOptions(final Class<?> c,
-      final SortedMap<String, Pair<String, String>> map) {
+  private void collectOptions(final Class<?> c) {
     String classSource = getContentOfFile(c);
 
     for (final Field field : c.getDeclaredFields()) {
 
       if (field.isAnnotationPresent(Option.class)) {
 
-        getOptionsDescription(c, map);
+        getOptionsDescription(c);
 
         // get info about option
         final String optionName = getOptionName(c, field);
@@ -230,8 +229,8 @@ public class OptionCollector {
         optionInfo.append(getAllowedValues(field, verbose));
 
         // check if a option was found before, some options are used twice
-        if (map.containsKey(optionName)) {
-          Pair<String, String> oldValues = map.get(optionName);
+        if (options.containsKey(optionName)) {
+          Pair<String, String> oldValues = options.get(optionName);
 
           String description = getOptionDescription(field);
           if (!description.equals(oldValues.getFirst())) {
@@ -243,10 +242,10 @@ public class OptionCollector {
             commonOptionInfo += oldValues.getSecond();
           }
 
-          map.put(optionName, Pair.of(description, commonOptionInfo));
+          options.put(optionName, Pair.of(description, commonOptionInfo));
 
         } else {
-          map.put(optionName,
+          options.put(optionName,
               Pair.of(getOptionDescription(field), optionInfo.toString()));
         }
       }
@@ -271,14 +270,13 @@ public class OptionCollector {
    * to the map, if a prefix is defined.
    *
    * @param c class with options
-   * @param map where the formatted options-description is added */
-  private static void getOptionsDescription(final Class<?> c,
-      final SortedMap<String, Pair<String, String>> map) {
+   */
+  private void getOptionsDescription(final Class<?> c) {
     if (c.isAnnotationPresent(Options.class)) {
       final Options classOption = c.getAnnotation(Options.class);
       if (!classOption.prefix().isEmpty()
           && !classOption.description().isEmpty()) {
-        map.put(classOption.prefix(),
+        options.put(classOption.prefix(),
             Pair.of(formatText(classOption.description()), ""));
       }
     }
