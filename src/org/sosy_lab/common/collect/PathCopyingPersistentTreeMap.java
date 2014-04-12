@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.collect;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;

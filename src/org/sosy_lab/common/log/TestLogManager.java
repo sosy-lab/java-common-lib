@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.common.log;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
 import java.util.logging.Level;

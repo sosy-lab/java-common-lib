@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
 import java.lang.annotation.Annotation;

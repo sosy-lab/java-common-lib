@@ -19,8 +19,10 @@
  */
 package org.sosy_lab.common.collect;
 
-import static org.junit.Assert.*;
-import static org.sosy_lab.common.collect.PersistentSortedMaps.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.sosy_lab.common.collect.PersistentSortedMaps.merge;
+import static org.sosy_lab.common.collect.PersistentSortedMaps.mergeWithKeyDifferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;

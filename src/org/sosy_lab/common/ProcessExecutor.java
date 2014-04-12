@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.BufferedReader;
 import java.io.IOException;
