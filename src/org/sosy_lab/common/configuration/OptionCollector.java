@@ -437,7 +437,8 @@ public class OptionCollector {
 
   /** This function returns the content of a sourcefile as String.
    *
-   * @param field the field, the sourcefile belongs to */
+   * @param cls the class whose sourcefile should be retrieved
+   */
   private String getContentOfFile(final Class<?> cls) {
 
     // get name of sourcefile, remove prefix 'class_'
@@ -466,7 +467,8 @@ public class OptionCollector {
    * returns the value of the field.
    *
    * @param content sourcecode where to search
-   * @param fieldString name of the field, which value is returned */
+   * @param fieldPattern regexp specifying the name of the field, whose value is returned
+   */
   private static String getDefaultValueFromContent(final String content,
       final String fieldPattern) {
     // search for fieldString and get the whole content after it (=rest),

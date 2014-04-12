@@ -241,7 +241,7 @@ public final class Classes {
    * Returns the name of any violating exception, or null if there is none.
    *
    * @param constructor The constructor to check.
-   * @param allowedExceptionType The type of exception that is allowed.
+   * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
   public static @Nullable String verifyDeclaredExceptions(Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
@@ -255,7 +255,7 @@ public final class Classes {
    * Returns the name of any violating exception, or null if there is none.
    *
    * @param method The method to check.
-   * @param allowedExceptionType The type of exception that is allowed.
+   * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
   public static @Nullable String verifyDeclaredExceptions(Method method, Class<?>... allowedExceptionTypes) {
