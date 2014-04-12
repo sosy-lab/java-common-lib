@@ -17,5 +17,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/**
+ * This package contains additional interfaces and implementations for collections,
+ * as well as further collection utilities.
+ */
 @javax.annotation.ParametersAreNonnullByDefault
 package org.sosy_lab.common.collect;

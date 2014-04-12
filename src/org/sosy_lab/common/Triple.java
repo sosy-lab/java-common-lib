@@ -34,7 +34,7 @@ import com.google.common.collect.Ordering;
 
 
 /**
- * A generic Triple class based on Pair.java
+ * A generic Triple class based on Pair.java.
  *
  * @param <A>
  * @param <B>

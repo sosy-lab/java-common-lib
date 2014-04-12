@@ -154,10 +154,10 @@ public class Configuration {
       description="all used options are printed")
   private boolean exportUsedOptions = false;
 
-  /** Splitter to create string arrays */
+  /** Splitter to create string arrays. */
   private static final Splitter ARRAY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
-  /** Map that stores which implementation we use for the collection classes */
+  /** Map that stores which implementation we use for the collection classes. */
   private static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
   static {
     ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder = ImmutableMap.builder();

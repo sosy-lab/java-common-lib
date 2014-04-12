@@ -51,7 +51,7 @@ import com.google.common.collect.ImmutableList;
 
 
 /**
- * Default implementation of {@link LogManager}
+ * Default implementation of {@link LogManager}.
  */
 @Options(prefix = "log",
     description = "Possible log levels in descending order "
