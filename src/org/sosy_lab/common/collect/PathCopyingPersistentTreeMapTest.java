@@ -113,7 +113,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
       }
 
     } else {
-      assertEquals(oldMap.size()+1, map.size());
+      assertEquals(oldMap.size() + 1, map.size());
       assertFalse(map.equals(oldMap));
     }
   }
@@ -132,7 +132,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     assertFalse(map.containsKey(key));
 
     if (oldMap.containsKey(key)) {
-      assertEquals(oldMap.size()-1, map.size());
+      assertEquals(oldMap.size() - 1, map.size());
       assertFalse(map.equals(oldMap));
 
     } else {

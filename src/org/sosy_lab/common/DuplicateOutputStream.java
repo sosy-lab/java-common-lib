@@ -86,7 +86,7 @@ public class DuplicateOutputStream extends OutputStream {
   @Override
   public void write(byte[] pB, int pOff, int pLen) throws IOException {
     try {
-    stream1.write(pB, pOff, pLen);
+      stream1.write(pB, pOff, pLen);
     } finally {
       stream2.write(pB, pOff, pLen);
     }
