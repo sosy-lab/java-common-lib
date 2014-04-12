@@ -38,7 +38,7 @@ import org.sosy_lab.common.log.LogManager;
  *
  * This class is not thread-safe.
  */
-public class AbstractMBean {
+public abstract class AbstractMBean {
 
   private static final MBeanServer mbs = getMBeanServer();
 
@@ -64,7 +64,7 @@ public class AbstractMBean {
   private ObjectName oname = null;
   private final LogManager logger;
 
-  public AbstractMBean(String name, LogManager logger) {
+  protected AbstractMBean(String name, LogManager logger) {
     this.logger = checkNotNull(logger);
 
     if (mbs != null) {
