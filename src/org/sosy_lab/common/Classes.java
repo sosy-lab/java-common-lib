@@ -51,8 +51,12 @@ public final class Classes {
 
     private static final long serialVersionUID = 7862065219560550275L;
 
-    public ClassInstantiationException(String className, String msg) {
-      super("Cannot instantiate class " + className + ":" + msg);
+    public ClassInstantiationException(String className, String msg, Throwable cause) {
+      super("Cannot instantiate class " + className + ":" + msg, cause);
+    }
+
+    public ClassInstantiationException(String className, Throwable cause) {
+      super("Cannot instantiate class " + className + ":" + cause.getMessage(), cause);
     }
   }
 
@@ -97,13 +101,13 @@ public final class Classes {
       return ct.newInstance(argumentValues);
 
     } catch (SecurityException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e.getMessage());
+      throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), "Matching constructor not found!");
+      throw new ClassInstantiationException(cls.getCanonicalName(), "Matching constructor not found!", e);
     } catch (InstantiationException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e.getMessage());
+      throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (IllegalAccessException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e.getMessage());
+      throw new ClassInstantiationException(cls.getCanonicalName(), e);
     }
   }
 
