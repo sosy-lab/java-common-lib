@@ -894,7 +894,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return super.equals(pO); // delegate to AbstractSet
     }
 
-    // hashCode() delegates to AbstractSet
+    @Override
+    public int hashCode() {
+      // hashCode() delegates to AbstractSet
+      return super.hashCode();
+    }
 
     @Override
     public Comparator<? super Entry<K, V>> comparator() {

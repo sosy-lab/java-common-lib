@@ -23,8 +23,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * This class represents a timer similar to {@link Timer},
  * however it nests two timers.
@@ -326,7 +324,7 @@ public final class NestedTimer {
   /**
    * Return a String with a default representation of the the sum of the times of total intervals.
    * For printing other times, or with a specific unit,
-   * use the appropriate getter and call {@link TimeSpan#formatAs(TimeUnit)}.
+   * use the appropriate getter and call {@link TimeSpan#formatAs(java.util.concurrent.TimeUnit)}.
    * The format and the content of the String returned by this method
    * is not guaranteed to be the same in future versions of this code.
    */

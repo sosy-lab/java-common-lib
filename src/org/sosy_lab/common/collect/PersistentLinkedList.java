@@ -67,7 +67,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     this.tail = tail;
   }
 
-  @SuppressWarnings({ "rawtypes" })
+  @SuppressWarnings("rawtypes")
   private static final PersistentLinkedList EMPTY = makeEmpty();
 
   @SuppressWarnings({"rawtypes", "unchecked"})
