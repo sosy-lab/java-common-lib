@@ -151,8 +151,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     assertEquals(0, map.hashCode());
   }
 
-  @Test
-  public void putABCD() {
+  private void putABCD() {
     put("a", "1");
     assertEquals(map.toString(), "{a=1}");
     assertEquals("a", map.firstKey());
@@ -174,16 +173,14 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     assertEquals("d", map.lastKey());
   }
 
-  @Test
-  public void removeDCBA() {
+  private void removeDCBA() {
     remove("d");
     remove("c");
     remove("b");
     remove("a");
   }
 
-  @Test
-  public void putDCBA() {
+  private void putDCBA() {
     put("d", "1");
     assertEquals(map.toString(), "{d=1}");
     assertEquals("d", map.firstKey());
@@ -205,8 +202,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     assertEquals("d", map.lastKey());
   }
 
-  @Test
-  public void removeABCD() {
+  private void removeABCD() {
     remove("a");
     remove("b");
     remove("c");
