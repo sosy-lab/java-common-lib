@@ -226,7 +226,7 @@ class Parser {
 
       } else if (line.startsWith("[") && line.endsWith("]")) {
         // category
-        line = line.substring(1, line.length()-1);
+        line = line.substring(1, line.length() - 1);
         line = line.trim();
 
         if (line.isEmpty()) {
@@ -267,7 +267,7 @@ class Parser {
 
       if (currentValue.endsWith("\\")) {
         // continuation
-        currentValue = currentValue.substring(0, currentValue.length()-1);
+        currentValue = currentValue.substring(0, currentValue.length() - 1);
 
       } else {
         definedOptions.put(currentPrefix + currentOptionName, currentValue);

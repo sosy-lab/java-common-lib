@@ -190,7 +190,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
 
   @Override
   public SortedSet<Map.Entry<K, V>> entrySet() {
-    return new ForwardingSortedSet<Map.Entry<K,V>>() {
+    return new ForwardingSortedSet<Map.Entry<K, V>>() {
 
         @Override
         protected SortedSet<Map.Entry<K, V>> delegate() {
@@ -224,7 +224,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
   @Override
   public SortedMap<K, V> headMap(final K pToKey) {
     checkNotNull(pToKey);
-    return new ForwardingSortedMap<K,V>() {
+    return new ForwardingSortedMap<K, V>() {
 
       @Override
       protected SortedMap<K, V> delegate() {
@@ -236,7 +236,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
   @Override
   public SortedMap<K, V> tailMap(final K pFromKey) {
     checkNotNull(pFromKey);
-    return new ForwardingSortedMap<K,V>() {
+    return new ForwardingSortedMap<K, V>() {
 
       @Override
       protected SortedMap<K, V> delegate() {
@@ -249,7 +249,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
   public SortedMap<K, V> subMap(final K pFromKey, final K pToKey) {
     checkNotNull(pFromKey);
     checkNotNull(pToKey);
-    return new ForwardingSortedMap<K,V>() {
+    return new ForwardingSortedMap<K, V>() {
 
       @Override
       protected SortedMap<K, V> delegate() {

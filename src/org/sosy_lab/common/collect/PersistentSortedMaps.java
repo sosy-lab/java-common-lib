@@ -223,7 +223,7 @@ public class PersistentSortedMaps {
         final V value1 = e1.getValue();
 
         if (collectDifferences != null) {
-          collectDifferences.add(Triple.<K,V,V>of(key, value1, null));
+          collectDifferences.add(Triple.<K, V, V>of(key, value1, null));
         }
 
         // forward e1 until it catches up with e2
@@ -240,7 +240,7 @@ public class PersistentSortedMaps {
         result = result.putAndCopy(key, value2);
 
         if (collectDifferences != null) {
-          collectDifferences.add(Triple.<K,V,V>of(key, null, value2));
+          collectDifferences.add(Triple.<K, V, V>of(key, null, value2));
         }
 
         // forward e2 until it catches up with e1
@@ -279,7 +279,7 @@ public class PersistentSortedMaps {
       while (rest.hasNext()) {
         e1 = rest.next();
 
-        collectDifferences.add(Triple.<K,V,V>of(e1.getKey(), e1.getValue(), null));
+        collectDifferences.add(Triple.<K, V, V>of(e1.getKey(), e1.getValue(), null));
       }
     }
 
@@ -297,7 +297,7 @@ public class PersistentSortedMaps {
       result = result.putAndCopy(key, value2);
 
       if (collectDifferences != null) {
-        collectDifferences.add(Triple.<K,V,V>of(key, null, value2));
+        collectDifferences.add(Triple.<K, V, V>of(key, null, value2));
       }
     }
 

@@ -91,7 +91,7 @@ public class ProcessExecutor<E extends Exception> {
    * @see #ProcessExecutor(LogManager, Class, String...)
    */
   public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd) throws IOException {
-    this(logger, exceptionClass, ImmutableMap.<String, String> of(), cmd);
+    this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
   }
 
   /**

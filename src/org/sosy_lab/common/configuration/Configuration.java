@@ -501,7 +501,7 @@ public class Configuration {
    * @param method the method of the value to be injected
    * @param options options-annotation of the class of the object */
   private void setOptionValueForMethod(final Object obj, final Method method,
-      final Options options) throws InvalidConfigurationException, IllegalAccessException{
+      final Options options) throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of method
     if (Modifier.isStatic(method.getModifiers())) {

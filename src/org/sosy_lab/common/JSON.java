@@ -87,8 +87,8 @@ public final class JSON {
     } else if (value instanceof Boolean) {
       out.append(value.toString());
 
-    } else if (value instanceof Map<?,?>) {
-      writeJSONString((Map<?,?>)value, out);
+    } else if (value instanceof Map<?, ?>) {
+      writeJSONString((Map<?, ?>)value, out);
 
     } else if (value instanceof List<?>) {
       writeJSONString((List<?>)value, out);
@@ -125,7 +125,7 @@ public final class JSON {
     boolean first = true;
 
     out.append('{');
-    for(Map.Entry<?, ?> entry : map.entrySet()) {
+    for (Map.Entry<?, ?> entry : map.entrySet()) {
       if (first) {
         first = false;
       } else {

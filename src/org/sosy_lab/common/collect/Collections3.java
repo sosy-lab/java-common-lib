@@ -78,7 +78,7 @@ public class Collections3 {
     // take the prefix and increment the value of the last character by one.
     StringBuilder end = new StringBuilder(prefix);
 
-    int lastPos = end.length()-1;
+    int lastPos = end.length() - 1;
     // This is basically end[lastPos] += 1
     end.setCharAt(lastPos, Chars.checkedCast((end.charAt(lastPos) + 1)));
 
