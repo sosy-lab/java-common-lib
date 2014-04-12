@@ -40,7 +40,7 @@ import org.sosy_lab.common.log.LogManager;
  */
 public abstract class AbstractMBean {
 
-  private static final MBeanServer mbs = getMBeanServer();
+  private static final MBeanServer MBEAN_SERVER = getMBeanServer();
 
   private static MBeanServer getMBeanServer() {
     try {
@@ -66,7 +66,7 @@ public abstract class AbstractMBean {
   protected AbstractMBean(String name, LogManager logger) {
     this.logger = checkNotNull(logger);
 
-    if (mbs != null) {
+    if (MBEAN_SERVER != null) {
       try {
         oname = new ObjectName(checkNotNull(name));
       } catch (MalformedObjectNameException e) {
@@ -80,18 +80,18 @@ public abstract class AbstractMBean {
    * Swallows all checked exceptions that might occur and logs them.
    */
   public void register() {
-    if (mbs != null && oname != null) {
+    if (MBEAN_SERVER != null && oname != null) {
       try {
 
         // if there is already an existing MBean with the same name, try to unregister it
-        if (mbs.isRegistered(oname)) {
-          mbs.unregisterMBean(oname);
+        if (MBEAN_SERVER.isRegistered(oname)) {
+          MBEAN_SERVER.unregisterMBean(oname);
 
-          assert !mbs.isRegistered(oname);
+          assert !MBEAN_SERVER.isRegistered(oname);
         }
 
         // now register our instance
-        mbs.registerMBean(this, oname);
+        MBEAN_SERVER.registerMBean(this, oname);
 
       } catch (JMException e) {
         logger.logException(Level.WARNING, e, "Error during registration of management interface");
@@ -111,9 +111,9 @@ public abstract class AbstractMBean {
    * May be called even if registration was not successful (does nothing in this case).
    */
   public void unregister() {
-    if (mbs != null && oname != null) {
+    if (MBEAN_SERVER != null && oname != null) {
       try {
-        mbs.unregisterMBean(oname);
+        MBEAN_SERVER.unregisterMBean(oname);
       } catch (JMException e) {
         logger.logException(Level.WARNING, e, "Error during unregistration of management interface");
       } catch (SecurityException e) {

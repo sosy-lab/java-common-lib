@@ -103,6 +103,7 @@ public class Pair<A, B> implements Serializable {
    * Static holder class for several function objects because if these fields
    * were static fields of the Pair class, they couldn't be generic.
    */
+  @SuppressWarnings("membername") // members are in effect static final constantss
   private static final class Holder<T, T2> {
 
     private static final Holder<?, ?> INSTANCE = new Holder<Void, Void>();

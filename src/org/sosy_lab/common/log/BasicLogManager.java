@@ -92,8 +92,8 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   // Number of characters taken from the start of the original output strings when truncating
   private final int truncateRemainingSize = 100;
 
-  private static final Level exceptionDebugLevel = Level.ALL;
-  private static final Joiner messageFormat = Joiner.on(' ').useForNull("null");
+  private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
+  private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
   protected final Logger logger;
   private final LogManagerBean mxBean;
 
@@ -346,7 +346,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
       }
     }
 
-    String messageText = messageFormat.join(argsStr);
+    String messageText = MESSAGE_FORMAT.join(argsStr);
     return messageText;
   }
 
@@ -434,7 +434,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    */
   @Override
   public void logDebugException(Throwable e, @Nullable String additionalMessage) {
-    logException(exceptionDebugLevel, e, additionalMessage);
+    logException(EXCEPTION_DEBUG_LEVEL, e, additionalMessage);
   }
 
   /**
