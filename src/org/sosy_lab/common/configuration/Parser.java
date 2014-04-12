@@ -78,6 +78,8 @@ import com.google.common.collect.Maps;
  */
 class Parser {
 
+  private Parser() {}
+
   static class InvalidConfigurationFileException extends InvalidConfigurationException {
 
     private static final long serialVersionUID = 8146907093750189669L;

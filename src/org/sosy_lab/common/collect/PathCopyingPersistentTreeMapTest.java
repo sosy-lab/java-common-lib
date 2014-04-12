@@ -298,7 +298,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   @Test
   public void testRandom() {
     Random rnd = new Random(3987432434L); // static seed for reproducibility
-    TreeMap<String, String> comparison = new TreeMap<>();
+    SortedMap<String, String> comparison = new TreeMap<>();
 
     // Insert 500 nodes
     for (int i = 0; i < 500; i++) {
