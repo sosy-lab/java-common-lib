@@ -112,11 +112,11 @@ public final class Timer {
    * Start the timer.
    * May be called only if the timer is currently not running.
    */
-  public final void start() {
+  public void start() {
     start(clock.read());
   }
 
-  final void start(final long newStartTime) {
+  void start(final long newStartTime) {
     checkState(!running);
 
     startTime = newStartTime;
@@ -129,17 +129,17 @@ public final class Timer {
    * Stop the timer.
    * May be called only if the timer is currently running.
    */
-  public final void stop() {
+  public void stop() {
     stop(clock.read());
   }
 
-  public final void stopIfRunning() {
+  public void stopIfRunning() {
     if (isRunning()) {
       stop();
     }
   }
 
-  final void stop(final long endTime) {
+  void stop(final long endTime) {
     checkState(running);
 
     lastIntervalLength = endTime - startTime;
@@ -151,7 +151,7 @@ public final class Timer {
     running = false;
   }
 
-  final TimeSpan export(long time) {
+  TimeSpan export(long time) {
     return TimeSpan.of(time, clock.unit());
   }
 
@@ -164,7 +164,7 @@ public final class Timer {
     return running;
   }
 
-  final long currentInterval() {
+  long currentInterval() {
     return running
           ? clock.read() - startTime
           : 0;
@@ -179,7 +179,7 @@ public final class Timer {
     return export(sumTime());
   }
 
-  final long sumTime() {
+  long sumTime() {
     return sumTime + currentInterval();
   }
 
@@ -192,7 +192,7 @@ public final class Timer {
     return export(maxTime());
   }
 
-  final long maxTime() {
+  long maxTime() {
     return Math.max(maxTime, currentInterval());
   }
 
@@ -215,7 +215,7 @@ public final class Timer {
     return export(lengthOfLastInterval());
   }
 
-  final long lengthOfLastInterval() {
+  long lengthOfLastInterval() {
     return running
           ? currentInterval()
           : lastIntervalLength;

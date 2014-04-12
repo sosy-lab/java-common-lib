@@ -46,42 +46,42 @@ public interface Path {
    *
    * @return A File object representing the path.
    */
-  public File toFile();
+  File toFile();
 
   /**
    * Returns the path that was used to create the instance.
    *
    * @return The path that was used to create the instance
    */
-  public String getOriginalPath();
+  String getOriginalPath();
 
   /**
    * Returns the name of the file or directory represented by this path.
    *
    * @return The name of the file or directory.
    */
-  public String getName();
+  String getName();
 
   /**
    * Returns the absolute path.
    *
    * @return The absolute path
    */
-  public Path toAbsolutePath();
+  Path toAbsolutePath();
 
   /**
    * Returns the absolute path.
    *
    * @return The absolute path
    */
-  public String getAbsolutePath();
+  String getAbsolutePath();
 
   /**
    * Returns the path represented by this instance.
    *
    * @return The path
    */
-  public String getPath();
+  String getPath();
 
   /**
    * Returns the path as canonical path.
@@ -89,28 +89,28 @@ public interface Path {
    * @return The canonical path.
    * @throws IOException
    */
-  public String getCanonicalPath() throws IOException;
+  String getCanonicalPath() throws IOException;
 
   /**
    * Returns a list containing the names of paths and directories contained within the current path.
    *
    * @return The contained files and directories
    */
-  public String[] list();
+  String[] list();
 
   /**
    * Returns the path's parent.
    *
    * @return The parent
    */
-  public Path getParent();
+  Path getParent();
 
   /**
    * Indicates whether the path is absolute or not.
    *
    * @return True, if the path is absolute, false otherwise
    */
-  public boolean isAbsolute();
+  boolean isAbsolute();
 
   /**
    * Resolves the given path against this path.
@@ -120,7 +120,7 @@ public interface Path {
    *
    * @return The resolved path
    */
-  public Path resolve(String other);
+  Path resolve(String other);
 
   /**
    * Resolves the given path against this path.
@@ -137,7 +137,7 @@ public interface Path {
    *
    * @return The resolved path
    */
-  public Path resolve(Path other);
+  Path resolve(Path other);
 
   /**
    * Returns a CharSource instance that is backed by the underlying path.
@@ -148,7 +148,7 @@ public interface Path {
    *
    * @return A CharSource
    */
-  public CharSource asCharSource(Charset charset);
+  CharSource asCharSource(Charset charset);
 
   /**
    * Returns a CharSink instance that is backed by the underlying path.
@@ -160,7 +160,7 @@ public interface Path {
    *
    * @return A CharSink
    */
-  public CharSink asCharSink(Charset charset, FileWriteMode... writeModes);
+  CharSink asCharSink(Charset charset, FileWriteMode... writeModes);
 
   /**
    * Returns a ByteSource instance that is backed by the underlying path.
@@ -169,7 +169,7 @@ public interface Path {
    *
    * @return A ByteSource
    */
-  public ByteSource asByteSource();
+  ByteSource asByteSource();
 
   /**
    * Returns a ByteSink instance that is backed by the underlying path.
@@ -179,54 +179,54 @@ public interface Path {
    * @param writeModes The write mode to use
    * @return A ByteSink
    */
-  public ByteSink asByteSink(FileWriteMode... writeModes);
+  ByteSink asByteSink(FileWriteMode... writeModes);
 
   /**
    * Indicates whether the path is empty.
    *
    * @return True, if the path is empty, false otherwise.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
 
   /**
    * Indicates whether the path exists.
    *
    * @return True, if the path exists, false otherwise
    */
-  public boolean exists();
+  boolean exists();
 
   /**
    * Indicates whether the path is a directory.
    *
    * @return True, if the path is a directory, false otherwise
    */
-  public boolean isDirectory();
+  boolean isDirectory();
 
   /**
    * Indicates whether the path is a file.
    *
    * @return True, if the path is a file, false otherwise
    */
-  public boolean isFile();
+  boolean isFile();
 
   /**
    * Indicates whether the path can be read.
    *
    * @return True, if the path can be read, false otherwise
    */
-  public boolean canRead();
+  boolean canRead();
 
   /**
    * Deletes the path.
    *
    * @return True, if the path could be deleted, false otherwise
    */
-  public boolean delete();
+  boolean delete();
 
   /**
    * Deletes the path when the virtual machine is terminated.
    */
-  public void deleteOnExit();
+  void deleteOnExit();
 
   /**
    * Creates all parent directories of the path.
@@ -235,12 +235,12 @@ public interface Path {
    *
    * @return True, if the directories could be created, otherwise false.
    */
-  public boolean mkdirs();
+  boolean mkdirs();
 
   /**
    * @see #getPath()
    */
   @Override
-  public String toString();
+  String toString();
 
 }

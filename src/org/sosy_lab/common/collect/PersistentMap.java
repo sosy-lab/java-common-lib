@@ -86,5 +86,5 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
-  public void clear() throws UnsupportedOperationException;
+  void clear() throws UnsupportedOperationException;
 }

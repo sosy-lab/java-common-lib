@@ -64,38 +64,38 @@ public @interface Option {
    * In both cases it will be prefixed with the prefix specified in the {@link Options}
    * annotation (if given).
    */
-  public String name() default "";
+  String name() default "";
 
   /**
    * An optional flag if this option needs to be specified in the configuration
    * file. The default is false. If set to true, an exception will be thrown if
    * the option is not in the file.
    */
-  public boolean required() default false;
+  boolean required() default false;
 
   /**
    * An optional flag that specifies if a configuration value should be converted
    * to upper case after it was read. For options with enum types, this flag is
    * always assumed to be true.
    */
-  public boolean toUppercase() default false;
+  boolean toUppercase() default false;
 
   /**
    * If regexp is specified, the value of this option (prior to conversion to
    * the correct type) will be checked against this regular expression. If it
    * does not match, an exception will be thrown.
    */
-  public String regexp() default "";
+  String regexp() default "";
 
   /**
    * If values is non-empty, the value of this option (prior to conversion to
    * the correct type) will be checked if it is listed in this array. If it
    * is not contained, an exception will be thrown.
    */
-  public String[] values() default {};
+  String[] values() default {};
 
   /**
    * A text that describes the current option (this will be part of the user documentation).
    */
-  public String description();
+  String description();
 }

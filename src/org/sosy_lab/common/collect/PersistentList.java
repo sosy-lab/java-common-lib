@@ -77,7 +77,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  public boolean add(T pE) throws UnsupportedOperationException;
+  boolean add(T pE) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -91,54 +91,54 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  public boolean addAll(Collection<? extends T> pC) throws UnsupportedOperationException;
+  boolean addAll(Collection<? extends T> pC) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public boolean addAll(int pIndex, Collection<? extends T> pC) throws UnsupportedOperationException;
+  boolean addAll(int pIndex, Collection<? extends T> pC) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public void clear() throws UnsupportedOperationException;
+  void clear() throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public T remove(int pIndex) throws UnsupportedOperationException;
+  T remove(int pIndex) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public boolean remove(Object pO) throws UnsupportedOperationException;
+  boolean remove(Object pO) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public boolean removeAll(Collection<?> pC) throws UnsupportedOperationException;
+  boolean removeAll(Collection<?> pC) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public boolean retainAll(Collection<?> pC) throws UnsupportedOperationException;
+  boolean retainAll(Collection<?> pC) throws UnsupportedOperationException;
 
   /**
    * @throws UnsupportedOperationException Always.
    */
   @Override
   @Deprecated
-  public T set(int pIndex, T pElement) throws UnsupportedOperationException;
+  T set(int pIndex, T pElement) throws UnsupportedOperationException;
 }

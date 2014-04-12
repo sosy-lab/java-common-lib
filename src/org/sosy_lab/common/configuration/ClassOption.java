@@ -41,5 +41,5 @@ public @interface ClassOption {
    * This field provides an optional package prefix that will be added to the
    * specified class name, if a class with the specified name is not found.
    */
-  public String packagePrefix() default "";
+  String packagePrefix() default "";
 }
