@@ -100,7 +100,17 @@
 
     <target depends="build-project, build-documentation" name="build"/>
 
-    <target depends="build-dependencies" name="build-project">
+    <!-- If available, we use error-prone as the compiler, cf. https://code.google.com/p/error-prone/ -->
+    <available classname="com.google.errorprone.ErrorProneAntCompilerAdapter"
+               property="javac.compiler"
+               value="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+    <target name="-warn-errorprone" unless="javac.compiler">
+        <echo level="warning">Google error-prone not detected in class path.</echo>
+        <echo level="warning">For additional compiler checks, we recommend running ant with command-line arguments "-lib lib/java/build".</echo>
+    </target>
+
+    <target depends="build-dependencies,-warn-errorprone" name="build-project">
+        <property name="javac.compiler" value="modern"/> <!-- fallback value -->
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>
         <javac debug="true"
                debuglevel="${debuglevel}"
@@ -108,6 +118,7 @@
                source="${source.format}"
                target="${class.format}"
                includeAntRuntime="false"
+               compiler="${javac.compiler}"
                encoding="UTF-8">
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
