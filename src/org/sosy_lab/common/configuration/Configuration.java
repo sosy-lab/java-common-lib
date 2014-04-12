@@ -50,7 +50,6 @@ import javax.annotation.Nullable;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
@@ -58,6 +57,7 @@ import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
