@@ -97,7 +97,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   protected final Logger logger;
   private final LogManagerBean mxBean;
 
-  public static interface LogManagerMXBean {
+  public interface LogManagerMXBean {
 
     String getConsoleLevel();
     void setConsoleLevel(String newLevel);

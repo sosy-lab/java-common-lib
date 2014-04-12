@@ -74,7 +74,7 @@ public final class NestedTimer {
    * Start the outer timer.
    * May be called only if the timer is currently not running.
    */
-  public final void startOuter() {
+  public void startOuter() {
     checkState(!isRunning());
     assert currentInnerTimer == null;
 
@@ -87,7 +87,7 @@ public final class NestedTimer {
    * May be called only if the timer is currently not running.
    * Guarantees that both timers are started in the exact same instant of time.
    */
-  public final void startBoth() {
+  public void startBoth() {
     checkState(!isRunning());
     assert currentInnerTimer == null;
 
@@ -102,7 +102,7 @@ public final class NestedTimer {
    * May be called only if the outer timer is currently running
    * and the inner timer is stopped.
    */
-  public final void stopOuter() {
+  public void stopOuter() {
     checkState(isOnlyOuterRunning());
 
     stopOuter(totalTimer.clock.read());
@@ -127,7 +127,7 @@ public final class NestedTimer {
     currentInnerTimer = null;
   }
 
-  public final void stopBoth() {
+  public void stopBoth() {
     checkState(isRunning());
     checkState(currentInnerTimer.isRunning());
 
@@ -182,7 +182,7 @@ public final class NestedTimer {
    * If the outer timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getOuterSumTime() {
+  public TimeSpan getOuterSumTime() {
     return totalTimer.export(outerSumTime());
   }
 
@@ -199,7 +199,7 @@ public final class NestedTimer {
    * To get only the sum time of the inner timer for the interval since the
    * last time the outer timer was started, call <code>getInnerTimer().getSumTime()</code>.
    */
-  public final TimeSpan getInnerSumTime() {
+  public TimeSpan getInnerSumTime() {
     return totalTimer.export(innerSumTime());
   }
 
@@ -216,7 +216,7 @@ public final class NestedTimer {
    * If the outer timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getTotalSumTime() {
+  public TimeSpan getTotalSumTime() {
     return totalTimer.getSumTime();
   }
 
@@ -225,7 +225,7 @@ public final class NestedTimer {
    * If the outer timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getOuterMaxTime() {
+  public TimeSpan getOuterMaxTime() {
     return totalTimer.export(Math.max(outerMaxTime, currentOuterInterval()));
   }
 
@@ -235,7 +235,7 @@ public final class NestedTimer {
    * If the inner timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getInnerMaxTime() {
+  public TimeSpan getInnerMaxTime() {
     long result = innerMaxTime;
     if (isRunning()) {
       result = Math.max(result, currentInnerTimer.maxTime());
@@ -248,7 +248,7 @@ public final class NestedTimer {
    * If the outer timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getTotalMaxTime() {
+  public TimeSpan getTotalMaxTime() {
     return totalTimer.getMaxTime();
   }
 
@@ -258,7 +258,7 @@ public final class NestedTimer {
    * If timer is running, the current interval is also counted.
    * If the timer was never started, this method returns 0.
    */
-  public final int getNumberOfIntervals() {
+  public int getNumberOfIntervals() {
     return totalTimer.getNumberOfIntervals();
   }
 
@@ -268,7 +268,7 @@ public final class NestedTimer {
    * up to now.
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getLengthOfLastOuterInterval() {
+  public TimeSpan getLengthOfLastOuterInterval() {
     return totalTimer.export(isRunning()
                             ? currentOuterInterval()
                             : lastOuterIntervalLength);
@@ -280,7 +280,7 @@ public final class NestedTimer {
    * up to now.
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getLengthOfLastTotalInterval() {
+  public TimeSpan getLengthOfLastTotalInterval() {
     return totalTimer.getLengthOfLastInterval();
 }
 
@@ -289,7 +289,7 @@ public final class NestedTimer {
    * If the outer timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getOuterAvgTime() {
+  public TimeSpan getOuterAvgTime() {
     int currentNumberOfIntervals = getNumberOfIntervals();
     if (currentNumberOfIntervals == 0) {
       // prevent divide by zero
@@ -305,7 +305,7 @@ public final class NestedTimer {
    * If the inner timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getInnerAvgSumTime() {
+  public TimeSpan getInnerAvgSumTime() {
     int currentNumberOfIntervals = getNumberOfIntervals();
     if (currentNumberOfIntervals == 0) {
       // prevent divide by zero
@@ -319,7 +319,7 @@ public final class NestedTimer {
    * If the timer is running, the current interval is also counted (up to the current time).
    * If the timer was never started, this method returns 0.
    */
-  public final TimeSpan getTotalAvgTime() {
+  public TimeSpan getTotalAvgTime() {
     return totalTimer.getAvgTime();
   }
 
@@ -331,7 +331,7 @@ public final class NestedTimer {
    * is not guaranteed to be the same in future versions of this code.
    */
   @Override
-  public final String toString() {
+  public String toString() {
     return getTotalSumTime().formatAs(SECONDS);
   }
 }

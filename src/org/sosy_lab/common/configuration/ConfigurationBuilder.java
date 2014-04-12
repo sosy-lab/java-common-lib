@@ -33,22 +33,22 @@ public interface ConfigurationBuilder {
   /**
    * Set a single option.
    */
-  public ConfigurationBuilder setOption(String name, String value);
+  ConfigurationBuilder setOption(String name, String value);
 
   /**
    * Reset a single option to its default value.
    */
-  public ConfigurationBuilder clearOption(String name);
+  ConfigurationBuilder clearOption(String name);
 
   /**
    * Add all options from a map.
    */
-  public ConfigurationBuilder setOptions(Map<String, String> options);
+  ConfigurationBuilder setOptions(Map<String, String> options);
 
   /**
    * Set the optional prefix for new configuration.
    */
-  public ConfigurationBuilder setPrefix(String prefix);
+  ConfigurationBuilder setPrefix(String prefix);
 
   /**
    * Copy everything from an existing Configuration instance. This also means
@@ -59,7 +59,7 @@ public interface ConfigurationBuilder {
    * If this method is called, it has to be the first method call on this
    * builder instance.
    */
-  public ConfigurationBuilder copyFrom(Configuration oldConfig);
+  ConfigurationBuilder copyFrom(Configuration oldConfig);
 
   /**
    * Load options from an InputStream with a "key = value" format.
@@ -72,7 +72,7 @@ public interface ConfigurationBuilder {
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
-  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source) throws IOException,
+  ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source) throws IOException,
       InvalidConfigurationException;
 
   /**
@@ -86,7 +86,7 @@ public interface ConfigurationBuilder {
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
   @Deprecated
-  public ConfigurationBuilder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException;
+  ConfigurationBuilder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from a file with a "key = value" format.
@@ -94,7 +94,7 @@ public interface ConfigurationBuilder {
    * @throws IOException If the file cannot be read.
    * @throws InvalidConfigurationException If the file contains an invalid format.
    */
-  public ConfigurationBuilder loadFromFile(String filename) throws IOException, InvalidConfigurationException;
+  ConfigurationBuilder loadFromFile(String filename) throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from a file with a "key = value" format.
@@ -102,7 +102,7 @@ public interface ConfigurationBuilder {
    * @throws IOException If the file cannot be read.
    * @throws InvalidConfigurationException If the file contains an invalid format.
    */
-  public ConfigurationBuilder loadFromFile(Path file) throws IOException, InvalidConfigurationException;
+  ConfigurationBuilder loadFromFile(Path file) throws IOException, InvalidConfigurationException;
 
   /**
    * Add a type converter for options with a certain type.
@@ -123,7 +123,7 @@ public interface ConfigurationBuilder {
    * @param converter A converter instance.
    * @return this
    */
-  public ConfigurationBuilder addConverter(Class<?> cls, TypeConverter converter);
+  ConfigurationBuilder addConverter(Class<?> cls, TypeConverter converter);
 
   /**
    * Create a Configuration instance with the settings specified by method
@@ -134,6 +134,6 @@ public interface ConfigurationBuilder {
    *
    * @throws InvalidConfigurationException if the settings contained invalid values for the configuration options of the Configuration class
    */
-  public Configuration build() throws InvalidConfigurationException;
+  Configuration build() throws InvalidConfigurationException;
 
 }

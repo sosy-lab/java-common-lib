@@ -43,7 +43,7 @@ public @interface FileOption {
   /**
    * More details for file options.
    */
-  public Type value();
+  Type value();
 
   public static enum Type {
     /**

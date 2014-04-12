@@ -35,10 +35,10 @@ public @interface Options {
    * An optional prefix for all configuration options of the class annotated
    * with this type. Prefix and name of the option will be separated by a dot.
    */
-  public String prefix() default "";
+  String prefix() default "";
 
   /**
    * An optional text, that describes the current options.
    */
-  public String description() default "";
+  String description() default "";
 }

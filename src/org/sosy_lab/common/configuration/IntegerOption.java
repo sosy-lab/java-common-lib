@@ -42,10 +42,10 @@ public @interface IntegerOption {
   /**
    * An optional minimum value for this option.
    */
-  public long min() default Long.MIN_VALUE;
+  long min() default Long.MIN_VALUE;
 
   /**
    * An optional maximum value for this option.
    */
-  public long max() default Long.MAX_VALUE;
+  long max() default Long.MAX_VALUE;
 }

@@ -33,7 +33,7 @@ public interface AbstractPathFactory {
    *
    * @return A Path instance
    */
-  public Path getPath(@Nullable String pathName, @Nullable String... more);
+  Path getPath(@Nullable String pathName, @Nullable String... more);
 
   /**
   * Creates a temporary path and returns the according Path instance.
@@ -47,5 +47,5 @@ public interface AbstractPathFactory {
   * @throws NullPointerException If the prefix is null.
   * @throws IllegalArgumentException if the prefix is shorter than 3 characters.
   */
-  public Path getTempPath(String prefix, @Nullable String suffix) throws IOException;
+  Path getTempPath(String prefix, @Nullable String suffix) throws IOException;
 }

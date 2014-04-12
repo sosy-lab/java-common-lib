@@ -52,7 +52,7 @@ public class PersistentSortedMaps {
    * A callback that is used when a key with two different values
    * is encountered during the merge of two maps.
    */
-  public static interface MergeConflictHandler<K, V> {
+  public interface MergeConflictHandler<K, V> {
 
     /**
      * Resolve a conflict for one given key.

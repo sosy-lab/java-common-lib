@@ -20,5 +20,5 @@
 package org.sosy_lab.common.configuration;
 
 public interface AbstractConfigurationBuilderFactory  {
-  public ConfigurationBuilder getBuilder();
+  ConfigurationBuilder getBuilder();
 }
