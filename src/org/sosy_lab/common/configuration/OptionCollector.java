@@ -32,9 +32,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -50,8 +50,6 @@ public class OptionCollector {
 
   private final static Pattern IGNORED_CLASSES = Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
   private final static int CHARS_PER_LINE = 75; // for description
-  private final static HashSet<String> errorMessages = new LinkedHashSet<>();
-  private static String sourcePath = "";
 
   /** The main-method collects all classes of a program and
    * then it searches for all {@link Option}s.
@@ -75,8 +73,26 @@ public class OptionCollector {
    *
    * @param verbose short or long output? */
   public static String getCollectedOptions(final boolean verbose) {
-    sourcePath = getSourcePath();
+    return new OptionCollector(verbose).getCollectedOptions();
+  }
 
+  private final Set<String> errorMessages = new LinkedHashSet<>();
+  private final String sourcePath;
+  private final boolean verbose;
+
+  /**
+   * @param pVerbose short or long output?
+   */
+  public OptionCollector(boolean pVerbose) {
+    verbose = pVerbose;
+    sourcePath = getSourcePath();
+  }
+
+  /**
+   * This function collects options from all classes
+   * and returns a formatted String.
+   */
+  public String getCollectedOptions() {
     // TreeMap for alphabetical order of keys
     final SortedMap<String, Pair<String, String>> map = new TreeMap<>();
 
@@ -89,7 +105,7 @@ public class OptionCollector {
 
     for (Class<?> c : getClasses()) {
       if (c.isAnnotationPresent(Options.class)) {
-        collectOptions(c, map, verbose);
+        collectOptions(c, map);
       }
       if (c.getPackage().getName().startsWith("org.sosy_lab.common")) {
         appendCommonOptions = false;
@@ -172,9 +188,9 @@ public class OptionCollector {
    *
    * @param c class where to take the Option from
    * @param map map with collected Options
-   * @param verbose short or long output? */
-  private static void collectOptions(final Class<?> c,
-      final SortedMap<String, Pair<String, String>> map, final boolean verbose) {
+   */
+  private void collectOptions(final Class<?> c,
+      final SortedMap<String, Pair<String, String>> map) {
     String classSource = getContentOfFile(c);
 
     for (final Field field : c.getDeclaredFields()) {
@@ -422,7 +438,7 @@ public class OptionCollector {
   /** This function returns the content of a sourcefile as String.
    *
    * @param field the field, the sourcefile belongs to */
-  private static String getContentOfFile(final Class<?> cls) {
+  private String getContentOfFile(final Class<?> cls) {
 
     // get name of sourcefile, remove prefix 'class_'
     String filename =
@@ -642,7 +658,7 @@ public class OptionCollector {
    *
    * @return list of classes
    */
-  private static List<Class<?>> getClasses() {
+  private List<Class<?>> getClasses() {
     Enumeration<URL> resources = getClassLoaderResources();
 
     final List<Class<?>> classes = new ArrayList<>();
@@ -666,7 +682,7 @@ public class OptionCollector {
    * @param packageName the package name for classes found inside the base directory
    * @param classes list where the classes are added.
    */
-  private static void collectClasses(final File directory,
+  private void collectClasses(final File directory,
       final String packageName, final List<Class<?>> classes) {
     if (directory.exists()) {
       final File[] files = directory.listFiles();
