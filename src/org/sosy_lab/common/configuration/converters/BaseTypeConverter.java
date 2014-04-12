@@ -134,8 +134,8 @@ public enum BaseTypeConverter implements TypeConverter {
       throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
           + method + "(" + paramType.getSimpleName() + ") method!");
     } catch (InvocationTargetException e) {
-      throw new InvalidConfigurationException("Could not parse \"" + optionName +
-          " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
+      throw new InvalidConfigurationException("Could not parse \"" + optionName
+          + " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
     }
   }
 }
