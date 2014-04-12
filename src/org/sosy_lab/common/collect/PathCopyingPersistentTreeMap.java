@@ -187,11 +187,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   // static creation methods
 
-  private static final PathCopyingPersistentTreeMap<?, ?> emptyMap = new PathCopyingPersistentTreeMap<String, Object>(null);
+  private static final PathCopyingPersistentTreeMap<?, ?> EMPTY_MAP = new PathCopyingPersistentTreeMap<String, Object>(null);
 
   @SuppressWarnings("unchecked")
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> of() {
-    return (PersistentSortedMap<K, V>) emptyMap;
+    return (PersistentSortedMap<K, V>) EMPTY_MAP;
   }
 
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> copyOf(Map<K, V> map) {

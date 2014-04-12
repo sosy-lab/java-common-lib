@@ -40,27 +40,27 @@ public final class Timer {
   /**
    * The clock we use for accessing the time.
    */
-  static final TickerWithUnit defaultClock;
+  static final TickerWithUnit DEFAULT_CLOCK;
   static {
     String clockToUse = System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").toUpperCase().trim();
     switch (clockToUse) {
     case "WALLTIME_MILLIS":
-      defaultClock = Tickers.getWalltimeMillis();
+      DEFAULT_CLOCK = Tickers.getWalltimeMillis();
       break;
     case "WALLTIME_NANOS":
-      defaultClock = Tickers.getWalltimeNanos();
+      DEFAULT_CLOCK = Tickers.getWalltimeNanos();
       break;
     case "THREAD_CPUTIME":
-      defaultClock = Tickers.getCurrentThreadCputime();
+      DEFAULT_CLOCK = Tickers.getCurrentThreadCputime();
       break;
     case "PROCESS_CPUTIME":
-      defaultClock = Tickers.getProcessCputime();
+      DEFAULT_CLOCK = Tickers.getProcessCputime();
       break;
     case "NONE":
-      defaultClock = Tickers.getNullTicker();
+      DEFAULT_CLOCK = Tickers.getNullTicker();
       break;
     default:
-      defaultClock = null;
+      DEFAULT_CLOCK = null;
     }
   }
 
@@ -95,11 +95,11 @@ public final class Timer {
    * Create a fresh timer in the not-running state.
    */
   public Timer() {
-    if (defaultClock == null) {
+    if (DEFAULT_CLOCK == null) {
       throw new IllegalArgumentException("Invalid value \'" + System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME) + "\'"
             + " for property " + DEFAULT_CLOCK_PROPERTY_NAME + ", cannot create Timer without explicitly specified clock.");
     }
-    clock = defaultClock;
+    clock = DEFAULT_CLOCK;
   }
 
   Timer(TickerWithUnit pClock) {
