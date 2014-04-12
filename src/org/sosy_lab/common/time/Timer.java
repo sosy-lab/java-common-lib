@@ -21,7 +21,8 @@ package org.sosy_lab.common.time;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 

@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.common.time;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;

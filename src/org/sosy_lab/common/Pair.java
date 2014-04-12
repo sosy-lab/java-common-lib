@@ -20,7 +20,8 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Objects.equal;
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
 
 import java.io.Serializable;

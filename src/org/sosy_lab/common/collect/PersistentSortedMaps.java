@@ -20,7 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterators.*;
+import static com.google.common.collect.Iterators.concat;
+import static com.google.common.collect.Iterators.singletonIterator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
