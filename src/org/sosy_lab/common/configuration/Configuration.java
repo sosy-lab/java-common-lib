@@ -730,7 +730,7 @@ public class Configuration {
    *
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
-   * @param type type of the object
+   * @param pType type of the object
    * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option
    */

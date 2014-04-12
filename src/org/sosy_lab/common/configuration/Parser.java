@@ -96,7 +96,7 @@ class Parser {
   /**
    * Parse a configuration file with the format as defined above.
    *
-   * @param filename The file to parse.
+   * @param file The file to parse.
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
    * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
@@ -112,7 +112,7 @@ class Parser {
    * Parse a configuration file with the format as defined above.
    *
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @param filename The file to parse.
+   * @param file The file to parse.
    * @param includeStack A set of all files present in the current stack of #include directives.
    * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.

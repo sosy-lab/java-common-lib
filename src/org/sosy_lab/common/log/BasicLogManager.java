@@ -320,7 +320,7 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
    * <code>wouldBeLogged(priority)</code> returns true before calling this message.
    *
    * @param priority the log level for the message
-   * @param trace the stack trace frame to use
+   * @param stackElement the stack trace frame to use
    * @param msg the message
    */
   private void log0(Level priority, StackTraceElement stackElement, String msg) {

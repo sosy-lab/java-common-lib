@@ -94,7 +94,7 @@ public class Appenders {
    * Return an {@link Appender} that writes a {@link Map} into the output
    * using a given {@link Joiner}.
    * @param joiner The joiner that will be used to create a string representation of the map.
-   * @param it The map which will be dumped.
+   * @param map The map which will be dumped.
    * @return an {@link Appender} instance
    */
   public static Appender forMap(final Joiner.MapJoiner joiner, final Map<?, ?> map) {

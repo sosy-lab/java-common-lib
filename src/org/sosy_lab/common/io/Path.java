@@ -156,7 +156,7 @@ public interface Path {
    * @see com.google.common.io.CharSink
    *
    * @param charset The charset to use.
-   * @param writeMode The write mode to use
+   * @param writeModes The write mode to use
    *
    * @return A CharSink
    */
