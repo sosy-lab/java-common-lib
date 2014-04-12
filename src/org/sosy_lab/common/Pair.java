@@ -71,9 +71,9 @@ public class Pair<A, B> implements Serializable {
 
   @Override
   public boolean equals(@Nullable Object other) {
-    return (other instanceof Pair<?,?>)
-      && equal(first,  ((Pair<?,?>)other).first)
-      && equal(second, ((Pair<?,?>)other).second);
+    return (other instanceof Pair<?, ?>)
+      && equal(first,  ((Pair<?, ?>)other).first)
+      && equal(second, ((Pair<?, ?>)other).second);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class Pair<A, B> implements Serializable {
     return Holder.<T, Void>getInstance().PROJECTION_TO_SECOND;
   }
 
-  public static <K,V> Function<Entry<? extends K, ? extends V>, Pair<K, V>> getPairFomMapEntry() {
+  public static <K, V> Function<Entry<? extends K, ? extends V>, Pair<K, V>> getPairFomMapEntry() {
     return Holder.<K, V>getInstance().PAIR_FROM_MAP_ENTRY;
   }
 
@@ -209,7 +209,7 @@ public class Pair<A, B> implements Serializable {
     checkNotNull(f1);
     checkNotNull(f2);
 
-    return new Function<Pair<A1,A2>, Pair<B1,B2>>() {
+    return new Function<Pair<A1, A2>, Pair<B1, B2>>() {
       @Override
       public Pair<B1, B2> apply(@Nonnull Pair<A1, A2> pInput) {
         return Pair.<B1, B2>of(f1.apply(pInput.getFirst()),

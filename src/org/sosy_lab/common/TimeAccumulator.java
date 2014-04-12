@@ -71,7 +71,7 @@ public class TimeAccumulator {
     Preconditions.checkArgument(pSlot < mMilliseconds.length);
     Preconditions.checkState(!mActive);
 
-    return mMilliseconds[pSlot]/1000.0;
+    return mMilliseconds[pSlot] / 1000.0;
   }
 
   public double getSeconds() {

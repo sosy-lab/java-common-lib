@@ -32,11 +32,11 @@ class LogUtils {
     String fullClassName = lr.getSourceClassName();
     int dotIndex = fullClassName.lastIndexOf('.');
     assert dotIndex < fullClassName.length() - 1 : "Last character in a class name cannot be a dot";
-  
+
     // if no dot is contained, dotIndex is -1 so we get the substring from 0,
     // i.e., the whole string (which is what we want)
-  
-    String className = fullClassName.substring(dotIndex+1);
+
+    String className = fullClassName.substring(dotIndex + 1);
     return className;
   }
 

@@ -284,7 +284,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
 
     @Override
     public int previousIndex() {
-      return nextIndex-1;
+      return nextIndex - 1;
     }
 
     @Override

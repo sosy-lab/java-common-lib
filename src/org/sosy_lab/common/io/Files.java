@@ -247,7 +247,7 @@ public final class Files {
     }
     parent.mkdirs();
     if (!parent.isDirectory()) {
-      throw new IOException("Unable to create parent directories of "+path);
+      throw new IOException("Unable to create parent directories of " + path);
     }
   }
 }

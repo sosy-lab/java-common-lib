@@ -54,7 +54,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
     TimeSpanOption option = (TimeSpanOption)pOption;
 
     // find unit in input string
-    int i = valueStr.length()-1;
+    int i = valueStr.length() - 1;
     CharMatcher letterMatcher = CharMatcher.JAVA_LETTER;
     while (i >= 0 && letterMatcher.matches(valueStr.charAt(i))) {
       i--;
@@ -64,13 +64,13 @@ public class TimeSpanTypeConverter implements TypeConverter {
     }
 
     // convert unit string to TimeUnit
-    TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i+1));
+    TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i + 1));
     if (userUnit == null) {
       userUnit = option.defaultUserUnit();
     }
 
     // Parse string without unit
-    long value = Long.parseLong(valueStr.substring(0, i+1).trim());
+    long value = Long.parseLong(valueStr.substring(0, i + 1).trim());
 
     // convert value from user unit to code unit
     TimeUnit codeUnit = option.codeUnit();
