@@ -36,10 +36,10 @@ import java.lang.annotation.Target;
 public @interface OptionDetailAnnotation {
 
   /**
-   * The annotation is applicable to configuration of these types or sub-types
-   * thereof. If a wrapper class of a primitive type is added here, the
-   * annotation automatically is also applicable to the corresponding primitive
-   * type.
+   * The annotation is applicable to configuration of these types.
+   * If a wrapper class of a primitive type is added here,
+   * the annotation automatically is also applicable to the corresponding primitive type.
+   * Otherwise types have to match exactly, i.e., no sub-types and super types.
    */
   Class<?>[] applicableTo();
 }
