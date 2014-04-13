@@ -159,7 +159,7 @@ public final class Configuration {
   private static final Splitter ARRAY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
   /** Map that stores which implementation we use for the collection classes. */
-  private static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
+  static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
   static {
     ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder = ImmutableMap.builder();
 
@@ -260,8 +260,11 @@ public final class Configuration {
   private LogManager logger = null;
 
   /*
-   * This constructor does not set the fields annotated with @Option!
+   * This constructor does not set the fields annotated with @Option
+   * to avoid the exception in the signature,
+   * the caller needs to make sure to set the values or inject them.
    */
+  @SuppressWarnings("options")
   Configuration(ImmutableMap<String, String> pProperties,
       ImmutableMap<String, Path> pSources,
       String pPrefix,
