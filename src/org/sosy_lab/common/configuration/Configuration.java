@@ -84,7 +84,7 @@ import com.google.common.primitives.Primitives;
  * useful access helper methods.
  */
 @Options
-public class Configuration {
+public final class Configuration {
 
   private static AbstractConfigurationBuilderFactory builderFactory;
 
@@ -262,7 +262,7 @@ public class Configuration {
   /*
    * This constructor does not set the fields annotated with @Option!
    */
-  protected Configuration(ImmutableMap<String, String> pProperties,
+  Configuration(ImmutableMap<String, String> pProperties,
       ImmutableMap<String, Path> pSources,
       String pPrefix,
       ImmutableMap<Class<?>, TypeConverter> pConverters,
