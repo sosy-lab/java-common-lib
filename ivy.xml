@@ -57,6 +57,6 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_ant" rev="1.1.1" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_ant" rev="1.1.1" transitive="false" conf="build->default" />
     </dependencies>
 </ivy-module>
