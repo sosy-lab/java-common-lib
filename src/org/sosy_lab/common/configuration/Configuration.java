@@ -689,16 +689,10 @@ public final class Configuration {
       return;
     }
 
-    Class<?>[] applicableTypes = annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo();
+    List<Class<?>> applicableTypes = Arrays.asList(
+        annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
 
-    boolean applicable = false;
-    for (Class<?> candidate : applicableTypes) {
-      if (candidate.isAssignableFrom(optionType)) {
-        return;
-      }
-    }
-
-    if (!applicable) {
+    if (!applicableTypes.contains(optionType)) {
       throw new UnsupportedOperationException("Annotation " + annotation + " is not applicable for options of type " + optionType.getCanonicalName());
     }
   }
