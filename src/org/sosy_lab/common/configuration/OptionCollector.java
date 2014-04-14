@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -41,7 +42,6 @@ import java.util.regex.Pattern;
 
 import org.sosy_lab.common.Pair;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
@@ -125,7 +125,7 @@ public class OptionCollector {
     // add options of this library
     if (appendCommonOptions) {
       try {
-        content.append(Resources.toString(Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt"), Charsets.UTF_8));
+        content.append(Resources.toString(Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt"), StandardCharsets.UTF_8));
       } catch (Exception e) {
         System.err.println("Could not find options of org.sosy-lab.common classes: " + e.getMessage());
       }
