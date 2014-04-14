@@ -22,6 +22,7 @@ package org.sosy_lab.common;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import javax.annotation.Nullable;
 
 import org.sosy_lab.common.io.Path;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
 /**
@@ -49,7 +49,7 @@ public final class JSON {
    * @throws IOException
    */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
-    try (Writer out = file.asCharSink(Charsets.US_ASCII).openStream()) { // We escape everything, so pure ASCII remains
+    try (Writer out = file.asCharSink(StandardCharsets.US_ASCII).openStream()) { // We escape everything, so pure ASCII remains
       writeJSONString(value, out);
     }
   }

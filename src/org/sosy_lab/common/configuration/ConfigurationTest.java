@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -37,7 +38,6 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
@@ -126,7 +126,7 @@ public class ConfigurationTest {
                            .build();
     TestCharsetOptions options = new TestCharsetOptions();
     config.inject(options);
-    assertEquals(Charsets.UTF_8, options.charset);
+    assertEquals(StandardCharsets.UTF_8, options.charset);
   }
 
   @Test(expected=InvalidConfigurationException.class)
