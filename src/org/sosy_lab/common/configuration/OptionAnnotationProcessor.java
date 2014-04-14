@@ -87,6 +87,9 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    checkNotNull(annotations);
+    checkNotNull(roundEnv);
+
     for (Class<? extends Annotation> annotation : KNOWN_OPTION_DETAIL_ANNOTATIONS) {
       for (Element elem : roundEnv.getElementsAnnotatedWith(annotation)) {
         processOptionDetailAnnotation(elem, annotation);
