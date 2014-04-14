@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
+import com.google.common.io.CharSource;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
@@ -30,5 +31,6 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(String[].class, new String[]{"test"});
     setDefault(Path.class, Paths.get("test"));
     setDefault(Configuration.class, Configuration.defaultConfiguration());
+    setDefault(CharSource.class, CharSource.wrap("test"));
   }
 }

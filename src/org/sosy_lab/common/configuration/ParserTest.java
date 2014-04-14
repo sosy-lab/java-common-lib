@@ -21,10 +21,8 @@ package org.sosy_lab.common.configuration;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +34,8 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSource;
 
 public class ParserTest {
 
@@ -54,9 +52,7 @@ public class ParserTest {
   }
 
   private Map<String, String> test(String content) throws IOException, InvalidConfigurationException {
-    InputStream stream = new ByteArrayInputStream(content.getBytes(Charsets.UTF_8));
-
-    return Parser.parse(stream, basePath, "test").getFirst();
+    return Parser.parse(CharSource.wrap(content), basePath, "test").getFirst();
   }
 
   private void testEmpty(String content) {

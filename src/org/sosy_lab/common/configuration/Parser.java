@@ -23,8 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,9 +37,9 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharSource;
 
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
@@ -135,39 +134,41 @@ class Parser {
       throw new InvalidConfigurationFileException("Circular inclusion of file " + file.toAbsolutePath());
     }
 
-    try (InputStream is = file.asByteSource().openStream()) {
-      return parse(is, file.getParent().getPath(), file.getPath(), includeStack);
+    try (BufferedReader r = file.asCharSource(StandardCharsets.UTF_8).openBufferedStream()) {
+      return parse(r, file.getParent().getPath(), file.getPath(), includeStack);
     }
   }
 
   /**
-   * Parse a configuration file given as an {@link InputStream} with the format as defined above.
+   * Parse a configuration file given as a {@link CharSource} with the format as defined above.
    *
-   * The stream is left open after this method returns.
-   * This method may itself open files from the filesystem if they are included,
-   * those files are closed.
+   * A stream from this source is opened and closed by this method.
+   * This method may additionally access more files from the file system
+   * if they are included.
    *
-   * @param is The stream to read the file from.
+   * @param source The source to read the file from.
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
+   * @param sourceName A string to use as source of the file in error messages (this should usually be a filename or something similar).
    * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Pair<Map<String, String>, Map<String, Path>> parse(InputStream is, @Nullable String basePath,
-      String source) throws IOException, InvalidConfigurationException {
+  static Pair<Map<String, String>, Map<String, Path>> parse(CharSource source, @Nullable String basePath,
+      String sourceName) throws IOException, InvalidConfigurationException {
 
-    return parse(is, basePath, source, Collections.<String>emptySet());
+    try (BufferedReader r = source.openBufferedStream()) {
+      return parse(r, basePath, sourceName, Collections.<String>emptySet());
+    }
   }
 
   /**
-   * Parse a configuration file given as an {@link InputStream} with the format as defined above.
+   * Parse a configuration file given as a {@link BufferedReader} with the format as defined above.
    *
-   * The stream is left open after this method returns.
-   * This method may itself open files from the filesystem if they are included,
-   * those files are closed.
+   * The reader is left open after this method returns.
+   * This method may additionally access more files from the file system
+   * if they are included.
    *
-   * @param is The stream to read the file from.
+   * @param r The reader to read the file from.
    * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
    * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
    * @param includeStack A set of all files present in the current stack of #include directives.
@@ -176,11 +177,9 @@ class Parser {
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   private static Pair<Map<String, String>, Map<String, Path>> parse(
-      InputStream is, @Nullable String basePath,
+      BufferedReader r, @Nullable String basePath,
       String source, Set<String> includeStack) throws IOException, InvalidConfigurationException {
     checkNotNull(source);
-
-    BufferedReader r = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
 
     String line;
     int lineno = 0;
