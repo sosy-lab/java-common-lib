@@ -26,6 +26,8 @@ import java.util.Map;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 
+import com.google.common.io.CharSource;
+
 
 
 public interface ConfigurationBuilder {
@@ -62,6 +64,22 @@ public interface ConfigurationBuilder {
   ConfigurationBuilder copyFrom(Configuration oldConfig);
 
   /**
+   * Load options from a {@link CharSource} with a "key = value" format.
+   *
+   * A stream from this source is opened and closed by this method.
+   * This method may additionally access more files from the file system
+   * if they are included.
+   *
+   * @param source The source to read from.
+   * @param basePath The directory where relative #include directives should be based on.
+   * @param sourceName A string to use as source of the file in error messages (this should usually be a filename or something similar).
+   * @throws IOException If the stream cannot be read.
+   * @throws InvalidConfigurationException If the stream contains an invalid format.
+   */
+  ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName) throws IOException,
+      InvalidConfigurationException;
+
+  /**
    * Load options from an InputStream with a "key = value" format.
    *
    * The stream remains open after this method returns.
@@ -72,6 +90,7 @@ public interface ConfigurationBuilder {
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
+  @Deprecated
   ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source) throws IOException,
       InvalidConfigurationException;
 

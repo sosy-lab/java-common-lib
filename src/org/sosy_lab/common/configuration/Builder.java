@@ -21,6 +21,7 @@ package org.sosy_lab.common.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +36,9 @@ import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharSource;
 
 public class Builder implements ConfigurationBuilder {
 
@@ -130,19 +134,35 @@ public class Builder implements ConfigurationBuilder {
   }
 
   /* (non-Javadoc)
-   * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromStream(java.io.InputStream, java.lang.String, java.lang.String)
+   * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromSource(com.google.common.io.CharSource, java.lang.String, java.lang.String)
    */
   @Override
-  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source) throws IOException, InvalidConfigurationException {
-    Preconditions.checkNotNull(stream);
+  public ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName) throws IOException, InvalidConfigurationException {
+    Preconditions.checkNotNull(source);
     Preconditions.checkNotNull(basePath);
     setupProperties();
 
-    final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(stream, basePath, source);
+    final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(source, basePath, sourceName);
     properties.putAll(content.getFirst());
     sources.putAll(content.getSecond());
 
     return this;
+  }
+
+  /* (non-Javadoc)
+   * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromStream(java.io.InputStream, java.lang.String, java.lang.String)
+   */
+  @Deprecated
+  @Override
+  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String sourceName) throws IOException, InvalidConfigurationException {
+    Preconditions.checkNotNull(stream);
+    Preconditions.checkNotNull(basePath);
+
+    byte[] rawContent = ByteStreams.toByteArray(stream);
+    CharSource source = ByteSource.wrap(rawContent)
+                                  .asCharSource(StandardCharsets.UTF_8);
+
+    return loadFromSource(source, basePath, sourceName);
   }
 
   /* (non-Javadoc)
