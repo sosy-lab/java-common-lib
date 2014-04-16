@@ -92,15 +92,27 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
     for (Class<? extends Annotation> annotation : KNOWN_OPTION_DETAIL_ANNOTATIONS) {
       for (Element elem : roundEnv.getElementsAnnotatedWith(annotation)) {
+        if (elem.getAnnotation(annotation) == null) {
+          // might happen for files with compile errors
+          continue;
+        }
         processOptionDetailAnnotation(elem, annotation);
       }
     }
 
     for (Element elem : roundEnv.getElementsAnnotatedWith(Options.class)) {
+      if (elem.getAnnotation(Options.class) == null) {
+        // might happen for files with compile errors
+        continue;
+      }
       processOptions(elem);
     }
 
     for (Element elem : roundEnv.getElementsAnnotatedWith(Option.class)) {
+      if (elem.getAnnotation(Option.class) == null) {
+        // might happen for files with compile errors
+        continue;
+      }
       processOption(elem);
       checkOptionDetailAnnotations(elem);
     }
@@ -131,6 +143,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     if (elem.getKind() != ElementKind.CLASS) {
       message(ERROR, elem, Options.class,
           "@Options annotation can only be used on classes.");
+      return;
     }
     TypeElement element = (TypeElement)elem;
 
