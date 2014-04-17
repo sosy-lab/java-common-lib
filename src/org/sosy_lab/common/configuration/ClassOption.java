@@ -38,8 +38,11 @@ import java.lang.annotation.Target;
 public @interface ClassOption {
 
   /**
-   * This field provides an optional package prefix that will be added to the
-   * specified class name, if a class with the specified name is not found.
+   * This field provides optional package prefixes that can be added to the
+   * specified class name.
+   * First the specified class name is tried without any prefix,
+   * and then with each prefix in the given order.
+   * The result is the first class that is found.
    */
-  String packagePrefix() default "";
+  String[] packagePrefix() default "";
 }

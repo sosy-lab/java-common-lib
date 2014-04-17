@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 
 import org.sosy_lab.common.Pair;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
@@ -586,8 +587,8 @@ public class OptionCollector {
     final ClassOption classOption = field.getAnnotation(ClassOption.class);
     String str = "";
     if (classOption != null) {
-      if (verbose && !classOption.packagePrefix().isEmpty()) {
-        str += "  packagePrefix: " + classOption.packagePrefix() + "\n";
+      if (verbose && classOption.packagePrefix().length != 0) {
+        str += "  packagePrefix: " + Joiner.on(", ").join(classOption.packagePrefix()) + "\n";
       }
     }
     return str;
