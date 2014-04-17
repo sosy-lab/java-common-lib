@@ -21,11 +21,15 @@ package org.sosy_lab.common.configuration.converters;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Path;
+
+import com.google.common.collect.Iterables;
 
 
 public class ClassTypeConverter implements TypeConverter {
@@ -34,23 +38,30 @@ public class ClassTypeConverter implements TypeConverter {
   public Object convert(String optionName, String value, Class<?> type, Type genericType,
       Annotation secondaryOption, Path pSource) throws InvalidConfigurationException {
 
+    Iterable<String> packagePrefixes = Collections.<String>singleton(null); // null means "no prefix"
+
     // get optional package prefix
-    String packagePrefix = "";
     if (secondaryOption != null) {
       if (!(secondaryOption instanceof ClassOption)) {
         throw new UnsupportedOperationException("Options of type Class may not be annotated with " + secondaryOption);
       }
-      packagePrefix = ((ClassOption) secondaryOption).packagePrefix();
+      packagePrefixes = Iterables.concat(packagePrefixes,
+          Arrays.asList(((ClassOption) secondaryOption).packagePrefix()));
     }
 
     // get value of type parameter
     Class<?> targetType = Classes.getComponentType(genericType).getFirst();
 
     // get class object
-    Class<?> cls;
-    try {
-      cls = Classes.forName(value, packagePrefix);
-    } catch (ClassNotFoundException e) {
+    Class<?> cls = null;
+    for (String prefix : packagePrefixes) {
+      try {
+        cls = Classes.forName(value, prefix);
+      } catch (ClassNotFoundException _) {
+        // Ignore, we try next prefix and throw below if none is found.
+      }
+    }
+    if (cls == null) {
       throw new InvalidConfigurationException("Class " + value + " specified in option " + optionName + " not found");
     }
 
