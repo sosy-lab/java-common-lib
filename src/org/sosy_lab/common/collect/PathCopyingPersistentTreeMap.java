@@ -28,11 +28,13 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -42,7 +44,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -766,7 +767,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       Map.Entry<?, ?> other = (Map.Entry<?, ?>)pO;
       Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
 
-      return (thisNode != null) && Objects.equal(thisNode.getValue(), other.getValue());
+      return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
     }
 
     @Override
@@ -834,7 +835,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
         } else {
           // thisEntry == otherEntry
-          if (!Objects.equal(thisEntry.getKey(), otherEntry.getKey())) {
+          if (!Objects.equals(thisEntry.getKey(), otherEntry.getKey())) {
             // value mis-match
             return false;
           }
@@ -960,7 +961,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>>
     create(@Nullable Node<K, V> root) {
       if (root == null) {
-        return Iterators.emptyIterator();
+        return Collections.emptyIterator();
       } else {
         return new EntryInOrderIterator<>(root, null, null);
       }
@@ -974,7 +975,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>>
     createWithBounds(@Nullable Node<K, V> root, @Nullable K pFromKey, @Nullable K pToKey) {
       if (root == null) {
-        return Iterators.emptyIterator();
+        return Collections.emptyIterator();
       } else {
         return new EntryInOrderIterator<>(root, pFromKey, pToKey);
       }
@@ -1255,7 +1256,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
         Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
 
-        return (thisNode != null) && Objects.equal(thisNode.getValue(), other.getValue());
+        return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
       }
 
       @Override

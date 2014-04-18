@@ -29,11 +29,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
@@ -177,7 +177,7 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T> implement
     // find position of value and update suffix
     int pos = 0;
     for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
-      if (Objects.equal(value, list.head)) {
+      if (Objects.equals(value, list.head)) {
         suffix = list.tail;
         break;
       }

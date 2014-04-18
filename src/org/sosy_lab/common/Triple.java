@@ -19,12 +19,12 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -70,9 +70,9 @@ public class Triple<A, B, C> implements Serializable {
   @Override
   public boolean equals(@Nullable Object other) {
     return (other instanceof Triple<?, ?, ?>)
-      && equal(first,  ((Triple<?, ?, ?>)other).first)
-      && equal(second, ((Triple<?, ?, ?>)other).second)
-      && equal(third,  ((Triple<?, ?, ?>)other).third);
+      && Objects.equals(first,  ((Triple<?, ?, ?>)other).first)
+      && Objects.equals(second, ((Triple<?, ?, ?>)other).second)
+      && Objects.equals(third,  ((Triple<?, ?, ?>)other).third);
   }
 
   @Override
