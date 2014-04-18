@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
@@ -31,6 +30,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -73,8 +73,8 @@ public class Pair<A, B> implements Serializable {
   @Override
   public boolean equals(@Nullable Object other) {
     return (other instanceof Pair<?, ?>)
-      && equal(first,  ((Pair<?, ?>)other).first)
-      && equal(second, ((Pair<?, ?>)other).second);
+      && Objects.equals(first,  ((Pair<?, ?>)other).first)
+      && Objects.equals(second, ((Pair<?, ?>)other).second);
   }
 
   @Override
