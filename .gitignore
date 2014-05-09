@@ -5,6 +5,7 @@
 /TEST-*.txt
 /junit
 /JUnit.html
+/JUnit-coverage
 /FindBugs.html
 /FindBugs.xml
 /FindBugs.diff.html
