@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab : -->
-<project basedir="." default="build" name="Sosy-Lab Common Library" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project basedir="." default="build" name="Sosy-Lab Common Library"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:jacoco="antlib:org.jacoco.ant">
     <!-- Include a file in which all properties can be overridden.
          This file won't get checked in and can be used to change properties
          locally for one machine if necessary. -->
@@ -158,8 +160,15 @@
                  classpath="${ivy.jar.dir}/ant-junit.jar"/>
     </target>
 
-    <target description="Run all JUnit tests" depends="build, load-junit" name="tests">
+    <target name="load-jacoco" depends="resolve-dependencies">
+        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+            <classpath><fileset dir="${ivy.jar.dir}" includes="org.jacoco.*.jar asm-debug-all.jar"/></classpath>
+        </taskdef>
+    </target>
+
+    <target description="Run all JUnit tests" depends="build, load-junit, load-jacoco" name="tests">
         <mkdir dir="${junit.dir}"/>
+        <jacoco:coverage destfile="${junit.dir}/jacoco.exec">
         <junit fork="true" printSummary="true" showOutput="false" failureproperty="junit.failed" timeout="100000">
             <assertions>
             <enable />
@@ -172,6 +181,15 @@
                 </fileset>
             </batchtest>
         </junit>
+        </jacoco:coverage>
+        <jacoco:report>
+            <executiondata><file file="${junit.dir}/jacoco.exec"/></executiondata>
+            <structure name="SoSy-Lab Common">
+                <classfiles><fileset dir="${class.dir}"/></classfiles>
+                <sourcefiles encoding="UTF-8"><fileset dir="${source.dir}"/></sourcefiles>
+            </structure>
+            <html destdir="JUnit-coverage"/>
+        </jacoco:report>
         <junitreport todir="${junit.dir}">
             <fileset dir="${junit.dir}">
                 <include name="TEST-*.xml" />
