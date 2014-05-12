@@ -163,11 +163,11 @@ public final class TimeSpan implements Comparable<TimeSpan> {
   @Override
   public int compareTo(TimeSpan other) {
     if (this.unit == other.unit) {
-      return Longs.compare(this.span, other.span);
+      return Long.compare(this.span, other.span);
     }
     TimeUnit leastCommonUnit = leastCommonUnit(this, other);
-    return Longs.compare(this.get(leastCommonUnit),
-                         other.get(leastCommonUnit));
+    return Long.compare(this.get(leastCommonUnit),
+                        other.get(leastCommonUnit));
   }
 
   private static TimeUnit leastCommonUnit(TimeSpan a, TimeSpan b) {
