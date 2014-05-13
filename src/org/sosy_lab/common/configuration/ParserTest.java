@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.CharSource;
 
 public class ParserTest {
@@ -295,7 +295,7 @@ public class ParserTest {
   public final void includeDepthN() throws IOException {
     Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
 
-    List<Path> allFiles = Lists.newArrayList();
+    List<Path> allFiles = new ArrayList<>();
     allFiles.add(included);
 
     for (int i = 0; i < MAX_INCLUDE_TEST_DEPTH; i++) {
@@ -352,7 +352,7 @@ public class ParserTest {
   public final void recursiveIncludeDepthN() throws IOException, InvalidConfigurationException {
     Path firstIncluded = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
 
-    List<Path> allFiles = Lists.newArrayList();
+    List<Path> allFiles = new ArrayList<>();
     allFiles.add(firstIncluded);
     Path included = firstIncluded;
 
