@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +39,6 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.io.CharSource;
 
 /**
@@ -186,9 +186,9 @@ class Parser {
     String currentPrefix = "";
     String currentOptionName = null;
     String currentValue = null;
-    Map<String, String> definedOptions = Maps.newHashMap();
-    Map<String, String> includedOptions = Maps.newHashMap();
-    Map<String, Path> includedOptionsSources = Maps.newHashMap();
+    Map<String, String> definedOptions = new HashMap<>();
+    Map<String, String> includedOptions = new HashMap<>();
+    Map<String, Path> includedOptionsSources = new HashMap<>();
 
     while ((line = r.readLine()) != null) {
       lineno++;
