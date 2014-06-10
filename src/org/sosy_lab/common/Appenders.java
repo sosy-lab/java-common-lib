@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
@@ -196,6 +197,65 @@ public class Appenders {
    */
   public static String toString(Appender a) {
     return appendTo(new StringBuilder(), a).toString();
+  }
+
+  private static class SizeLimitReachedException extends IOException {
+    private static final long serialVersionUID = 1855247676627224183L;
+  }
+
+  /**
+   * Convert an {@link Appender} into a string by calling it's {@link Appender#appendTo(Appendable)} method.
+   *
+   * This method truncates the returned string at a given length,
+   * and tries to be more efficient than generating the full string
+   * and truncating it at the end (though no guarantees are made).
+   *
+   * @param a The {@link Appender} to convert into a string.
+   * @param truncateAt The maximum size of the returned string (>= 0).
+   * @return a string representation of the passed object, with a maximum size of <code>truncateAt</code>
+   */
+  public static String toStringWithTruncation(Appender a, final int truncateAt) {
+    checkArgument(truncateAt >= 0, "Maximum size of String cannot be negative");
+    final StringBuilder sb = new StringBuilder();
+    Appendable limiter = new Appendable() {
+
+      private void checkSize() throws SizeLimitReachedException {
+        if (sb.length() >= truncateAt) {
+          throw new SizeLimitReachedException();
+        }
+      }
+
+      @Override
+      public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
+        sb.append(pCsq, pStart, pEnd);
+        checkSize();
+        return this;
+      }
+
+      @Override
+      public Appendable append(char pC) throws IOException {
+        sb.append(pC);
+        checkSize();
+        return this;
+      }
+
+      @Override
+      public Appendable append(CharSequence pCsq) throws IOException {
+        sb.append(pCsq);
+        checkSize();
+        return this;
+      }
+    };
+
+    try {
+      a.appendTo(limiter);
+    } catch (SizeLimitReachedException e) {
+      assert sb.length() >= truncateAt;
+      sb.setLength(truncateAt);
+    } catch (IOException e) {
+      throw new AssertionError("StringBuilder threw IOException", e);
+    }
+    return sb.toString();
   }
 
   /**
