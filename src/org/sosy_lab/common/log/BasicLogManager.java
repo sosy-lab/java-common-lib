@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import org.sosy_lab.common.AbstractMBean;
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -336,11 +338,18 @@ public class BasicLogManager implements org.sosy_lab.common.LogManager {
   private String buildMessageText(Object... args) {
     String[] argsStr = new String[args.length];
     for (int i = 0; i < args.length; i++) {
-      String arg = firstNonNull(args[i], "null").toString();
+      Object o = firstNonNull(args[i], "null");
+      String arg;
+      if (o instanceof Appender && (truncateSize > 0)) {
+        arg = Appenders.toStringWithTruncation((Appender)o, truncateSize + 1);
+      } else {
+        arg = o.toString();
+      }
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
+        String length = (o instanceof Appender) ? ">= " + truncateSize : arg.length() + "";
         argsStr[i] = arg.substring(0, truncateRemainingSize)
-                   + "... <REMAINING ARGUMENT OMITTED BECAUSE " + arg.length() + " CHARACTERS LONG>";
+                   + "... <REMAINING ARGUMENT OMITTED BECAUSE " + length + " CHARACTERS LONG>";
       } else {
         argsStr[i] = arg;
       }
