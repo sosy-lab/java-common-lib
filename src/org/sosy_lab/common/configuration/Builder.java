@@ -134,6 +134,22 @@ public class Builder implements ConfigurationBuilder {
   }
 
   /* (non-Javadoc)
+   * @see org.sosy_lab.common.configuration.ConfigurationBuilder#copyOptionFrom(org.sosy_lab.common.configuration.Configuration, java.lang.String)
+   */
+  @Override
+  public ConfigurationBuilder copyOptionFrom(Configuration oldConfig, String option) throws IllegalArgumentException {
+    Preconditions.checkNotNull(oldConfig);
+    Preconditions.checkNotNull(option);
+    Preconditions.checkArgument(oldConfig.properties.containsKey(option));
+    setupProperties();
+
+    properties.put(option, oldConfig.properties.get(option));
+    sources.put(option, oldConfig.sources.get(option));
+
+    return this;
+  }
+
+  /* (non-Javadoc)
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromSource(com.google.common.io.CharSource, java.lang.String, java.lang.String)
    */
   @Override

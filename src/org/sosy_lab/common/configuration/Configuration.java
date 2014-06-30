@@ -308,6 +308,18 @@ public final class Configuration {
     return result;
   }
 
+  /**
+   * Check whether an option has a specified value.
+   * USE OF THIS METHOD IS NOT RECOMMENDED!
+   *
+   * If possible, use {@link Option} and {@link #inject(Object)}.
+   * This provides type safety, documentation, logging, default values, etc.
+   */
+  public boolean hasProperty(String key) {
+    return properties.containsKey(prefix + key)
+        || properties.containsKey(key);
+  }
+
   public Set<String> getUnusedProperties() {
     return Collections.unmodifiableSet(unusedProperties);
   }
