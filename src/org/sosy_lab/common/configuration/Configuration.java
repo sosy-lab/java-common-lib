@@ -316,6 +316,7 @@ public final class Configuration {
    * This provides type safety, documentation, logging, default values, etc.
    */
   public boolean hasProperty(String key) {
+    checkNotNull(key);
     return properties.containsKey(prefix + key)
         || properties.containsKey(key);
   }
