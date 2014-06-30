@@ -64,6 +64,22 @@ public interface ConfigurationBuilder {
   ConfigurationBuilder copyFrom(Configuration oldConfig);
 
   /**
+   * Copy one single option from another Configuration instance,
+   * overwriting the value in this builder, if it is already set.
+   * The given Configuration instance needs to have a value for this option.
+   *
+   * It is better to use this method instead of
+   * <code>setOption(option, oldConfig.getProperty(option))</code>,
+   * because it retains the mapping to the source of this value,
+   * which allows better error messages and resolving relative file paths.
+   *
+   * @param oldConfig A configuration instance with a value for option.
+   * @param option The name of a configuration option.
+   * @throws IllegalArgumentException If the given configuration does not specify a value for the given option.
+   */
+  ConfigurationBuilder copyOptionFrom(Configuration oldConfig, String option) throws IllegalArgumentException;
+
+  /**
    * Load options from a {@link CharSource} with a "key = value" format.
    *
    * A stream from this source is opened and closed by this method.
