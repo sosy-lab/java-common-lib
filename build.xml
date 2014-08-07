@@ -125,6 +125,7 @@
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
             <compilerarg value="-Xlint"/>
+            <compilerarg value="-Werror"/>
         </javac>
     </target>
 
