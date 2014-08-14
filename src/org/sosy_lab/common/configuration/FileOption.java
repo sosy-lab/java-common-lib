@@ -28,13 +28,14 @@ import java.lang.annotation.Target;
 
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.PathTemplate;
 
 /**
  * This is an annotation providing more features for options of types {@link File} and {@link Path}.
  * In order to use it, you need to register an instance of {@link FileTypeConverter}
  * as a converter for {@link FileOption}.
  */
-@OptionDetailAnnotation(applicableTo={File.class, Path.class})
+@OptionDetailAnnotation(applicableTo={File.class, Path.class, PathTemplate.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

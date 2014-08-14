@@ -30,6 +30,7 @@ import com.google.common.testing.AbstractPackageSanityTests;
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
+    setDefault(String.class, "test");
     setDefault(String[].class, new String[]{"test"});
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
