@@ -494,18 +494,10 @@ public class OptionCollector {
         }
 
         // remove brackets from file: new File("example.txt") --> "example.txt"
-        if (defaultValue.startsWith("new File(")) {
-          defaultValue = defaultValue.substring("new File(".length(), defaultValue.length() - 1);
-        }
-        if (defaultValue.startsWith("Paths.get(")) {
-          defaultValue = defaultValue.substring("Paths.get(".length(), defaultValue.length() - 1);
-        }
-        if (defaultValue.startsWith("new Path(")) {
-          defaultValue = defaultValue.substring("new Path(".length(), defaultValue.length() - 1);
-        }
-        if (defaultValue.startsWith("Pattern.compile(")) {
-          defaultValue = defaultValue.substring("Pattern.compile(".length(), defaultValue.length() - 1);
-        }
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "new File");
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "Paths.get");
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "new Path");
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "Pattern.compile");
 
         if (defaultValue.startsWith("ImmutableSet.of(")) {
           defaultValue = "{" + defaultValue.substring(
@@ -527,6 +519,18 @@ public class OptionCollector {
       // TODO: other types of generics?
     }
     return defaultValue.trim();
+  }
+
+  /**
+   * If the string matches something like "<func>(<args>)" for a given <func>,
+   * return only the <args> part, otherwise the full string.
+   */
+  private static String stripSurroundingFunctionCall(String s, String partToBeStripped) {
+    String toBeStripped = partToBeStripped + "(";
+    if (s.startsWith(toBeStripped)) {
+      return s.substring(toBeStripped.length(), s.length() - 1);
+    }
+    return s;
   }
 
   /** This function returns the allowed values or interval for a field.
