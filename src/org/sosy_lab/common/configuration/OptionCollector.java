@@ -498,6 +498,7 @@ public class OptionCollector {
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Paths.get");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "new Path");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Pattern.compile");
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "PathTemplate.ofFormatString");
 
         if (defaultValue.startsWith("ImmutableSet.of(")) {
           defaultValue = "{" + defaultValue.substring(
