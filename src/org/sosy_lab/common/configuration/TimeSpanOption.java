@@ -25,6 +25,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
+
+import org.sosy_lab.common.time.TimeSpan;
 /**
  * This is an annotation for all integer options that specify some sort of time
  * duration (e.g., a timeout).
@@ -36,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * Supported units are "ns", "ms", "s", "min", and "h".
  * Microseconds are not supported.
  */
-@OptionDetailAnnotation(applicableTo={Integer.class, Long.class})
+@OptionDetailAnnotation(applicableTo={Integer.class, Long.class, TimeSpan.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
@@ -50,8 +52,9 @@ public @interface TimeSpanOption {
 
   /**
    * The unit which will be used to write the value from the user into the
-   * annotated field.
-   * This is also the unit of the default value of this option (if one is given)!
+   * annotated field if the field is of type int or long.
+   * This is also the unit of the default value of this option (if one is given),
+   * and of the minimum and maximum value!
    */
   TimeUnit codeUnit();
 
