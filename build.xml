@@ -136,6 +136,7 @@
         <java classname="org.sosy_lab.common.configuration.OptionCollector"
             fork="true"
             output="${class.dir}/org/sosy_lab/common/ConfigurationOptions.txt" append="false"
+            failonerror="true"
             logError="true">
 
             <classpath refid="classpath"/>
