@@ -501,6 +501,19 @@ public class OptionCollector {
         defaultValue = stripSurroundingFunctionCall(defaultValue, "PathTemplate.ofFormatString");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "PathCounterTemplate.ofFormatString");
 
+        if (defaultValue.startsWith("TimeSpan.ofNanos(")) {
+          defaultValue = defaultValue.substring(
+              "TimeSpan.ofNanos(".length(), defaultValue.length() - 1) + "ns";
+        }
+        if (defaultValue.startsWith("TimeSpan.ofMillis(")) {
+          defaultValue = defaultValue.substring(
+              "TimeSpan.ofMillis(".length(), defaultValue.length() - 1) + "ms";
+        }
+        if (defaultValue.startsWith("TimeSpan.ofSeconds(")) {
+          defaultValue = defaultValue.substring(
+              "TimeSpan.ofSeconds(".length(), defaultValue.length() - 1) + "s";
+        }
+
         if (defaultValue.startsWith("ImmutableSet.of(")) {
           defaultValue = "{" + defaultValue.substring(
               "ImmutableSet.of(".length(), defaultValue.length() - 1) + "}";

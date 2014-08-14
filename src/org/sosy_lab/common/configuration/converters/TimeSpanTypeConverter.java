@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.time.TimeSpan;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.BiMap;
@@ -70,11 +71,11 @@ public class TimeSpanTypeConverter implements TypeConverter {
     }
 
     // Parse string without unit
-    long value = Long.parseLong(valueStr.substring(0, i + 1).trim());
+    long rawValue = Long.parseLong(valueStr.substring(0, i + 1).trim());
 
     // convert value from user unit to code unit
     TimeUnit codeUnit = option.codeUnit();
-    value = codeUnit.convert(value, userUnit);
+    long value = codeUnit.convert(rawValue, userUnit);
 
     if (option.min() > value || value > option.max()) {
       String codeUnitStr = TIME_UNITS.inverse().get(codeUnit);
@@ -90,8 +91,11 @@ public class TimeSpanTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException("Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
       }
       result = (int)value;
-    } else {
+    } else if (pType.equals(Long.class)) {
       result = value;
+    } else {
+      assert pType.equals(TimeSpan.class);
+      result = TimeSpan.of(rawValue, userUnit);
     }
     return result;
   }
