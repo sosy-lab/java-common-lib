@@ -33,6 +33,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.io.Paths;
 
@@ -57,7 +58,7 @@ import com.google.common.collect.ImmutableSet;
 public class FileTypeConverter implements TypeConverter {
 
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES = ImmutableSet.<Class<?>>of(
-      File.class, Path.class, PathTemplate.class);
+      File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
   @Option(name="output.path", description="directory to put all output files in")
   private String outputDirectory = "output/";
@@ -131,6 +132,8 @@ public class FileTypeConverter implements TypeConverter {
       defaultValue = Paths.get((File) pDefaultValue);
     } else if (pType.equals(PathTemplate.class)) {
       defaultValue = Paths.get(((PathTemplate)pDefaultValue).getTemplate());
+    } else if (pType.equals(PathCounterTemplate.class)) {
+      defaultValue = Paths.get(((PathCounterTemplate)pDefaultValue).getTemplate());
     } else {
       defaultValue = (Path)pDefaultValue;
     }
@@ -180,6 +183,8 @@ public class FileTypeConverter implements TypeConverter {
       return file.toFile();
     } else if (targetType.equals(PathTemplate.class)) {
       return PathTemplate.ofFormatString(file.toString());
+    } else if (targetType.equals(PathCounterTemplate.class)) {
+      return PathCounterTemplate.ofFormatString(file.toString());
     } else {
       assert targetType.equals(Path.class);
       return file;

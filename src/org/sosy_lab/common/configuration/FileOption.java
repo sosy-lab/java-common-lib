@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 
 /**
@@ -35,7 +36,8 @@ import org.sosy_lab.common.io.PathTemplate;
  * In order to use it, you need to register an instance of {@link FileTypeConverter}
  * as a converter for {@link FileOption}.
  */
-@OptionDetailAnnotation(applicableTo={File.class, Path.class, PathTemplate.class})
+@OptionDetailAnnotation(applicableTo={File.class, Path.class, PathTemplate.class,
+                                      PathCounterTemplate.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
