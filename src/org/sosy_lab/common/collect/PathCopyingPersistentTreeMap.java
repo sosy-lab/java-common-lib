@@ -50,6 +50,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * This is an implementation of {@link PersistentSortedMap} that is based on
  * left-leaning red-black trees (LLRB) and path copying.
@@ -92,6 +94,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   private static final long serialVersionUID = 1041711151457528188L;
 
   @SuppressWarnings("unused")
+  @SuppressFBWarnings(value = "EQ_DOESNT_OVERRIDE_EQUALS",
+      justification = "Inherits equals() according to specification.")
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
 
     // Constants for isRed field
