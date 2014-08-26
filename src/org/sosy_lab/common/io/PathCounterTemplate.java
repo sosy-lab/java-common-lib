@@ -47,6 +47,7 @@ public final class PathCounterTemplate {
    * with {@link String#format(String, Object...)}.
    * @param pTemplate The template to check.
    */
+  @SuppressWarnings("ReturnValueIgnored")
   @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
   private static void checkPatternValidity(String pTemplate) throws IllegalFormatException {
     String.format(pTemplate, 0);
