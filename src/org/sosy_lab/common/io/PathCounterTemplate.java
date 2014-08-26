@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.IllegalFormatException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * A template for {@link Path} objects that uses a counter
  * to produce paths with a fresh new name for every request.
@@ -35,12 +37,19 @@ public final class PathCounterTemplate {
 
   private PathCounterTemplate(String pTemplate) {
     checkArgument(!pTemplate.isEmpty());
-
-    // check whether the template is valid for inserting ints
-    // (will throw exception otherwise)
-    String.format(pTemplate, 0);
+    checkPatternValidity(pTemplate);
 
     template = pTemplate;
+  }
+
+  /**
+   * Check whether a String is a valid template for inserting one int
+   * with {@link String#format(String, Object...)}.
+   * @param pTemplate The template to check.
+   */
+  @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
+  private static void checkPatternValidity(String pTemplate) throws IllegalFormatException {
+    String.format(pTemplate, 0);
   }
 
   /**

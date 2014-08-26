@@ -21,7 +21,7 @@
     <path id="classpath">
         <pathelement location="${class.dir}"/>
         <fileset dir="lib" includes="*.jar"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar"/>
     </path>
 
     <available property="svn.isworkingcopy" file=".svn"/>

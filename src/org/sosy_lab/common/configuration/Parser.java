@@ -41,6 +41,8 @@ import org.sosy_lab.common.io.Paths;
 import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
  *
@@ -176,6 +178,8 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
+  @SuppressFBWarnings(value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
+      justification = "performance irrelevant compared to I/O, String much more convenient")
   private static Pair<Map<String, String>, Map<String, Path>> parse(
       BufferedReader r, @Nullable String basePath,
       String source, Set<String> includeStack) throws IOException, InvalidConfigurationException {
