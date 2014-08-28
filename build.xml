@@ -209,13 +209,16 @@
     <target name="jar" depends="build">
         <property name="jar.file" value="common-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
+        <manifestclasspath property="classpath.jar" jarfile="${ivy.lib.dir}/runtime/common.jar" maxParentLevels="0">
+            <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="*.jar"/></classpath>
+        </manifestclasspath>
         <jar basedir="${class.dir}/" destfile="${jar.file}"
                 whenmanifestonly="fail"
                 includes="**"
                 excludes="**/*Test.class **/*Test$*.class"
                 >
             <manifest>
-                <attribute name="Class-Path" value="guava.jar jsr305.jar"/>
+                <attribute name="Class-Path" value="${classpath.jar}"/>
                 <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
                 <attribute name="Implementation-Version" value="${version}"/>
             </manifest>
