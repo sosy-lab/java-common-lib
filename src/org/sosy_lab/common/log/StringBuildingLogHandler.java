@@ -23,11 +23,14 @@ import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+import javax.annotation.concurrent.GuardedBy;
+
 /**
  * This class may be used to read the log into a String.
  */
 public class StringBuildingLogHandler extends Handler {
 
+  @GuardedBy("this")
   private final StringBuilder sb = new StringBuilder();
 
   @Override
@@ -65,12 +68,12 @@ public class StringBuildingLogHandler extends Handler {
     }
   }
 
-  public String getLog() {
+  public synchronized String getLog() {
     return sb.toString();
   }
 
 
-  public void clear() {
+  public synchronized void clear() {
     sb.setLength(0);
     sb.trimToSize(); // free memory
   }
