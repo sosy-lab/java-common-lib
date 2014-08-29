@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="version" basedir=".">
+
+    <!-- Targets for determining the version number based on the SVN revision. -->
+
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+
+    <target name="determine-version">
+        <exec executable="svnversion"
+                outputproperty="svn.revision"
+                failonerror="false" failifexecutionfails="false"
+                logError="false" error="/dev/null">
+            <env key="LANG" value="C" />
+        </exec>
+
+        <condition property="version" value="0.${svn.revision}" else="UNKNOWN">
+            <not><equals arg1="${svn.revision}" arg2="Unversioned directory"/></not>
+        </condition>
+
+        <condition property="version.publishable">
+            <matches string="${version}" pattern="^0\.[0-9]+$" />
+        </condition>
+    </target>
+</project>
