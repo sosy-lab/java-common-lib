@@ -17,24 +17,36 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="lib" includes="*.jar"/>
         <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar"/>
     </path>
+
+
+    <!-- Main targets -->
+
+    <target name="clean" description="Clean">
+        <delete includeEmptyDirs="true">
+            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar"/>
+        </delete>
+    </target>
+
+    <target name="build", depends="build-project, build-documentation" description="Build"/>
+
+    <target name="dist" depends="jar, sources" description="Make a distributable release"/>
+
+    <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
+
+    <target name="publish" depends="dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+
+
+    <!-- Auxiliary targets -->
 
     <target name="init" depends="determine-version">
         <echo message="Building ${ant.project.name} ${version}"/>
         <mkdir dir="${class.dir}"/>
     </target>
-    <target name="clean">
-        <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${class.dir}/** common-*.jar"/>
-        </delete>
-    </target>
-    <target depends="clean" name="cleanall"/>
 
-    <target depends="init,resolve-dependencies" name="build-dependencies"/>
+    <target name="build-dependencies" depends="init, resolve-dependencies"/>
 
-    <target depends="build-project, build-documentation" name="build"/>
     <target name="build-documentation" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
 
@@ -52,10 +64,4 @@
         </java>
         <echo message="Options collected." level="info"/>
     </target>
-
-    <target name="publish" depends="jar, sources, publish-artifacts" description="Publish current version to Ivy repository"/>
-
-    <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
-
-    <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 </project>
