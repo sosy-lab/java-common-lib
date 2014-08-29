@@ -29,7 +29,7 @@
         </delete>
     </target>
 
-    <target name="build", depends="build-project, build-documentation" description="Build"/>
+    <target name="build" depends="build-project, build-documentation" description="Build"/>
 
     <target name="dist" depends="jar, sources" description="Make a distributable release"/>
 
