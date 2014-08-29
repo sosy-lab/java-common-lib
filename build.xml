@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab : -->
-<project basedir="." default="build" name="Sosy-Lab Common Library"
-         xmlns:ivy="antlib:org.apache.ivy.ant"
-         xmlns:jacoco="antlib:org.jacoco.ant">
+<project name="Sosy-Lab Common Library" basedir="." default="build">
     <!-- Include a file in which all properties can be overridden.
          This file won't get checked in and can be used to change properties
          locally for one machine if necessary. -->
     <property file="build.properties"/>
     <property environment="env"/>
-    <property name="debuglevel" value="source,lines,vars"/>
-    <property name="source.format" value="1.7"/>
-    <property name="source.dir" value="src"/>
-    <property name="class.format" value="1.7"/>
-    <property name="class.dir" value="bin"/>
-    <property name="junit.dir" value="junit"/>
 
-    <antversion property="ant.version.exact"/> <!-- Define property that contains the Ant version. -->
-    <property name="ivy.lib.dir" value="${basedir}/lib/java"/>
+    <import file="build/build-version.xml"/>
+    <import file="build/build-ivy.xml"/>
+    <import file="build/build-compile.xml"/>
+    <import file="build/build-jar.xml"/>
+    <import file="build/build-junit.xml"/>
+    <import file="build/build-findbugs.xml"/>
+    <import file="build/build-publish.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
         <fileset dir="lib" includes="*.jar"/>
         <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar"/>
     </path>
-
-    <available property="svn.isworkingcopy" file=".svn"/>
-
-    <target name="determine-version-svn" if="svn.isworkingcopy">
-        <exec executable="svnversion" outputproperty="svn.version"
-              failonerror="false" failifexecutionfails="false" logError="false" error="/dev/null">
-            <env key="LANG" value="C"/>
-        </exec>
-        <property name="version" value="0.${svn.version}"/>
-    </target>
-
-    <target depends="determine-version-svn" name="determine-version">
-        <property name="version" value="UNKNOWN"/> <!-- provide default value if property is not yet set -->
-        <condition property="version.publishable">
-            <matches string="${version}" pattern="^0\.[0-9]+$"/>
-        </condition>
-    </target>
-
 
     <target name="init" depends="determine-version">
         <echo message="Building ${ant.project.name} ${version}"/>
@@ -53,82 +32,9 @@
     </target>
     <target depends="clean" name="cleanall"/>
 
-    <property name="ivy.version" value="2.3.0"/> <!-- Change version number here to use a newer version of Ivy. -->
-    <!-- <property name="ivy.disable" value=""/> --> <!-- Disable ivy completely. -->
-    <property name="ivy.repo.url" value="http://www.sosy-lab.org/ivy"/>
-    <property name="ivy.jar.dir" value="${ivy.lib.dir}/build"/>
-    <property name="ivy.jar.file" value="ivy.jar"/>
-    <available file="${ivy.jar.dir}/${ivy.jar.file}" property="ivy.jar.present"/>
-    <available file="${ivy.lib.dir}-contrib" property="ivy.contrib.present"/>
-
-    <!-- If necessary, download Ivy from web site so that it does not need to be installed. -->
-    <target name="bootstrap-ivy" unless="ivy.jar.present">
-        <mkdir dir="${ivy.jar.dir}"/>
-        <echo message="Downloading ivy..."/>
-    <get src="${ivy.repo.url}/org.apache.ivy/ivy/ivy-${ivy.version}.jar" dest="${ivy.jar.dir}/${ivy.jar.file}" usetimestamp="true"/>
-    </target>
-
-    <!-- Load the Ivy plugin for Ant so the Ivy tasks are available. -->
-    <target name="load-ivy" depends="bootstrap-ivy">
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="${ivy.jar.file}"/>
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-
-    <!-- Ask Ivy to get all the dependencies for us -->
-    <target name="resolve-dependencies" depends="load-ivy, update-contrib" unless="ivy.disable">
-        <echo message="Downloading and installing dependencies with Ivy..."/>
-        <ivy:resolve conf="build, runtime, test"/>
-        <ivy:retrieve sync="true" overwriteMode="different" pattern="${ivy.lib.dir}/[conf]/[artifact](-[classifier]).[ext]"/>
-    </target>
-
-    <target name="report-dependencies" depends="resolve-dependencies" description="Generate dependencies report">
-        <ivy:report graph="false" dot="true" conf="runtime, build, test, contrib"/>
-    </target>
-
-    <!-- Update additional resources if they were downloaded previously. -->
-    <target name="update-contrib" if="ivy.contrib.present">
-        <antcall target="install-contrib"/>
-    </target>
-
-    <target name="install-contrib" depends="load-ivy" description="retrieve sources and docs for external libraries" unless="ivy.disable">
-        <ivy:resolve conf="contrib"/>
-        <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
-    </target>
-
-
-    <target depends="init,determine-version,resolve-dependencies" name="build-dependencies"/>
+    <target depends="init,resolve-dependencies" name="build-dependencies"/>
 
     <target depends="build-project, build-documentation" name="build"/>
-
-    <!-- If available, we use error-prone as the compiler, cf. https://code.google.com/p/error-prone/ -->
-    <available classname="com.google.errorprone.ErrorProneAntCompilerAdapter"
-               property="javac.compiler"
-               value="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
-    <target name="-warn-errorprone" unless="javac.compiler">
-        <echo level="warning">Google error-prone not detected in class path.</echo>
-        <echo level="warning">For additional compiler checks, we recommend running ant with command-line arguments "-lib lib/java/build".</echo>
-    </target>
-
-    <target depends="build-dependencies,-warn-errorprone" name="build-project">
-        <property name="javac.compiler" value="modern"/> <!-- fallback value -->
-        <depend srcdir="${source.dir}" destdir="${class.dir}"/>
-        <javac debug="true"
-               debuglevel="${debuglevel}"
-               destdir="${class.dir}"
-               source="${source.format}"
-               target="${class.format}"
-               includeAntRuntime="false"
-               compiler="${javac.compiler}"
-               encoding="UTF-8">
-            <src path="${source.dir}"/>
-            <classpath refid="classpath"/>
-            <compilerarg value="-Xlint"/>
-            <compilerarg value="-Werror"/>
-        </javac>
-    </target>
-
     <target name="build-documentation" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
 
@@ -147,158 +53,9 @@
         <echo message="Options collected." level="info"/>
     </target>
 
+    <target name="publish" depends="jar, sources, publish-artifacts" description="Publish current version to Ivy repository"/>
 
-<!-- Tests -->
-    <!-- Load the JUnit plugin for Ant if it's not installed. -->
-    <condition property="ant.junit.available">
-        <typefound name="junit"/>
-    </condition>
-    <target name="load-junit" depends="resolve-dependencies" unless="ant.junit.available">
-        <taskdef name="junit"
-                 classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"
-                 classpath="${ivy.jar.dir}/ant-junit.jar"/>
-        <taskdef name="junitreport"
-                 classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator"
-                 classpath="${ivy.jar.dir}/ant-junit.jar"/>
-    </target>
-
-    <target name="load-jacoco" depends="resolve-dependencies">
-        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-            <classpath><fileset dir="${ivy.jar.dir}" includes="org.jacoco.*.jar asm-debug-all.jar"/></classpath>
-        </taskdef>
-    </target>
-
-    <target description="Run all JUnit tests" depends="build, load-junit, load-jacoco" name="tests">
-        <mkdir dir="${junit.dir}"/>
-        <jacoco:coverage destfile="${junit.dir}/jacoco.exec">
-        <junit fork="true" printSummary="true" showOutput="false" failureproperty="junit.failed" timeout="100000">
-            <assertions>
-            <enable />
-            </assertions>
-            <formatter type="xml"/>
-            <classpath refid="classpath"/>
-            <batchtest fork="true" todir="${junit.dir}">
-                <fileset dir="${class.dir}">
-                    <include name="**/*Test.*"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        </jacoco:coverage>
-        <jacoco:report>
-            <executiondata><file file="${junit.dir}/jacoco.exec"/></executiondata>
-            <structure name="SoSy-Lab Common">
-                <classfiles><fileset dir="${class.dir}"/></classfiles>
-                <sourcefiles encoding="UTF-8"><fileset dir="${source.dir}"/></sourcefiles>
-            </structure>
-            <html destdir="JUnit-coverage"/>
-        </jacoco:report>
-        <junitreport todir="${junit.dir}">
-            <fileset dir="${junit.dir}">
-                <include name="TEST-*.xml" />
-            </fileset>
-            <report format="noframes" />
-        </junitreport>
-        <move file="junit-noframes.html" tofile="JUnit.html"/>
-        <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
-    </target>
-
-
-<!-- Distribution and publishing -->
     <target description="Make a distributable release" depends="build,jar,sources" name="dist"/>
 
-    <target name="jar" depends="build">
-        <property name="jar.file" value="common-${version}.jar"/>
-        <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
-        <manifestclasspath property="classpath.jar" jarfile="${ivy.lib.dir}/runtime/common.jar" maxParentLevels="0">
-            <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="*.jar"/></classpath>
-        </manifestclasspath>
-        <jar basedir="${class.dir}/" destfile="${jar.file}"
-                whenmanifestonly="fail"
-                includes="**"
-                excludes="**/*Test.class **/*Test$*.class"
-                >
-            <manifest>
-                <attribute name="Class-Path" value="${classpath.jar}"/>
-                <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
-                <attribute name="Implementation-Version" value="${version}"/>
-            </manifest>
-        </jar>
-    </target>
-
-    <target name="sources" depends="determine-version">
-        <jar basedir="${source.dir}/" includes="**/*.java" destfile="common-${version}-sources.jar"
-                whenmanifestonly="fail">
-            <manifest>
-                    <attribute name="Implementation-Title" value="SoSy-Lab Common Library"/>
-                    <attribute name="Implementation-Version" value="${version}"/>
-            </manifest>
-        </jar>
-    </target>
-
-    <target name="publish" depends="tests,jar,sources">
-        <fail unless="version.publishable"
-              message="Cannot publish version ${version}, only unmodified SVN checkouts may be published"/>
-        <ivy:publish
-              pubrevision="${version}"
-              resolver="Sosy-Lab-Publish"
-              status="release"
-              artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
-              />
-        <echo>
-            You now want to run
-            svn add repository/org.sosy_lab/common/*-${version}*
-            svn ci repository/org.sosy_lab/common -m"publish version ${version} of SoSy-Lab Common library"
-            to make the new version publicly available.</echo>
-    </target>
-
-    <!-- Targets for running FindBugs.
-         These need a locally installed FindBugs,
-         and you need to pass -Dfindbugs.home=<PATH_TO_FINDBUGS> to ant.
-    -->
-    <target name="run-findbugs" depends="jar">
-        <delete file="FindBugs.html"/>
-        <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.home}/lib/findbugs.jar"/>
-        <findbugs home="${findbugs.home}"
-                output="xml:withMessages"
-                outputFile="FindBugs.xml"
-                excludeFilter=".settings/FindBugs.exclude.xml"
-                warningsProperty="findbugs.warnings">
-            <auxClasspath refid="classpath" />
-            <sourcePath path="${source.dir}" />
-            <class location="${jar.file}" />
-        </findbugs>
-    </target>
-
-    <target name="findbugs-report" if="findbugs.warnings">
-        <echo>FindBugs found warnings, generating report.</echo>
-        <xslt in="FindBugs.xml" out="FindBugs.html" style="${findbugs.home}/src/xsl/fancy.xsl"/>
-    </target>
-
-    <target name="findbugs" depends="run-findbugs, findbugs-report"
-        description="Run FindBugs and generate report."/>
-
-    <target name="run-findbugs-diff" depends="jar">
-        <delete file="FindBugs.diff.html"/>
-        <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.home}/lib/findbugs.jar"/>
-        <findbugs home="${findbugs.home}"
-                output="xml:withMessages"
-                outputFile="FindBugs.diff.xml"
-                excludeFilter=".settings/FindBugs.exclude.xml"
-                warningsProperty="findbugs.newwarnings"
-                baselineBugs="FindBugs.known.xml">
-            <auxClasspath refid="classpath" />
-            <sourcePath path="${source.dir}" />
-            <class location="${jar.file}" />
-        </findbugs>
-    </target>
-
-    <target name="findbugs-diff-report" if="findbugs.newwarnings">
-        <echo>FindBugs found new warnings, generating report.</echo>
-        <xslt in="FindBugs.diff.xml" out="FindBugs.diff.html" style="${findbugs.home}/src/xsl/fancy.xsl"/>
-    </target>
-
-    <target name="findbugs-diff" depends="run-findbugs-diff, findbugs-diff-report"
-        description="Run FindBugs and generate report with newly found warnings."/>
-
-    <target name="findbugs-full" depends="findbugs, findbugs-diff"/>
+    <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 </project>
