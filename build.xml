@@ -35,7 +35,7 @@
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <target name="publish" depends="dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version to Ivy repository"/>
 
 
     <!-- Auxiliary targets -->
