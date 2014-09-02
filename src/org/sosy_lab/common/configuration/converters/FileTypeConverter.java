@@ -36,6 +36,7 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.io.Paths;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -98,7 +99,7 @@ public class FileTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String pValue, Class<?> pType, Type pGenericType,
-      Annotation secondaryOption, Path pSource) throws InvalidConfigurationException {
+      Annotation secondaryOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 

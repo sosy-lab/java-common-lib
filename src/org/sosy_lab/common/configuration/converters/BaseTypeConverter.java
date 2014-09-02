@@ -33,6 +33,7 @@ import java.util.regex.PatternSyntaxException;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.primitives.Primitives;
 
@@ -48,7 +49,7 @@ public enum BaseTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> type, Type pGenericType,
-      Annotation pSecondaryOption, Path pSource) throws InvalidConfigurationException {
+      Annotation pSecondaryOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
 
     if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method

@@ -67,7 +67,7 @@
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="ParameterNumber">
-      <property name="max" value="6"/>
+      <property name="max" value="7"/>
     </module>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
