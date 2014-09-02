@@ -135,7 +135,8 @@ public final class Configuration {
     return new Configuration(ImmutableMap.<String, String>of(),
         ImmutableMap.<String, Path>of(), "",
         ImmutableMap.copyOf(DEFAULT_CONVERTERS), new HashSet<String>(0),
-        new HashSet<String>(0));
+        new HashSet<String>(0),
+        null);
   }
 
   /**
@@ -144,7 +145,8 @@ public final class Configuration {
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
     Configuration newConfig = new Configuration(oldConfig.properties,
         oldConfig.sources, newPrefix,
-        oldConfig.converters, oldConfig.unusedProperties, oldConfig.deprecatedProperties);
+        oldConfig.converters, oldConfig.unusedProperties, oldConfig.deprecatedProperties,
+        oldConfig.logger);
 
     // instead of calling inject() set options manually
     // this avoids the "throws InvalidConfigurationException" in the signature
@@ -259,7 +261,11 @@ public final class Configuration {
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
 
-  private LogManager logger = null;
+  private @Nullable LogManager logger = null;
+
+  @Nullable LogManager getLogger() {
+    return logger;
+  }
 
   /*
    * This constructor does not set the fields annotated with @Option
@@ -271,7 +277,8 @@ public final class Configuration {
       ImmutableMap<String, Path> pSources,
       String pPrefix,
       ImmutableMap<Class<?>, TypeConverter> pConverters,
-      Set<String> pUnusedProperties, Set<String> pDeprecatedProperties) {
+      Set<String> pUnusedProperties, Set<String> pDeprecatedProperties,
+      @Nullable LogManager pLogger) {
 
     checkNotNull(pProperties);
     checkNotNull(pSources);
@@ -284,6 +291,7 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
+    logger = pLogger;
   }
 
   public void enableLogging(LogManager pLogger) {
