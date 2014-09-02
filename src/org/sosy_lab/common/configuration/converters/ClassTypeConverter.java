@@ -28,6 +28,7 @@ import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.collect.Iterables;
 
@@ -36,7 +37,7 @@ public class ClassTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String value, Class<?> type, Type genericType,
-      Annotation secondaryOption, Path pSource) throws InvalidConfigurationException {
+      Annotation secondaryOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
 
     Iterable<String> packagePrefixes = Collections.<String>singleton(null); // null means "no prefix"
 
@@ -69,6 +70,8 @@ public class ClassTypeConverter implements TypeConverter {
     if (!targetType.isAssignableFrom(cls)) {
       throw new InvalidConfigurationException("Class " + value + " specified in option " + optionName + " is not an instance of " + targetType.getCanonicalName());
     }
+
+    Classes.produceClassLoadingWarning(logger, cls, targetType);
 
     return cls;
   }

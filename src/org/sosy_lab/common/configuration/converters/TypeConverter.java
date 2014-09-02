@@ -29,6 +29,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.OptionDetailAnnotation;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
 
 /**
  * TypeConverters are used to parse Strings into instances of specific types
@@ -62,6 +63,7 @@ public interface TypeConverter {
    * (this is one of the annotations marked with {@link OptionDetailAnnotation}).
    * @param source The file where the configuration option was read from.
    * May contain a dummy value if the option was given somehow else.
+   * @param logger A logger for warnings etc.
    * @return An instance of the target type produced from the string representation-
    *
    * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
@@ -70,7 +72,7 @@ public interface TypeConverter {
   @Nullable
   Object convert(String optionName, String value, Class<?> type,
       @Nullable Type genericType, @Nullable Annotation secondaryOption,
-      Path source) throws InvalidConfigurationException;
+      Path source, LogManager logger) throws InvalidConfigurationException;
 
   /**
    * Optionally convert the default value for an option that was given in the

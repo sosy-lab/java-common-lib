@@ -30,10 +30,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.base.Throwables;
 
@@ -359,5 +361,21 @@ public final class Classes {
       type = upperBounds[0];
     }
     return type;
+  }
+
+  public static void produceClassLoadingWarning(LogManager logger, Class<?> cls, @Nullable Class<?> type) {
+    checkNotNull(logger);
+    Package pkg = cls.getPackage();
+    String typeName = type == null ? "class" : type.getSimpleName();
+
+    if (cls.isAnnotationPresent(Deprecated.class)
+        || pkg.isAnnotationPresent(Deprecated.class)) {
+      logger.logf(Level.WARNING, "Using %s %s, which is marked as deprecated and should not be used.", typeName, cls.getSimpleName());
+
+    } else if (cls.isAnnotationPresent(Unmaintained.class)
+        || pkg.isAnnotationPresent(Unmaintained.class)) {
+
+      logger.logf(Level.WARNING, "Using %s %s, which is unmaintained and may not work correctly.", typeName, cls.getSimpleName());
+    }
   }
 }

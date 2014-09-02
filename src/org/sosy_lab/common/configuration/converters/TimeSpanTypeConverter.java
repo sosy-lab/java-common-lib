@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
 import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
 import com.google.common.base.CharMatcher;
@@ -47,7 +48,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> pType,
-      Type pGenericType, Annotation pOption, Path pSource) throws InvalidConfigurationException {
+      Type pGenericType, Annotation pOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
 
     if (!(pOption instanceof TimeSpanOption)) {
       throw new UnsupportedOperationException("Time span options need to be annotated with @TimeSpanOption");

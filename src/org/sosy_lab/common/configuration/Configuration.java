@@ -59,8 +59,10 @@ import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.log.TestLogManager;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -827,7 +829,7 @@ public final class Configuration {
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
     return converter.convert(optionName, valueStr, type, genericType, secondaryOption,
-        sources.get(optionName));
+        sources.get(optionName), MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
   }
 
   /**
