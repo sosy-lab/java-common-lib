@@ -31,7 +31,7 @@
         </jar>
     </target>
 
-    <target name="sources" depends="determine-version">
+    <target name="sources" depends="determine-version, resolve-dependencies">
         <jar basedir="${source.dir}/"
                 destfile="${ivy.module}-${version}-sources.jar"
                 includes="**/*.java"
