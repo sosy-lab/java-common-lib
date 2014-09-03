@@ -19,6 +19,15 @@
  */
 package org.sosy_lab.common.configuration;
 
-public interface AbstractConfigurationBuilderFactory  {
+public interface ConfigurationBuilderFactory  {
   ConfigurationBuilder getBuilder();
+
+  enum DefaultConfigurationBuilderFactory implements ConfigurationBuilderFactory {
+    INSTANCE;
+
+    @Override
+    public ConfigurationBuilder getBuilder() {
+      return new Builder();
+    }
+  }
 }

@@ -61,6 +61,7 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.log.TestLogManager;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -88,7 +89,13 @@ import com.google.common.primitives.Primitives;
 @Options
 public final class Configuration {
 
-  private static AbstractConfigurationBuilderFactory builderFactory;
+  private static ConfigurationBuilderFactory builderFactory =
+      new ConfigurationBuilderFactory() {
+        @Override
+        public ConfigurationBuilder getBuilder() {
+          return new Builder();
+        }
+      };
 
   /**
    * Create a new Builder instance.
@@ -100,13 +107,11 @@ public final class Configuration {
   /**
    * Sets the factory that will be used to create a {@link ConfigurationBuilder}
    * instance.
-   * If set to null a default factory will be used that returns {@link Builder}
-   * instances.
    *
-   * @param factory The factory to use or null.
+   * @param factory The factory to use in the future for creating all builders.
    */
-  public static void setBuilderFactory(@Nullable AbstractConfigurationBuilderFactory factory) {
-    builderFactory = factory;
+  public static void setBuilderFactory(ConfigurationBuilderFactory factory) {
+    builderFactory = checkNotNull(factory);
   }
 
   /**
@@ -115,16 +120,8 @@ public final class Configuration {
    *
    * @return The factory.
    */
-  public static AbstractConfigurationBuilderFactory getBuilderFactory() {
-    if (builderFactory == null) {
-      builderFactory = new AbstractConfigurationBuilderFactory() {
-        @Override
-        public ConfigurationBuilder getBuilder() {
-          return new Builder();
-        }
-      };
-    }
-
+  @VisibleForTesting
+  static ConfigurationBuilderFactory getBuilderFactory() {
     return builderFactory;
   }
 
