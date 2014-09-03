@@ -33,7 +33,6 @@ import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
-import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -304,11 +303,9 @@ public class Builder implements ConfigurationBuilder {
       newDeprecatedProperties = new HashSet<>(0);
     }
 
-    LogManager logger = oldConfig != null ? oldConfig.getLogger() : null;
-
     Configuration newConfig = new Configuration(newProperties, newSources, newPrefix,
         newConverters, newUnusedProperties, newDeprecatedProperties,
-        logger);
+        oldConfig != null ? oldConfig.getLogger() : null);
     newConfig.inject(newConfig);
 
     // reset builder instance so that it may be re-used

@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConfigurationBuilderFactory;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
@@ -62,7 +63,7 @@ public class ConfigurationTest {
 
   @Before
   public void setUp() {
-    Configuration.setBuilderFactory(null);
+    Configuration.setBuilderFactory(DefaultConfigurationBuilderFactory.INSTANCE);
   }
 
   @Test
@@ -183,7 +184,7 @@ public class ConfigurationTest {
 
   @Test
   public void shouldReturnCustomFactory() throws Exception {
-    AbstractConfigurationBuilderFactory mockFactory = mock(AbstractConfigurationBuilderFactory.class);
+    ConfigurationBuilderFactory mockFactory = mock(ConfigurationBuilderFactory.class);
     Configuration.setBuilderFactory(mockFactory);
 
     assertEquals(mockFactory, Configuration.getBuilderFactory());
@@ -199,7 +200,7 @@ public class ConfigurationTest {
   @Test
   public void shouldReturnCustomBuilder() throws Exception {
     ConfigurationBuilder mockBuilder = mock(ConfigurationBuilder.class);
-    AbstractConfigurationBuilderFactory stubFactory = mock(AbstractConfigurationBuilderFactory.class);
+    ConfigurationBuilderFactory stubFactory = mock(ConfigurationBuilderFactory.class);
     when(stubFactory.getBuilder()).thenReturn(mockBuilder);
 
     Configuration.setBuilderFactory(stubFactory);
