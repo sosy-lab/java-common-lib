@@ -96,7 +96,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
   protected final Logger logger;
-  private final LogManagerBean mxBean;
+  private final @Nullable LogManagerBean mxBean;
 
   public interface LogManagerMXBean {
 
@@ -106,33 +106,27 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
   private class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
 
-    private final @Nullable Handler consoleHandler;
+    private final Handler consoleHandler;
 
-    public LogManagerBean(@Nullable Handler pConsoleHandler) {
+    public LogManagerBean(Handler pConsoleHandler) {
       super("org.sosy_lab.common.log:type=LogManager", BasicLogManager.this);
-      consoleHandler = pConsoleHandler;
+      consoleHandler = checkNotNull(pConsoleHandler);
     }
 
     @Override
     public String getConsoleLevel() {
-      if (consoleHandler != null) {
-        return consoleHandler.getLevel().toString();
-      }
-
-      return "";
+      return consoleHandler.getLevel().toString();
     }
 
     @Override
     public void setConsoleLevel(String pNewLevel) throws IllegalArgumentException {
       Level newLevel = Level.parse(pNewLevel.toUpperCase());
 
-      if (consoleHandler != null) {
-        try {
-          consoleHandler.setLevel(newLevel);
-          logger.setLevel(getMinimumLevel(fileLevel, newLevel));
-        } catch (SecurityException e) {
-          // on Google App Engine calling setLevel() is forbidden.
-        }
+      try {
+        consoleHandler.setLevel(newLevel);
+        logger.setLevel(getMinimumLevel(fileLevel, newLevel));
+      } catch (SecurityException e) {
+        // on Google App Engine calling setLevel() is forbidden.
       }
     }
   }
@@ -212,8 +206,12 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
     }
 
     // setup MXBean at the end (this might already log something!)
-    mxBean = new LogManagerBean(consoleOutputHandler);
-    mxBean.register();
+    if (consoleOutputHandler != null) {
+      mxBean = new LogManagerBean(consoleOutputHandler);
+      mxBean.register();
+    } else {
+      mxBean = null;
+    }
   }
 
   /**
@@ -506,7 +504,9 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   }
   @Override
   public void close() {
-    mxBean.unregister();
+    if (mxBean != null) {
+      mxBean.unregister();
+    }
     for (Handler handler : logger.getHandlers()) {
       handler.close();
     }
