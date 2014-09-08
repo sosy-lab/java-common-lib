@@ -23,6 +23,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import javax.annotation.Nullable;
+
 /**
  * This class represents a timer similar to {@link Timer},
  * however it nests two timers.
@@ -59,7 +61,7 @@ public final class NestedTimer {
   private long innerSumTime           = 0;
 
   /** Volatile to make {@link #isRunning()} thread-safe. */
-  private volatile Timer currentInnerTimer = null;
+  private volatile @Nullable Timer currentInnerTimer = null;
 
   /** The maximal time of all intervals. */
   private long innerMaxTime           = 0;

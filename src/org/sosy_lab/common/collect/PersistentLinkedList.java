@@ -60,10 +60,10 @@ import com.google.common.collect.UnmodifiableListIterator;
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
 public class PersistentLinkedList<T> extends AbstractSequentialList<T> implements PersistentList<T> {
 
-  private final T head; // only null for the empty list
-  private final PersistentLinkedList<T> tail; // only null for the empty list
+  private final @Nullable T head; // only null for the empty list
+  private final @Nullable PersistentLinkedList<T> tail; // only null for the empty list
 
-  private PersistentLinkedList(final T head, final PersistentLinkedList<T> tail) {
+  private PersistentLinkedList(final @Nullable T head, final @Nullable PersistentLinkedList<T> tail) {
     this.head = head;
     this.tail = tail;
   }

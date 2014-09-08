@@ -23,4 +23,6 @@
  * The main class of this package is {@link org.sosy_lab.common.configuration.Configuration}.
  */
 @javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 package org.sosy_lab.common.configuration;

@@ -21,4 +21,6 @@
  * This package contains helpful utilities for concurrent code.
  */
 @javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 package org.sosy_lab.common.concurrency;

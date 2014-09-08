@@ -104,8 +104,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private static final long serialVersionUID = -7393505826652634501L;
 
-    private final Node<K, V> left;
-    private final Node<K, V> right;
+    private @Nullable final Node<K, V> left;
+    private @Nullable final Node<K, V> right;
     private final boolean isRed;
 
     // Leaf node
@@ -218,11 +218,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   // state and constructor
 
-  private final Node<K, V> root;
+  private final @Nullable Node<K, V> root;
 
-  private transient EntrySet<K, V> entrySet;
+  private transient @Nullable EntrySet<K, V> entrySet;
 
-  private PathCopyingPersistentTreeMap(Node<K, V> pRoot) {
+  private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
   }
 
@@ -230,11 +230,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   // private utility methods
 
   @SuppressWarnings("unchecked")
+  @Nullable
   private static <K extends Comparable<? super K>, V> Node<K, V> findNode(Object key, Node<K, V> root) {
     checkNotNull(key);
     return findNode((K)key, root);
   }
 
+  @Nullable
   private static <K extends Comparable<? super K>, V> Node<K, V> findNode(K key, Node<K, V> root) {
     Preconditions.checkNotNull(key);
 
@@ -497,6 +499,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return mapFromTree(removeAndCopy0((K)checkNotNull(key), root));
   }
 
+  @Nullable
   private static <K extends Comparable<? super K>, V> Node<K, V>  removeAndCopy0(final K key, Node<K, V> current) {
     // Removing a node is more difficult.
     // We can remove a leaf if it is red.
@@ -592,6 +595,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * Unconditionally delete the node with the smallest key in a given subtree.
    * @return A new subtree reflecting the change.
    */
+  @Nullable
   private static <K, V> Node<K, V> removeMininumNodeInTree(Node<K, V> current) {
     if (current.left == null) {
       // This is the minium node to delete
@@ -748,7 +752,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    */
   private static final class EntrySet<K extends Comparable<? super K>, V> extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
 
-    private final Node<K, V> root;
+    private final @Nullable Node<K, V> root;
 
     // Cache size
     private transient int size = -1;
@@ -1149,7 +1153,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K fromKey;  // inclusive
     private final @Nullable K toKey; // exclusive
 
-    private transient SortedSet<Map.Entry<K, V>> entrySet;
+    private transient @Nullable SortedSet<Map.Entry<K, V>> entrySet;
 
     private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
       root = pRoot;

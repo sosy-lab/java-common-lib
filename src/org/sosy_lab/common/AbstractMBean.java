@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
 
+import javax.annotation.Nullable;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -40,8 +41,9 @@ import org.sosy_lab.common.log.LogManager;
  */
 public abstract class AbstractMBean {
 
-  private static final MBeanServer MBEAN_SERVER = getMBeanServer();
+  private static final @Nullable MBeanServer MBEAN_SERVER = getMBeanServer();
 
+  @Nullable
   private static MBeanServer getMBeanServer() {
     try {
       // wrap this call in method so that an exception does not prevent the
@@ -60,7 +62,7 @@ public abstract class AbstractMBean {
     }
   }
 
-  private ObjectName oname = null;
+  private @Nullable ObjectName oname = null;
   private final LogManager logger;
 
   protected AbstractMBean(String name, LogManager logger) {

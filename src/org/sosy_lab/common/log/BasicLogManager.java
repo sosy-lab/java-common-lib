@@ -106,9 +106,9 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
   private class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
 
-    private final Handler consoleHandler;
+    private final @Nullable Handler consoleHandler;
 
-    public LogManagerBean(Handler pConsoleHandler) {
+    public LogManagerBean(@Nullable Handler pConsoleHandler) {
       super("org.sosy_lab.common.log:type=LogManager", BasicLogManager.this);
       consoleHandler = pConsoleHandler;
     }

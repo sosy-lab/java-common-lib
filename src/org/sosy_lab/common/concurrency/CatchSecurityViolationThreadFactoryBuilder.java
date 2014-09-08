@@ -26,6 +26,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.annotation.Nullable;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -40,11 +42,11 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @see CatchSecurityViolationThreadFactoryBuilder
  */
 public class CatchSecurityViolationThreadFactoryBuilder {
-  private Boolean daemon;
-  private String nameFormat;
-  private Integer priority;
-  private UncaughtExceptionHandler handler;
-  private ThreadFactory backingFactory;
+  private @Nullable Boolean daemon;
+  private @Nullable String nameFormat;
+  private @Nullable Integer priority;
+  private @Nullable UncaughtExceptionHandler handler;
+  private @Nullable ThreadFactory backingFactory;
 
   /**
    * @see CatchSecurityViolationThreadFactoryBuilder#setThreadFactory(ThreadFactory)

@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 
 public class Paths {
 
-  private static AbstractPathFactory factory = null;
+  private static @Nullable AbstractPathFactory factory = null;
 
   /**
    * Prevent instantiation.

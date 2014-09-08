@@ -21,4 +21,6 @@
  * This package contains general utilities that do not fit anywhere else.
  */
 @javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 package org.sosy_lab.common;

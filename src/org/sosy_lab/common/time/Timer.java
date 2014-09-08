@@ -24,6 +24,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 /**
@@ -41,7 +43,7 @@ public final class Timer {
   /**
    * The clock we use for accessing the time.
    */
-  static final TickerWithUnit DEFAULT_CLOCK;
+  static final @Nullable TickerWithUnit DEFAULT_CLOCK;
   static {
     String clockToUse = System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").toUpperCase().trim();
     switch (clockToUse) {
