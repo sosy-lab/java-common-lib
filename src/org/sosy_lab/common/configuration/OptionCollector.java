@@ -32,7 +32,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterators;
 import com.google.common.io.Resources;
 
 /** This class collects all {@link Option}s of a program. */
@@ -151,15 +153,15 @@ public class OptionCollector {
   /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
   private static String getSourcePath() {
-    Enumeration<URL> resources = getClassLoaderResources();
+    Iterator<URL> resources = getClassLoaderResources();
 
     // check each resource:
     // cut off the ending 'bin', append 'src/org/sosy_lab'
     // and check, if the result is a folder.
     // '/src/org/sosy_lab/X' is the default location of program X.
-    while (resources.hasMoreElements()) {
+    while (resources.hasNext()) {
       try {
-        File file = new File(resources.nextElement().toURI());
+        File file = new File(resources.next().toURI());
         final String testPath =
             file.toString().substring(0, file.toString().length() - 3);
         if (new File(testPath + "src/org/sosy_lab").isDirectory()) {
@@ -175,18 +177,17 @@ public class OptionCollector {
 
   /** This function returns the contextClassLoader-Resources. */
   @Nullable
-  private static Enumeration<URL> getClassLoaderResources() {
+  private static Iterator<URL> getClassLoaderResources() {
     final ClassLoader classLoader =
         Thread.currentThread().getContextClassLoader();
     assert classLoader != null;
 
-    Enumeration<URL> resources = null;
     try {
-      resources = classLoader.getResources("");
+      return Iterators.forEnumeration(classLoader.getResources(""));
     } catch (IOException e) {
       System.err.println("Could not get recources of classloader.");
     }
-    return resources;
+    return Collections.emptyIterator();
   }
 
   /** This method collects every {@link Option} of a class.
@@ -682,11 +683,11 @@ public class OptionCollector {
    * @return list of classes
    */
   private List<Class<?>> getClasses() {
-    Enumeration<URL> resources = getClassLoaderResources();
+    Iterator<URL> resources = getClassLoaderResources();
 
     final List<Class<?>> classes = new ArrayList<>();
-    while (resources.hasMoreElements()) {
-      URL url = resources.nextElement();
+    while (resources.hasNext()) {
+      URL url = resources.next();
       try {
         File file = new File(url.toURI());
         collectClasses(file, "", classes);
