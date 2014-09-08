@@ -23,4 +23,6 @@
  * time spans together with the respective time unit.
  */
 @javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 package org.sosy_lab.common.time;

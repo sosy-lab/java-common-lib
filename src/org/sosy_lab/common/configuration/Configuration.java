@@ -303,6 +303,7 @@ public final class Configuration {
    * If possible, use {@link Option} and {@link #inject(Object)}.
    * This provides type safety, documentation, logging etc.
    */
+  @Nullable
   public String getProperty(String key) {
     checkNotNull(key);
     String result = properties.get(prefix + key);
@@ -610,6 +611,7 @@ public final class Configuration {
    * @throws UnsupportedOperationException If the declaration of the option in the source code is invalid.
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
+  @Nullable
   private <T> Object getValue(final String optionName, final T defaultValue,
       final Class<T> type, final Type genericType, final Option option,
       final AnnotatedElement member)
@@ -650,6 +652,7 @@ public final class Configuration {
    * @param option the option-annotation of the field of the value
    * @param alwaysUppercase how to write the value
    */
+  @Nullable
   private String getValueString(final String name, final Option option,
       final boolean alwaysUppercase) throws InvalidConfigurationException {
 
@@ -914,6 +917,7 @@ public final class Configuration {
   /**
    * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
    */
+  @Nullable
   private static String trimToNull(String s) {
     if (s == null) {
       return null;

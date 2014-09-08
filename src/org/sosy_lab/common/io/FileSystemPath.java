@@ -42,7 +42,7 @@ import com.google.common.io.Files;
 public class FileSystemPath implements Path {
 
   protected String path = "";
-  private File fileInstance = null;
+  private @Nullable File fileInstance = null;
 
   /**
    * Creates a new Path object from one or more path strings.

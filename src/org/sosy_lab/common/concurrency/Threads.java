@@ -31,7 +31,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class Threads {
 
-  private static ThreadFactory factory;
+  private static @Nullable ThreadFactory factory;
 
   /**
    * Prevent instantiation.

@@ -40,6 +40,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 import org.sosy_lab.common.Pair;
 
 import com.google.common.base.Joiner;
@@ -172,6 +174,7 @@ public class OptionCollector {
   }
 
   /** This function returns the contextClassLoader-Resources. */
+  @Nullable
   private static Enumeration<URL> getClassLoaderResources() {
     final ClassLoader classLoader =
         Thread.currentThread().getContextClassLoader();

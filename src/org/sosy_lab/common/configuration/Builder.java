@@ -42,11 +42,11 @@ import com.google.common.io.CharSource;
 
 public class Builder implements ConfigurationBuilder {
 
-  private Map<String, String> properties = null;
-  private Map<String, Path> sources = null;
-  private Configuration oldConfig = null;
-  private String prefix = null;
-  private Map<Class<?>, TypeConverter> converters = null;
+  private @Nullable Map<String, String> properties = null;
+  private @Nullable Map<String, Path> sources = null;
+  private @Nullable Configuration oldConfig = null;
+  private @Nullable String prefix = null;
+  private @Nullable Map<Class<?>, TypeConverter> converters = null;
 
   private void setupProperties() {
     if (properties == null) {
