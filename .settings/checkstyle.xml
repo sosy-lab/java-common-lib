@@ -165,7 +165,7 @@
     <property name="eachLine" value="true"/>
   </module>
   <module name="StrictDuplicateCode">
-    <property name="min" value="22"/>
+    <property name="min" value="26"/>
   </module>
   <module name="SuppressWarningsFilter"/>
   <module name="JavadocPackage"/>
