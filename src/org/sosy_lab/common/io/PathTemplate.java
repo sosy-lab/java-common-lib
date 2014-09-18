@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * A template for paths, from which a real path can be constructed
  * by passing some values to fill in the blanks.
@@ -63,5 +65,12 @@ public final class PathTemplate {
    */
   public String getTemplate() {
     return template;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("template", template)
+        .toString();
   }
 }

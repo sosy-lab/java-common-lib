@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.IllegalFormatException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.MoreObjects;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -76,5 +78,13 @@ public final class PathCounterTemplate {
    */
   public String getTemplate() {
     return template;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("template", template)
+        .add("counter", counter.get())
+        .toString();
   }
 }
