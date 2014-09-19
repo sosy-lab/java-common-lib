@@ -148,19 +148,7 @@ public class FileSystemPath implements Path {
     if (other.isEmpty()) {
       return this;
     }
-
-    // other has root component
-    // TODO How can a path be not absolute and still have a root component?
-
-    // other has no root component
-    String absolutePath;
-    if (isFile()) {
-      absolutePath = getParent().getAbsolutePath();
-    } else {
-      absolutePath = getAbsolutePath();
-    }
-
-    return Paths.get(absolutePath, other.getOriginalPath());
+    return Paths.get(this.getOriginalPath(), other.getOriginalPath());
   }
 
   @Override
