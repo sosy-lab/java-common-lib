@@ -38,6 +38,8 @@ import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.io.Paths;
 import org.sosy_lab.common.log.LogManager;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -74,11 +76,81 @@ public class FileTypeConverter implements TypeConverter {
   private String rootDirectory = ".";
   private final Path rootPath;
 
+  // Allow only paths below the current directory,
+  // i.e., no absolute paths and no "../"
+  private final boolean safePathsOnly;
+
+  @Deprecated
   public FileTypeConverter(Configuration config) throws InvalidConfigurationException {
+    this(config, false);
+  }
+
+  protected FileTypeConverter(Configuration config, boolean pSafePathsOnly)
+      throws InvalidConfigurationException {
+    safePathsOnly = pSafePathsOnly; // set before calls to checkSafePath
     config.inject(this, FileTypeConverter.class);
 
-    rootPath = Paths.get(rootDirectory);
-    outputPath = rootPath.resolve(outputDirectory);
+    rootPath = checkSafePath(Paths.get(rootDirectory), "rootDirectory");
+    outputPath = checkSafePath(rootPath.resolve(outputDirectory), "output.path");
+  }
+
+  public static FileTypeConverter create(Configuration config)
+      throws InvalidConfigurationException {
+    return new FileTypeConverter(config, false);
+  }
+
+  /**
+   * Create an instanceof of this class that allows only injected files
+   * that are below the current directory.
+   */
+  public static FileTypeConverter createWithSafePathsOnly(Configuration config)
+      throws InvalidConfigurationException {
+    return new FileTypeConverter(config, true);
+  }
+
+  /**
+   * Checks whether a path is safe (i.e., it is below the current directory).
+   * Absolute paths and paths with "../" are forbidden.
+   * Returns the unchanged path if it is safe,
+   * or throws an exception.
+   *
+   * If {@link #safePathsOnly} is false, no checks are done,
+   * and this method always returns the path.
+   */
+  @VisibleForTesting
+  Path checkSafePath(Path pPath, String optionName) throws InvalidConfigurationException {
+    if (!safePathsOnly) {
+      return pPath; // any path allowed
+    }
+
+    if (pPath.isAbsolute()) {
+      throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it is absolute.");
+    }
+    String path = pPath.getPath();
+    if (path.contains(File.pathSeparator)) {
+      throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it contains the character '" + File.pathSeparator + "'.");
+    }
+
+    int depth = 0;
+    for (String component : Splitter.on(File.separator).split(path)) {
+      switch (component) {
+      case "":
+      case ".":
+        break;
+      case "..":
+        depth--;
+        break;
+      default:
+        depth++;
+        break;
+      }
+
+      if (depth < 0) {
+        throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it is not below the current directory.");
+      }
+    }
+
+    return pPath;
   }
 
   public String getOutputDirectory() {
@@ -165,6 +237,8 @@ public class FileTypeConverter implements TypeConverter {
     } else {
       file = rootPath.resolve(file);
     }
+
+    checkSafePath(file, optionName); // throws exception if unsafe
 
     if (file.isDirectory()) {
       throw new InvalidConfigurationException("Option " + optionName
