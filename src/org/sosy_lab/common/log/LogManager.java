@@ -37,6 +37,14 @@ import javax.annotation.Nullable;
 public interface LogManager extends AutoCloseable {
 
   /**
+   * Returns a new LogManager instance which may use the given name
+   * as an indicator from which component a log message comes from.
+   * @param name A non-empty string.
+   * @return A LogManager instance.
+   */
+  LogManager withComponentName(String name);
+
+  /**
    * Returns true if a message with the given log level would be logged.
    * @param priority the log level
    * @return whether this log level is enabled

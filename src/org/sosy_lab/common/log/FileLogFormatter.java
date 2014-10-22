@@ -43,6 +43,13 @@ public class FileLogFormatter extends Formatter {
     sb.append(lr.getLevel());
     sb.append("\t ");
 
+    if (lr instanceof ExtendedLogRecord) {
+      String component = ((ExtendedLogRecord)lr).getSourceComponentName();
+      if (!component.isEmpty()) {
+        sb.append(component);
+        sb.append(":");
+      }
+    }
     sb.append(LogUtils.extractSimpleClassName(lr));
     sb.append(".");
     sb.append(lr.getSourceMethodName());

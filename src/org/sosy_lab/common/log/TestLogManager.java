@@ -44,6 +44,12 @@ public enum TestLogManager implements LogManager {
   }
 
   @Override
+  public LogManager withComponentName(String pName) {
+    checkArgument(!pName.isEmpty());
+    return this;
+  }
+
+  @Override
   public boolean wouldBeLogged(Level pPriority) {
     checkNotNull(pPriority);
 
