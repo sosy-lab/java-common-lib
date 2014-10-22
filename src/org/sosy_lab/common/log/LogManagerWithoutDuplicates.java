@@ -48,6 +48,19 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager
   }
 
   /**
+   * @see LogManager#withComponentName(String)
+   *
+   * This method returns a new LogManagerWithoutDuplicates,
+   * which does not share state with the current instance
+   * (i.e., it is possible to log the same message both through the old
+   * and the new instance once).
+   */
+  @Override
+  public LogManagerWithoutDuplicates withComponentName(String pName) {
+    return new LogManagerWithoutDuplicates(delegate.withComponentName(pName));
+  }
+
+  /**
    * Logging method similar to {@link #log(Level, Object...)},
    * however, subsequent calls to this method with the same arguments
    * will be silently ignored.

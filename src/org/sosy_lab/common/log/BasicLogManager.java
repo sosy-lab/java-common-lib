@@ -20,6 +20,7 @@
 package org.sosy_lab.common.log;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   protected final Logger logger;
   private final int truncateSize;
   private final @Nullable LogManagerBean mxBean;
+  private final String componentName;
 
   public interface LogManagerMXBean {
 
@@ -141,6 +143,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
     Level consoleLevel = options.getConsoleLevel();
     truncateSize = options.getTruncateSize();
 
+    componentName = "";
+
     logger = Logger.getAnonymousLogger();
     logger.setLevel(getMinimumLevel(fileLevel, consoleLevel));
     logger.setUseParentHandlers(false);
@@ -207,6 +211,23 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
     handler.setLevel(level);
 
     logger.addHandler(handler);
+  }
+
+  private BasicLogManager(BasicLogManager originalLogger, String pComponentName) {
+    logger = originalLogger.logger;
+    truncateSize = originalLogger.truncateSize;
+    componentName = pComponentName;
+    mxBean = null;
+  }
+
+  @Override
+  public LogManager withComponentName(String pName) {
+    checkArgument(!pName.isEmpty());
+
+    String name = componentName.isEmpty()
+        ? pName
+        : componentName + ":" + pName;
+    return new BasicLogManager(this, name);
   }
 
   /**
@@ -294,10 +315,11 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    */
   private void log0(Level priority, StackTraceElement stackElement, String msg) {
 
-    LogRecord record = new LogRecord(priority, msg);
+    ExtendedLogRecord record = new ExtendedLogRecord(priority, msg);
 
     record.setSourceClassName(stackElement.getClassName());
     record.setSourceMethodName(stackElement.getMethodName());
+    record.setSourceComponentName(componentName);
 
     logger.log(record);
   }
