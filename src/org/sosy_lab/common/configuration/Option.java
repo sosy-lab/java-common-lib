@@ -67,6 +67,13 @@ public @interface Option {
   String name() default "";
 
   /**
+   * An optional flag that this configuration option is secure,
+   * i.e., setting it to an arbitrary attacker-controlled value
+   * may not allow any harm (like abitrary code execution).
+   */
+  boolean secure() default false;
+
+  /**
    * An optional flag if this option needs to be specified in the configuration
    * file. The default is false. If set to true, an exception will be thrown if
    * the option is not in the file.

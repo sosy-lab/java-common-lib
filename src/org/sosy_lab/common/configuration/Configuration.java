@@ -97,6 +97,8 @@ public final class Configuration {
         }
       };
 
+  private static boolean secureMode = false;
+
   /**
    * Create a new Builder instance.
    */
@@ -123,6 +125,15 @@ public final class Configuration {
   @VisibleForTesting
   static ConfigurationBuilderFactory getBuilderFactory() {
     return builderFactory;
+  }
+
+  /**
+   * Enable a secure mode, i.e., allow only injection of configuration options
+   * marked as secure.
+   * Once enabled, this can not be disabled.
+   */
+  public static void enableSecureModeGlobally() {
+    secureMode = true;
   }
 
   /**
@@ -623,6 +634,12 @@ public final class Configuration {
     final Object value;
     if (valueStr != null) {
       // option was specified
+
+      if (secureMode && !option.secure()) {
+        throw new InvalidConfigurationException(
+            "Configuration option " + optionName + " was specified, but is not allowed in secure mode.");
+      }
+
       value = convertValue(optionName, valueStr, type, genericType, secondaryOption);
 
       if (member.isAnnotationPresent(Deprecated.class)) {
