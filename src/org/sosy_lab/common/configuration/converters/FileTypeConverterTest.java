@@ -95,6 +95,9 @@ public class FileTypeConverterTest {
           // path and whether it is allowed in safe mode and when included from config/file
           {"/etc/passwd", false, false},
           {"relative/dir" + File.pathSeparator + "/etc", false, false},
+          {"file::name", true, true},
+          {"file::name:illegal", false, false},
+          {"file:::illegal", false, false},
           {"file", true, true},
           {"dir/../file", true, true},
           {"./dir/file", true, true},
