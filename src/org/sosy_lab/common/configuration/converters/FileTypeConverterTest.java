@@ -47,6 +47,7 @@ import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTy
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
+import com.google.common.base.StandardSystemProperty;
 import com.google.common.io.CharSource;
 
 @RunWith(Suite.class)
@@ -105,6 +106,8 @@ public class FileTypeConverterTest {
           {"dir/../../file", false, true},
           {"../../file", false, false},
           {"dir/../../../file", false, false},
+          {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
+          {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
       });
     }
 

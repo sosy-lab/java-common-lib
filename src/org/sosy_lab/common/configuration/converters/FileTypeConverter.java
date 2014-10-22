@@ -40,6 +40,7 @@ import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -62,6 +63,8 @@ public class FileTypeConverter implements TypeConverter {
 
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES = ImmutableSet.<Class<?>>of(
       File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
+
+  private static final String TEMP_DIR = StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;
 
   @Option(secure=true, name="output.path", description="directory to put all output files in")
   private String outputDirectory = "output/";
@@ -123,10 +126,18 @@ public class FileTypeConverter implements TypeConverter {
       return pPath; // any path allowed
     }
 
-    if (pPath.isAbsolute()) {
-      throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it is absolute.");
-    }
     String path = pPath.getPath();
+
+    if (pPath.isAbsolute()) {
+      if (pPath.getPath().startsWith(TEMP_DIR)) {
+        // Make it a a relative path
+        path = path.substring(TEMP_DIR.length());
+
+      } else {
+        throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it is absolute.");
+      }
+    }
+
     // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
     if (path.replaceAll("::", "").contains(File.pathSeparator)) {
       throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it contains the character '" + File.pathSeparator + "'.");
