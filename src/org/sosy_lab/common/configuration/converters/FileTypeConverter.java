@@ -63,11 +63,11 @@ public class FileTypeConverter implements TypeConverter {
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES = ImmutableSet.<Class<?>>of(
       File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
-  @Option(name="output.path", description="directory to put all output files in")
+  @Option(secure=true, name="output.path", description="directory to put all output files in")
   private String outputDirectory = "output/";
   private final Path outputPath;
 
-  @Option(name="output.disable", description="disable all default output files"
+  @Option(secure=true, name="output.disable", description="disable all default output files"
     + "\n(any explicitly given file will still be written)")
   private boolean disableOutput = false;
 

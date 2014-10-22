@@ -51,7 +51,7 @@ public class ConfigurationTest {
   @Options
   private static class TestEnumSetOptions {
 
-    @Option(description="Test injection of EnumSet")
+    @Option(secure=true, description="Test injection of EnumSet")
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
   }
 
@@ -82,7 +82,7 @@ public class ConfigurationTest {
   @Options
   private static class TestSetOfEnumsOptions {
 
-    @Option(description="Test injection of a set of enum values")
+    @Option(secure=true, description="Test injection of a set of enum values")
     private Set<TestEnum> values = Sets.immutableEnumSet(TestEnum.E1, TestEnum.E3);
   }
 
@@ -116,7 +116,7 @@ public class ConfigurationTest {
   @Options
   private static class TestCharsetOptions {
 
-    @Option(description="Test injection of Charset instances")
+    @Option(secure=true, description="Test injection of Charset instances")
     private Charset charset = Charset.defaultCharset();
   }
 
@@ -151,7 +151,7 @@ public class ConfigurationTest {
   @Options
   private static class TestPatternOptions {
 
-    @Option(description="Test injection of Pattern instances")
+    @Option(secure=true, description="Test injection of Pattern instances")
     private Pattern regexp = Pattern.compile(".*");
   }
 
