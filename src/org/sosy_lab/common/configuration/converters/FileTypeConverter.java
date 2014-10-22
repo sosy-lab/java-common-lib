@@ -127,7 +127,8 @@ public class FileTypeConverter implements TypeConverter {
       throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it is absolute.");
     }
     String path = pPath.getPath();
-    if (path.contains(File.pathSeparator)) {
+    // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
+    if (path.replaceAll("::", "").contains(File.pathSeparator)) {
       throw new InvalidConfigurationException("The option " + optionName + " specifies the path '" + pPath + "' that is forbidden in safe mode because it contains the character '" + File.pathSeparator + "'.");
     }
 
