@@ -54,7 +54,7 @@ import com.google.common.base.Throwables;
 public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
   // Number of characters taken from the start of the original output strings when truncating
-  private final int truncateRemainingSize = 100;
+  private static final int TRUNCATE_REMAINING_SIZE = 100;
 
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
@@ -337,7 +337,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
         String length = (o instanceof Appender) ? ">= " + truncateSize : arg.length() + "";
-        argsStr[i] = arg.substring(0, truncateRemainingSize)
+        argsStr[i] = arg.substring(0, TRUNCATE_REMAINING_SIZE)
                    + "... <REMAINING ARGUMENT OMITTED BECAUSE " + length + " CHARACTERS LONG>";
       } else {
         argsStr[i] = arg;
