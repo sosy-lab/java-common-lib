@@ -38,64 +38,28 @@ import org.sosy_lab.common.AbstractMBean;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 
 
 /**
  * Default implementation of {@link LogManager}.
  */
-@Options(prefix = "log",
-    description = "Possible log levels in descending order "
-    + "\n(lower levels include higher ones):"
-    + "\nOFF:      no logs published"
-    + "\nSEVERE:   error messages"
-    + "\nWARNING:  warnings"
-    + "\nINFO:     messages"
-    + "\nFINE:     logs on main application level"
-    + "\nFINER:    logs on central CPA algorithm level"
-    + "\nFINEST:   logs published by specific CPAs"
-    + "\nALL:      debugging information"
-    + "\nCare must be taken with levels of FINER or lower, as output files may "
-    + "become quite large and memory usage might become an issue.")
 public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
-
-  @Option(name="level", toUppercase=true, description="log level of file output")
-  private Level fileLevel = Level.OFF;
-
-  @Option(toUppercase=true, description="log level of console output")
-  private Level consoleLevel = Level.INFO;
-
-  @Option(toUppercase=true, description="single levels to be excluded from being logged")
-  private List<Level> fileExclude = ImmutableList.of();
-
-  @Option(toUppercase=true, description="single levels to be excluded from being logged")
-  private List<Level> consoleExclude = ImmutableList.of();
-
-  @Option(name="file",
-      description="name of the log file")
-  @FileOption(FileOption.Type.OUTPUT_FILE)
-  private Path outputFile = Paths.get("CPALog.txt");
-
-  @Option(description="maximum size of log output strings before they will be truncated")
-  private int truncateSize = 10000;
 
   // Number of characters taken from the start of the original output strings when truncating
   private final int truncateRemainingSize = 100;
 
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
+
   protected final Logger logger;
+  private final int truncateSize;
   private final @Nullable LogManagerBean mxBean;
 
   public interface LogManagerMXBean {
@@ -106,11 +70,13 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
   private class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
 
+    private final Level fileLevel;
     private final Handler consoleHandler;
 
-    public LogManagerBean(Handler pConsoleHandler) {
+    public LogManagerBean(Handler pConsoleHandler, Level pFileLevel) {
       super("org.sosy_lab.common.log:type=LogManager", BasicLogManager.this);
       consoleHandler = checkNotNull(pConsoleHandler);
+      fileLevel = checkNotNull(pFileLevel);
     }
 
     @Override
@@ -170,7 +136,10 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
    */
   public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
-    config.inject(this, BasicLogManager.class);
+    LoggingOptions options = new LoggingOptions(config);
+    Level fileLevel = options.getFileLevel();
+    Level consoleLevel = options.getConsoleLevel();
+    truncateSize = options.getTruncateSize();
 
     logger = Logger.getAnonymousLogger();
     logger.setLevel(getMinimumLevel(fileLevel, consoleLevel));
@@ -181,17 +150,18 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       if (consoleOutputHandler == null) {
         consoleOutputHandler = new ConsoleHandler();
       }
-      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, consoleExclude);
+      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, options.getConsoleExclude());
     }
 
     // create file logger
     if (fileOutputHandler == null) {
+      Path outputFile = options.getOutputFile();
       if (!fileLevel.equals(Level.OFF) && outputFile != null) {
         try {
           Files.createParentDirs(outputFile);
 
           Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
-          setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, fileExclude);
+          setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
         } catch (IOException e) {
           // redirect log messages to console
           if (consoleLevel.intValue() > fileLevel.intValue()) {
@@ -202,12 +172,12 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
         }
       }
     } else {
-      setupHandler(fileOutputHandler, new FileLogFormatter(), fileLevel, fileExclude);
+      setupHandler(fileOutputHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
     }
 
     // setup MXBean at the end (this might already log something!)
     if (consoleOutputHandler != null) {
-      mxBean = new LogManagerBean(consoleOutputHandler);
+      mxBean = new LogManagerBean(consoleOutputHandler, fileLevel);
       mxBean.register();
     } else {
       mxBean = null;
