@@ -56,7 +56,7 @@ public class FileTypeConverterTest {
   @Options
   static class FileInjectionTestOptions {
     @FileOption(Type.OPTIONAL_INPUT_FILE)
-    @Option(description="none", name="test.path")
+    @Option(secure=true, description="none", name="test.path")
     Path path;
   }
 
@@ -120,7 +120,7 @@ public class FileTypeConverterTest {
     @Options
     static class FileInjectionTestOptions {
       @FileOption(Type.OPTIONAL_INPUT_FILE)
-      @Option(description="none", name="test.path")
+      @Option(secure=true, description="none", name="test.path")
       Path path;
     }
 

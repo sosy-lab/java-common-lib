@@ -48,24 +48,24 @@ import com.google.common.collect.ImmutableList;
     + "become quite large and memory usage might become an issue.")
 final class LoggingOptions {
 
-  @Option(name="level", toUppercase=true, description="log level of file output")
+  @Option(secure=true, name="level", toUppercase=true, description="log level of file output")
   private Level fileLevel = Level.OFF;
 
-  @Option(toUppercase=true, description="log level of console output")
+  @Option(secure=true, toUppercase=true, description="log level of console output")
   private Level consoleLevel = Level.INFO;
 
-  @Option(toUppercase=true, description="single levels to be excluded from being logged")
+  @Option(secure=true, toUppercase=true, description="single levels to be excluded from being logged")
   private List<Level> fileExclude = ImmutableList.of();
 
-  @Option(toUppercase=true, description="single levels to be excluded from being logged")
+  @Option(secure=true, toUppercase=true, description="single levels to be excluded from being logged")
   private List<Level> consoleExclude = ImmutableList.of();
 
-  @Option(name="file",
+  @Option(secure=true, name="file",
       description="name of the log file")
   @FileOption(FileOption.Type.OUTPUT_FILE)
   private Path outputFile = Paths.get("CPALog.txt");
 
-  @Option(description="maximum size of log output strings before they will be truncated")
+  @Option(secure=true, description="maximum size of log output strings before they will be truncated")
   @IntegerOption(min=1)
   private int truncateSize = 10000;
 

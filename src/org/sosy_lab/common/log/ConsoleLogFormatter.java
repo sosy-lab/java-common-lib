@@ -34,7 +34,7 @@ import org.sosy_lab.common.configuration.Options;
 @Options(prefix="log")
 public class ConsoleLogFormatter extends Formatter {
 
-  @Option(description="use colors for log messages on console")
+  @Option(secure=true, description="use colors for log messages on console")
   private boolean useColors = true;
 
   public ConsoleLogFormatter(Configuration config) throws InvalidConfigurationException {
