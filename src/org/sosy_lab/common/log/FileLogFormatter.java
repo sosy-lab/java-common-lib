@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.log;
 
+import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -32,10 +34,23 @@ public class FileLogFormatter extends Formatter {
 
   @Override
   public String format(LogRecord lr) {
+    StringBuffer sb = new StringBuffer();
 
-    return dateFormat.format(lr.getMillis()) + "\t "
-        + "level: " + lr.getLevel().toString() + "\t "
-        + LogUtils.extractSimpleClassName(lr)  + "." + lr.getSourceMethodName()  + "\t "
-        + lr.getMessage() + "\n\n";
+    dateFormat.format(new Date(lr.getMillis()), sb, new FieldPosition(0));
+    sb.append("\t ");
+
+    sb.append("level: ");
+    sb.append(lr.getLevel());
+    sb.append("\t ");
+
+    sb.append(LogUtils.extractSimpleClassName(lr));
+    sb.append(".");
+    sb.append(lr.getSourceMethodName());
+    sb.append("\t ");
+
+    sb.append(lr.getMessage());
+
+    sb.append("\n\n");
+    return sb.toString();
   }
 }
