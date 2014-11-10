@@ -19,15 +19,14 @@
  */
 package org.sosy_lab.common.concurrency;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.concurrent.ThreadFactory;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -47,7 +46,7 @@ public class ThreadsTest {
     Threads.setThreadFactory(null);
     ThreadFactory factory = Threads.threadFactory();
 
-    Assert.assertNotNull(factory);
+    assertThat(factory).isNotNull();
   }
 
   @Test
@@ -58,24 +57,25 @@ public class ThreadsTest {
 
     Threads.setThreadFactory(stubFactory);
 
-    Assert.assertEquals(mockThread, Threads.threadFactoryBuilder().build().newThread(mockRunnable));
+    Thread newThread = Threads.threadFactoryBuilder().build().newThread(mockRunnable);
+    assertThat(newThread).isSameAs(mockThread);
   }
 
   @Test
   public void shouldSetDaemon() throws Exception {
     Thread t = Threads.newThread(mockRunnable, "t", true);
-    assertTrue(t.isDaemon());
+    assertThat(t.isDaemon()).isTrue();
   }
 
   @Test
   public void shouldUseNameFormat() throws Exception {
     Thread t1 = Threads.newThread(mockRunnable, "test-%d");
-    assertEquals("test-0", t1.getName());
+    assertThat(t1.getName()).isEqualTo("test-0");
   }
 
   @Test
   public void shouldSetPriority() throws Exception {
     Thread t = Threads.newThread(mockRunnable, "t", false, Thread.MAX_PRIORITY);
-    assertEquals(Thread.MAX_PRIORITY, t.getPriority());
+    assertThat(t.getPriority()).isEqualTo(Thread.MAX_PRIORITY);
   }
 }

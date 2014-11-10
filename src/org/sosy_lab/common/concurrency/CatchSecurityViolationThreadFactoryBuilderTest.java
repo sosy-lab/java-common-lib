@@ -19,16 +19,15 @@
  */
 package org.sosy_lab.common.concurrency;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +53,7 @@ public class CatchSecurityViolationThreadFactoryBuilderTest {
   @Test
   public void shouldSetDaemon() throws Exception {
     Thread t = builder.setDaemon(true).build().newThread(mockRunnable);
-    assertTrue(t.isDaemon());
+    assertThat(t.isDaemon()).isTrue();
   }
 
   @Test
@@ -63,21 +62,21 @@ public class CatchSecurityViolationThreadFactoryBuilderTest {
     Thread t1 = f.newThread(mockRunnable);
     Thread t2 = f.newThread(mockRunnable);
 
-    assertEquals("test-0", t1.getName());
-    assertEquals("test-1", t2.getName());
+    assertThat(t1.getName()).isEqualTo("test-0");
+    assertThat(t2.getName()).isEqualTo("test-1");
   }
 
   @Test
   public void shouldSetPriority() throws Exception {
     Thread t = builder.setPriority(Thread.MAX_PRIORITY).build().newThread(mockRunnable);
-    assertEquals(Thread.MAX_PRIORITY, t.getPriority());
+    assertThat(t.getPriority()).isEqualTo(Thread.MAX_PRIORITY);
   }
 
   @Test
   public void shouldSetExceptionHandler() throws Exception {
     UncaughtExceptionHandler mockHandler = mock(UncaughtExceptionHandler.class);
     Thread t = builder.setUncaughtExceptionHandler(mockHandler).build().newThread(mockRunnable);
-    assertEquals(mockHandler, t.getUncaughtExceptionHandler());
+    assertThat(t.getUncaughtExceptionHandler()).isSameAs(mockHandler);
   }
 
   @Test
@@ -88,6 +87,6 @@ public class CatchSecurityViolationThreadFactoryBuilderTest {
 
     Thread t = builder.setThreadFactory(stubFactory).build().newThread(mockRunnable);
 
-    Assert.assertEquals(mockThread, t);
+    assertThat(t).isSameAs(mockThread);
   }
 }

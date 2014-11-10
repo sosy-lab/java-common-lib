@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class ParserTest {
     try {
       Map<String, String> parsedOptions = test(content);
 
-      assertEquals(Collections.emptyMap(), parsedOptions);
+      assertThat(parsedOptions).isEmpty();
 
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -72,7 +72,7 @@ public class ParserTest {
 
       Map<String, String> expectedOptions = Collections.singletonMap(key, value);
 
-      assertEquals(expectedOptions, parsedOptions);
+      assertThat(parsedOptions).isEqualTo(expectedOptions);
 
     } catch (Exception e) {
       throw new RuntimeException(e);

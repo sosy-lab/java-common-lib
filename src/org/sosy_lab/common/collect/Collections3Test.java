@@ -19,12 +19,13 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class Collections3Test {
@@ -47,7 +48,7 @@ public class Collections3Test {
     testMap.put("c" + 0, null);
     testMap.put("ca", null);
 
-    Assert.assertEquals(resultMap, Collections3.subMapWithPrefix(testMap, "b"));
+    assertThat(Collections3.subMapWithPrefix(testMap, "b")).isEqualTo(resultMap);
   }
 
   @Test
@@ -68,6 +69,6 @@ public class Collections3Test {
     testSet.add("c" + 0);
     testSet.add("ca");
 
-    Assert.assertEquals(resultSet, Collections3.subSetWithPrefix(testSet, "b"));
+    assertThat(Collections3.subSetWithPrefix(testSet, "b")).isEqualTo(resultSet);
   }
 }

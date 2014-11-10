@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -33,7 +35,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
@@ -96,25 +97,25 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     map = map.putAndCopy(key, value);
     ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
 
-    assertEquals(oldMapSize, oldMap.size());
-    assertEquals(oldMapStr, oldMap.toString());
+    assertThat(oldMap).hasSize(oldMapSize);
+    assertThat(oldMap.toString()).isEqualTo(oldMapStr);
 
-    assertEquals(value, map.get(key));
+    assertThat(map).containsEntry(key, value);
 
     if (oldMap.containsKey(key)) {
-      assertEquals(oldMap.size(), map.size());
+      assertThat(map).hasSize(oldMap.size());
 
       if (oldMap.get(key).equals(value)) {
-        assertEquals(oldMap.toString(), map.toString());
-        assertEquals(oldMap.hashCode(), map.hashCode());
-        assertEquals(oldMap, map);
+        assertThat(map.toString()).isEqualTo(oldMap.toString());
+        assertThat(map.hashCode()).isEqualTo(oldMap.hashCode());
+        assertThat(map).isEqualTo(oldMap);
       } else {
-        assertFalse(map.equals(oldMap));
+        assertThat(map).isNotEqualTo(oldMap);
       }
 
     } else {
-      assertEquals(oldMap.size() + 1, map.size());
-      assertFalse(map.equals(oldMap));
+      assertThat(map).hasSize(oldMap.size() + 1);
+      assertThat(map).isNotEqualTo(oldMap);
     }
   }
 
@@ -126,49 +127,49 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     map = map.removeAndCopy(key);
     ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
 
-    assertEquals(oldMapSize, oldMap.size());
-    assertEquals(oldMapStr, oldMap.toString());
+    assertThat(oldMap).hasSize(oldMapSize);
+    assertThat(oldMap.toString()).isEqualTo(oldMapStr);
 
     assertFalse(map.containsKey(key));
 
     if (oldMap.containsKey(key)) {
-      assertEquals(oldMap.size() - 1, map.size());
-      assertFalse(map.equals(oldMap));
+      assertThat(map).hasSize(oldMap.size() - 1);
+      assertThat(map).isNotEqualTo(oldMap);
 
     } else {
-      assertEquals(oldMap.size(), map.size());
-      assertEquals(oldMap.toString(), map.toString());
-      assertEquals(oldMap.hashCode(), map.hashCode());
-      assertEquals(oldMap, map);
+      assertThat(map).hasSize(oldMap.size());
+      assertThat(map.toString()).isEqualTo(oldMap.toString());
+      assertThat(map.hashCode()).isEqualTo(oldMap.hashCode());
+      assertThat(map).isEqualTo(oldMap);
     }
   }
 
   @Test
   public void testEmpty() {
-    assertEquals(map.toString(), "{}");
-    assertTrue(map.isEmpty());
-    assertEquals(0, map.size());
-    assertEquals(0, map.hashCode());
+    assertThat(map.toString()).isEqualTo("{}");
+    assertThat(map).isEmpty();
+    assertThat(map).hasSize(0);
+    assertThat(map.hashCode()).isEqualTo(0);
   }
 
   private void putABCD() {
     put("a", "1");
-    assertEquals(map.toString(), "{a=1}");
+    assertThat(map.toString()).isEqualTo("{a=1}");
     assertEquals("a", map.firstKey());
     assertEquals("a", map.lastKey());
 
     put("b", "2");
-    assertEquals(map.toString(), "{a=1, b=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=2}");
     assertEquals("a", map.firstKey());
     assertEquals("b", map.lastKey());
 
     put("c", "3");
-    assertEquals(map.toString(), "{a=1, b=2, c=3}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=2, c=3}");
     assertEquals("a", map.firstKey());
     assertEquals("c", map.lastKey());
 
     put("d", "4");
-    assertEquals(map.toString(), "{a=1, b=2, c=3, d=4}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=2, c=3, d=4}");
     assertEquals("a", map.firstKey());
     assertEquals("d", map.lastKey());
   }
@@ -182,24 +183,24 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   private void putDCBA() {
     put("d", "1");
-    assertEquals(map.toString(), "{d=1}");
-    assertEquals("d", map.firstKey());
-    assertEquals("d", map.lastKey());
+    assertThat(map.toString()).isEqualTo("{d=1}");
+    assertThat(map.firstKey()).isEqualTo("d");
+    assertThat(map.lastKey()).isEqualTo("d");
 
     put("c", "2");
-    assertEquals(map.toString(), "{c=2, d=1}");
-    assertEquals("c", map.firstKey());
-    assertEquals("d", map.lastKey());
+    assertThat(map.toString()).isEqualTo("{c=2, d=1}");
+    assertThat(map.firstKey()).isEqualTo("c");
+    assertThat(map.lastKey()).isEqualTo("d");
 
     put("b", "3");
-    assertEquals(map.toString(), "{b=3, c=2, d=1}");
-    assertEquals("b", map.firstKey());
-    assertEquals("d", map.lastKey());
+    assertThat(map.toString()).isEqualTo("{b=3, c=2, d=1}");
+    assertThat(map.firstKey()).isEqualTo("b");
+    assertThat(map.lastKey()).isEqualTo("d");
 
     put("a", "4");
-    assertEquals(map.toString(), "{a=4, b=3, c=2, d=1}");
-    assertEquals("a", map.firstKey());
-    assertEquals("d", map.lastKey());
+    assertThat(map.toString()).isEqualTo("{a=4, b=3, c=2, d=1}");
+    assertThat(map.firstKey()).isEqualTo("a");
+    assertThat(map.lastKey()).isEqualTo("d");
   }
 
   private void removeABCD() {
@@ -240,55 +241,55 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   @Test
   public void testInner() {
     put("a", "1");
-    assertEquals(map.toString(), "{a=1}");
+    assertThat(map.toString()).isEqualTo("{a=1}");
 
     put("z", "2");
-    assertEquals(map.toString(), "{a=1, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, z=2}");
 
     put("b", "3");
-    assertEquals(map.toString(), "{a=1, b=3, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, z=2}");
 
     put("y", "4");
-    assertEquals(map.toString(), "{a=1, b=3, y=4, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, y=4, z=2}");
 
     put("c", "5");
-    assertEquals(map.toString(), "{a=1, b=3, c=5, y=4, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, c=5, y=4, z=2}");
 
     put("x", "6");
-    assertEquals(map.toString(), "{a=1, b=3, c=5, x=6, y=4, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, c=5, x=6, y=4, z=2}");
 
     put("d", "7");
-    assertEquals(map.toString(), "{a=1, b=3, c=5, d=7, x=6, y=4, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, c=5, d=7, x=6, y=4, z=2}");
 
     put("w", "8");
-    assertEquals(map.toString(), "{a=1, b=3, c=5, d=7, w=8, x=6, y=4, z=2}");
+    assertThat(map.toString()).isEqualTo("{a=1, b=3, c=5, d=7, w=8, x=6, y=4, z=2}");
   }
 
   @Test
   public void testOuter() {
     put("d", "1");
-    assertEquals(map.toString(), "{d=1}");
+    assertThat(map.toString()).isEqualTo("{d=1}");
 
     put("w", "2");
-    assertEquals(map.toString(), "{d=1, w=2}");
+    assertThat(map.toString()).isEqualTo("{d=1, w=2}");
 
     put("c", "3");
-    assertEquals(map.toString(), "{c=3, d=1, w=2}");
+    assertThat(map.toString()).isEqualTo("{c=3, d=1, w=2}");
 
     put("x", "4");
-    assertEquals(map.toString(), "{c=3, d=1, w=2, x=4}");
+    assertThat(map.toString()).isEqualTo("{c=3, d=1, w=2, x=4}");
 
     put("b", "5");
-    assertEquals(map.toString(), "{b=5, c=3, d=1, w=2, x=4}");
+    assertThat(map.toString()).isEqualTo("{b=5, c=3, d=1, w=2, x=4}");
 
     put("y", "6");
-    assertEquals(map.toString(), "{b=5, c=3, d=1, w=2, x=4, y=6}");
+    assertThat(map.toString()).isEqualTo("{b=5, c=3, d=1, w=2, x=4, y=6}");
 
     put("a", "7");
-    assertEquals(map.toString(), "{a=7, b=5, c=3, d=1, w=2, x=4, y=6}");
+    assertThat(map.toString()).isEqualTo("{a=7, b=5, c=3, d=1, w=2, x=4, y=6}");
 
     put("z", "8");
-    assertEquals(map.toString(), "{a=7, b=5, c=3, d=1, w=2, x=4, y=6, z=8}");
+    assertThat(map.toString()).isEqualTo("{a=7, b=5, c=3, d=1, w=2, x=4, y=6, z=8}");
   }
 
   @Test
@@ -355,29 +356,29 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   }
 
   private void checkEqualTo(SortedMap<String, String> comparison, SortedMap<String, String> map) {
-    assertEquals(comparison, map);
-    assertEquals(comparison.isEmpty(), map.isEmpty());
-    assertEquals(comparison.size(), map.size());
-    assertEquals(comparison.hashCode(), map.hashCode());
+    assertThat(map).isEqualTo(comparison);
+    assertThat(map.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
+    assertThat(map).hasSize(comparison.size());
+    assertThat(map.hashCode()).named("hashCode").isEqualTo(comparison.hashCode());
     checkEqualTo(comparison.entrySet(), map.entrySet());
     checkEqualTo(comparison.keySet(),   map.keySet());
     checkEqualTo(comparison.values(),   map.values());
     if (!comparison.isEmpty()) {
-      assertEquals(comparison.firstKey(), map.firstKey());
-      assertEquals(comparison.lastKey(), map.lastKey());
+      assertThat(map.firstKey()).named("firstKey").isEqualTo(comparison.firstKey());
+      assertThat(map.lastKey()).named("lastKey").isEqualTo(comparison.lastKey());
     }
   }
 
   private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
-    assertEquals(comparison, set);
-    assertEquals(comparison.hashCode(), set.hashCode());
+    assertThat(set).isEqualTo(comparison);
+    assertThat(set.hashCode()).named("hashCode").isEqualTo(comparison.hashCode());
     checkEqualTo((Collection<T>)comparison, (Collection<T>)set);
   }
 
   private <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {
     // equals() and hashCode() is undefined for Collections
-    assertEquals(comparison.isEmpty(), set.isEmpty());
-    assertEquals(comparison.size(), set.size());
-    assertTrue(Iterables.elementsEqual(comparison, set));
+    assertThat(set.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
+    assertThat(set).hasSize(comparison.size());
+    assertThat(set).iteratesAs(comparison);
   }
 }

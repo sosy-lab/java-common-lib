@@ -19,13 +19,10 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static com.google.common.truth.Truth.assertThat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -70,7 +67,7 @@ public class ConfigurationTest {
   public void testEnumSet() throws InvalidConfigurationException {
     TestEnumSetOptions options = new TestEnumSetOptions();
     enumTestConfiguration().inject(options);
-    assertEquals(EnumSet.of(TestEnum.E2, TestEnum.E3), options.values);
+    assertThat(options.values).iteratesAs(TestEnum.E2, TestEnum.E3);
   }
 
   @Test
@@ -90,7 +87,7 @@ public class ConfigurationTest {
   public void testSetOfEnums() throws InvalidConfigurationException {
     TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
     enumTestConfiguration().inject(options);
-    assertEquals(EnumSet.of(TestEnum.E2, TestEnum.E3), options.values);
+    assertThat(options.values).iteratesAs(TestEnum.E2, TestEnum.E3);
   }
 
   @Test(expected=UnsupportedOperationException.class)
@@ -104,7 +101,7 @@ public class ConfigurationTest {
   public void testSetOfEnumsIsOptimizedGuavaClass() throws InvalidConfigurationException {
     TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
     enumTestConfiguration().inject(options);
-    assertThat(options.values.getClass().getName(), containsString("ImmutableEnumSet"));
+    assertThat(options.values.getClass().getName()).endsWith("ImmutableEnumSet");
   }
 
   @Test
@@ -127,7 +124,7 @@ public class ConfigurationTest {
                            .build();
     TestCharsetOptions options = new TestCharsetOptions();
     config.inject(options);
-    assertEquals(StandardCharsets.UTF_8, options.charset);
+    assertThat(options.charset).isEqualTo(StandardCharsets.UTF_8);
   }
 
   @Test(expected=InvalidConfigurationException.class)
@@ -163,8 +160,8 @@ public class ConfigurationTest {
 
     TestPatternOptions options = new TestPatternOptions();
     config.inject(options);
-    assertTrue(options.regexp.matcher("fooTESTbar").matches());
-    assertFalse(options.regexp.matcher("barTESTfoo").matches());
+    assertThat("fooTESTbar").matches(options.regexp);
+    assertThat("barTESTfoo").doesNotMatch(options.regexp);
   }
 
   @Test(expected=InvalidConfigurationException.class)
@@ -187,14 +184,14 @@ public class ConfigurationTest {
     ConfigurationBuilderFactory mockFactory = mock(ConfigurationBuilderFactory.class);
     Configuration.setBuilderFactory(mockFactory);
 
-    assertEquals(mockFactory, Configuration.getBuilderFactory());
+    assertThat(Configuration.getBuilderFactory()).isSameAs(mockFactory);
   }
 
   @Test
   public void shouldReturnDefaultBuilder() throws Exception {
     ConfigurationBuilder builder = Configuration.builder();
 
-    assertTrue(builder instanceof Builder);
+    assertThat(builder).isInstanceOf(Builder.class);
   }
 
   @Test
@@ -205,7 +202,7 @@ public class ConfigurationTest {
 
     Configuration.setBuilderFactory(stubFactory);
 
-    assertEquals(mockBuilder, Configuration.builder());
+    assertThat(Configuration.builder()).isSameAs(mockBuilder);
   }
 
   /**
@@ -230,7 +227,7 @@ public class ConfigurationTest {
         Object injectedValue = field.get(injectedInstance);
         Object defaultValue = field.get(defaultInstance);
 
-        assertEquals(defaultValue, injectedValue);
+        assertThat(injectedValue).isSameAs(defaultValue);
       }
 
     } catch (ReflectiveOperationException e) {

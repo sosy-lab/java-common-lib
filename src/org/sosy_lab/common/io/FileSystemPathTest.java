@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.common.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.nio.file.Paths;
 
@@ -53,7 +52,7 @@ public class FileSystemPathTest {
     FileSystemPath commonDirB = new FileSystemPath(dirPathB);
     Path resolvedCommonPath = commonDirA.resolve(commonDirB);
 
-    assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
+    assertThat(resolvedNioPath.toString()).isEqualTo(resolvedCommonPath.toString());
   }
 
   @Test
@@ -69,40 +68,40 @@ public class FileSystemPathTest {
     FileSystemPath commonDirB = new FileSystemPath(dirPathB);
     Path resolvedCommonPath = commonDirA.resolve(commonDirB);
 
-    assertEquals(resolvedNioPath.toString(), resolvedCommonPath.toString());
+    assertThat(resolvedNioPath.toString()).isEqualTo(resolvedCommonPath.toString());
   }
 
   @Test
   public void resolveTwoFiles() throws Exception {
     java.nio.file.Path nioOther = Paths.get("PathTest.java");
     FileSystemPath commonOther = new FileSystemPath("PathTest.java");
-    assertEquals(nioPath.resolve(nioOther).toString(), commonPath.resolve(commonOther).toString());
+    assertThat(nioPath.resolve(nioOther).toString()).isEqualTo(commonPath.resolve(commonOther).toString());
   }
 
   @Test
   public void constructorWithEmptyPath() throws Exception {
     FileSystemPath path = new FileSystemPath("");
-    assertEquals("", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("");
   }
 
   @Test
   public void constructorWithSinglePath() throws Exception {
     FileSystemPath path = new FileSystemPath("foo");
-    assertEquals("foo", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("foo");
   }
 
   @Test
   public void constructorWithMultiplePaths() throws Exception {
     FileSystemPath path = new FileSystemPath("foo", "bar", "baz");
 
-    assertEquals("foo/bar/baz", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("foo/bar/baz");
   }
 
   @Test
   public void constructorWithEmptyPathButMorePaths() throws Exception {
     FileSystemPath path = new FileSystemPath("", "bar", "baz");
 
-    assertEquals("bar/baz", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("bar/baz");
   }
 
   @Test
@@ -110,55 +109,55 @@ public class FileSystemPathTest {
     FileSystemPath path = new FileSystemPath(null);
     path.toFile();
 
-    assertEquals("", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEmpty();
   }
 
   @Test
   public void getParent() throws Exception {
-    assertEquals(nioPath.getParent().toString(), commonPath.getParent().toString());
+    assertThat(nioPath.getParent().toString()).isEqualTo(commonPath.getParent().toString());
   }
 
   @Test
   public void toAbsolutePath() throws Exception {
-    assertEquals(nioPath.toAbsolutePath().toString(), commonPath.toAbsolutePath().toString());
+    assertThat(nioPath.toAbsolutePath().toString()).isEqualTo(commonPath.toAbsolutePath().toString());
   }
 
   @Test
   public void getFileName() throws Exception {
-    assertEquals(nioPath.getFileName().toString(), commonPath.getName().toString());
+    assertThat(nioPath.getFileName().toString()).isEqualTo(commonPath.getName().toString());
   }
 
   @Test
   public void isAbsolute() throws Exception {
-    assertEquals(nioPath.isAbsolute(), commonPath.isAbsolute());
+    assertThat(nioPath.isAbsolute()).isEqualTo(commonPath.isAbsolute());
   }
 
   @Test
   public void toStringTest() throws Exception {
-    assertEquals(nioPath.toString(), commonPath.toString());
+    assertThat(nioPath.toString()).isEqualTo(commonPath.toString());
   }
 
   @Test
   public void testEquals() throws Exception {
     Path pathA = new FileSystemPath("1", (String[])null);
     Path pathB = new FileSystemPath(null, "1");
-    assertEquals(pathA, pathB);
+    assertThat(pathA).isEqualTo(pathB);
 
     pathA = new FileSystemPath("1", "1");
     pathB = new FileSystemPath(null, "1", "1");
-    assertEquals(pathA, pathB);
+    assertThat(pathA).isEqualTo(pathB);
 
     pathA = new FileSystemPath("");
     pathB = new FileSystemPath(null, "");
-    assertEquals(pathA, pathB);
+    assertThat(pathA).isEqualTo(pathB);
 
     pathA = new FileSystemPath("pathA");
     pathB = new FileSystemPath("pathB");
-    assertNotEquals(pathA, pathB);
+    assertThat(pathA).isNotEqualTo(pathB);
 
     pathA = new FileSystemPath("pathA");
     pathB = pathA;
-    assertEquals(pathA, pathB);
+    assertThat(pathA).isEqualTo(pathB);
   }
 
 }
