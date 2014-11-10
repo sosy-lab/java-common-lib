@@ -30,13 +30,21 @@ import java.util.concurrent.ThreadFactory;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRule;
 
 
 public class CatchSecurityViolationThreadFactoryBuilderTest {
 
+  @Rule
+  public MockitoJUnitRule mockito = new MockitoJUnitRule(this);
+
+  @Mock
+  private Runnable mockRunnable;
+
   private CatchSecurityViolationThreadFactoryBuilder builder;
-  private Runnable mockRunnable = mock(Runnable.class);
 
   @Before
   public void setUp() {
