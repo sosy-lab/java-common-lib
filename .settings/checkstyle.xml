@@ -152,7 +152,6 @@
     <module name="ForbidReturnInFinalBlockCheck"/>
     <module name="ReturnNullInsteadOfBoolean"/>
     <module name="ReturnBooleanFromTernary"/>
-    <module name="NestedTernary"/>
     <module name="NoNullForCollectionReturnCheck">
       <property name="searchThroughMethodBody" value="true"/>
     </module>
