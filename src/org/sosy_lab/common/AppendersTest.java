@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.IOException;
 
@@ -41,21 +41,21 @@ public class AppendersTest {
 
   @Test
   public void testToStringWithTruncation_NoLimit() {
-    assertEquals("123456789", Appenders.toStringWithTruncation(testAppender, 100));
-    assertEquals("123456789", Appenders.toStringWithTruncation(testAppender, 10));
-    assertEquals("123456789", Appenders.toStringWithTruncation(testAppender, 9));
+    assertThat(Appenders.toStringWithTruncation(testAppender, 100)).isEqualTo("123456789");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 10)).isEqualTo("123456789");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 9)).isEqualTo("123456789");
   }
 
   @Test
   public void testToStringWithTruncation_Limit() {
-    assertEquals("12345678", Appenders.toStringWithTruncation(testAppender, 8));
-    assertEquals("1234567",  Appenders.toStringWithTruncation(testAppender, 7));
-    assertEquals("123456",   Appenders.toStringWithTruncation(testAppender, 6));
-    assertEquals("12345",    Appenders.toStringWithTruncation(testAppender, 5));
-    assertEquals("1234",     Appenders.toStringWithTruncation(testAppender, 4));
-    assertEquals("123",      Appenders.toStringWithTruncation(testAppender, 3));
-    assertEquals("12",       Appenders.toStringWithTruncation(testAppender, 2));
-    assertEquals("1",        Appenders.toStringWithTruncation(testAppender, 1));
-    assertEquals("",         Appenders.toStringWithTruncation(testAppender, 0));
+    assertThat(Appenders.toStringWithTruncation(testAppender, 8)).isEqualTo("12345678");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 7)).isEqualTo("1234567");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 6)).isEqualTo("123456");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 5)).isEqualTo("12345");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 4)).isEqualTo("1234");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 3)).isEqualTo("123");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 2)).isEqualTo("12");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 1)).isEqualTo("1");
+    assertThat(Appenders.toStringWithTruncation(testAppender, 0)).isEqualTo("");
   }
 }

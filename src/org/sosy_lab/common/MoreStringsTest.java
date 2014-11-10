@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.common;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
 
@@ -28,21 +27,21 @@ public class MoreStringsTest {
 
   @Test
   public void startsWithIgnoreCase_Empty() {
-    assertTrue(MoreStrings.startsWithIgnoreCase("aB", ""));
+    assertThat(MoreStrings.startsWithIgnoreCase("aB", "")).isTrue();
   }
 
   @Test
   public void startsWithIgnoreCase_Short() {
-    assertFalse(MoreStrings.startsWithIgnoreCase("aB", "aBc"));
+    assertThat(MoreStrings.startsWithIgnoreCase("aB", "aBc")).isFalse();
   }
 
   @Test
   public void startsWithIgnoreCase_Matching() {
-    assertTrue(MoreStrings.startsWithIgnoreCase("AbC", "aB"));
+    assertThat(MoreStrings.startsWithIgnoreCase("AbC", "aB")).isTrue();
   }
 
   @Test
   public void startsWithIgnoreCase_NonMatching() {
-    assertFalse(MoreStrings.startsWithIgnoreCase("AbC", "Ac"));
+    assertThat(MoreStrings.startsWithIgnoreCase("AbC", "Ac")).isFalse();
   }
 }

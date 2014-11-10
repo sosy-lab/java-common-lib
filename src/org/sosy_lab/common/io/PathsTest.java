@@ -19,11 +19,10 @@
  */
 package org.sosy_lab.common.io;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
 import java.net.URI;
@@ -44,7 +43,7 @@ public class PathsTest {
     Paths.setFactory(null);
     Path path = Paths.get("test");
 
-    assertThat(path, instanceOf(FileSystemPath.class));
+    assertThat(path).isInstanceOf(FileSystemPath.class);
   }
 
   @Test
@@ -58,20 +57,20 @@ public class PathsTest {
     Paths.setFactory(factory);
     Path path = Paths.get("test");
 
-    assertEquals("stub", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("stub");
   }
 
   @Test
   public void shouldConvertFileToPath() throws Exception {
     Path path = Paths.get(new File("test"));
 
-    assertEquals("test", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("test");
   }
 
   @Test
   public void shouldConvertURItoPath() throws Exception {
     Path path = Paths.get(new URI("file:///test"));
 
-    assertEquals("/test", path.getOriginalPath());
+    assertThat(path.getOriginalPath()).isEqualTo("/test");
   }
 }

@@ -19,13 +19,12 @@
  */
 package org.sosy_lab.common.collect;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.sosy_lab.common.collect.PersistentSortedMaps.merge;
 import static org.sosy_lab.common.collect.PersistentSortedMaps.mergeWithKeyDifferences;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -65,8 +64,8 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
-    assertTrue(differences.isEmpty());
+    assertThat(result).isEqualTo(FULL_MAP);
+    assertThat(differences).isEmpty();
   }
 
   @Test
@@ -80,17 +79,14 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", null, "1"),
       Triple.of("b", null, "2"),
       Triple.of("c", null, "3"),
       Triple.of("d", null, "4")
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -104,17 +100,14 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", "1", null),
       Triple.of("b", "2", null),
       Triple.of("c", "3", null),
       Triple.of("d", "4", null)
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -128,15 +121,12 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("b", null, "2"),
       Triple.of("d", null, "4")
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -150,15 +140,12 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", null, "1"),
       Triple.of("c", null, "3")
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -172,15 +159,12 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("b", "2", null),
       Triple.of("d", "4", null)
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -194,15 +178,12 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", "1", null),
       Triple.of("c", "3", null)
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -216,17 +197,14 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", "1", null),
       Triple.of("b", null, "2"),
       Triple.of("c", "3", null),
       Triple.of("d", null, "4")
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
   @Test
@@ -240,17 +218,14 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
               differences);
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Triple<String, String, String>[] expectedDifferences = new Triple[] {
+    assertThat(differences).iteratesAs(
       Triple.of("a", null, "1"),
       Triple.of("b", "2", null),
       Triple.of("c", null, "3"),
       Triple.of("d", "4", null)
-    };
-
-    assertEquals(Arrays.asList(expectedDifferences), differences);
+      );
   }
 
 
@@ -263,7 +238,7 @@ public class PersistentSortedMapsTest {
               FULL_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -274,7 +249,7 @@ public class PersistentSortedMapsTest {
               FULL_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -285,7 +260,7 @@ public class PersistentSortedMapsTest {
               EMPTY_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -296,7 +271,7 @@ public class PersistentSortedMapsTest {
               FULL_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -307,7 +282,7 @@ public class PersistentSortedMapsTest {
               FULL_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -318,7 +293,7 @@ public class PersistentSortedMapsTest {
               HALF1_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -329,7 +304,7 @@ public class PersistentSortedMapsTest {
               HALF2_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -340,7 +315,7 @@ public class PersistentSortedMapsTest {
               HALF2_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -351,7 +326,7 @@ public class PersistentSortedMapsTest {
               HALF1_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result);
+    assertThat(result).isEqualTo(FULL_MAP);
   }
 
 
@@ -364,9 +339,9 @@ public class PersistentSortedMapsTest {
                         FULL_MAP,
                         PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result.getThird());
-    assertTrue(result.getFirst().isEmpty());
-    assertTrue(result.getSecond().isEmpty());
+    assertThat(result.getFirst()).isEmpty();
+    assertThat(result.getSecond()).isEmpty();
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -377,9 +352,9 @@ public class PersistentSortedMapsTest {
                         FULL_MAP,
                         PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertTrue(result.getFirst().isEmpty());
-    assertEquals(FULL_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEmpty();
+    assertThat(result.getSecond()).isEqualTo(FULL_MAP);
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -390,9 +365,9 @@ public class PersistentSortedMapsTest {
                         EMPTY_MAP,
                         PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(FULL_MAP, result.getFirst());
-    assertTrue(result.getSecond().isEmpty());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEqualTo(FULL_MAP);
+    assertThat(result.getSecond()).isEmpty();
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -403,9 +378,9 @@ public class PersistentSortedMapsTest {
                         FULL_MAP,
                         PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(EMPTY_MAP, result.getFirst());
-    assertEquals(HALF2_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEmpty();
+    assertThat(result.getSecond()).isEqualTo(HALF2_MAP);
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -416,9 +391,9 @@ public class PersistentSortedMapsTest {
               FULL_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(EMPTY_MAP, result.getFirst());
-    assertEquals(HALF1_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEmpty();
+    assertThat(result.getSecond()).isEqualTo(HALF1_MAP);
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -429,9 +404,9 @@ public class PersistentSortedMapsTest {
               HALF1_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(HALF2_MAP, result.getFirst());
-    assertEquals(EMPTY_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEqualTo(HALF2_MAP);
+    assertThat(result.getSecond()).isEmpty();
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -442,9 +417,9 @@ public class PersistentSortedMapsTest {
               HALF2_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(HALF1_MAP, result.getFirst());
-    assertEquals(EMPTY_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEqualTo(HALF1_MAP);
+    assertThat(result.getSecond()).isEmpty();
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -455,9 +430,9 @@ public class PersistentSortedMapsTest {
               HALF2_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(HALF1_MAP, result.getFirst());
-    assertEquals(HALF2_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEqualTo(HALF1_MAP);
+    assertThat(result.getSecond()).isEqualTo(HALF2_MAP);
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 
   @Test
@@ -468,8 +443,8 @@ public class PersistentSortedMapsTest {
               HALF1_MAP,
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
-    assertEquals(HALF2_MAP, result.getFirst());
-    assertEquals(HALF1_MAP, result.getSecond());
-    assertEquals(FULL_MAP, result.getThird());
+    assertThat(result.getFirst()).isEqualTo(HALF2_MAP);
+    assertThat(result.getSecond()).isEqualTo(HALF1_MAP);
+    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 }

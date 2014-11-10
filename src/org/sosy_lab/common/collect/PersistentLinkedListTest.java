@@ -19,13 +19,14 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.testing.ListTestSuiteBuilder;
@@ -73,43 +74,37 @@ public class PersistentLinkedListTest extends TestCase {
 
   @Test
   public void testOf1() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("a");
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"a"});
-    Assert.assertEquals(l2, l1);
+    assertThat(PersistentLinkedList.of("a"))
+              .iteratesAs("a");
   }
 
   @Test
   public void testOf2() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("a", "b");
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"a", "b"});
-    Assert.assertEquals(l2, l1);
+    assertThat(PersistentLinkedList.of("a", "b"))
+              .iteratesAs("a", "b");
   }
 
   @Test
   public void testOf3() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("a", "b", "c");
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"a", "b", "c"});
-    Assert.assertEquals(l2, l1);
+    assertThat(PersistentLinkedList.of("a", "b", "c"))
+              .iteratesAs("a", "b", "c");
   }
 
   @Test
   public void testOfVarArgs() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("a", "b", "c", "d");
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"a", "b", "c", "d"});
-    Assert.assertEquals(l2, l1);
+    assertThat(PersistentLinkedList.of("a", "b", "c", "d"))
+              .iteratesAs("a", "b", "c", "d");
   }
 
   @Test
   public void testWithAll() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("d").withAll(Arrays.asList("a", "b", "c"));
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"a", "b", "c", "d"});
-    Assert.assertEquals(l2, l1);
+    assertThat(PersistentLinkedList.of("d").withAll(Arrays.asList("a", "b", "c")))
+              .iteratesAs("a", "b", "c", "d");
   }
 
   @Test
   public void testReversed() {
-    PersistentLinkedList<String> l1 = PersistentLinkedList.of("a", "b", "c", "d");
-    PersistentLinkedList<String> l2 = PersistentLinkedList.copyOf(new String[]{"d", "c", "b", "a"});
-    Assert.assertEquals(l2, l1.reversed());
+    assertThat(PersistentLinkedList.of("a", "b", "c", "d").reversed())
+              .iteratesAs("d", "c", "b", "a");
   }
 }

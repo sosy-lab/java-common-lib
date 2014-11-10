@@ -19,8 +19,9 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import static org.junit.Assert.assertEquals;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
+
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +147,7 @@ public class FileTypeConverterTest {
         thrown.expectMessage(testPath);
       }
 
-      assertEquals(path, conv.checkSafePath(path, "dummy"));
+      assertThat(conv.checkSafePath(path, "dummy")).isEqualTo(path);
     }
 
     @Test
@@ -163,8 +164,8 @@ public class FileTypeConverterTest {
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
-      assertEquals(Paths.get(testPath).resolve("output").getOriginalPath(),
-          conv.getOutputDirectory());
+      assertThat(conv.getOutputDirectory())
+                .isEqualTo(Paths.get(testPath).resolve("output").getOriginalPath());
     }
 
     @Test
@@ -180,7 +181,8 @@ public class FileTypeConverterTest {
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
-      assertEquals(Paths.get(".").resolve(testPath).getPath(), conv.getOutputDirectory());
+      assertThat(conv.getOutputDirectory())
+                .isEqualTo(Paths.get(".").resolve(testPath).getPath());
     }
 
     @Test
@@ -199,7 +201,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertEquals(Paths.get(testPath), options.path);
+      assertThat(options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -219,7 +221,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertEquals(Paths.get(testPath), options.path);
+      assertThat(options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -239,7 +241,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertEquals(Paths.get("config").resolve(testPath), options.path);
+      assertThat(options.path).isEqualTo(Paths.get("config").resolve(testPath));
     }
   }
 }

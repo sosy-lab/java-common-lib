@@ -20,7 +20,8 @@
 package org.sosy_lab.common;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
+
+import static com.google.common.truth.Truth.assertThat;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -48,8 +49,8 @@ public class LazyFutureTaskTest {
       }
     }, true);
 
-    assertEquals(true, f.get());
-    assertEquals(true, test.get());
+    assertThat(f.get()).isTrue();
+    assertThat(test.get()).isTrue();
   }
 
   @Test
@@ -62,7 +63,7 @@ public class LazyFutureTaskTest {
       }
     });
 
-    assertEquals(true, f.get());
+    assertThat(f.get()).isTrue();
   }
 
   @Test
@@ -94,7 +95,7 @@ public class LazyFutureTaskTest {
     }, null);
 
     // no call to f.get()
-    assertEquals(true, test.get());
+    assertThat(test.get()).isTrue();
   }
 
   @Test
