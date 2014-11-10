@@ -28,12 +28,19 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.ThreadFactory;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRule;
 
 
 public class ThreadsTest {
 
-  private Runnable mockRunnable = mock(Runnable.class);
+  @Rule
+  public MockitoJUnitRule mockito = new MockitoJUnitRule(this);
+
+  @Mock
+  private Runnable mockRunnable;
 
   @Test
   public void shouldReturnDefaultThreadFactory() throws Exception {
@@ -51,7 +58,7 @@ public class ThreadsTest {
 
     Threads.setThreadFactory(stubFactory);
 
-    Assert.assertEquals(mockThread, Threads.threadFactoryBuilder().build().newThread(mock(Runnable.class)));
+    Assert.assertEquals(mockThread, Threads.threadFactoryBuilder().build().newThread(mockRunnable));
   }
 
   @Test

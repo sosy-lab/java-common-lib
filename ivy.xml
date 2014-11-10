@@ -54,13 +54,15 @@
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.7.0.201403182114" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.7.2.201409121644" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
         <dependency org="org.apache.ant" name="ant-junit" rev="${ant.version.exact}" transitive="false" conf="build->default"/>
 
-        <dependency name="mockito-core" org="org.mockito" rev="1.9.5" conf="test->default; contrib->sources" />
+        <!-- Mockito
+             Mocking framework for tests. -->
+        <dependency org="org.mockito" name="mockito-core" rev="1.10.10" conf="test->default"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
