@@ -6,6 +6,10 @@
 /junit
 /JUnit.html
 /JUnit-coverage
+/Checkstyle.html
+/Checkstyle.xml
+/Checkstyle.Test.html
+/Checkstyle.Test.xml
 /FindBugs.html
 /FindBugs.xml
 /FindBugs.diff.html
