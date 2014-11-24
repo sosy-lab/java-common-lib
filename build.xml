@@ -7,11 +7,14 @@
     <property file="build.properties"/>
     <property environment="env"/>
 
+    <property name="ivy.configurations" value="build, runtime, test, checkstyle, findbugs"/>
+
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
     <import file="build/build-jar.xml"/>
     <import file="build/build-junit.xml"/>
+    <import file="build/build-checkstyle.xml"/>
     <import file="build/build-findbugs.xml"/>
     <import file="build/build-publish.xml"/>
 

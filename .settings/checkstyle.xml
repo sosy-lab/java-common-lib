@@ -143,19 +143,19 @@
     <module name="UpperEll"/>
     <module name="OuterTypeFilename"/>
     <module name="AvoidStarImport"/>
-    <module name="ForbidAnnotation">
+    <module name="com.github.sevntu.checkstyle.checks.annotation.ForbidAnnotation">
       <property name="annotationNames" value="Test"/>
       <property name="annotationTargets" value="METHOD_DEF"/>
     </module>
-    <module name="AvoidDefaultSerializableInInnerClasses"/>
-    <module name="AvoidNotShortCircuitOperatorsForBoolean"/>
-    <module name="ForbidReturnInFinalBlockCheck"/>
-    <module name="ReturnNullInsteadOfBoolean"/>
-    <module name="ReturnBooleanFromTernary"/>
-    <module name="NoNullForCollectionReturnCheck">
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClasses"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBoolean"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinalBlockCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBoolean"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnBooleanFromTernary"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.NoNullForCollectionReturnCheck">
       <property name="searchThroughMethodBody" value="true"/>
     </module>
-    <module name="NoMainMethodInAbstractClass"/>
+    <module name="com.github.sevntu.checkstyle.checks.design.NoMainMethodInAbstractClass"/>
   </module>
   <module name="Header">
     <property name="header" value="/*\n *  SoSy-Lab Common is a library of useful utilities.\n *  This file is part of SoSy-Lab Common.\n *\n *  Copyright (C) 2007-2014  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>
