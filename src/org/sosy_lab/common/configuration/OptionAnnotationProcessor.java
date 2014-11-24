@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.Completions;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -61,6 +62,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import com.google.auto.service.AutoService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
@@ -78,6 +80,7 @@ import com.google.common.collect.ImmutableSet;
  */
 @SupportedAnnotationTypes("org.sosy_lab.common.configuration.*")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
+@AutoService(Processor.class)
 public class OptionAnnotationProcessor extends AbstractProcessor {
 
   // The set of known option-detail annotations.
