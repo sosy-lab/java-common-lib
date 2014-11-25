@@ -75,9 +75,11 @@ public interface ConfigurationBuilder {
    *
    * @param oldConfig A configuration instance with a value for option.
    * @param option The name of a configuration option.
-   * @throws IllegalArgumentException If the given configuration does not specify a value for the given option.
+   * @throws IllegalArgumentException If the given configuration
+   * does not specify a value for the given option.
    */
-  ConfigurationBuilder copyOptionFrom(Configuration oldConfig, String option) throws IllegalArgumentException;
+  ConfigurationBuilder copyOptionFrom(Configuration oldConfig, String option)
+      throws IllegalArgumentException;
 
   /**
    * Load options from a {@link CharSource} with a "key = value" format.
@@ -88,11 +90,13 @@ public interface ConfigurationBuilder {
    *
    * @param source The source to read from.
    * @param basePath The directory where relative #include directives should be based on.
-   * @param sourceName A string to use as source of the file in error messages (this should usually be a filename or something similar).
+   * @param sourceName A string to use as source of the file in error messages
+   * (this should usually be a filename or something similar).
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
-  ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName) throws IOException,
+  ConfigurationBuilder loadFromSource(CharSource source, String basePath,
+      String sourceName) throws IOException,
       InvalidConfigurationException;
 
   /**
@@ -102,12 +106,14 @@ public interface ConfigurationBuilder {
    *
    * @param stream The stream to read from.
    * @param basePath The directory where relative #include directives should be based on.
-   * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
+   * @param source A string to use as source of the file in error messages
+   * (this should usually be a filename or something similar).
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
   @Deprecated
-  ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source) throws IOException,
+  ConfigurationBuilder loadFromStream(InputStream stream, String basePath,
+      String source) throws IOException,
       InvalidConfigurationException;
 
   /**
@@ -121,7 +127,8 @@ public interface ConfigurationBuilder {
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
   @Deprecated
-  ConfigurationBuilder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException;
+  ConfigurationBuilder loadFromStream(InputStream stream)
+      throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from a file with a "key = value" format.
@@ -129,7 +136,8 @@ public interface ConfigurationBuilder {
    * @throws IOException If the file cannot be read.
    * @throws InvalidConfigurationException If the file contains an invalid format.
    */
-  ConfigurationBuilder loadFromFile(String filename) throws IOException, InvalidConfigurationException;
+  ConfigurationBuilder loadFromFile(String filename)
+      throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from a file with a "key = value" format.
@@ -167,7 +175,8 @@ public interface ConfigurationBuilder {
    * This method resets the builder instance, so that after this method has
    * returned it is exactly in the same state as directly after instantiation.
    *
-   * @throws InvalidConfigurationException if the settings contained invalid values for the configuration options of the Configuration class
+   * @throws InvalidConfigurationException if the settings contained invalid values
+   * for the configuration options of the Configuration class
    */
   Configuration build() throws InvalidConfigurationException;
 

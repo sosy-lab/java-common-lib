@@ -26,7 +26,8 @@ import javax.annotation.CheckReturnValue;
 /**
  * Interface for persistent map.
  * A persistent data structure is immutable, but provides cheap copy-and-write
- * operations. Thus all write operations ({{@link #putAndCopy(Object, Object)}, {{@link #removeAndCopy(Object)}})
+ * operations. Thus all write operations
+ * ({{@link #putAndCopy(Object, Object)}, {{@link #removeAndCopy(Object)}})
  * will not modify the current instance, but return a new instance instead.
  *
  * All modifying operations inherited from {@link Map} are not supported and

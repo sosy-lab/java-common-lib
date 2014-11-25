@@ -55,7 +55,8 @@ import com.google.common.collect.ForwardingSortedSet;
  * However, they currently do not support any modifying operations.
  * All iterators produced by the collection views iterate over an immutable
  * snapshot of the map taken at iterator creation time and thus do not reflect
- * intermediate changes to the map. The iterators also don't support the {@link Iterator#remove()} method.
+ * intermediate changes to the map.
+ * The iterators also don't support the {@link Iterator#remove()} method.
  * Thus it is safe to iterate over the map while changing it.
  *
  * This implementation is thread-safe and lock free,
@@ -78,7 +79,8 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * To create an empty instance, get an empty instance of your favorite
    * {@link PersistentSortedMap} implementation and pass it to this method.
    */
-  public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(PersistentSortedMap<K, V> pMap)  {
+  public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(
+      PersistentSortedMap<K, V> pMap)  {
     return new CopyOnWriteSortedMap<>(pMap);
   }
 
@@ -87,7 +89,8 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * The snapshot of the given map is created atomically.
    * Changes to the new map don't reflect in the given map and vice-versa.
    */
-  public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(CopyOnWriteSortedMap<K, V> pMap) {
+  public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(
+      CopyOnWriteSortedMap<K, V> pMap) {
     return new CopyOnWriteSortedMap<>(pMap.map.get());
   }
 

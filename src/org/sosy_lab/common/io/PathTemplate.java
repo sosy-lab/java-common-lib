@@ -52,7 +52,8 @@ public final class PathTemplate {
    * Construct a concrete {@link Path} from this template and the given values.
    * @param args
    * @return
-   * @throws IllegalFormatException If the template is invalid, or the arguments does not match the template.
+   * @throws IllegalFormatException If the template is invalid,
+   * or the arguments does not match the template.
    */
   public Path getPath(Object... args) {
     checkArgument(!Arrays.asList(args).contains(null), "Values for PathTemplate may not be null");

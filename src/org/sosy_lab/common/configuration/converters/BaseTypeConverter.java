@@ -49,7 +49,8 @@ public enum BaseTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> type, Type pGenericType,
-      Annotation pSecondaryOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
+      Annotation pSecondaryOption, Path pSource, LogManager logger)
+          throws InvalidConfigurationException {
 
     if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
@@ -59,7 +60,8 @@ public enum BaseTypeConverter implements TypeConverter {
       try {
         return convertEnum(type, valueStr);
       } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException("Invalid value " + valueStr + " for option " + optionName);
+        throw new InvalidConfigurationException(
+            "Invalid value " + valueStr + " for option " + optionName);
       }
 
     } else if (type.equals(String.class)) {
@@ -69,23 +71,28 @@ public enum BaseTypeConverter implements TypeConverter {
       try {
         return Charset.forName(valueStr);
       } catch (IllegalCharsetNameException e) {
-        throw new InvalidConfigurationException("Illegal charset '" + valueStr + "' in option " + optionName, e);
+        throw new InvalidConfigurationException(
+            "Illegal charset '" + valueStr + "' in option " + optionName, e);
       } catch (UnsupportedCharsetException e) {
-        throw new InvalidConfigurationException("Unsupported charset " + valueStr + " in option " + optionName, e);
+        throw new InvalidConfigurationException(
+            "Unsupported charset " + valueStr + " in option " + optionName, e);
       }
 
     } else if (type.equals(Level.class)) {
       try {
         return Level.parse(valueStr);
       } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException("Illegal log level " + valueStr + " in option " + optionName);
+        throw new InvalidConfigurationException(
+            "Illegal log level " + valueStr + " in option " + optionName);
       }
 
     } else if (type.equals(Pattern.class)) {
       try {
         return Pattern.compile(valueStr);
       } catch (PatternSyntaxException e) {
-        throw new InvalidConfigurationException("Illegal regular expression " + valueStr + " in option " + optionName + " (" + e.getMessage() + ")", e);
+        throw new InvalidConfigurationException(
+            "Illegal regular expression " + valueStr + " in option " + optionName
+            + " (" + e.getMessage() + ")", e);
       }
 
     } else {

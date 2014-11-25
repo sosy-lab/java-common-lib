@@ -49,7 +49,8 @@ public final class JSON {
    * @throws IOException
    */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
-    try (Writer out = file.asCharSink(StandardCharsets.US_ASCII).openStream()) { // We escape everything, so pure ASCII remains
+    // We escape everything, so pure ASCII remains
+    try (Writer out = file.asCharSink(StandardCharsets.US_ASCII).openStream()) {
       writeJSONString(value, out);
     }
   }
@@ -94,7 +95,8 @@ public final class JSON {
       writeJSONString((List<?>)value, out);
 
     } else {
-      throw new NotSerializableException("Object of class " + value.getClass().getName() + " cannot be written as JSON");
+      throw new NotSerializableException("Object of class " + value.getClass().getName()
+          + " cannot be written as JSON");
     }
   }
 
@@ -173,7 +175,8 @@ public final class JSON {
         break;
       default:
         //Reference: http://www.unicode.org/versions/Unicode5.1.0/
-        if ((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F') || (ch>='\u2000' && ch<='\u20FF')) {
+        if ((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F')
+            || (ch>='\u2000' && ch<='\u20FF')) {
           String ss = Integer.toHexString(ch)
                              .toUpperCase();
           out.append("\\u");

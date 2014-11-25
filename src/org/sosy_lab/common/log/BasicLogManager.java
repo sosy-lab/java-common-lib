@@ -118,7 +118,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    *
    * @see #BasicLogManager(Configuration, Handler, Handler)
    */
-  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler) throws InvalidConfigurationException {
+  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler)
+      throws InvalidConfigurationException {
     this(config, consoleOutputHandler, null);
   }
 
@@ -137,7 +138,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * instance will be used.
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
    */
-  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler, @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
+  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler,
+      @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
     LoggingOptions options = new LoggingOptions(config);
     Level fileLevel = options.getFileLevel();
     Level consoleLevel = options.getConsoleLevel();
@@ -154,7 +156,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       if (consoleOutputHandler == null) {
         consoleOutputHandler = new ConsoleHandler();
       }
-      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config), consoleLevel, options.getConsoleExclude());
+      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config),
+          consoleLevel, options.getConsoleExclude());
     }
 
     // create file logger
@@ -172,7 +175,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
             logger.getHandlers()[0].setLevel(fileLevel);
           }
 
-          logger.log(Level.WARNING, "Could not open log file " + e.getMessage() + ", redirecting log output to console");
+          logger.log(Level.WARNING, "Could not open log file " + e.getMessage()
+              + ", redirecting log output to console");
         }
       }
     } else {
@@ -196,7 +200,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * @param level The level to use with the handler.
    * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
    */
-  protected void setupHandler(Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
+  protected void setupHandler(Handler handler, Formatter formatter, Level level,
+      List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
@@ -247,7 +252,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * in order to increase performance if the message is never logged.
    *
    * @param priority the log level for the message
-   * @param args the parts of the message (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
+   * @param args the parts of the message
+   * (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
    */
   @Override
   public void log(Level priority, Object... args) {
@@ -472,7 +478,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       logMessage += Throwables.getStackTraceAsString(e);
 
       StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-      int traceIndex = 2; // first method in stacktrace is Thread#getStackTrace(), second is this method
+      // first method in stacktrace is Thread#getStackTrace(), second is this method
+      int traceIndex = 2;
 
       // find the first interesting method in the stack trace
       // (we assume that methods starting with "log" are helper methods for logging

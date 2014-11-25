@@ -76,7 +76,8 @@ public class ProcessExecutor<E extends Exception> {
 
   private final Writer in;
 
-  private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(3));
+  private final ListeningExecutorService executor =
+      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(3));
   private final ListenableFuture<?> outFuture;
   private final ListenableFuture<?> errFuture;
   private final ListenableFuture<Integer> processFuture;
@@ -91,7 +92,8 @@ public class ProcessExecutor<E extends Exception> {
   /**
    * @see #ProcessExecutor(LogManager, Class, String...)
    */
-  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd) throws IOException {
+  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass,
+      String... cmd) throws IOException {
     this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
   }
 
@@ -244,11 +246,13 @@ public class ProcessExecutor<E extends Exception> {
       @Override
       public void onFailure(Throwable e) {
         if (!processFuture.isCancelled()) {
-          logger.logUserException(Level.FINEST, e, "Killing " + name + " due to error in output handling");
+          logger.logUserException(Level.FINEST, e,
+              "Killing " + name + " due to error in output handling");
           processFuture.cancel(true);
 
         } else {
-          logger.logDebugException(e, "Error in output handling after " + name + " was already killed");
+          logger.logDebugException(e,
+              "Error in output handling after " + name + " was already killed");
         }
       }
 
@@ -306,7 +310,8 @@ public class ProcessExecutor<E extends Exception> {
    * @throws TimeoutException If timeout is hit.
    * @throws InterruptedException
    */
-  public int join(final long timelimit) throws IOException, E, TimeoutException, InterruptedException {
+  public int join(final long timelimit)
+      throws IOException, E, TimeoutException, InterruptedException {
     try {
       Integer exitCode = null;
       try {

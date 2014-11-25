@@ -58,7 +58,8 @@ public interface LogManager extends AutoCloseable {
    * in order to increase performance if the message is never logged.
    *
    * @param priority the log level for the message
-   * @param args the parts of the message (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
+   * @param args the parts of the message
+   * (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
    */
   void log(Level priority, Object... args);
 

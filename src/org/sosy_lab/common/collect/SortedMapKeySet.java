@@ -38,7 +38,9 @@ import com.google.common.collect.Iterators;
  *
  * @param <K> The type of keys.
  */
-class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K> implements SortedSet<K> {
+class SortedMapKeySet<K extends Comparable<? super K>>
+    extends AbstractSet<K>
+    implements SortedSet<K> {
 
   private final SortedMap<K, ?> map;
 

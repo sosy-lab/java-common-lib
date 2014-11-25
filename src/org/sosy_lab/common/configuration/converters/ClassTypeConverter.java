@@ -37,14 +37,17 @@ public class ClassTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String value, Class<?> type, Type genericType,
-      Annotation secondaryOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
+      Annotation secondaryOption, Path pSource, LogManager logger)
+          throws InvalidConfigurationException {
 
-    Iterable<String> packagePrefixes = Collections.<String>singleton(null); // null means "no prefix"
+    // null means "no prefix"
+    Iterable<String> packagePrefixes = Collections.<String>singleton(null);
 
     // get optional package prefix
     if (secondaryOption != null) {
       if (!(secondaryOption instanceof ClassOption)) {
-        throw new UnsupportedOperationException("Options of type Class may not be annotated with " + secondaryOption);
+        throw new UnsupportedOperationException(
+            "Options of type Class may not be annotated with " + secondaryOption);
       }
       packagePrefixes = Iterables.concat(packagePrefixes,
           Arrays.asList(((ClassOption) secondaryOption).packagePrefix()));
@@ -63,12 +66,15 @@ public class ClassTypeConverter implements TypeConverter {
       }
     }
     if (cls == null) {
-      throw new InvalidConfigurationException("Class " + value + " specified in option " + optionName + " not found");
+      throw new InvalidConfigurationException(
+          "Class " + value + " specified in option " + optionName + " not found");
     }
 
     // check type
     if (!targetType.isAssignableFrom(cls)) {
-      throw new InvalidConfigurationException("Class " + value + " specified in option " + optionName + " is not an instance of " + targetType.getCanonicalName());
+      throw new InvalidConfigurationException(
+          "Class " + value + " specified in option " + optionName
+          + " is not an instance of " + targetType.getCanonicalName());
     }
 
     Classes.produceClassLoadingWarning(logger, cls, targetType);

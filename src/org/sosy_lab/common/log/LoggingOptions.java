@@ -54,10 +54,12 @@ final class LoggingOptions {
   @Option(secure=true, toUppercase=true, description="log level of console output")
   private Level consoleLevel = Level.INFO;
 
-  @Option(secure=true, toUppercase=true, description="single levels to be excluded from being logged")
+  @Option(secure=true, toUppercase=true,
+      description="single levels to be excluded from being logged")
   private List<Level> fileExclude = ImmutableList.of();
 
-  @Option(secure=true, toUppercase=true, description="single levels to be excluded from being logged")
+  @Option(secure=true, toUppercase=true,
+      description="single levels to be excluded from being logged")
   private List<Level> consoleExclude = ImmutableList.of();
 
   @Option(secure=true, name="file",
@@ -65,7 +67,8 @@ final class LoggingOptions {
   @FileOption(FileOption.Type.OUTPUT_FILE)
   private Path outputFile = Paths.get("CPALog.txt");
 
-  @Option(secure=true, description="maximum size of log output strings before they will be truncated")
+  @Option(secure=true,
+      description="maximum size of log output strings before they will be truncated")
   @IntegerOption(min=1)
   private int truncateSize = 10000;
 

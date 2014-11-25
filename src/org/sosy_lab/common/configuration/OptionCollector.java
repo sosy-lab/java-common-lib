@@ -53,7 +53,8 @@ import com.google.common.io.Resources;
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
-  private final static Pattern IGNORED_CLASSES = Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
+  private final static Pattern IGNORED_CLASSES =
+      Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
   private final static int CHARS_PER_LINE = 75; // for description
 
   /** The main-method collects all classes of a program and
@@ -130,9 +131,11 @@ public class OptionCollector {
     // add options of this library
     if (appendCommonOptions) {
       try {
-        content.append(Resources.toString(Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt"), StandardCharsets.UTF_8));
+        URL resource = Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt");
+        content.append(Resources.toString(resource, StandardCharsets.UTF_8));
       } catch (Exception e) {
-        System.err.println("Could not find options of org.sosy-lab.common classes: " + e.getMessage());
+        System.err.println("Could not find options of org.sosy-lab.common classes: "
+            + e.getMessage());
       }
     }
 
@@ -294,7 +297,8 @@ public class OptionCollector {
   }
 
   /** This function formats text and splits lines, if they are too long. */
-  public static String formatText(final String text, final String lineStart, final boolean useLineStartInFirstLine) {
+  public static String formatText(final String text, final String lineStart,
+      final boolean useLineStartInFirstLine) {
     checkNotNull(lineStart);
     if (text.isEmpty()) {
       return text;
@@ -407,7 +411,8 @@ public class OptionCollector {
       typeString = field.getType().getSimpleName();
     }
 
-    typeString = typeString.replaceAll("[^<>, ]*\\$([^<>, $]*)", "$1"); // remove prefix of inner classes
+    // remove prefix of inner classes
+    typeString = typeString.replaceAll("[^<>, ]*\\$([^<>, $]*)", "$1");
 
     fieldString += "\\s+" + typeString;
     fieldString += "\\s+" + field.getName();
@@ -503,7 +508,8 @@ public class OptionCollector {
         defaultValue = stripSurroundingFunctionCall(defaultValue, "new Path");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Pattern.compile");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "PathTemplate.ofFormatString");
-        defaultValue = stripSurroundingFunctionCall(defaultValue, "PathCounterTemplate.ofFormatString");
+        defaultValue = stripSurroundingFunctionCall(defaultValue,
+            "PathCounterTemplate.ofFormatString");
 
         if (defaultValue.startsWith("TimeSpan.ofNanos(")) {
           defaultValue = defaultValue.substring(
@@ -531,7 +537,8 @@ public class OptionCollector {
     } else {
 
       // special handling for generics
-      final String stringSetFieldPattern = fieldPattern.replace("\\s+Set\\s+", "\\s+Set<String>\\s+");
+      final String stringSetFieldPattern =
+          fieldPattern.replace("\\s+Set\\s+", "\\s+Set<String>\\s+");
       if (content.contains(stringSetFieldPattern)) {
         return getDefaultValueFromContent(content, stringSetFieldPattern);
       }
@@ -570,8 +577,8 @@ public class OptionCollector {
       for (int i = 0; i < enums.length; i++) {
         enumTitles[i] = ((Enum<?>)enums[i]).name();
       }
-      allowedValues =
-          "  enum:     " + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
+      allowedValues = "  enum:     "
+          + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
     }
 
     allowedValues += getOptionValues(field, verbose);

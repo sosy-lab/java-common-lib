@@ -51,7 +51,8 @@ import com.google.common.primitives.Longs;
  */
 public final class TimeSpan implements Comparable<TimeSpan> {
 
-  private static final EnumHashBiMap<TimeUnit, String> TIME_UNITS = EnumHashBiMap.create(TimeUnit.class);
+  private static final EnumHashBiMap<TimeUnit, String> TIME_UNITS =
+      EnumHashBiMap.create(TimeUnit.class);
   static {
     TIME_UNITS.put(NANOSECONDS,  "ns");
     TIME_UNITS.put(MICROSECONDS, "µs");
