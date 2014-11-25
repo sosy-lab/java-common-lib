@@ -47,7 +47,8 @@ public class DuplicateOutputStream extends OutputStream {
    * Create an output stream that forwards to all given output streams,
    * ignoring null parameters.
    */
-  public static OutputStream mergeStreams(@Nullable OutputStream stream1, @Nullable OutputStream stream2) {
+  public static OutputStream mergeStreams(@Nullable OutputStream stream1,
+      @Nullable OutputStream stream2) {
 
     if (stream1 == null) {
       if (stream2 == null) {

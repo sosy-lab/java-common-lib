@@ -81,7 +81,9 @@ public class PersistentSortedMaps {
     return new MergeConflictHandler<K, V>() {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
-        throw new IllegalArgumentException("Conflicting value when merging maps for key " + key + ": " + value1 + " and " + value2);
+        throw new IllegalArgumentException(
+            "Conflicting value when merging maps for key " + key + ": "
+            + value1 + " and " + value2);
       }
     };
   }
@@ -91,7 +93,8 @@ public class PersistentSortedMaps {
    * (according to the natural order).
    * This may not be used if the map contains {@code null} as value.
    */
-  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V> getMaximumMergeConflictHandler() {
+  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V>
+      getMaximumMergeConflictHandler() {
     return new MergeConflictHandler<K, V>() {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
@@ -105,7 +108,8 @@ public class PersistentSortedMaps {
    * (according to the natural order).
    * This may not be used if the map contains {@code null} as value.
    */
-  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V> getMinimumMergeConflictHandler() {
+  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V>
+      getMinimumMergeConflictHandler() {
     return new MergeConflictHandler<K, V>() {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
@@ -143,7 +147,8 @@ public class PersistentSortedMaps {
     if (map1.size() >= map2.size()) {
       return merge(map1, map2, Equivalence.equals(), conflictHandler, null);
     } else {
-      return merge(map2, map1, Equivalence.equals(), inverseMergeConflictHandler(conflictHandler), null);
+      return merge(map2, map1, Equivalence.equals(),
+          inverseMergeConflictHandler(conflictHandler), null);
     }
   }
 
@@ -165,9 +170,11 @@ public class PersistentSortedMaps {
    *
    * @param map1 The first map.
    * @param map2 The second map.
-   * @param valueEquals The {@link Equivalence} that will determine whether two values are considered equal.
+   * @param valueEquals The {@link Equivalence} that will determine
+   * whether two values are considered equal.
    * @param conflictHandler The handler that is called for a key with two different values.
-   * @param collectDifferences Null or a modifiable list into which keys with different values are put.
+   * @param collectDifferences Null or a modifiable list
+   * into which keys with different values are put.
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
@@ -319,7 +326,8 @@ public class PersistentSortedMaps {
    * @param map1 the first map
    * @param map2 the second map
    * @param conflictHandler the conflict handler
-   * @return The {@link Triple} {@code (from1, from2, union)} where {@code from1} and {@code from2} are the
+   * @return The {@link Triple} {@code (from1, from2, union)}
+   * where {@code from1} and {@code from2} are the
    * first and the second map mentioned above.
    */
   public static <K extends Comparable<? super K>, V>
@@ -330,7 +338,9 @@ public class PersistentSortedMaps {
 
     if (map1.size() < map2.size()) {
       // swap order for more efficient implementation
-      Triple<PersistentSortedMap<K, V>, PersistentSortedMap<K, V>, PersistentSortedMap<K, V>> result =
+      Triple<PersistentSortedMap<K, V>,
+             PersistentSortedMap<K, V>,
+             PersistentSortedMap<K, V>> result =
           mergeWithKeyDifferences(map2, map1, inverseMergeConflictHandler(conflictHandler));
       return Triple.of(result.getSecond(), result.getFirst(), result.getThird());
     }

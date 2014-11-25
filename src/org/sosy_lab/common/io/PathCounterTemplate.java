@@ -67,7 +67,8 @@ public final class PathCounterTemplate {
 
   /**
    * Construct a concrete {@link Path} that was not handed out by this instance before.
-   * @throws IllegalFormatException If the template is invalid, or the arguments does not match the template.
+   * @throws IllegalFormatException If the template is invalid,
+   * or the arguments does not match the template.
    */
   public Path getFreshPath() {
     return Paths.get(String.format(template, counter.getAndIncrement()));

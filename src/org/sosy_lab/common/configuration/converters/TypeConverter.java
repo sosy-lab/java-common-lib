@@ -66,7 +66,8 @@ public interface TypeConverter {
    * @param logger A logger for warnings etc.
    * @return An instance of the target type produced from the string representation-
    *
-   * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
+   * @throws UnsupportedOperationException If the option specification in the source code
+   * is invalid (e.g., a missing annotation).
    * @throws InvalidConfigurationException If the user specified an invalid value.
    */
   @Nullable
@@ -85,9 +86,11 @@ public interface TypeConverter {
    * @param secondaryOption An optional second annotation for the option
    * @return An instance of the target type-
    * @throws InvalidConfigurationException
-   * @throws UnsupportedOperationException If the option specification in the source code is invalid (e.g., a missing annotation).
+   * @throws UnsupportedOperationException If the option specification in the source code
+   * is invalid (e.g., a missing annotation).
    */
   @Nullable
   <T> T convertDefaultValue(String optionName, @Nullable T value, Class<T> type,
-      @Nullable Type genericType, @Nullable Annotation secondaryOption) throws InvalidConfigurationException;
+      @Nullable Type genericType, @Nullable Annotation secondaryOption)
+          throws InvalidConfigurationException;
 }

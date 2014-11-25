@@ -48,10 +48,12 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> pType,
-      Type pGenericType, Annotation pOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
+      Type pGenericType, Annotation pOption, Path pSource, LogManager logger)
+          throws InvalidConfigurationException {
 
     if (!(pOption instanceof TimeSpanOption)) {
-      throw new UnsupportedOperationException("Time span options need to be annotated with @TimeSpanOption");
+      throw new UnsupportedOperationException(
+          "Time span options need to be annotated with @TimeSpanOption");
     }
     TimeSpanOption option = (TimeSpanOption)pOption;
 
@@ -89,7 +91,8 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     if (pType.equals(Integer.class)) {
       if (value > Integer.MAX_VALUE) {
-        throw new InvalidConfigurationException("Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
+        throw new InvalidConfigurationException("Value for option " + optionName
+            + " is larger than " + Integer.MAX_VALUE);
       }
       result = (int)value;
     } else if (pType.equals(Long.class)) {

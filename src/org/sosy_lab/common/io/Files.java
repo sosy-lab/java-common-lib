@@ -55,7 +55,8 @@ public final class Files {
    *          characters
    * @throws  IOException  If a file could not be created
    */
-  public static Path createTempFile(String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
+  public static Path createTempFile(String prefix, @Nullable String suffix,
+      @Nullable String content) throws IOException {
     Path path = Paths.createTempPath(prefix, suffix);
     path.deleteOnExit();
 
@@ -94,7 +95,8 @@ public final class Files {
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix) throws IOException {
+  public static DeleteOnCloseFile createTempFile(String prefix,
+      @Nullable String suffix) throws IOException {
     Path tempFile = Paths.createTempPath(prefix, suffix);
     return new DeleteOnCloseFile(tempFile);
   }

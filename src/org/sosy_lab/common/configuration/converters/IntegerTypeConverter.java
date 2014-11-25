@@ -35,10 +35,12 @@ public class IntegerTypeConverter implements TypeConverter {
 
   @Override
   public Object convert(String optionName, String valueStr, Class<?> type,
-      Type pGenericType, Annotation pOption, Path pSource, LogManager logger) throws InvalidConfigurationException {
+      Type pGenericType, Annotation pOption, Path pSource, LogManager logger)
+          throws InvalidConfigurationException {
 
     if (!(pOption instanceof IntegerOption)) {
-      throw new UnsupportedOperationException("IntegerTypeConverter needs otions annotated with @IntegerOption");
+      throw new UnsupportedOperationException(
+          "IntegerTypeConverter needs otions annotated with @IntegerOption");
     }
     IntegerOption option = (IntegerOption)pOption;
 

@@ -64,7 +64,8 @@ public class Appenders {
    * @param o The object which will be dumped, may be null.
    * @throws IOException If the appendable throws an IOException
    */
-  public static void appendTo(final Appendable output,  @Nullable final Object o) throws IOException {
+  public static void appendTo(final Appendable output,  @Nullable final Object o)
+      throws IOException {
     if (o instanceof Appender) {
       ((Appender)o).appendTo(output);
     } else {
@@ -183,7 +184,8 @@ public class Appenders {
   }
 
   /**
-   * Convert an {@link Appender} into a string by calling it's {@link Appender#appendTo(Appendable)} method.
+   * Convert an {@link Appender} into a string by calling it's
+   * {@link Appender#appendTo(Appendable)} method.
    *
    * Note that the contract of {@link Appender} specifies that you should be able
    * to call {@link Object#toString()} on the object and get the same result,
@@ -204,7 +206,8 @@ public class Appenders {
   }
 
   /**
-   * Convert an {@link Appender} into a string by calling it's {@link Appender#appendTo(Appendable)} method.
+   * Convert an {@link Appender} into a string by calling it's
+   * {@link Appender#appendTo(Appendable)} method.
    *
    * This method truncates the returned string at a given length,
    * and tries to be more efficient than generating the full string
@@ -212,7 +215,8 @@ public class Appenders {
    *
    * @param a The {@link Appender} to convert into a string.
    * @param truncateAt The maximum size of the returned string (>= 0).
-   * @return a string representation of the passed object, with a maximum size of <code>truncateAt</code>
+   * @return a string representation of the passed object,
+   * with a maximum size of <code>truncateAt</code>
    */
   public static String toStringWithTruncation(Appender a, final int truncateAt) {
     checkArgument(truncateAt >= 0, "Maximum size of String cannot be negative");

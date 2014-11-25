@@ -173,7 +173,8 @@ public final class Configuration {
   /** Map that stores which implementation we use for the collection classes. */
   static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
   static {
-    ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder =
+        ImmutableMap.builder();
 
     putSafely(builder, EnumSet.class,    EnumSet.class); // Caution: needs special casing
 
@@ -205,7 +206,8 @@ public final class Configuration {
 
   // Mutable static state on purpose here!
   // See below for explanation.
-  static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = Collections.synchronizedMap(createConverterMap());
+  static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS =
+      Collections.synchronizedMap(createConverterMap());
   static {
     DEFAULT_CONVERTERS.put(Class.class, new ClassTypeConverter());
     DEFAULT_CONVERTERS.put(IntegerOption.class, new IntegerTypeConverter());
@@ -248,7 +250,8 @@ public final class Configuration {
             checkNotNull(pValue);
             if (cls.isAnnotation()
                 && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
-              throw new IllegalArgumentException("Can register type converters only for annotations which are option detail annotations");
+              throw new IllegalArgumentException("Can register type converters"
+                  + " only for annotations which are option detail annotations");
             }
           }
           @Override
@@ -485,7 +488,8 @@ public final class Configuration {
       throw new UnsupportedOperationException("@Option is not allowed on static members");
     }
     if (Modifier.isFinal(field.getModifiers())) {
-      throw new UnsupportedOperationException("@Option is not allowed on final fields because Java doesn't guarantee visibility of new value");
+      throw new UnsupportedOperationException("@Option is not allowed on final fields"
+          + " because Java doesn't guarantee visibility of new value");
     }
 
     // try to read default value
@@ -512,13 +516,17 @@ public final class Configuration {
     // options which were not changed need not to be set
     if (value == defaultValue) {
       if (logger != null) {
-        logger.log(Level.CONFIG, "Option:", name, "Class:", field.getDeclaringClass().getName(), "field:", field.getName(), "value: <DEFAULT>");
+        logger.log(Level.CONFIG, "Option:", name,
+            "Class:", field.getDeclaringClass().getName(),
+            "field:", field.getName(), "value: <DEFAULT>");
       }
       return;
     }
 
     if (logger != null) {
-      logger.log(Level.CONFIG, "Option:", name, "Class:", field.getDeclaringClass().getName(), "field:", field.getName(), "value:", value);
+      logger.log(Level.CONFIG, "Option:", name,
+          "Class:", field.getDeclaringClass().getName(),
+          "field:", field.getName(), "value:", value);
     }
 
     // set value to field
@@ -544,7 +552,8 @@ public final class Configuration {
       throw new UnsupportedOperationException("@Option is not allowed on static members");
     }
 
-    String exception = Classes.verifyDeclaredExceptions(method, InvalidConfigurationException.class);
+    String exception = Classes.verifyDeclaredExceptions(
+        method, InvalidConfigurationException.class);
     if (exception != null) {
       throw new UnsupportedOperationException("Method with @Option may not throw " + exception);
     }
@@ -564,7 +573,9 @@ public final class Configuration {
     final Object value = getValue(name, null, type, genericType, option, method);
 
     if (logger != null) {
-      logger.log(Level.CONFIG, "Option:", name, "Class:", method.getDeclaringClass().getName(), "method:", method.getName(), "value:", value);
+      logger.log(Level.CONFIG, "Option:", name,
+          "Class:", method.getDeclaringClass().getName(),
+          "method:", method.getName(), "value:", value);
     }
 
     // set value to field
@@ -578,7 +589,8 @@ public final class Configuration {
       final Throwable t = e.getCause();
 
       if (t instanceof IllegalArgumentException) {
-        // this is an expected exception if the value is wrong, so create a nice message for the user
+        // this is an expected exception if the value is wrong,
+        // so create a nice message for the user
         throw new InvalidConfigurationException("Invalid value in configuration file: \""
             + name + " = " + value + '\"'
             + (t.getMessage() != null ? " (" + t.getMessage() + ")" : ""), t);
@@ -619,7 +631,8 @@ public final class Configuration {
    * @param member The member that declares the option.
    * @return The value to assign (may be null).
    *
-   * @throws UnsupportedOperationException If the declaration of the option in the source code is invalid.
+   * @throws UnsupportedOperationException If the declaration of the option
+   * in the source code is invalid.
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
   @Nullable
@@ -636,8 +649,8 @@ public final class Configuration {
       // option was specified
 
       if (secureMode && !option.secure()) {
-        throw new InvalidConfigurationException(
-            "Configuration option " + optionName + " was specified, but is not allowed in secure mode.");
+        throw new InvalidConfigurationException("Configuration option " + optionName
+            + " was specified, but is not allowed in secure mode.");
       }
 
       value = convertValue(optionName, valueStr, type, genericType, secondaryOption);
@@ -713,7 +726,8 @@ public final class Configuration {
     for (Annotation a : element.getDeclaredAnnotations()) {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
         if (result != null) {
-          throw new UnsupportedOperationException("Both " + result + " and " + a + " are present at " + element.toString());
+          throw new UnsupportedOperationException("Both " + result + " and " + a
+              + " are present at " + element.toString());
         }
         result = a;
       }
@@ -727,7 +741,8 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(Annotation annotation, final Class<?> optionType) throws UnsupportedOperationException {
+  private void checkApplicability(Annotation annotation, final Class<?> optionType)
+      throws UnsupportedOperationException {
     if (annotation == null) {
       return;
     }
@@ -736,7 +751,8 @@ public final class Configuration {
         annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
 
     if (!applicableTypes.contains(optionType)) {
-      throw new UnsupportedOperationException("Annotation " + annotation + " is not applicable for options of type " + optionType.getCanonicalName());
+      throw new UnsupportedOperationException("Annotation " + annotation
+          + " is not applicable for options of type " + optionType.getCanonicalName());
     }
   }
 
@@ -803,7 +819,8 @@ public final class Configuration {
 
     checkApplicability(secondaryOption, componentType);
 
-    List<?> values = convertMultipleValues(optionName, valueStr, componentType, componentGenericType, secondaryOption);
+    List<?> values = convertMultipleValues(optionName, valueStr,
+        componentType, componentGenericType, secondaryOption);
 
     if (pType.isArray()) {
 
@@ -823,13 +840,16 @@ public final class Configuration {
         && (collectionClass == Set.class || collectionClass == ImmutableSet.class)) {
       // There is a specialized ImmutableSet for enums in Guava that is more efficient.
       // We use it if we can.
-      return BaseTypeConverter.invokeStaticMethod(Sets.class, "immutableEnumSet", Iterable.class, values, optionName);
+      return BaseTypeConverter.invokeStaticMethod(Sets.class, "immutableEnumSet",
+          Iterable.class, values, optionName);
 
     } else {
-      // we now that it's a Collection<componentType> / Set<? extends componentType> etc., so we can safely assign to it
+      // we now that it's a Collection<componentType> / Set<? extends componentType> etc.,
+      // so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
-      return BaseTypeConverter.invokeStaticMethod(collectionClass, "copyOf", Iterable.class, values, optionName);
+      return BaseTypeConverter.invokeStaticMethod(collectionClass, "copyOf",
+          Iterable.class, values, optionName);
     }
   }
 
@@ -885,7 +905,8 @@ public final class Configuration {
   }
 
   private <T> Object convertDefaultValue(final String optionName, final T defaultValue,
-      final Class<T> type, final Type genericType, final Annotation secondaryOption) throws InvalidConfigurationException {
+      final Class<T> type, final Type genericType, final Annotation secondaryOption)
+          throws InvalidConfigurationException {
 
     Class<?> innerType;
     if (type.isArray()) {
@@ -906,7 +927,8 @@ public final class Configuration {
       // TODO: Also pass default values inside a collection.
 
       TypeConverter converter = getConverter(type, secondaryOption);
-      return converter.convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
+      return converter.convertDefaultValue(optionName, defaultValue,
+          type, genericType, secondaryOption);
     }
 
     return defaultValue;
@@ -943,7 +965,8 @@ public final class Configuration {
   }
 
   @SuppressWarnings("unchecked")
-  private static <T extends Enum<T>> EnumSet<?> createEnumSetUnchecked(Class<?> enumType, Collection<?> values) {
+  private static <T extends Enum<T>> EnumSet<?> createEnumSetUnchecked(
+      Class<?> enumType, Collection<?> values) {
     EnumSet<T> result = EnumSet.noneOf((Class<T>)enumType);
     result.addAll((Collection<? extends T>) values);
     return result;

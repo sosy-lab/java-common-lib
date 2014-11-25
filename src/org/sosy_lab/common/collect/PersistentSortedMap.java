@@ -29,7 +29,8 @@ import javax.annotation.CheckReturnValue;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
-public interface PersistentSortedMap<K, V> extends PersistentMap<K, V>, SortedMap<K, V>, OurSortedMap<K, V> {
+public interface PersistentSortedMap<K, V>
+    extends PersistentMap<K, V>, SortedMap<K, V>, OurSortedMap<K, V> {
 
   @Override
   @CheckReturnValue

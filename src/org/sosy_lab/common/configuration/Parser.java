@@ -94,14 +94,17 @@ class Parser {
     }
   }
 
-  private static final Pattern OPTION_NAME = Pattern.compile("^[a-zA-Z0-9_+-]+(\\.[a-zA-Z0-9_+-]+)*$");
+  private static final Pattern OPTION_NAME =
+      Pattern.compile("^[a-zA-Z0-9_+-]+(\\.[a-zA-Z0-9_+-]+)*$");
 
   /**
    * Parse a configuration file with the format as defined above.
    *
    * @param file The file to parse.
-   * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
+   * @param basePath If filename is relative, use this as parent path
+   * (if null or empty, the current working directory is used).
+   * @return A map with all configuration directives in this file,
+   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
@@ -114,15 +117,18 @@ class Parser {
   /**
    * Parse a configuration file with the format as defined above.
    *
-   * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
+   * @param basePath If filename is relative, use this as parent path
+   * (if null or empty, the current working directory is used).
    * @param file The file to parse.
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
+   * @return A map with all configuration directives in this file,
+   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Pair<Map<String, String>, Map<String, Path>> parse(Path file, @Nullable String basePath,
-      Set<String> includeStack) throws IOException, InvalidConfigurationException {
+  private static Pair<Map<String, String>, Map<String, Path>> parse(
+      Path file, @Nullable String basePath, Set<String> includeStack)
+          throws IOException, InvalidConfigurationException {
 
     if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
       file = Paths.get(basePath, file.getPath());
@@ -133,7 +139,8 @@ class Parser {
     includeStack = new HashSet<>(includeStack);
     boolean newFile = includeStack.add(file.toAbsolutePath().getPath());
     if (!newFile) {
-      throw new InvalidConfigurationFileException("Circular inclusion of file " + file.toAbsolutePath());
+      throw new InvalidConfigurationFileException(
+          "Circular inclusion of file " + file.toAbsolutePath());
     }
 
     try (BufferedReader r = file.asCharSource(StandardCharsets.UTF_8).openBufferedStream()) {
@@ -149,14 +156,18 @@ class Parser {
    * if they are included.
    *
    * @param source The source to read the file from.
-   * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @param sourceName A string to use as source of the file in error messages (this should usually be a filename or something similar).
-   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
+   * @param basePath If filename is relative, use this as parent path
+   * (if null or empty, the current working directory is used).
+   * @param sourceName A string to use as source of the file in error messages
+   * (this should usually be a filename or something similar).
+   * @return A map with all configuration directives in this file,
+   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Pair<Map<String, String>, Map<String, Path>> parse(CharSource source, @Nullable String basePath,
-      String sourceName) throws IOException, InvalidConfigurationException {
+  static Pair<Map<String, String>, Map<String, Path>> parse(
+      CharSource source, @Nullable String basePath, String sourceName)
+          throws IOException, InvalidConfigurationException {
 
     try (BufferedReader r = source.openBufferedStream()) {
       return parse(r, basePath, sourceName, Collections.<String>emptySet());
@@ -171,10 +182,13 @@ class Parser {
    * if they are included.
    *
    * @param r The reader to read the file from.
-   * @param basePath If filename is relative, use this as parent path (if null or empty, the current working directory is used).
-   * @param source A string to use as source of the file in error messages (this should usually be a filename or something similar).
+   * @param basePath If filename is relative, use this as parent path
+   * (if null or empty, the current working directory is used).
+   * @param source A string to use as source of the file in error messages
+   * (this should usually be a filename or something similar).
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file, and a map with the source location of each defined option.
+   * @return A map with all configuration directives in this file,
+   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
@@ -216,15 +230,18 @@ class Parser {
         // currently only #include is supported.
 
         if (!line.startsWith("#include")) {
-          throw new InvalidConfigurationFileException("Illegal parser directive", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Illegal parser directive", lineno, source, fullLine);
         }
 
         line = line.substring("#include".length()).trim();
         if (line.isEmpty()) {
-          throw new InvalidConfigurationFileException("Include without filename", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Include without filename", lineno, source, fullLine);
         }
 
-        final Pair<Map<String, String>, Map<String, Path>> includedContent = parse(Paths.get(line), basePath, includeStack);
+        final Pair<Map<String, String>, Map<String, Path>> includedContent =
+            parse(Paths.get(line), basePath, includeStack);
         includedOptions.putAll(includedContent.getFirst());
         includedOptionsSources.putAll(includedContent.getSecond());
         continue;
@@ -239,7 +256,8 @@ class Parser {
           currentPrefix = "";
 
         } else if (!OPTION_NAME.matcher(line).matches()) {
-          throw new InvalidConfigurationFileException("Invalid category \"" + line + "\"", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Invalid category \"" + line + "\"", lineno, source, fullLine);
 
         } else {
           currentPrefix = line + ".";
@@ -247,21 +265,26 @@ class Parser {
         continue;
 
       } else if (line.length() < 3) {
-        throw new InvalidConfigurationFileException("Illegal content", lineno, source, fullLine);
+        throw new InvalidConfigurationFileException(
+            "Illegal content", lineno, source, fullLine);
 
       } else {
         // normal key=value line
         String[] bits = line.split("=", 2);
         if (bits.length != 2) {
-          throw new InvalidConfigurationFileException("Missing key-value separator", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Missing key-value separator", lineno, source, fullLine);
         }
 
         currentOptionName = bits[0].trim();
         if (!OPTION_NAME.matcher(currentOptionName).matches()) {
-          throw new InvalidConfigurationFileException("Invalid option \"" + currentOptionName + "\"", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Invalid option \"" + currentOptionName + "\"", lineno, source, fullLine);
         }
         if (definedOptions.containsKey(currentPrefix + currentOptionName)) {
-          throw new InvalidConfigurationFileException("Duplicate option \"" + currentPrefix + currentOptionName + "\"", lineno, source, fullLine);
+          throw new InvalidConfigurationFileException(
+              "Duplicate option \"" + currentPrefix + currentOptionName + "\"",
+              lineno, source, fullLine);
         }
 
         currentValue = bits[1].trim();

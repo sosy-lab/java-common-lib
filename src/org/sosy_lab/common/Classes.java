@@ -92,7 +92,8 @@ public final class Classes {
    * @param argumentTypes Array with the types of the parameters of the desired constructor.
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param type The return type (has to be a super type of the class, of course).
-   * @throws ClassInstantiationException If something goes wrong (like class cannot be found or has no constructor).
+   * @throws ClassInstantiationException If something goes wrong
+   * (like class cannot be found or has no constructor).
    * @throws InvocationTargetException If the constructor throws an exception.
    */
   public static <T> T createInstance(Class<? extends T> cls,
@@ -106,7 +107,8 @@ public final class Classes {
     } catch (SecurityException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), "Matching constructor not found!", e);
+      throw new ClassInstantiationException(cls.getCanonicalName(),
+          "Matching constructor not found!", e);
     } catch (InstantiationException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (IllegalAccessException e) {
@@ -124,11 +126,14 @@ public final class Classes {
    *
    * @param type The return type (has to be a super type of the class, of course).
    * @param cls The class to instantiate.
-   * @param argumentTypes Array with the types of the parameters of the desired constructor (optional).
-   * @param argumentValues Array with the values that will be passed to the constructor.
+   * @param argumentTypes Array with the types of the parameters
+   * of the desired constructor (optional).
+   * @param argumentValues Array with the values
+   * that will be passed to the constructor.
    */
   public static <T> T createInstance(Class<T> type, Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes, Object[] argumentValues) throws InvalidConfigurationException {
+      @Nullable Class<?>[] argumentTypes, Object[] argumentValues)
+          throws InvalidConfigurationException {
     return createInstance(type, cls, argumentTypes, argumentValues, RuntimeException.class);
   }
 
@@ -141,7 +146,8 @@ public final class Classes {
    *
    * @param type The return type (has to be a super type of the class, of course).
    * @param cls The class to instantiate.
-   * @param argumentTypes Array with the types of the parameters of the desired constructor (optional).
+   * @param argumentTypes Array with the types of the parameters
+   * of the desired constructor (optional).
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
@@ -169,13 +175,16 @@ public final class Classes {
     try {
       ct = cls.getConstructor(argumentTypes);
     } catch (NoSuchMethodException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName + " " + className + ", no matching constructor", e);
+      throw new InvalidConfigurationException("Invalid " + typeName
+          + " " + className + ", no matching constructor", e);
     }
 
     // verify signature
-    String exception = Classes.verifyDeclaredExceptions(ct, exceptionType, InvalidConfigurationException.class);
+    String exception = Classes.verifyDeclaredExceptions(ct, exceptionType,
+        InvalidConfigurationException.class);
     if (exception != null) {
-      throw new InvalidConfigurationException("Invalid " + typeName + " " + className + ", constructor declares unsupported checked exception " + exception);
+      throw new InvalidConfigurationException("Invalid " + typeName
+          + " " + className + ", constructor declares unsupported checked exception " + exception);
     }
 
     // instantiate
@@ -183,10 +192,12 @@ public final class Classes {
       return ct.newInstance(argumentValues);
 
     } catch (InstantiationException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName + " " + className + ", class cannot be instantiated (" + e.getMessage() + ")", e);
+      throw new InvalidConfigurationException("Invalid " + typeName
+          + " " + className + ", class cannot be instantiated (" + e.getMessage() + ")", e);
 
     } catch (IllegalAccessException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName + " " + className + ", constructor is not accessible", e);
+      throw new InvalidConfigurationException("Invalid " + typeName
+          + " " + className + ", constructor is not accessible", e);
 
     } catch (InvocationTargetException e) {
       Throwable t = e.getCause();
@@ -205,7 +216,8 @@ public final class Classes {
    * @return The class object for  name  or  prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
-  public static Class<?> forName(String name, @Nullable String prefix) throws ClassNotFoundException, SecurityException {
+  public static Class<?> forName(String name, @Nullable String prefix)
+      throws ClassNotFoundException, SecurityException {
     return forName(name, prefix, null);
   }
 
@@ -220,7 +232,8 @@ public final class Classes {
    * @return The class object for  name  or  prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
-  private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl) throws ClassNotFoundException, SecurityException {
+  private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl)
+      throws ClassNotFoundException, SecurityException {
     if (cl == null) {
       // use the class loader of this class to simulate the behaviour
       // of Class#forName(String)
@@ -252,7 +265,8 @@ public final class Classes {
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static @Nullable String verifyDeclaredExceptions(Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(Constructor<?> constructor,
+      Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(constructor.getExceptionTypes(), allowedExceptionTypes);
   }
 
@@ -266,11 +280,13 @@ public final class Classes {
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static @Nullable String verifyDeclaredExceptions(Method method, Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(Method method,
+      Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(method.getExceptionTypes(), allowedExceptionTypes);
   }
 
-  private static @Nullable String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
+  private static @Nullable String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes,
+      Class<?>[] allowedExceptionTypes) {
     checkNotNull(allowedExceptionTypes);
     for (Class<?> declaredException : declaredExceptionTypes) {
 
@@ -308,16 +324,20 @@ public final class Classes {
    * X<Foo<Bar>>     : (Foo.class, Foo<Bar>)
    *
    * @param type The type (needs to be parameterized with exactly one parameter)
-   * @return A tuple of a class object and a ParameterizedType object (the latter is null if the type is not generic)
+   * @return A tuple of a class object and a ParameterizedType object
+   * (the latter is null if the type is not generic)
    */
   public static Pair<Class<?>, ParameterizedType> getComponentType(final Type type) {
     checkNotNull(type);
-    checkArgument(type instanceof ParameterizedType, "Cannot extract generic parameter from non-parameterized type %s", type);
+    checkArgument(type instanceof ParameterizedType,
+        "Cannot extract generic parameter from non-parameterized type %s", type);
 
     ParameterizedType pType = (ParameterizedType)type;
     Type[] parameterTypes = pType.getActualTypeArguments();
 
-    checkArgument(parameterTypes.length == 1, "Cannot extract generic parameter from parameterized type %s which has not exactly one parameter", type);
+    checkArgument(parameterTypes.length == 1,
+        "Cannot extract generic parameter from parameterized type %s"
+        + " which has not exactly one parameter", type);
 
     Type paramType = parameterTypes[0];
 
@@ -333,7 +353,8 @@ public final class Classes {
     if (paramType instanceof Class<?>) {
       componentType = (Class<?>)paramType;
     } else {
-      throw new UnsupportedOperationException("Cannot extract generic base type from type " + paramType);
+      throw new UnsupportedOperationException(
+          "Cannot extract generic base type from type " + paramType);
     }
 
     return Pair.<Class<?>, ParameterizedType>of(componentType, componentGenericType);
@@ -353,30 +374,35 @@ public final class Classes {
     if (type instanceof WildcardType) {
       WildcardType wcType = (WildcardType)type;
       if (wcType.getLowerBounds().length > 0) {
-        throw new UnsupportedOperationException("Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
+        throw new UnsupportedOperationException(
+            "Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
       }
       Type[] upperBounds = ((WildcardType)type).getUpperBounds();
       if (upperBounds.length != 1) {
-        throw new UnsupportedOperationException("Currently only type bounds with one upper bound are supported, not \"" + type + "\"");
+        throw new UnsupportedOperationException(
+            "Currently only type bounds with one upper bound are supported, not \"" + type + "\"");
       }
       type = upperBounds[0];
     }
     return type;
   }
 
-  public static void produceClassLoadingWarning(LogManager logger, Class<?> cls, @Nullable Class<?> type) {
+  public static void produceClassLoadingWarning(LogManager logger, Class<?> cls,
+      @Nullable Class<?> type) {
     checkNotNull(logger);
     Package pkg = cls.getPackage();
     String typeName = type == null ? "class" : type.getSimpleName();
 
     if (cls.isAnnotationPresent(Deprecated.class)
         || pkg.isAnnotationPresent(Deprecated.class)) {
-      logger.logf(Level.WARNING, "Using %s %s, which is marked as deprecated and should not be used.", typeName, cls.getSimpleName());
+      logger.logf(Level.WARNING, "Using %s %s, which is marked as deprecated"
+          + " and should not be used.", typeName, cls.getSimpleName());
 
     } else if (cls.isAnnotationPresent(Unmaintained.class)
         || pkg.isAnnotationPresent(Unmaintained.class)) {
 
-      logger.logf(Level.WARNING, "Using %s %s, which is unmaintained and may not work correctly.", typeName, cls.getSimpleName());
+      logger.logf(Level.WARNING, "Using %s %s, which is unmaintained"
+          + " and may not work correctly.", typeName, cls.getSimpleName());
     }
   }
 }

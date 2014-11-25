@@ -54,13 +54,20 @@ public class Triple<A, B, C> implements Serializable {
     this.third = third;
   }
 
-  public static <A, B, C> Triple<A, B, C> of(@Nullable A first, @Nullable B second, @Nullable C third) {
+  public static <A, B, C> Triple<A, B, C> of(@Nullable A first,
+      @Nullable B second, @Nullable C third) {
     return new Triple<>(first, second, third);
   }
 
-  @Nullable public final A getFirst() { return first; }
-  @Nullable public final B getSecond() { return second; }
-  @Nullable public final C getThird() { return third; }
+  @Nullable public final A getFirst() {
+    return first;
+  }
+  @Nullable public final B getSecond() {
+    return second;
+  }
+  @Nullable public final C getThird() {
+    return third;
+  }
 
   @Override
   public String toString() {
@@ -122,26 +129,29 @@ public class Triple<A, B, C> implements Serializable {
       return (Holder<T>) INSTANCE;
     }
 
-    private final Function<Triple<? extends T, ?, ?>, T> PROJECTION_TO_FIRST = new Function<Triple<? extends T, ?, ?>, T>() {
-      @Override
-      public T apply(@Nonnull Triple<? extends T, ?, ?> pArg0) {
-        return pArg0.getFirst();
-      }
-    };
+    private final Function<Triple<? extends T, ?, ?>, T> PROJECTION_TO_FIRST =
+        new Function<Triple<? extends T, ?, ?>, T>() {
+          @Override
+          public T apply(@Nonnull Triple<? extends T, ?, ?> pArg0) {
+            return pArg0.getFirst();
+          }
+        };
 
-    private final Function<Triple<?, ? extends T, ?>, T> PROJECTION_TO_SECOND = new Function<Triple<?, ? extends T, ?>, T>() {
-      @Override
-      public T apply(@Nonnull Triple<?, ? extends T, ?> pArg0) {
-        return pArg0.getSecond();
-      }
-    };
+    private final Function<Triple<?, ? extends T, ?>, T> PROJECTION_TO_SECOND =
+        new Function<Triple<?, ? extends T, ?>, T>() {
+          @Override
+          public T apply(@Nonnull Triple<?, ? extends T, ?> pArg0) {
+            return pArg0.getSecond();
+          }
+        };
 
-    private final Function<Triple<?, ?, ? extends T>, T> PROJECTION_TO_THIRD = new Function<Triple<?, ?, ? extends T>, T>() {
-      @Override
-      public T apply(@Nonnull Triple<?, ?, ? extends T> pArg0) {
-        return pArg0.getThird();
-      }
-    };
+    private final Function<Triple<?, ?, ? extends T>, T> PROJECTION_TO_THIRD =
+        new Function<Triple<?, ?, ? extends T>, T>() {
+          @Override
+          public T apply(@Nonnull Triple<?, ?, ? extends T> pArg0) {
+            return pArg0.getThird();
+          }
+        };
   }
 
   /**
@@ -193,8 +203,14 @@ public class Triple<A, B, C> implements Serializable {
       Comparator<A> firstOrdering, Comparator<B> secondOrdering,
       Comparator<C> thirdOrdering) {
 
-    return from(firstOrdering).onResultOf(Triple.<A>getProjectionToFirst())
-        .<Triple<? extends A, ? extends B, ?>>compound(from(secondOrdering).onResultOf(Triple.<B>getProjectionToSecond()))
-        .compound(from(thirdOrdering).onResultOf(Triple.<C>getProjectionToThird()));
+    Ordering<Triple<? extends A, ?, ?>> firstDimension =
+        from(firstOrdering).onResultOf(Triple.<A>getProjectionToFirst());
+    Ordering<Triple<?, ? extends B, ?>> secondDimension =
+        from(secondOrdering).onResultOf(Triple.<B>getProjectionToSecond());
+    Ordering<Triple<?, ?, ? extends C>> thirdDimension =
+        from(thirdOrdering).onResultOf(Triple.<C>getProjectionToThird());
+    return firstDimension
+        .<Triple<? extends A, ? extends B, ?>>compound(secondDimension)
+        .compound(thirdDimension);
   }
 }

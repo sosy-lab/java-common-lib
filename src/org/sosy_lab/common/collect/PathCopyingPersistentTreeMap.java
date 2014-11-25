@@ -194,14 +194,16 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   // static creation methods
 
-  private static final PathCopyingPersistentTreeMap<?, ?> EMPTY_MAP = new PathCopyingPersistentTreeMap<String, Object>(null);
+  private static final PathCopyingPersistentTreeMap<?, ?> EMPTY_MAP =
+      new PathCopyingPersistentTreeMap<String, Object>(null);
 
   @SuppressWarnings("unchecked")
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> of() {
     return (PersistentSortedMap<K, V>) EMPTY_MAP;
   }
 
-  public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> copyOf(Map<K, V> map) {
+  public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> copyOf(
+      Map<K, V> map) {
     checkNotNull(map);
 
     if (map instanceof PathCopyingPersistentTreeMap<?, ?>) {
@@ -231,13 +233,15 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @SuppressWarnings("unchecked")
   @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(Object key, Node<K, V> root) {
+  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(
+      Object key, Node<K, V> root) {
     checkNotNull(key);
     return findNode((K)key, root);
   }
 
   @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(K key, Node<K, V> root) {
+  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(
+      K key, Node<K, V> root) {
     Preconditions.checkNotNull(key);
 
     Node<K, V> current = root;
@@ -303,7 +307,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextGreaterOrEqualNode(K key, Node<K, V> root) {
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V>
+      findNextGreaterOrEqualNode(K key, Node<K, V> root) {
     Preconditions.checkNotNull(key);
 
     Node<K, V> result = null; // this is always greater than or equal to key
@@ -353,7 +358,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextStrictlySmallerNode(K key, Node<K, V> root) {
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V>
+      findNextStrictlySmallerNode(K key, Node<K, V> root) {
     Preconditions.checkNotNull(key);
 
     Node<K, V> result = null; // this is always smaller than key
@@ -400,31 +406,37 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
-  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) throws IllegalStateException {
+  private static <K extends Comparable<? super K>, V> int checkAssertions(
+      Node<K, V> current) throws IllegalStateException {
     if (current == null) {
       return 0;
     }
 
     // check property of binary search tree
     if (current.left != null) {
-      checkState(current.getKey().compareTo(current.left.getKey()) > 0, "Tree has left child that is not smaller.");
+      checkState(current.getKey().compareTo(current.left.getKey()) > 0,
+          "Tree has left child that is not smaller.");
     }
     if (current.right != null) {
-      checkState(current.getKey().compareTo(current.right.getKey()) < 0, "Tree has right child that is not bigger.");
+      checkState(current.getKey().compareTo(current.right.getKey()) < 0,
+          "Tree has right child that is not bigger.");
     }
 
     // Check LLRB invariants
     // No red right child.
     checkState(!Node.isRed(current.right), "LLRB has red right child");
     // No more than two consecutive red nodes.
-    checkState(!Node.isRed(current) || !Node.isRed(current.left) || !Node.isRed(current.left.left), "LLRB has three red nodes in a row.");
+    checkState(!Node.isRed(current) || !Node.isRed(current.left) || !Node.isRed(current.left.left),
+        "LLRB has three red nodes in a row.");
 
     // Check recursively.
     int leftBlackHeight  = checkAssertions(current.left);
     int rightBlackHeight = checkAssertions(current.right);
 
     // Check black height balancing.
-    checkState(leftBlackHeight == rightBlackHeight, "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight);
+    checkState(leftBlackHeight == rightBlackHeight,
+        "Black path length on left is " + leftBlackHeight
+        + " and on right is " + rightBlackHeight);
 
     int blackHeight = leftBlackHeight;
     if (current.isBlack()) {
@@ -462,7 +474,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return mapFromTree(putAndCopy0(checkNotNull(key), value, root));
   }
 
-  private static <K extends Comparable<? super K>, V> Node<K, V> putAndCopy0(final K key, V value, Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> Node<K, V> putAndCopy0(
+      final K key, V value, Node<K, V> current) {
     // Inserting is easy:
     // We find the place where to insert,
     // and afterwards fix the invariants by some rotations or re-colorings.
@@ -500,7 +513,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V>  removeAndCopy0(final K key, Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> Node<K, V>  removeAndCopy0(
+      final K key, Node<K, V> current) {
     // Removing a node is more difficult.
     // We can remove a leaf if it is red.
     // So we try to always have a red node while going downwards.
@@ -577,7 +591,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // Delete the successor
         Node<K, V> newRight = removeMininumNodeInTree(current.right);
         // and replace current with it
-        current = new Node<>(successor.getKey(), successor.getValue(), current.left, newRight, current.getColor());
+        current = new Node<>(successor.getKey(), successor.getValue(),
+            current.left, newRight, current.getColor());
 
       } else {
         // key > current.data
@@ -653,15 +668,21 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   private static <K, V> Node<K, V> rotateCounterclockwise(Node<K, V> current) {
-    final Node<K, V> crossoverNode = current.right.left; // the node that is moved between subtrees
-    final Node<K, V> newLeft = new Node<>(current.getKey(), current.getValue(), current.left, crossoverNode, Node.RED);
-    return new Node<>(current.right.getKey(), current.right.getValue(), newLeft, current.right.right, current.getColor());
+    // the node that is moved between subtrees:
+    final Node<K, V> crossoverNode = current.right.left;
+    final Node<K, V> newLeft = new Node<>(current.getKey(), current.getValue(),
+        current.left, crossoverNode, Node.RED);
+    return new Node<>(current.right.getKey(), current.right.getValue(),
+        newLeft, current.right.right, current.getColor());
   }
 
   private static <K, V> Node<K, V> rotateClockwise(Node<K, V> current) {
-    final Node<K, V> crossOverNode = current.left.right; // the node that is moved between subtrees
-    final Node<K, V> newRight = new Node<>(current.getKey(), current.getValue(), crossOverNode, current.right, Node.RED);
-    return new Node<>(current.left.getKey(), current.left.getValue(), current.left.left, newRight, current.getColor());
+    // the node that is moved between subtrees:
+    final Node<K, V> crossOverNode = current.left.right;
+    final Node<K, V> newRight = new Node<>(current.getKey(), current.getValue(),
+        crossOverNode, current.right, Node.RED);
+    return new Node<>(current.left.getKey(), current.left.getValue(),
+        current.left.left, newRight, current.getColor());
   }
 
   private static <K, V> Node<K, V> makeLeftRed(Node<K, V> current) {
@@ -671,7 +692,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     current = colorFlip(current);
     if (Node.isRed(current.right.left)) {
       Node<K, V> newRight = rotateClockwise(current.right);
-      current = new Node<>(current.getKey(), current.getValue(), current.left, newRight, current.getColor());
+      current = new Node<>(current.getKey(), current.getValue(),
+          current.left, newRight, current.getColor());
 
       current = rotateCounterclockwise(current);
       current = colorFlip(current);
@@ -750,7 +772,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static final class EntrySet<K extends Comparable<? super K>, V> extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
+  private static final class EntrySet<K extends Comparable<? super K>, V>
+      extends AbstractSet<Map.Entry<K, V>>
+      implements SortedSet<Map.Entry<K, V>> {
 
     private final @Nullable Node<K, V> root;
 
@@ -848,7 +872,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
             return false;
           }
 
-          otherEntry = null; // settings this to null forwards both iterators by one in the next loop iteration
+          // setting this to null forwards both iterators by one in the next loop iteration
+          otherEntry = null;
         }
       }
 
@@ -955,7 +980,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class EntryInOrderIterator<K extends Comparable<? super K>, V> extends UnmodifiableIterator<Map.Entry<K, V>> {
+  private static class EntryInOrderIterator<K extends Comparable<? super K>, V>
+      extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:
     // stack.top is always the next element to be returned
@@ -1031,7 +1057,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
           return;
         }
       }
-      throw new AssertionError("PartialEntryInOrderIterator created with lower bound that is not in map");
+      throw new AssertionError(
+          "PartialEntryInOrderIterator created with lower bound that is not in map");
     }
 
     private void stopFurtherIterationIfOutOfRange() {
@@ -1242,7 +1269,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
      * the upper bound is exclusive.
      * The range needs to contain at least one mapping.
      */
-    private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
+    private class PartialEntrySet
+        extends AbstractSet<Map.Entry<K, V>>
+        implements SortedSet<Map.Entry<K, V>> {
 
       private transient int size;
 

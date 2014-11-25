@@ -137,7 +137,8 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#copyOptionFrom(org.sosy_lab.common.configuration.Configuration, java.lang.String)
    */
   @Override
-  public ConfigurationBuilder copyOptionFrom(Configuration oldConfig, String option) throws IllegalArgumentException {
+  public ConfigurationBuilder copyOptionFrom(Configuration oldConfig,
+      String option) throws IllegalArgumentException {
     Preconditions.checkNotNull(oldConfig);
     Preconditions.checkNotNull(option);
     Preconditions.checkArgument(oldConfig.properties.containsKey(option));
@@ -153,12 +154,14 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromSource(com.google.common.io.CharSource, java.lang.String, java.lang.String)
    */
   @Override
-  public ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromSource(CharSource source, String basePath,
+      String sourceName) throws IOException, InvalidConfigurationException {
     Preconditions.checkNotNull(source);
     Preconditions.checkNotNull(basePath);
     setupProperties();
 
-    final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(source, basePath, sourceName);
+    final Pair<Map<String, String>, Map<String, Path>> content =
+        Parser.parse(source, basePath, sourceName);
     properties.putAll(content.getFirst());
     sources.putAll(content.getSecond());
 
@@ -170,7 +173,8 @@ public class Builder implements ConfigurationBuilder {
    */
   @Deprecated
   @Override
-  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String sourceName) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath,
+      String sourceName) throws IOException, InvalidConfigurationException {
     Preconditions.checkNotNull(stream);
     Preconditions.checkNotNull(basePath);
 
@@ -186,7 +190,8 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   @Deprecated
-  public ConfigurationBuilder loadFromStream(InputStream stream) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromStream(InputStream stream)
+      throws IOException, InvalidConfigurationException {
     return loadFromStream(stream, "", "unknown source");
   }
 
@@ -194,7 +199,8 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromFile(java.lang.String)
    */
   @Override
-  public ConfigurationBuilder loadFromFile(@Nullable String filename) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromFile(@Nullable String filename)
+      throws IOException, InvalidConfigurationException {
     return loadFromFile(Paths.get(filename));
   }
 
@@ -202,7 +208,8 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromFile(org.sosy_lab.common.io.Path)
    */
   @Override
-  public ConfigurationBuilder loadFromFile(Path file) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromFile(Path file)
+      throws IOException, InvalidConfigurationException {
     Preconditions.checkNotNull(file);
 
     if (!file.exists()) {

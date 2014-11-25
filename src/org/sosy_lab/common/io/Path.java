@@ -127,8 +127,10 @@ public interface Path {
    *
    * If the other parameter is an absolute path then this method trivially returns other.
    * If other is an empty path then this method trivially returns this path.
-   * Otherwise this method considers this path to be a directory and resolves the given path against this path.
-   * In the simplest case, the given path does not have a root component, in which case this method joins the given path to this path and returns a resulting path
+   * Otherwise this method considers this path to be a directory
+   * and resolves the given path against this path.
+   * In the simplest case, the given path does not have a root component,
+   * in which case this method joins the given path to this path and returns a resulting path
    * that ends with the given path.
    * Where the given path has a root component then resolution is highly implementation dependent
    * and therefore unspecified.

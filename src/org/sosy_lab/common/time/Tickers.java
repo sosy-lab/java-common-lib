@@ -98,7 +98,8 @@ public class Tickers {
     private final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
     {
       if (!threadMxBean.isThreadCpuTimeSupported()) {
-        throw new UnsupportedOperationException("JVM does not support measuring per-thread cputime");
+        throw new UnsupportedOperationException(
+            "JVM does not support measuring per-thread cputime");
       }
       threadMxBean.setThreadCpuTimeEnabled(true);
       read(); // read once to throw fail-fast exception if its not supported
@@ -170,15 +171,18 @@ public class Tickers {
   }
 
   /**
-   * Return a {@link TickerWithUnit} that delegates to {@link ThreadMXBean#getCurrentThreadCpuTime()}.
-   * @throws UnsupportedOperationException If the JVM does not support measuring per-thread CPU time.
+   * Return a {@link TickerWithUnit} that delegates to
+   * {@link ThreadMXBean#getCurrentThreadCpuTime()}.
+   * @throws UnsupportedOperationException
+   * If the JVM does not support measuring per-thread CPU time.
    */
   public static TickerWithUnit getCurrentThreadCputime() {
     return CurrentThreadCputime.INSTANCE;
   }
 
   /**
-   * Return a {@link TickerWithUnit} that delegates to {@link OperatingSystemMXBean#getProcessCputime()}.
+   * Return a {@link TickerWithUnit} that delegates to
+   * {@link OperatingSystemMXBean#getProcessCputime()}.
    * This is available on Sun/Oracle/OpenJDK JVM for Linux,
    * but not guaranteed on other platforms.
    * @throws UnsupportedOperationException If the JVM does not support measuring process CPU time.

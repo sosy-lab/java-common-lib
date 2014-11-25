@@ -38,14 +38,16 @@ import org.sosy_lab.common.time.Tickers.TickerWithUnit;
  */
 public final class Timer {
 
-  private static final String DEFAULT_CLOCK_PROPERTY_NAME = Timer.class.getCanonicalName() + ".timeSource";
+  private static final String DEFAULT_CLOCK_PROPERTY_NAME =
+      Timer.class.getCanonicalName() + ".timeSource";
 
   /**
    * The clock we use for accessing the time.
    */
   static final @Nullable TickerWithUnit DEFAULT_CLOCK;
   static {
-    String clockToUse = System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").toUpperCase().trim();
+    String clockToUse = System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS")
+        .toUpperCase().trim();
     switch (clockToUse) {
     case "WALLTIME_MILLIS":
       DEFAULT_CLOCK = Tickers.getWalltimeMillis();
@@ -78,7 +80,8 @@ public final class Timer {
 
   /**
    * The sum of times of all intervals.
-   * This field should be accessed through {@link #sumTime()} to account for a currently running interval.
+   * This field should be accessed through {@link #sumTime()}
+   * to account for a currently running interval.
    */
   private long sumTime               = 0;
 
@@ -87,7 +90,8 @@ public final class Timer {
 
   /**
    * The number of intervals.
-   * This field should be accessed through {@link #getNumberOfIntervals()} to account for a currently running interval.
+   * This field should be accessed through {@link #getNumberOfIntervals()}
+   * to account for a currently running interval.
    */
   private int  numberOfIntervals     = 0;
 
@@ -99,8 +103,10 @@ public final class Timer {
    */
   public Timer() {
     if (DEFAULT_CLOCK == null) {
-      throw new IllegalArgumentException("Invalid value \'" + System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME) + "\'"
-            + " for property " + DEFAULT_CLOCK_PROPERTY_NAME + ", cannot create Timer without explicitly specified clock.");
+      throw new IllegalArgumentException("Invalid value "
+          + "\'" + System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME) + "\'"
+          + " for property " + DEFAULT_CLOCK_PROPERTY_NAME
+          + ", cannot create Timer without explicitly specified clock.");
     }
     clock = DEFAULT_CLOCK;
   }

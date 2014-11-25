@@ -68,7 +68,8 @@ public class Threads {
    * @param priority The priority of the new thread.
    * @return A new Thread instance.
    */
-  public static Thread newThread(Runnable r, @Nullable String name, @Nullable Boolean daemon, @Nullable Integer priority) {
+  public static Thread newThread(Runnable r, @Nullable String name,
+      @Nullable Boolean daemon, @Nullable Integer priority) {
     checkNotNull(r);
     CatchSecurityViolationThreadFactoryBuilder builder = threadFactoryBuilder();
 

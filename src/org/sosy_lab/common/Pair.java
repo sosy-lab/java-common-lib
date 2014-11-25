@@ -62,8 +62,12 @@ public class Pair<A, B> implements Serializable {
     return new Pair<>(first, second);
   }
 
-  @Nullable public A getFirst() { return first; }
-  @Nullable public B getSecond() { return second; }
+  @Nullable public A getFirst() {
+    return first;
+  }
+  @Nullable public B getSecond() {
+    return second;
+  }
 
   @Override
   public String toString() {
@@ -115,30 +119,34 @@ public class Pair<A, B> implements Serializable {
       return (Holder<T, T2>) INSTANCE;
     }
 
-    private final Function<Pair<? extends T, ?>, T> PROJECTION_TO_FIRST = new Function<Pair<? extends T, ?>, T>() {
-      @Override
-      public T apply(@Nonnull Pair<? extends T, ?> pArg0) {
-        return pArg0.getFirst();
-      }
-    };
+    private final Function<Pair<? extends T, ?>, T> PROJECTION_TO_FIRST =
+        new Function<Pair<? extends T, ?>, T>() {
+          @Override
+          public T apply(@Nonnull Pair<? extends T, ?> pArg0) {
+            return pArg0.getFirst();
+          }
+        };
 
-    private final Function<Pair<?, ? extends T>, T> PROJECTION_TO_SECOND = new Function<Pair<?, ? extends T>, T>() {
-      @Override
-      public T apply(@Nonnull Pair<?, ? extends T> pArg0) {
-        return pArg0.getSecond();
-      }
-    };
+    private final Function<Pair<?, ? extends T>, T> PROJECTION_TO_SECOND =
+        new Function<Pair<?, ? extends T>, T>() {
+          @Override
+          public T apply(@Nonnull Pair<?, ? extends T> pArg0) {
+            return pArg0.getSecond();
+          }
+        };
 
-    private final Function<Entry<? extends T, ? extends T2>, Pair<T, T2>> PAIR_FROM_MAP_ENTRY = new Function<Entry<? extends T, ? extends T2>, Pair<T, T2>>() {
-      @Override
-      public Pair<T, T2> apply(
-          @Nonnull Entry<? extends T, ? extends T2> pArg0) {
-        return Pair.<T, T2>of(pArg0.getKey(), pArg0.getValue());
-      }
-    };
+    private final Function<Entry<? extends T, ? extends T2>, Pair<T, T2>> PAIR_FROM_MAP_ENTRY =
+        new Function<Entry<? extends T, ? extends T2>, Pair<T, T2>>() {
+          @Override
+          public Pair<T, T2> apply(
+              @Nonnull Entry<? extends T, ? extends T2> pArg0) {
+            return Pair.<T, T2>of(pArg0.getKey(), pArg0.getValue());
+          }
+        };
   }
 
-  public static <A, B> List<Pair<A, B>> zipList(Collection<? extends A> a, Collection<? extends B> b) {
+  public static <A, B> List<Pair<A, B>> zipList(Collection<? extends A> a,
+      Collection<? extends B> b) {
     List<Pair<A, B>> result = new ArrayList<>(a.size());
 
     Iterator<? extends A> iteratorA = a.iterator();
@@ -153,7 +161,8 @@ public class Pair<A, B> implements Serializable {
     return result;
   }
 
-  public static <A, B> Iterable<Pair<A, B>> zipWithPadding(final Iterable<? extends A> a, final Iterable<? extends B> b) {
+  public static <A, B> Iterable<Pair<A, B>> zipWithPadding(final Iterable<? extends A> a,
+      final Iterable<? extends B> b) {
     checkNotNull(a);
     checkNotNull(b);
     return new Iterable<Pair<A, B>>() {

@@ -34,10 +34,12 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * This class implements the builder pattern to create a {@link ThreadFactory} with certain
  * preset properties. The implementation behaves like {@link ThreadFactoryBuilder} but with
  * an important difference:
- * When trying to modify the thread (setting its name, priority,...) any occurring {@link SecurityException}
- * will be silently caught. This is important to make threading work on Google App Engine.
+ * When trying to modify the thread (setting its name, priority,...)
+ * any occurring {@link SecurityException} will be silently caught.
+ * This is important to make threading work on Google App Engine.
  *
- * Unfortunately the original ThreadFactoryBuilder class cannot be sub-classed because it declared as final.
+ * Unfortunately the original ThreadFactoryBuilder class cannot be sub-classed
+ * because it declared as final.
  *
  * @see CatchSecurityViolationThreadFactoryBuilder
  */
@@ -59,7 +61,8 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   /**
    * @see ThreadFactoryBuilder#setUncaughtExceptionHandler(UncaughtExceptionHandler)
    */
-  public CatchSecurityViolationThreadFactoryBuilder setUncaughtExceptionHandler(UncaughtExceptionHandler pHandler) {
+  public CatchSecurityViolationThreadFactoryBuilder setUncaughtExceptionHandler(
+      UncaughtExceptionHandler pHandler) {
     handler = checkNotNull(pHandler);
     return this;
   }
