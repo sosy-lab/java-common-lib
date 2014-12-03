@@ -42,6 +42,7 @@ import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
+import com.google.common.testing.EqualsTester;
 
 public class PathCopyingPersistentTreeMapTest extends TestCase {
 
@@ -107,8 +108,8 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
       if (oldMap.get(key).equals(value)) {
         assertThat(map.toString()).isEqualTo(oldMap.toString());
-        assertThat(map.hashCode()).isEqualTo(oldMap.hashCode());
-        assertThat(map).isEqualTo(oldMap);
+        new EqualsTester().addEqualityGroup(map, oldMap).testEquals();
+
       } else {
         assertThat(map).isNotEqualTo(oldMap);
       }
@@ -139,8 +140,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     } else {
       assertThat(map).hasSize(oldMap.size());
       assertThat(map.toString()).isEqualTo(oldMap.toString());
-      assertThat(map.hashCode()).isEqualTo(oldMap.hashCode());
-      assertThat(map).isEqualTo(oldMap);
+      new EqualsTester().addEqualityGroup(map, oldMap).testEquals();
     }
   }
 
@@ -356,10 +356,9 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   }
 
   private void checkEqualTo(SortedMap<String, String> comparison, SortedMap<String, String> map) {
-    assertThat(map).isEqualTo(comparison);
+    new EqualsTester().addEqualityGroup(map, comparison).testEquals();
     assertThat(map.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
     assertThat(map).hasSize(comparison.size());
-    assertThat(map.hashCode()).named("hashCode").isEqualTo(comparison.hashCode());
     checkEqualTo(comparison.entrySet(), map.entrySet());
     checkEqualTo(comparison.keySet(),   map.keySet());
     checkEqualTo(comparison.values(),   map.values());
@@ -370,8 +369,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   }
 
   private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
-    assertThat(set).isEqualTo(comparison);
-    assertThat(set.hashCode()).named("hashCode").isEqualTo(comparison.hashCode());
+    new EqualsTester().addEqualityGroup(set, comparison).testEquals();
     checkEqualTo((Collection<T>)comparison, (Collection<T>)set);
   }
 
