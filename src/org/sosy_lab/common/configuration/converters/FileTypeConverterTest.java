@@ -25,8 +25,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,8 +90,8 @@ public class FileTypeConverterTest {
   public static abstract class FileTypeConverterTestBase {
 
     @Parameters(name="{0} (safe={1}, safeInFile={2})")
-    public static List<Object[]> testPaths() {
-      return Arrays.asList(new Object[][] {
+    public static Object[][] testPaths() {
+      return new Object[][] {
           // path and whether it is allowed in safe mode and when included from config/file
           {"/etc/passwd", false, false},
           {"relative/dir" + File.pathSeparator + "/etc", false, false},
@@ -109,7 +107,7 @@ public class FileTypeConverterTest {
           {"dir/../../../file", false, false},
           {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
           {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
-      });
+      };
     }
 
     @Parameter(0)
