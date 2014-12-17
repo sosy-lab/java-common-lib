@@ -240,7 +240,7 @@ public final class Files {
    */
   public static void createParentDirs(Path path) throws IOException {
     Path parent = path.getParent();
-    if (parent == null) {
+    if (parent == null || parent.exists()) {
       // the parent is the root directory and therefore exists or cannot be created.
       return;
     }
