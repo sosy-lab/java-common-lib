@@ -244,8 +244,7 @@ public final class Files {
       // the parent is the root directory and therefore exists or cannot be created.
       return;
     }
-    parent.mkdirs();
-    if (!parent.isDirectory()) {
+    if (!parent.mkdirs()) {
       throw new IOException("Unable to create parent directories of " + path);
     }
   }
