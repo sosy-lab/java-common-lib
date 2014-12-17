@@ -396,7 +396,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
         logMessage += additionalMessage;
 
         if (!exceptionMessage.isEmpty()) {
-          if ((e instanceof IOException) && logMessage.endsWith("file")) {
+          if ((e instanceof IOException) && logMessage.endsWith("file")
+              && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
             // nicer error message, so that we have something like
             // "could not write to file /FOO.txt (Permission denied)"
             logMessage += " " + exceptionMessage;
