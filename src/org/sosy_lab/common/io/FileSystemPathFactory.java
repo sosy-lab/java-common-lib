@@ -26,6 +26,9 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.StandardSystemProperty;
+import com.google.common.base.Strings;
+
 
 public class FileSystemPathFactory implements AbstractPathFactory {
 
@@ -49,7 +52,23 @@ public class FileSystemPathFactory implements AbstractPathFactory {
     //    SecurityManager securityManager = new SecurityManager();
     //    securityManager.checkWrite(fileName);
 
-    return getPath(File.createTempFile(prefix, suffix).getPath());
+    try {
+      return getPath(File.createTempFile(prefix, suffix).getPath());
+    } catch (IOException e) {
+      // The message of this exception is often quite unhelpful,
+      // improve it by adding the path were we attempted to write.
+      String tmpDir = StandardSystemProperty.JAVA_IO_TMPDIR.value();
+      if (e.getMessage() != null && e.getMessage().contains(tmpDir)) {
+        throw e;
+      }
+
+      String fileName = Paths.get(tmpDir, prefix + "*" + suffix).getPath();
+      if (Strings.nullToEmpty(e.getMessage()).isEmpty()) {
+        throw new IOException(fileName, e);
+      } else {
+        throw new IOException(fileName + " (" + e.getMessage() + ")", e);
+      }
+    }
   }
 
 }
