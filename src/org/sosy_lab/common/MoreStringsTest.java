@@ -21,7 +21,10 @@ package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Test;
+import org.sosy_lab.common.MoreStrings.WithLongString;
 
 public class MoreStringsTest {
 
@@ -43,5 +46,35 @@ public class MoreStringsTest {
   @Test
   public void startsWithIgnoreCase_NonMatching() {
     assertThat(MoreStrings.startsWithIgnoreCase("AbC", "Ac")).isFalse();
+  }
+
+  @Test
+  public void test_longStringOf() {
+    final String testString = "TEST-STRING";
+    WithLongString instance = new WithLongString() {
+        @Override
+        public String toLongString() {
+          return testString;
+        }
+      };
+
+    assertThat(MoreStrings.longStringOf(instance).toString()).isEqualTo(testString);
+  }
+
+  @Test
+  @SuppressWarnings("unused")
+  public void test_longStringOf_lazy() {
+    final AtomicBoolean wasCalled = new AtomicBoolean(false);
+    WithLongString instance = new WithLongString() {
+        @Override
+        public String toLongString() {
+          wasCalled.set(true);
+          return "";
+        }
+      };
+
+    Object unused = MoreStrings.longStringOf(instance);
+
+    assertThat(wasCalled.get()).named("Whether toLongString method was called").isFalse();
   }
 }
