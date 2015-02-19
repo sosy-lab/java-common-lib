@@ -12,6 +12,7 @@
                 failonerror="false" failifexecutionfails="false"
                 logError="false" error="/dev/null">
             <env key="LANG" value="C" />
+            <env key="LANGUAGE" value="C" />
         </exec>
 
         <condition property="version" value="0.${svn.revision}" else="UNKNOWN">
