@@ -37,11 +37,10 @@ public class FileLogFormatter extends Formatter {
     StringBuffer sb = new StringBuffer();
 
     dateFormat.format(new Date(lr.getMillis()), sb, new FieldPosition(0));
-    sb.append("\t ");
+    sb.append("\t");
 
-    sb.append("level: ");
     sb.append(lr.getLevel());
-    sb.append("\t ");
+    sb.append("\t");
 
     if (lr instanceof ExtendedLogRecord) {
       String component = ((ExtendedLogRecord)lr).getSourceComponentName();
@@ -53,7 +52,7 @@ public class FileLogFormatter extends Formatter {
     sb.append(LogUtils.extractSimpleClassName(lr));
     sb.append(".");
     sb.append(lr.getSourceMethodName());
-    sb.append("\t ");
+    sb.append("\t");
 
     sb.append(lr.getMessage());
 
