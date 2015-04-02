@@ -249,7 +249,8 @@ public final class Classes {
     } catch (ClassNotFoundException e) {
       try {
         return cl.loadClass(prefix + "." + name); // try with prefix added
-      } catch (ClassNotFoundException _) {
+      } catch (ClassNotFoundException e2) {
+        e.addSuppressed(e2);
         throw e; // re-throw original exception to get correct error message
       }
     }
