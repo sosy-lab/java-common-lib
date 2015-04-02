@@ -23,8 +23,11 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
+import com.google.errorprone.annotations.ForOverride;
+
 public abstract class ForwardingLogManager implements LogManager {
 
+  @ForOverride
   protected abstract LogManager delegate();
 
   @Override
