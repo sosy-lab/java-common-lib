@@ -44,7 +44,7 @@ public class Concurrency {
     while (!executor.isTerminated()) {
       try {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      } catch (InterruptedException _) {
+      } catch (InterruptedException ignored) {
         interrupted = true;
       }
     }

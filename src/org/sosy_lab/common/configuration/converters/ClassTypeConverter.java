@@ -61,7 +61,7 @@ public class ClassTypeConverter implements TypeConverter {
     for (String prefix : packagePrefixes) {
       try {
         cls = Classes.forName(value, prefix);
-      } catch (ClassNotFoundException _) {
+      } catch (ClassNotFoundException ignored) {
         // Ignore, we try next prefix and throw below if none is found.
       }
     }

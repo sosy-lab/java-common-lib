@@ -177,7 +177,8 @@ public class ProcessExecutor<E extends Exception> {
               Thread.currentThread().interrupt();
               return exitCode;
 
-            } catch (InterruptedException _) { /* ignore, we will call interrupt() */
+            } catch (InterruptedException ignored) {
+              // ignore, we will call interrupt()
             }
           }
         }
