@@ -46,6 +46,7 @@ import org.sosy_lab.common.io.Path;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.errorprone.annotations.ForOverride;
 
 
 /**
@@ -200,6 +201,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * @param level The level to use with the handler.
    * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
    */
+  @ForOverride
   protected void setupHandler(Handler handler, Formatter formatter, Level level,
       List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
