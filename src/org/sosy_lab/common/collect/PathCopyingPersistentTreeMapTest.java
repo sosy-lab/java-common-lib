@@ -381,6 +381,6 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     // equals() and hashCode() is undefined for Collections
     assertThat(set.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
     assertThat(set).hasSize(comparison.size());
-    assertThat(set).iteratesAs(comparison);
+    assertThat(set).containsExactlyElementsIn(comparison).inOrder();
   }
 }

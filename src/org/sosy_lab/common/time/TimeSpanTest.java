@@ -275,10 +275,10 @@ public class TimeSpanTest {
 
   @Test
   public void testCompareTo() {
-    assertThat(TimeSpan.empty()).comparesEqualTo(TimeSpan.of(0, SECONDS));
-    assertThat(TimeSpan.empty()).comparesEqualTo(TimeSpan.of(0, NANOSECONDS));
-    assertThat(LARGE).comparesEqualTo(LARGE_AS_HOURS);
-    assertThat(LARGE).comparesEqualTo(LARGE_AS_MINUTES);
+    assertThat(TimeSpan.empty()).isEquivalentAccordingToCompareTo(TimeSpan.of(0, SECONDS));
+    assertThat(TimeSpan.empty()).isEquivalentAccordingToCompareTo(TimeSpan.of(0, NANOSECONDS));
+    assertThat(LARGE).isEquivalentAccordingToCompareTo(LARGE_AS_HOURS);
+    assertThat(LARGE).isEquivalentAccordingToCompareTo(LARGE_AS_MINUTES);
 
     assertThat(LARGE).isGreaterThan(TimeSpan.empty());
     assertThat(LARGE).isGreaterThan(TimeSpan.of(0, HOURS));

@@ -79,7 +79,7 @@ public class ConfigurationTest {
   public void testEnumSet() throws InvalidConfigurationException {
     TestEnumSetOptions options = new TestEnumSetOptions();
     enumTestConfiguration().inject(options);
-    assertThat(options.values).iteratesAs(TestEnum.E2, TestEnum.E3);
+    assertThat(options.values).containsExactly(TestEnum.E2, TestEnum.E3).inOrder();
   }
 
   @Test
@@ -98,7 +98,7 @@ public class ConfigurationTest {
   public void testSetOfEnums() throws InvalidConfigurationException {
     TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
     enumTestConfiguration().inject(options);
-    assertThat(options.values).iteratesAs(TestEnum.E2, TestEnum.E3);
+    assertThat(options.values).containsExactly(TestEnum.E2, TestEnum.E3).inOrder();
   }
 
   @Test(expected = UnsupportedOperationException.class)

@@ -100,11 +100,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forRightValueOnly("a", "1"),
             MapsDifference.Entry.forRightValueOnly("b", "2"),
             MapsDifference.Entry.forRightValueOnly("c", "3"),
-            MapsDifference.Entry.forRightValueOnly("d", "4"));
+            MapsDifference.Entry.forRightValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -122,11 +123,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forLeftValueOnly("a", "1"),
             MapsDifference.Entry.forLeftValueOnly("b", "2"),
             MapsDifference.Entry.forLeftValueOnly("c", "3"),
-            MapsDifference.Entry.forLeftValueOnly("d", "4"));
+            MapsDifference.Entry.forLeftValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -144,9 +146,10 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forRightValueOnly("b", "2"),
-            MapsDifference.Entry.forRightValueOnly("d", "4"));
+            MapsDifference.Entry.forRightValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -164,9 +167,10 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forRightValueOnly("a", "1"),
-            MapsDifference.Entry.forRightValueOnly("c", "3"));
+            MapsDifference.Entry.forRightValueOnly("c", "3"))
+        .inOrder();
   }
 
   @Test
@@ -184,9 +188,10 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forLeftValueOnly("b", "2"),
-            MapsDifference.Entry.forLeftValueOnly("d", "4"));
+            MapsDifference.Entry.forLeftValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -204,9 +209,10 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forLeftValueOnly("a", "1"),
-            MapsDifference.Entry.forLeftValueOnly("c", "3"));
+            MapsDifference.Entry.forLeftValueOnly("c", "3"))
+        .inOrder();
   }
 
   @Test
@@ -224,11 +230,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forLeftValueOnly("a", "1"),
             MapsDifference.Entry.forRightValueOnly("b", "2"),
             MapsDifference.Entry.forLeftValueOnly("c", "3"),
-            MapsDifference.Entry.forRightValueOnly("d", "4"));
+            MapsDifference.Entry.forRightValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -246,11 +253,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forRightValueOnly("a", "1"),
             MapsDifference.Entry.forLeftValueOnly("b", "2"),
             MapsDifference.Entry.forRightValueOnly("c", "3"),
-            MapsDifference.Entry.forLeftValueOnly("d", "4"));
+            MapsDifference.Entry.forLeftValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -268,11 +276,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP_INVERSE);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forDifferingValues("a", "4", "1"),
             MapsDifference.Entry.forRightValueOnly("b", "2"),
             MapsDifference.Entry.forDifferingValues("c", "2", "3"),
-            MapsDifference.Entry.forRightValueOnly("d", "4"));
+            MapsDifference.Entry.forRightValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test
@@ -290,11 +299,12 @@ public class PersistentSortedMapsTest {
     assertThat(result).isEqualTo(FULL_MAP_INVERSE);
 
     assertThat(differences)
-        .iteratesAs(
+        .containsExactly(
             MapsDifference.Entry.forDifferingValues("a", "1", "4"),
             MapsDifference.Entry.forLeftValueOnly("b", "2"),
             MapsDifference.Entry.forDifferingValues("c", "3", "2"),
-            MapsDifference.Entry.forLeftValueOnly("d", "4"));
+            MapsDifference.Entry.forLeftValueOnly("d", "4"))
+        .inOrder();
   }
 
   @Test

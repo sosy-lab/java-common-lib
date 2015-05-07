@@ -73,33 +73,37 @@ public class PersistentLinkedListTest extends TestCase {
 
   @Test
   public void testOf1() {
-    assertThat(PersistentLinkedList.of("a")).iteratesAs("a");
+    assertThat(PersistentLinkedList.of("a")).containsExactly("a").inOrder();
   }
 
   @Test
   public void testOf2() {
-    assertThat(PersistentLinkedList.of("a", "b")).iteratesAs("a", "b");
+    assertThat(PersistentLinkedList.of("a", "b")).containsExactly("a", "b").inOrder();
   }
 
   @Test
   public void testOf3() {
-    assertThat(PersistentLinkedList.of("a", "b", "c")).iteratesAs("a", "b", "c");
+    assertThat(PersistentLinkedList.of("a", "b", "c")).containsExactly("a", "b", "c").inOrder();
   }
 
   @Test
   public void testOfVarArgs() {
-    assertThat(PersistentLinkedList.of("a", "b", "c", "d")).iteratesAs("a", "b", "c", "d");
+    assertThat(PersistentLinkedList.of("a", "b", "c", "d"))
+        .containsExactly("a", "b", "c", "d")
+        .inOrder();
   }
 
   @Test
   public void testWithAll() {
     assertThat(PersistentLinkedList.of("d").withAll(Arrays.asList("a", "b", "c")))
-        .iteratesAs("a", "b", "c", "d");
+        .containsExactly("a", "b", "c", "d")
+        .inOrder();
   }
 
   @Test
   public void testReversed() {
     assertThat(PersistentLinkedList.of("a", "b", "c", "d").reversed())
-        .iteratesAs("d", "c", "b", "a");
+        .containsExactly("d", "c", "b", "a")
+        .inOrder();
   }
 }
