@@ -14,3 +14,6 @@
 /FindBugs.xml
 /FindBugs.diff.html
 /FindBugs.diff.xml
+
+.idea/workspace.xml
+.idea/uiDesigner.xml
