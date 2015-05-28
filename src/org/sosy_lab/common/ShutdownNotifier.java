@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Collections;
 import java.util.Set;
@@ -86,7 +88,10 @@ public final class ShutdownNotifier {
       // This creates a set which is backed by a thread-safe map
       // with identity comparison (== instead of equals())
       // and weak references for the keys
-      Collections.newSetFromMap(new MapMaker().concurrencyLevel(1).weakKeys().<ShutdownRequestListener, Boolean>makeMap());
+      Collections.newSetFromMap(new MapMaker()
+                                .concurrencyLevel(1)
+                                .weakKeys()
+                                .<ShutdownRequestListener, Boolean>makeMap());
 
   // Separate flag for notification of listeners
   // in order to prevent a race condition when registering a listener
@@ -140,7 +145,8 @@ public final class ShutdownNotifier {
    * When this method returns, it is guaranteed that all currently registered
    * listeners where notified and have been unregistered.
    *
-   * @param pReason A non-null human-readable string that tells the user why a shutdown was requested.
+   * @param pReason A non-null human-readable string that tells the user
+   * why a shutdown was requested.
    */
   public void requestShutdown(final String pReason) {
     checkNotNull(pReason);
@@ -299,7 +305,8 @@ public final class ShutdownNotifier {
      * Instead, just call {@link ShutdownRequestListener#shouldShutdown()}
      * whenever you would check the flag (this is similarly cheap).
      *
-     * @param reason A non-null human-readable string that tells the user why a shutdown was requested.
+     * @param reason A non-null human-readable string that tells the user
+     * why a shutdown was requested.
      */
     void shutdownRequested(String reason);
   }
