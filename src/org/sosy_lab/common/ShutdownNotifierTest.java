@@ -1,6 +1,6 @@
 /*
- *  CPAchecker is a tool for configurable software verification.
- *  This file is part of CPAchecker.
+ *  SoSy-Lab Common is a library of useful utilities.
+ *  This file is part of SoSy-Lab Common.
  *
  *  Copyright (C) 2007-2014  Dirk Beyer
  *  All rights reserved.
@@ -16,10 +16,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *
- *  CPAchecker web page:
- *    http://cpachecker.sosy-lab.org
  */
 package org.sosy_lab.common;
 
