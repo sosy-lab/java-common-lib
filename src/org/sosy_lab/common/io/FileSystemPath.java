@@ -63,8 +63,6 @@ public class FileSystemPath implements Path {
     if (more != null) {
       if (more.length == 0) {
         this.path = path;
-      } else if (path.isEmpty() && more.length == 0) {
-        this.path = "";
       } else {
         char separatorChar = File.separatorChar;
         Joiner joiner = Joiner.on(separatorChar).skipNulls();
@@ -116,7 +114,7 @@ public class FileSystemPath implements Path {
   }
 
   @Override
-  public String[] list() {
+  public @Nullable String[] list() {
     return toFile().list();
   }
 
