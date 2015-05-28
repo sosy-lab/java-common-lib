@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * Testing rationals library
  */
-public class TestExtendedRational {
+public class ExtendedRationalTest {
   @Test
   public void testTypes() {
     ExtendedRational x;
