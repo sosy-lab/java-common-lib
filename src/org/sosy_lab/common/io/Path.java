@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import javax.annotation.Nullable;
+
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
@@ -96,7 +98,7 @@ public interface Path {
    *
    * @return The contained files and directories
    */
-  String[] list();
+  @Nullable String[] list();
 
   /**
    * Returns the path's parent.

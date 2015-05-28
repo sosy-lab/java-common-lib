@@ -715,8 +715,9 @@ public class OptionCollector {
    */
   private void collectClasses(final File directory,
       final String packageName, final List<Class<?>> classes) {
-    if (directory.exists()) {
-      final File[] files = directory.listFiles();
+    assert directory.isDirectory();
+    final File[] files = directory.listFiles();
+    if (files != null) {
       Arrays.sort(files);
       for (final File file : files) {
         final String fileName = file.getName();
