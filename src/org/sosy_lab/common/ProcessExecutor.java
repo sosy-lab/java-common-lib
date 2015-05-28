@@ -51,7 +51,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.errorprone.annotations.ForOverride;
 
 /**
  * This class can be used to execute a separate process and read it's output in
@@ -405,7 +404,6 @@ public class ProcessExecutor<E extends Exception> {
    * This method will be called in a new thread.
    * @throws E Overwriting methods may throw this exception which will be propagated.
    */
-  @ForOverride
   protected void handleOutput(String line) throws E {
     checkNotNull(line);
     logger.log(Level.ALL, name, "output:", line);
@@ -421,7 +419,6 @@ public class ProcessExecutor<E extends Exception> {
    * This method will be called in a new thread.
    * @throws E Overwriting methods may throw this exception which will be propagated.
    */
-  @ForOverride
   protected void handleErrorOutput(String line) throws E {
     checkNotNull(line);
     logger.log(Level.WARNING, name, "error output:", line);
@@ -436,7 +433,6 @@ public class ProcessExecutor<E extends Exception> {
    * This method will be called in a new thread.
    * @throws E Overwriting methods may throw this exception which will be propagated.
    */
-  @ForOverride
   protected void handleExitCode(int code) throws E {
     if (code != 0) {
       logger.log(Level.WARNING, "Exit code from", name, "was", code);
