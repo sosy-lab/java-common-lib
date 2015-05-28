@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="file://bin/" />
+    <libelement value="file://lib/java/runtime/guava.jar" />
+    <libelement value="file://lib/java/test/guava-testlib.jar" />
+    <libelement value="file://lib/java/test/truth.jar" />
+    <libelement value="file://lib/java/test/junit.jar" />
+    <libelement value="file://lib/java/test/hamcrest-core.jar" />
+    <libelement value="file://lib/java/test/mockito-core.jar" />
+    <libelement value="file://lib/java/test/objenesis.jar" />
+    <libelement value="file://lib/java/build/annotations.jar" />
+    <libelement value="file://lib/java/build/auto-service.jar" />
+    <libelement value="file://lib/java/build/error_prone_annotations.jar" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="bin/">
+        <CLASSES>
+          <root url="file://$USER_HOME$/bin" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="guava.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/guava.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="guava-testlib.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/guava-testlib.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-testlib-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truth.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/truth.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/truth-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="junit.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hamcrest-core.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/hamcrest-core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mockito-core.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/mockito-core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/mockito-core.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="objenesis.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/objenesis.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="annotations.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/build/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java/build/annotations.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="auto-service.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/build/auto-service.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="error_prone_annotations.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/build/error_prone_annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/error_prone_annotations-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="inheritedJdk" />
+  </component>
+</module>
