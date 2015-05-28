@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestRational {
+public class RationalTest {
   @Test
   public void testInstantiation() {
     Rational x;

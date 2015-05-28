@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.google.common.testing.EqualsTester;
 
 
-public class TestLinearExpression {
+public class LinearExpressionTest {
 
   @Test public void testInstantiation() {
     LinearExpression<String> x;
