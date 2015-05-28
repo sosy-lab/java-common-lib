@@ -156,7 +156,7 @@ public class Pair<A, B> implements Serializable {
           @Override
           public Pair<T, T2> apply(
               @Nonnull Entry<? extends T, ? extends T2> pArg0) {
-            return Pair.of(pArg0.getKey(), pArg0.getValue());
+            return Pair.<T, T2>of(pArg0.getKey(), pArg0.getValue());
           }
         };
   }
@@ -170,7 +170,7 @@ public class Pair<A, B> implements Serializable {
     while (iteratorA.hasNext()) {
       checkArgument(iteratorB.hasNext(), "Second list is shorter");
 
-      result.add(Pair.of(iteratorA.next(), iteratorB.next()));
+      result.add(Pair.<A, B>of(iteratorA.next(), iteratorB.next()));
     }
     checkArgument(!iteratorB.hasNext(), "Second list is longer");
 
@@ -239,7 +239,7 @@ public class Pair<A, B> implements Serializable {
     return new Function<Pair<A1, A2>, Pair<B1, B2>>() {
       @Override
       public Pair<B1, B2> apply(@Nonnull Pair<A1, A2> pInput) {
-        return Pair.of(f1.apply(pInput.getFirst()),
+        return Pair.<B1, B2>of(f1.apply(pInput.getFirst()),
                                f2.apply(pInput.getSecond()));
       }
     };
