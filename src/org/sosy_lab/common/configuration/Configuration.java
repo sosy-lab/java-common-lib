@@ -88,6 +88,10 @@ import com.google.common.primitives.Primitives;
  */
 @Options
 public final class Configuration {
+  /**
+   * Signal for the processor that the deprecated-prefix feature is not used.
+   */
+  static final String NO_DEPRECATED_PREFIX = "<NO_DEPRECATION>";
 
   private static ConfigurationBuilderFactory builderFactory =
       new ConfigurationBuilderFactory() {
@@ -511,7 +515,8 @@ public final class Configuration {
     // get value
     final Option option = field.getAnnotation(Option.class);
     final String name = getOptionName(options, field, option);
-    final Object value = getValue(name, typedDefaultValue, type, genericType, option, field);
+    final Object value = getValue(
+        options, field, typedDefaultValue, type, genericType, option, field);
 
     // options which were not changed need not to be set
     if (value == defaultValue) {
@@ -570,7 +575,7 @@ public final class Configuration {
     // get value
     final Option option = method.getAnnotation(Option.class);
     final String name = getOptionName(options, method, option);
-    final Object value = getValue(name, null, type, genericType, option, method);
+    final Object value = getValue(options, method, null, type, genericType, option, method);
 
     if (logger != null) {
       logger.log(Level.CONFIG, "Option:", name,
@@ -601,29 +606,38 @@ public final class Configuration {
     }
   }
 
+  private String getOptionName(final Options options, final Member member, final Option option) {
+    return getOptionName(options, member, option, false);
+  }
+
   /** This function return the name of an {@link Option}.
    * If no option name is defined, the name of the member is returned.
    * If a prefix is defined, it is added in front of the name.
    *
    * @param options the @Options annotation of the class, that contains the member
    * @param member member with @Option annotation
-   * @param option the @Option annotation */
-  private String getOptionName(final Options options, final Member member, final Option option) {
-    String prefix = options.prefix();
-    if (!prefix.isEmpty()) {
-      prefix += ".";
-    }
+   * @param option the @Option annotation
+   * @param isDeprecated flag specifying whether the deprecated prefix should be
+   *                     used.
+   */
+  private String getOptionName(final Options options, final Member member, final Option option,
+                               boolean isDeprecated) {
     String name = option.name();
     if (name.isEmpty()) {
       name = member.getName();
     }
-    return prefix + name;
+    String optsPrefix = !isDeprecated ? options.prefix() : options.deprecatedPrefix();
+    if (!optsPrefix.isEmpty()) {
+      optsPrefix += ".";
+    }
+    return optsPrefix + name;
   }
 
   /**
    * This method gets the value which needs to be assigned to the option.
    *
-   * @param optionName The name of the option.
+   * @param options Options annotation.
+   * @param method Member the annotation is attached to.
    * @param defaultValue The default value (may be null).
    * @param type The type of the option.
    * @param genericType The type of the option.
@@ -636,15 +650,48 @@ public final class Configuration {
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
   @Nullable
-  private <T> Object getValue(final String optionName, final T defaultValue,
-      final Class<T> type, final Type genericType, final Option option,
+  private <T> Object getValue(
+      final Options options,
+      final Member method,
+      @Nullable final T defaultValue,
+      final Class<T> type,
+      final Type genericType,
+      final Option option,
       final AnnotatedElement member)
       throws UnsupportedOperationException, InvalidConfigurationException {
 
-    final String valueStr = getValueString(optionName, option, type.isEnum());
+    final String optionName = getOptionName(options, method, option);
+    String valueStr = getValueString(optionName, option, type.isEnum());
     final Annotation secondaryOption = getSecondaryAnnotation(member);
 
     final Object value;
+    if (!options.deprecatedPrefix().equals(NO_DEPRECATED_PREFIX)) {
+      String optionDeprecatedName = getOptionName(options, method, option, true);
+      String deprecatedValueStr = getValueString(optionDeprecatedName, option,
+          type.isEnum());
+      if (valueStr == null) {
+        valueStr = deprecatedValueStr;
+        if (logger != null) {
+          logger.log(Level.WARNING, "Using deprecated options prefix",
+              options.deprecatedPrefix(),
+              "for class",
+              type.getCanonicalName(),
+              "please update your config to use the prefix",
+              options.prefix());
+        }
+      } else if (deprecatedValueStr != null
+          && !deprecatedValueStr.equals(valueStr)) {
+        if (logger != null) {
+          logger.log(Level.WARNING, "Option", optionName,
+              "is set to two different values using deprecated prefix",
+              options.deprecatedPrefix(),
+              "and new prefix",
+              options.prefix(),
+              ". Using the value supplied by the new prefix.");
+        }
+      }
+    }
+
     if (valueStr != null) {
       // option was specified
 
