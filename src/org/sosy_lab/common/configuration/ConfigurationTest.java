@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -30,6 +32,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
@@ -38,6 +41,7 @@ import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConf
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
+import org.sosy_lab.common.log.LogManager;
 
 public class ConfigurationTest {
 
@@ -233,5 +237,59 @@ public class ConfigurationTest {
     } catch (ReflectiveOperationException e) {
       Throwables.propagate(e);
     }
+  }
+
+  @Options(prefix="prefix", deprecatedPrefix="deprecated")
+  private static class DeprecatedOptions {
+    @Option(secure=true, description="test")
+    private String test = "test";
+  }
+
+  /**
+   * Deprecated options are acceptable, but throw warnings.
+   */
+  @Test
+  public void testDeprecatedOptionsWarning() throws Exception {
+    LogManager mockLogger = mock(LogManager.class);
+    Configuration c = Configuration.builder()
+        .setOption("deprecated.test", "myValue").build();
+    c.enableLogging(mockLogger);
+
+    DeprecatedOptions opts = new DeprecatedOptions();
+    c.inject(opts);
+    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    assertThat(opts.test).isEqualTo("myValue");
+  }
+
+  /**
+   * When both deprecated and new options are supplied, the new option
+   * is used and the warning is logged.
+   */
+  @Test
+  public void testDuplicateOptions() throws Exception {
+    LogManager mockLogger = mock(LogManager.class);
+    Configuration c = Configuration.builder()
+        .setOption("deprecated.test", "myDeprecatedValue")
+        .setOption("prefix.test", "myNewValue").build();
+    c.enableLogging(mockLogger);
+    DeprecatedOptions opts = new DeprecatedOptions();
+    c.inject(opts);
+    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    assertThat(opts.test).isEqualTo("myNewValue");
+  }
+
+
+  @Test
+  public void testCopyWithNewPrefix() throws Exception {
+    LogManager mockLogger = mock(LogManager.class);
+    final Configuration c = Configuration.builder()
+        .setOption("start.deprecated.test", "myDeprecatedValue")
+        .setOption("start.prefix.test", "myNewValue")
+        .setPrefix("start").build();
+    c.enableLogging(mockLogger);
+    DeprecatedOptions opts = new DeprecatedOptions();
+    c.inject(opts);
+    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    assertThat(opts.test).isEqualTo("myNewValue");
   }
 }

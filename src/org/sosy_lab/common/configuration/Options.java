@@ -38,7 +38,18 @@ public @interface Options {
   String prefix() default "";
 
   /**
+   * When the prefix needs to be renamed, often it is desirable to maintain
+   * the backwards compatibility with the previous config.
+   * In that case, the previous prefix can be moved to the field
+   * {@code deprecatedPrefix}.
+   * Both normal and deprecated prefixes would work,
+   * with latter printing the deprecation warning.
+   */
+  String deprecatedPrefix() default Configuration.NO_DEPRECATED_PREFIX;
+
+  /**
    * An optional text, that describes the current options.
    */
   String description() default "";
+
 }
