@@ -23,6 +23,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -280,6 +281,20 @@ public class ConfigurationTest {
     assertThat(opts.test).isEqualTo("myNewValue");
   }
 
+  @Test
+  public void testDuplicateOptionsSameValue() throws Exception {
+    LogManager mockLogger = mock(LogManager.class);
+    Configuration c = Configuration.builder()
+        .setOption("deprecated.test", "myValue")
+        .setOption("prefix.test", "myValue").build();
+    c.enableLogging(mockLogger);
+
+    DeprecatedOptions opts = new DeprecatedOptions();
+    c.inject(opts);
+    verify(mockLogger, never()).log(eq(Level.WARNING), anyVararg());
+    verify(mockLogger, never()).logf(eq(Level.WARNING), anyString(), anyVararg());
+    assertThat(opts.test).isEqualTo("myValue");
+  }
 
   @Test
   public void testCopyWithNewPrefix() throws Exception {
