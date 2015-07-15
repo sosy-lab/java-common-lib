@@ -70,7 +70,7 @@ public class Builder implements ConfigurationBuilder {
     setupProperties();
 
     properties.put(name, value);
-    sources.put(name, Paths.get("manually set"));
+    sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
 
     return this;
   }
@@ -99,7 +99,7 @@ public class Builder implements ConfigurationBuilder {
 
     properties.putAll(options);
     for (String name : options.keySet()) {
-      sources.put(name, Paths.get("manually set"));
+      sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
     }
 
     return this;
