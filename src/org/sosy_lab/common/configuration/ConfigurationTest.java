@@ -253,6 +253,7 @@ public class ConfigurationTest {
    */
   @Test
   public void testDeprecatedOptionsWarning() throws Exception {
+    @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
     Configuration c = Configuration.builder()
         .setOption("deprecated.test", "myValue").build();
@@ -270,6 +271,7 @@ public class ConfigurationTest {
    */
   @Test
   public void testDuplicateOptions() throws Exception {
+    @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
     Configuration c = Configuration.builder()
         .setOption("deprecated.test", "myDeprecatedValue")
@@ -283,6 +285,7 @@ public class ConfigurationTest {
 
   @Test
   public void testDuplicateOptionsSameValue() throws Exception {
+    @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
     Configuration c = Configuration.builder()
         .setOption("deprecated.test", "myValue")
@@ -298,6 +301,7 @@ public class ConfigurationTest {
 
   @Test
   public void testCopyWithNewPrefix() throws Exception {
+    @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
     final Configuration c = Configuration.builder()
         .setOption("start.deprecated.test", "myDeprecatedValue")
