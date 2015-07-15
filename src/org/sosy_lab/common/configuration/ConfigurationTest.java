@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,10 +40,10 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConfigurationBuilderFactory;
+import org.sosy_lab.common.log.LogManager;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
-import org.sosy_lab.common.log.LogManager;
 
 public class ConfigurationTest {
 
@@ -257,7 +259,7 @@ public class ConfigurationTest {
 
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
-    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    verify(mockLogger).logf(eq(Level.WARNING), anyString(), anyVararg());
     assertThat(opts.test).isEqualTo("myValue");
   }
 
@@ -274,7 +276,7 @@ public class ConfigurationTest {
     c.enableLogging(mockLogger);
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
-    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    verify(mockLogger).logf(eq(Level.WARNING), anyString(), anyVararg());
     assertThat(opts.test).isEqualTo("myNewValue");
   }
 
@@ -289,7 +291,7 @@ public class ConfigurationTest {
     c.enableLogging(mockLogger);
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
-    verify(mockLogger).log(eq(Level.WARNING), anyVararg());
+    verify(mockLogger).logf(eq(Level.WARNING), anyString(), anyVararg());
     assertThat(opts.test).isEqualTo("myNewValue");
   }
 }

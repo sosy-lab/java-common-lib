@@ -88,10 +88,16 @@ import com.google.common.primitives.Primitives;
  */
 @Options
 public final class Configuration {
+
   /**
    * Signal for the processor that the deprecated-prefix feature is not used.
    */
   static final String NO_DEPRECATED_PREFIX = "<NO_DEPRECATION>";
+
+  /**
+   * Dummy value used for source paths that have no correspondence to the file system.
+   */
+  static final String NO_NAMED_SOURCE = "manually set";
 
   private static ConfigurationBuilderFactory builderFactory =
       new ConfigurationBuilderFactory() {
@@ -669,25 +675,26 @@ public final class Configuration {
       String optionDeprecatedName = getOptionName(options, method, option, true);
       String deprecatedValueStr = getValueString(optionDeprecatedName, option,
           type.isEnum());
-      if (valueStr == null) {
-        valueStr = deprecatedValueStr;
-        if (logger != null) {
-          logger.log(Level.WARNING, "Using deprecated options prefix",
-              options.deprecatedPrefix(),
-              "for class",
-              type.getCanonicalName(),
-              "please update your config to use the prefix",
-              options.prefix());
-        }
-      } else if (deprecatedValueStr != null
-          && !deprecatedValueStr.equals(valueStr)) {
-        if (logger != null) {
-          logger.log(Level.WARNING, "Option", optionName,
-              "is set to two different values using deprecated prefix",
-              options.deprecatedPrefix(),
-              "and new prefix",
-              options.prefix(),
-              ". Using the value supplied by the new prefix.");
+      if (deprecatedValueStr != null && !deprecatedValueStr.equals(valueStr)) {
+        if (valueStr == null) {
+          valueStr = deprecatedValueStr;
+          if (logger != null) {
+            logger.logf(Level.WARNING,
+                "Using deprecated name for option '%s'%s, "
+                + "please update your config to use the option name '%s' instead.",
+                optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+                optionName);
+          }
+        } else {
+          if (logger != null) {
+            logger.logf(Level.WARNING,
+                "Option '%s'%s is set to a different value "
+                + "than its deprecated previous name '%s'%s, "
+                + "using the value '%s' of the former and ignoring the latter.",
+                optionName, getOptionSourceForLogging(optionName),
+                optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+                valueStr);
+          }
         }
       }
     }
@@ -719,6 +726,20 @@ public final class Configuration {
       printOptionInfos(type, option, optionName, valueStr, defaultValue);
     }
     return value;
+  }
+
+  /**
+   * Return a string describing the source of an option suitable for logging
+   * (best-effort, may return an empty string).
+   */
+  private String getOptionSourceForLogging(String optionDeprecatedName) {
+    if (sources.containsKey(optionDeprecatedName)) {
+      String source = sources.get(optionDeprecatedName).toString();
+      if (!source.isEmpty() && !source.equals(NO_NAMED_SOURCE)) {
+        return " in file " + source;
+      }
+    }
+    return "";
   }
 
   /**
