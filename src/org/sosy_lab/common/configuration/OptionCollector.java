@@ -83,7 +83,6 @@ public class OptionCollector {
   }
 
   private final Set<String> errorMessages = new LinkedHashSet<>();
-  private final String sourcePath;
   private final boolean verbose;
 
   // The map where we will collect all options.
@@ -95,7 +94,6 @@ public class OptionCollector {
    */
   public OptionCollector(boolean pVerbose) {
     verbose = pVerbose;
-    sourcePath = getSourcePath();
   }
 
   /**
@@ -155,26 +153,34 @@ public class OptionCollector {
 
   /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
-  private static String getSourcePath() {
-    Iterator<URL> resources = getClassLoaderResources();
+  private static String getSourcePath(Class<?> cls) {
+    String sourcePath = cls.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-    // check each resource:
-    // cut off the ending 'bin', append 'src/org/sosy_lab'
-    // and check, if the result is a folder.
-    // '/src/org/sosy_lab/X' is the default location of program X.
-    while (resources.hasNext()) {
-      try {
-        File file = new File(resources.next().toURI());
-        final String testPath =
-            file.toString().substring(0, file.toString().length() - 3);
-        if (new File(testPath + "src/org/sosy_lab").isDirectory()) {
-          return testPath + "src/";
-        }
-      } catch (URISyntaxException e) {
-        // ignore, a warning will be printed later on if the source cannot be found
-      }
+    // in case we have spaces in the filename these have to be fixed:
+    sourcePath = sourcePath.replace("%20", " ");
 
+    // check the folders known as source, depending on the current folder
+    // structure for the class files
+
+    // this could be a usual eclipse environment, therefore src is the appropriate
+    // folder to search for sources
+    if (sourcePath.endsWith("bin/")) {
+      sourcePath = sourcePath.substring(0, sourcePath.length()-4);
+
+      // this is a typical project layout for gradle, the sources should be in
+      // src/main/java/
+    } else if (sourcePath.endsWith("build/classes/main/")) {
+      sourcePath = sourcePath.substring(0, sourcePath.length()-19);
     }
+
+    // gradle projects do also in eclipse have another folder for sources
+    // so check which folder is the actual source folder
+    if (new File(sourcePath + "src/main/java/").isDirectory()) {
+      return sourcePath + "src/main/java/";
+    } else if (new File(sourcePath + "src/").isDirectory()) {
+      return sourcePath + "src/";
+    }
+
     return "";
   }
 
@@ -449,9 +455,8 @@ public class OptionCollector {
    */
   private String getContentOfFile(final Class<?> cls) {
 
-    // get name of sourcefile, remove prefix 'class_'
-    String filename =
-        cls.toString().substring(6).replace(".", "/");
+    // get name of sourcefile
+    String filename = cls.getName().replace(".", "/");
 
     // encapsulated classes have a "$" in filename
     if (filename.contains("$")) {
@@ -459,7 +464,7 @@ public class OptionCollector {
     }
 
     // get name of source file
-    filename = sourcePath + filename + ".java";
+    filename = getSourcePath(cls) + filename + ".java";
 
     try {
       return com.google.common.io.Files.toString(new File(filename),
