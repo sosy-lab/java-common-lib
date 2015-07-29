@@ -2,7 +2,7 @@
  *  SoSy-Lab Common is a library of useful utilities.
  *  This file is part of SoSy-Lab Common.
  *
- *  Copyright (C) 2007-2014  Dirk Beyer
+ *  Copyright (C) 2007-2015  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -165,12 +165,12 @@ public class OptionCollector {
     // this could be a usual eclipse environment, therefore src is the appropriate
     // folder to search for sources
     if (sourcePath.endsWith("bin/")) {
-      sourcePath = sourcePath.substring(0, sourcePath.length()-4);
+      sourcePath = sourcePath.substring(0, sourcePath.length() - 4);
 
       // this is a typical project layout for gradle, the sources should be in
       // src/main/java/
     } else if (sourcePath.endsWith("build/classes/main/")) {
-      sourcePath = sourcePath.substring(0, sourcePath.length()-19);
+      sourcePath = sourcePath.substring(0, sourcePath.length() - 19);
     }
 
     // gradle projects do also in eclipse have another folder for sources
