@@ -26,6 +26,7 @@ import java.util.logging.SimpleFormatter;
 
 import org.sosy_lab.common.configuration.Configuration;
 
+import com.google.common.base.Predicates;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
@@ -36,5 +37,8 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(Formatter.class, new SimpleFormatter());
 
     setDefault(Configuration.class, Configuration.defaultConfiguration());
+
+    // NullLogManager does not do any checkNotNull checks on purpose
+    ignoreClasses(Predicates.<Class<?>>equalTo(NullLogManager.class));
   }
 }

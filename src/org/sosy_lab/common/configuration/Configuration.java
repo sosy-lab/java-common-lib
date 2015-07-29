@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -59,6 +60,7 @@ import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.log.NullLogManager;
 import org.sosy_lab.common.log.TestLogManager;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -282,9 +284,9 @@ public final class Configuration {
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
 
-  private @Nullable LogManager logger = null;
+  private LogManager logger = NullLogManager.getInstance();
 
-  @Nullable LogManager getLogger() {
+  LogManager getLogger() {
     return logger;
   }
 
@@ -312,11 +314,11 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
-    logger = pLogger;
+    logger = firstNonNull(pLogger, NullLogManager.getInstance());
   }
 
   public void enableLogging(LogManager pLogger) {
-    checkState(logger == null, "Logging already enabled.");
+    checkState(logger.equals(NullLogManager.getInstance()), "Logging already enabled.");
     logger = checkNotNull(pLogger);
   }
 
@@ -526,19 +528,15 @@ public final class Configuration {
 
     // options which were not changed need not to be set
     if (value == defaultValue) {
-      if (logger != null) {
-        logger.log(Level.CONFIG, "Option:", name,
-            "Class:", field.getDeclaringClass().getName(),
-            "field:", field.getName(), "value: <DEFAULT>");
-      }
+      logger.log(Level.CONFIG, "Option:", name,
+          "Class:", field.getDeclaringClass().getName(),
+          "field:", field.getName(), "value: <DEFAULT>");
       return;
     }
 
-    if (logger != null) {
-      logger.log(Level.CONFIG, "Option:", name,
-          "Class:", field.getDeclaringClass().getName(),
-          "field:", field.getName(), "value:", value);
-    }
+    logger.log(Level.CONFIG, "Option:", name,
+        "Class:", field.getDeclaringClass().getName(),
+        "field:", field.getName(), "value:", value);
 
     // set value to field
     try {
@@ -583,11 +581,9 @@ public final class Configuration {
     final String name = getOptionName(options, method, option);
     final Object value = getValue(options, method, null, type, genericType, option, method);
 
-    if (logger != null) {
-      logger.log(Level.CONFIG, "Option:", name,
-          "Class:", method.getDeclaringClass().getName(),
-          "method:", method.getName(), "value:", value);
-    }
+    logger.log(Level.CONFIG, "Option:", name,
+        "Class:", method.getDeclaringClass().getName(),
+        "method:", method.getName(), "value:", value);
 
     // set value to field
     try {
@@ -678,23 +674,19 @@ public final class Configuration {
       if (deprecatedValueStr != null && !deprecatedValueStr.equals(valueStr)) {
         if (valueStr == null) {
           valueStr = deprecatedValueStr;
-          if (logger != null) {
-            logger.logf(Level.WARNING,
-                "Using deprecated name for option '%s'%s, "
-                + "please update your config to use the option name '%s' instead.",
-                optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
-                optionName);
-          }
+          logger.logf(Level.WARNING,
+              "Using deprecated name for option '%s'%s, "
+              + "please update your config to use the option name '%s' instead.",
+              optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+              optionName);
         } else {
-          if (logger != null) {
-            logger.logf(Level.WARNING,
-                "Option '%s'%s is set to a different value "
-                + "than its deprecated previous name '%s'%s, "
-                + "using the value '%s' of the former and ignoring the latter.",
-                optionName, getOptionSourceForLogging(optionName),
-                optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
-                valueStr);
-          }
+          logger.logf(Level.WARNING,
+              "Option '%s'%s is set to a different value "
+              + "than its deprecated previous name '%s'%s, "
+              + "using the value '%s' of the former and ignoring the latter.",
+              optionName, getOptionSourceForLogging(optionName),
+              optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+              valueStr);
         }
       }
     }
