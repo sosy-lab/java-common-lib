@@ -44,9 +44,6 @@
         <!--  Guava-testlib contains many useful testing utilities -->
         <dependency org="com.google.guava" name="guava-testlib" rev="18.0" conf="test->default; contrib->sources"/>
 
-        <!-- Annotations from JSR 305 (e.g., @Nullable) -->
-        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
-
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build.xml for upgrading. -->
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.version}" conf="build->default"/>
@@ -69,7 +66,7 @@
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="1.10.10" conf="test->default"/>
+        <dependency org="org.mockito" name="mockito-core" rev="1.10.19" conf="test->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -77,13 +74,14 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.0.2" transitive="false" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.0.2" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.0.4" transitive="false" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.0.4" conf="build->default; contrib->sources" />
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.0" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.5" conf="checkstyle->default"/>
 
         <!-- FindBugs -->
-        <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.0" conf="findbugs->default"/>
+        <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
+        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
     </dependencies>
 </ivy-module>
