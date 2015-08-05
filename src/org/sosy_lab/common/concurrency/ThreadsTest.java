@@ -30,13 +30,14 @@ import java.util.concurrent.ThreadFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRule;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 
 public class ThreadsTest {
 
   @Rule
-  public MockitoJUnitRule mockito = new MockitoJUnitRule(this);
+  public MockitoRule mockito = MockitoJUnit.rule();
 
   @Mock
   private Runnable mockRunnable;
