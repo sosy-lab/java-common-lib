@@ -40,7 +40,7 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
   @Override
   SortedSet<Map.Entry<K, V>> entrySet();
 
-  static class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
+  class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
                                            extends AbstractImmutableSortedMap<K, V> {
 
     private static final OurSortedMap<?, ?> INSTANCE = new EmptyImmutableOurSortedMap<>();
