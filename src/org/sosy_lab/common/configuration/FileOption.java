@@ -48,7 +48,7 @@ public @interface FileOption {
    */
   Type value();
 
-  public static enum Type {
+  enum Type {
     /**
      * The file specified with this option is a required input file
      * (a non-existing file will be considered an invalid configuration).
