@@ -78,7 +78,7 @@
         <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.0.4" conf="build->default; contrib->sources" />
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.5" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.6" conf="checkstyle->default"/>
 
         <!-- FindBugs -->
         <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
