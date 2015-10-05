@@ -24,9 +24,6 @@ import static com.google.common.truth.Truth.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.Test;
 
 import com.google.common.collect.testing.ListTestSuiteBuilder;
@@ -36,6 +33,9 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.testers.ListLastIndexOfTester;
 import com.google.common.collect.testing.testers.ListListIteratorTester;
 import com.google.common.collect.testing.testers.ListSubListTester;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class PersistentLinkedListTest extends TestCase {
 

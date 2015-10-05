@@ -22,8 +22,6 @@ package org.sosy_lab.common.collect;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import junit.framework.TestSuite;
-
 import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
@@ -35,6 +33,8 @@ import com.google.common.collect.testing.testers.MapPutAllTester;
 import com.google.common.collect.testing.testers.MapPutTester;
 import com.google.common.collect.testing.testers.MapRemoveTester;
 import com.google.common.collect.testing.testers.SortedMapNavigationTester;
+
+import junit.framework.TestSuite;
 
 public class CopyOnWriteSortedMapTest {
 

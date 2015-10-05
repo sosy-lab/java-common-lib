@@ -121,7 +121,9 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
    * @return Whether an expression is a multiple of another expression.
    */
   public boolean isMultipleOf(LinearExpression<T> other) {
-    if (other.size() != data.size()) return false;
+    if (other.size() != data.size()) {
+      return false;
+    }
     Rational multiplier = null;
     for (T key : data.keySet()) {
       Rational div = other.getCoeff(key).divides(data.get(key));

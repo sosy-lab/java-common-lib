@@ -87,7 +87,7 @@ public class FileTypeConverterTest {
   }
 
   @RunWith(Parameterized.class)
-  public static abstract class FileTypeConverterTestBase {
+  public abstract static class FileTypeConverterTestBase {
 
     @Parameters(name="{0} (safe={1}, safeInFile={2})")
     public static Object[][] testPaths() {

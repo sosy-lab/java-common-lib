@@ -50,8 +50,8 @@ public class Pair<A, B> implements Serializable {
 
   private static final long serialVersionUID = -8410959888808077296L;
 
-  @Nullable private final A first;
-  @Nullable private final B second;
+  private final @Nullable A first;
+  private final @Nullable B second;
 
   private Pair(@Nullable A first, @Nullable B second) {
     this.first = first;
@@ -62,10 +62,10 @@ public class Pair<A, B> implements Serializable {
     return new Pair<>(first, second);
   }
 
-  @Nullable public A getFirst() {
+  public @Nullable A getFirst() {
     return first;
   }
-  @Nullable public B getSecond() {
+  public @Nullable B getSecond() {
     return second;
   }
 
