@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
  *
  * Represented as wrapper around {@link Rational} class.
  */
-public final class ExtendedRational implements Comparable<ExtendedRational>{
+public final class ExtendedRational implements Comparable<ExtendedRational> {
   @SuppressWarnings("hiding")
   public enum NumberType {
     NEG_INFTY,
@@ -25,6 +25,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational>{
 
   public static final ExtendedRational INFTY = new ExtendedRational(NumberType.INFTY);
   public static final ExtendedRational NEG_INFTY = new ExtendedRational(NumberType.NEG_INFTY);
+  @SuppressWarnings("checkstyle:constantname")
   public static final ExtendedRational NaN = new ExtendedRational(NumberType.NaN);
 
   public ExtendedRational(Rational pRational) {
@@ -138,9 +139,15 @@ public final class ExtendedRational implements Comparable<ExtendedRational>{
 
   @Override
   public boolean equals(Object y) {
-    if (this == y) return true;
-    if (y == null) return false;
-    if (y.getClass() != this.getClass()) return false;
+    if (this == y) {
+      return true;
+    }
+    if (y == null) {
+      return false;
+    }
+    if (y.getClass() != this.getClass()) {
+      return false;
+    }
     ExtendedRational b = (ExtendedRational) y;
     return compareTo(b) == 0;
   }

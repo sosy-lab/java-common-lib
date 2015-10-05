@@ -39,7 +39,7 @@ import com.google.common.base.Ticker;
  */
 public class Tickers {
 
-  public static abstract class TickerWithUnit extends Ticker {
+  public abstract static class TickerWithUnit extends Ticker {
 
     public abstract TimeUnit unit();
   }

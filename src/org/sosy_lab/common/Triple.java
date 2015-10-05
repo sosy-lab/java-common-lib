@@ -44,9 +44,9 @@ public class Triple<A, B, C> implements Serializable {
 
   private static final long serialVersionUID = 1272029955865151903L;
 
-  @Nullable private final A first;
-  @Nullable private final B second;
-  @Nullable private final C third;
+  private final @Nullable A first;
+  private final @Nullable B second;
+  private final @Nullable C third;
 
   private Triple(@Nullable A first, @Nullable B second, @Nullable C third) {
     this.first = first;
@@ -59,13 +59,13 @@ public class Triple<A, B, C> implements Serializable {
     return new Triple<>(first, second, third);
   }
 
-  @Nullable public final A getFirst() {
+  public final @Nullable A getFirst() {
     return first;
   }
-  @Nullable public final B getSecond() {
+  public final @Nullable B getSecond() {
     return second;
   }
-  @Nullable public final C getThird() {
+  public final @Nullable C getThird() {
     return third;
   }
 

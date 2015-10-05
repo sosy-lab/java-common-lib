@@ -14,13 +14,13 @@ public final class Rational extends Number implements Comparable<Rational> {
   private static final long serialVersionUID = 1657347377738275521L;
 
   // -- Just some shortcuts for BigIntegers --
-  static private final BigInteger b_zero = BigInteger.ZERO;
-  static private final BigInteger b_one = BigInteger.ONE;
-  static private final BigInteger b_m_one = b_one.negate();
+  private static final BigInteger B_ZERO = BigInteger.ZERO;
+  private static final BigInteger B_ONE = BigInteger.ONE;
+  private static final BigInteger B_M_ONE = B_ONE.negate();
 
-  public static final Rational ZERO = new Rational(b_zero, b_one);
-  public static final Rational ONE = new Rational(b_one, b_one);
-  public static final Rational NEG_ONE = new Rational(b_m_one, b_one);
+  public static final Rational ZERO = new Rational(B_ZERO, B_ONE);
+  public static final Rational ONE = new Rational(B_ONE, B_ONE);
+  public static final Rational NEG_ONE = new Rational(B_M_ONE, B_ONE);
 
   /**
    * Rationals are always stored in the normal form.
@@ -75,11 +75,11 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   public static Rational ofLong(long numerator) {
-    return of(BigInteger.valueOf(numerator), b_one);
+    return of(BigInteger.valueOf(numerator), B_ONE);
   }
 
   public static Rational ofBigInteger(BigInteger numerator) {
-    return of(numerator, b_one);
+    return of(numerator, B_ONE);
   }
 
   /**
@@ -94,7 +94,8 @@ public final class Rational extends Number implements Comparable<Rational> {
    */
   public static Rational ofString(String s) throws NumberFormatException {
     int idx = s.indexOf('/');
-    BigInteger num, den;
+    BigInteger num;
+    BigInteger den;
     if (idx == -1) { // No slash found.
       num = new BigInteger(s);
       return ofBigInteger(num);
@@ -110,12 +111,12 @@ public final class Rational extends Number implements Comparable<Rational> {
    * Assumes that <code>num</code> and <code>den</code> are in the normal form.
    */
   private static Rational ofNormalForm(BigInteger num, BigInteger den) {
-    if (num.equals(b_zero)) {
+    if (num.equals(B_ZERO)) {
       return ZERO;
-    } else if (den.equals(b_one)) {
-      if (num.equals(b_one)) {
+    } else if (den.equals(B_ONE)) {
+      if (num.equals(B_ONE)) {
         return ONE;
-      } else if (num.equals(b_m_one)) {
+      } else if (num.equals(B_M_ONE)) {
         return NEG_ONE;
       }
     }
@@ -166,7 +167,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   public Rational reciprocal() throws IllegalArgumentException {
-    if (num.equals(b_zero)) {
+    if (num.equals(B_ZERO)) {
       throw new IllegalArgumentException(
           "Division by zero not supported, use ExtendedRational if you need it");
     }
@@ -186,7 +187,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   public boolean isIntegral() {
-    return den.equals(b_one);
+    return den.equals(B_ONE);
   }
 
   public BigInteger getNum() {
@@ -209,7 +210,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    */
   @Override
   public String toString() {
-    if (den.equals(b_one)) {
+    if (den.equals(B_ONE)) {
       return num.toString();
     }
     return num + "/" + den;

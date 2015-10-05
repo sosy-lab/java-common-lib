@@ -267,7 +267,7 @@ public class Appenders {
    * method returns the same result that {@link #appendTo(Appendable)} produces
    * in order to ensure that the contract of {@link Appender} is fulfilled.
    */
-  public static abstract class AbstractAppender implements Appender {
+  public abstract static class AbstractAppender implements Appender {
 
     @Override
     public String toString() {

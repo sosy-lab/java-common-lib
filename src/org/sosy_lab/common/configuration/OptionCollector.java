@@ -53,9 +53,9 @@ import com.google.common.io.Resources;
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
-  private final static Pattern IGNORED_CLASSES =
+  private static final Pattern IGNORED_CLASSES =
       Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
-  private final static int CHARS_PER_LINE = 75; // for description
+  private static final int CHARS_PER_LINE = 75; // for description
 
   /** The main-method collects all classes of a program and
    * then it searches for all {@link Option}s.

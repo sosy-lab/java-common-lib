@@ -69,7 +69,7 @@ public final class Classes {
    * (e.g., when getting the result from a {@link Callable} of which you know
    * it shouldn't throw such exceptions).
    */
-  public final static class UnexpectedCheckedException extends RuntimeException {
+  public static final class UnexpectedCheckedException extends RuntimeException {
 
     private static final long serialVersionUID = -8706288432548996095L;
 
