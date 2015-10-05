@@ -77,9 +77,9 @@ public class Triple<A, B, C> implements Serializable {
   @Override
   public boolean equals(@Nullable Object other) {
     return (other instanceof Triple<?, ?, ?>)
-      && Objects.equals(first,  ((Triple<?, ?, ?>)other).first)
-      && Objects.equals(second, ((Triple<?, ?, ?>)other).second)
-      && Objects.equals(third,  ((Triple<?, ?, ?>)other).third);
+        && Objects.equals(first, ((Triple<?, ?, ?>) other).first)
+        && Objects.equals(second, ((Triple<?, ?, ?>) other).second)
+        && Objects.equals(third, ((Triple<?, ?, ?>) other).third);
   }
 
   @Override

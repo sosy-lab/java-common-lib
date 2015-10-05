@@ -97,7 +97,7 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
 
     @Override
     public boolean equals(Object pObj) {
-      return pObj instanceof Map<?, ?> && ((Map<?, ?>)pObj).isEmpty();
+      return pObj instanceof Map<?, ?> && ((Map<?, ?>) pObj).isEmpty();
     }
 
     @Override

@@ -110,7 +110,7 @@ public enum BaseTypeConverter implements TypeConverter {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private static Object convertEnum(Class<?> cls, String value) {
-    return Enum.valueOf((Class)cls, value);
+    return Enum.valueOf((Class) cls, value);
   }
 
   /**

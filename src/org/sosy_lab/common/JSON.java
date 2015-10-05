@@ -65,18 +65,18 @@ public final class JSON {
 
     } else if (value instanceof CharSequence) {
       out.append('\"');
-      escape((CharSequence)value, out);
+      escape((CharSequence) value, out);
       out.append('\"');
 
     } else if (value instanceof Double) {
-      if (((Double)value).isInfinite() || ((Double)value).isNaN()) {
+      if (((Double) value).isInfinite() || ((Double) value).isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
       }
 
     } else if (value instanceof Float) {
-      if (((Float)value).isInfinite() || ((Float)value).isNaN()) {
+      if (((Float) value).isInfinite() || ((Float) value).isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
@@ -89,10 +89,10 @@ public final class JSON {
       out.append(value.toString());
 
     } else if (value instanceof Map<?, ?>) {
-      writeJSONString((Map<?, ?>)value, out);
+      writeJSONString((Map<?, ?>) value, out);
 
     } else if (value instanceof List<?>) {
-      writeJSONString((List<?>)value, out);
+      writeJSONString((List<?>) value, out);
 
     } else {
       throw new NotSerializableException("Object of class " + value.getClass().getName()

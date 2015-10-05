@@ -150,7 +150,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
           "@Options annotation can only be used on classes.");
       return;
     }
-    TypeElement element = (TypeElement)elem;
+    TypeElement element = (TypeElement) elem;
 
     // Check for constructor without Configuration parameter.
     // Private classes and constructors are ignored, these are often used for tests.
@@ -191,7 +191,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         foundOption = true;
         break;
       }
-      currentClass = (TypeElement)((DeclaredType)currentClass.getSuperclass()).asElement();
+      currentClass = (TypeElement) ((DeclaredType) currentClass.getSuperclass()).asElement();
     } while (currentClass.getSuperclass().getKind() != TypeKind.NONE);
 
     if (!foundOption && warningsEnabled(element)) {
@@ -229,7 +229,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       break;
     case METHOD:
       // check signature (parameter count, declared exceptions)
-      final ExecutableElement method = (ExecutableElement)elem;
+      final ExecutableElement method = (ExecutableElement) elem;
       if (method.getParameters().size() != 1) {
         message(ERROR, method,
             "Methods annotated with @Option need to have exactly one parameter.");
@@ -297,7 +297,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         optionType = elem.asType();
         break;
       case METHOD:
-        ExecutableElement method = (ExecutableElement)elem;
+        ExecutableElement method = (ExecutableElement) elem;
         if (method.getParameters().size() != 1) {
           continue; // error, already reported above
         }
@@ -312,14 +312,14 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       boolean isCollection = false;
       if (optionType.getKind() == TypeKind.ARRAY) {
         isArray = true;
-        optionType = ((ArrayType)optionType).getComponentType();
+        optionType = ((ArrayType) optionType).getComponentType();
 
       } else {
         String rawTypeName = getRawTypeName(optionType);
         for (Class<?> collectionClass : Configuration.COLLECTIONS.keySet()) {
           // String comparison for type equality (cf. isSubtypeOf())
           if (rawTypeName.equals(collectionClass.getName())) {
-            List<? extends TypeMirror> params = ((DeclaredType)optionType).getTypeArguments();
+            List<? extends TypeMirror> params = ((DeclaredType) optionType).getTypeArguments();
             if (params.size() != 1) {
            // all collections have 1 type parameter, error is reported by compiler itself
               continue;
@@ -344,8 +344,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       boolean foundMatchingType = false;
       final Set<String> acceptedTypeNames = new HashSet<>();
 
-      for (Object listEntry : (Iterable<?>)acceptedClasses.getValue()) {
-        DeclaredType acceptedType = (DeclaredType)((AnnotationValue)listEntry).getValue();
+      for (Object listEntry : (Iterable<?>) acceptedClasses.getValue()) {
+        DeclaredType acceptedType = (DeclaredType) ((AnnotationValue) listEntry).getValue();
         acceptedTypeNames.add(acceptedType.toString());
 
         // String comparison for type equality (cf. isSubtypeOf())
@@ -404,7 +404,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       if (type.toString().equals(superType)) {
         return true;
       }
-      type = ((TypeElement)((DeclaredType)type).asElement()).getSuperclass();
+      type = ((TypeElement) ((DeclaredType) type).asElement()).getSuperclass();
     } while (type.getKind() != TypeKind.NONE);
     return false;
   }
@@ -503,7 +503,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   private String getRawTypeName(final TypeMirror t) {
     TypeMirror type = typeUtils().erasure(t);
     if (type.getKind().isPrimitive()) {
-      type = typeUtils().boxedClass((PrimitiveType)type).asType();
+      type = typeUtils().boxedClass((PrimitiveType) type).asType();
     }
     String typeName = type.toString();
 

@@ -68,7 +68,7 @@ public class ConsoleLogFormatter extends Formatter {
     sb.append(lr.getMessage());
     sb.append(" (");
     if (lr instanceof ExtendedLogRecord) {
-      String component = ((ExtendedLogRecord)lr).getSourceComponentName();
+      String component = ((ExtendedLogRecord) lr).getSourceComponentName();
       if (!component.isEmpty()) {
         sb.append(component);
         sb.append(":");

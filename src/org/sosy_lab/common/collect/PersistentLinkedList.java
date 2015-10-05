@@ -123,7 +123,7 @@ public class PersistentLinkedList<T>
    *  @return A new list with the values from the Iterable */
   public static <T> PersistentLinkedList<T> copyOf(final List<T> values) {
     if (values instanceof PersistentLinkedList<?>) {
-      return (PersistentLinkedList<T>)values;
+      return (PersistentLinkedList<T>) values;
     }
     PersistentLinkedList<T> result = PersistentLinkedList.<T>of();
     for (T value : Lists.reverse(values)) {

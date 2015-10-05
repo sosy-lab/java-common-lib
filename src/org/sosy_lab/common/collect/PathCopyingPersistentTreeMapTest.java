@@ -28,9 +28,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +40,9 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.testing.EqualsTester;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class PathCopyingPersistentTreeMapTest extends TestCase {
 
@@ -96,7 +96,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     String oldMapStr = oldMap.toString();
 
     map = map.putAndCopy(key, value);
-    ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
+    ((PathCopyingPersistentTreeMap<?, ?>) map).checkAssertions();
 
     assertThat(oldMap).hasSize(oldMapSize);
     assertThat(oldMap.toString()).isEqualTo(oldMapStr);
@@ -126,7 +126,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     String oldMapStr = oldMap.toString();
 
     map = map.removeAndCopy(key);
-    ((PathCopyingPersistentTreeMap<?, ?>)map).checkAssertions();
+    ((PathCopyingPersistentTreeMap<?, ?>) map).checkAssertions();
 
     assertThat(oldMap).hasSize(oldMapSize);
     assertThat(oldMap.toString()).isEqualTo(oldMapStr);
@@ -370,7 +370,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
     new EqualsTester().addEqualityGroup(set, comparison).testEquals();
-    checkEqualTo((Collection<T>)comparison, (Collection<T>)set);
+    checkEqualTo((Collection<T>) comparison, (Collection<T>) set);
   }
 
   private <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {

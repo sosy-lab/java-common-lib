@@ -207,7 +207,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     checkNotNull(map);
 
     if (map instanceof PathCopyingPersistentTreeMap<?, ?>) {
-      return (PathCopyingPersistentTreeMap<K, V>)map;
+      return (PathCopyingPersistentTreeMap<K, V>) map;
     }
 
     PersistentSortedMap<K, V> result = of();
@@ -236,7 +236,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   private static <K extends Comparable<? super K>, V> Node<K, V> findNode(
       Object key, Node<K, V> root) {
     checkNotNull(key);
-    return findNode((K)key, root);
+    return findNode((K) key, root);
   }
 
   @Nullable
@@ -509,7 +509,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     if (isEmpty()) {
       return this;
     }
-    return mapFromTree(removeAndCopy0((K)checkNotNull(key), root));
+    return mapFromTree(removeAndCopy0((K) checkNotNull(key), root));
   }
 
   @Nullable
@@ -796,7 +796,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         return false;
       }
       // pO is not null here
-      Map.Entry<?, ?> other = (Map.Entry<?, ?>)pO;
+      Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
       Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
 
       return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
@@ -806,7 +806,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     public boolean containsAll(Collection<?> pC) {
       if (pC instanceof EntrySet<?, ?>) {
         // We can rely on sorted-set semantics here and optimize.
-        EntrySet<?, ?> other = (EntrySet<?, ?>)pC;
+        EntrySet<?, ?> other = (EntrySet<?, ?>) pC;
         if (this.root == other.root) {
           return true;
         }
@@ -855,7 +855,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
 
         @SuppressWarnings("unchecked")
-        int comp = thisEntry.getKey().compareTo((K)otherEntry.getKey());
+        int comp = thisEntry.getKey().compareTo((K) otherEntry.getKey());
 
         if (comp < 0) {
           // thisEntry < otherEntry, just continue
@@ -915,7 +915,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public boolean equals(Object pO) {
       if (pO instanceof EntrySet<?, ?>) {
-        EntrySet<?, ?> other = (EntrySet<?, ?>)pO;
+        EntrySet<?, ?> other = (EntrySet<?, ?>) pO;
         if (this.root == other.root) {
           return true;
         }
@@ -1208,14 +1208,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public boolean containsKey(Object pKey) {
       @SuppressWarnings("unchecked")
-      K key = (K)checkNotNull(pKey);
+      K key = (K) checkNotNull(pKey);
       return inRange(key) && findNode(key, root) != null;
     }
 
     @Override
     public V get(Object pKey) {
       @SuppressWarnings("unchecked")
-      K key = (K)checkNotNull(pKey);
+      K key = (K) checkNotNull(pKey);
       if (!inRange(key)) {
         return null;
       }
@@ -1287,7 +1287,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
           return false;
         }
         // pO is not null here
-        Map.Entry<?, ?> other = (Map.Entry<?, ?>)pO;
+        Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
         if (!inRange((K) other.getKey())) {
           return false;
         }

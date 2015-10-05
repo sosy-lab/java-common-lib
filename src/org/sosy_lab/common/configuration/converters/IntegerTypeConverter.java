@@ -42,13 +42,13 @@ public class IntegerTypeConverter implements TypeConverter {
       throw new UnsupportedOperationException(
           "IntegerTypeConverter needs otions annotated with @IntegerOption");
     }
-    IntegerOption option = (IntegerOption)pOption;
+    IntegerOption option = (IntegerOption) pOption;
 
     assert type.equals(Integer.class) || type.equals(Long.class);
 
     Object value = BaseTypeConverter.valueOf(type, optionName, valueStr);
 
-    long n = ((Number)value).longValue();
+    long n = ((Number) value).longValue();
     if (option.min() > n || n > option.max()) {
       throw new InvalidConfigurationException("Invalid value in configuration file: \""
           + optionName + " = " + value + '\"'
