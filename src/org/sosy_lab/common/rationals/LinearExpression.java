@@ -1,9 +1,13 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -87,6 +91,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   public Rational getCoeff(T variable) {
+    checkNotNull(variable);
     Rational out = data.get(variable);
     if (out == null) {
       return Rational.ZERO;
@@ -164,6 +169,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   public static void writeMonomial(
       String varSerialized, Rational coeff, StringBuilder b
   ) {
+    checkNotNull(varSerialized);
     if (b.length() != 0 && coeff.signum() >= 0) {
       b.append(" + ");
     }
@@ -177,7 +183,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   @Override
-  public boolean equals(Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object == this) {
       return true;
     }

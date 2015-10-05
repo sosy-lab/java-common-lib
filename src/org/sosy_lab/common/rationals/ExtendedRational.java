@@ -1,5 +1,9 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -21,7 +25,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   private final NumberType numberType;
-  private final Rational rational;
+  private final @Nullable Rational rational;
 
   public static final ExtendedRational INFTY = new ExtendedRational(NumberType.INFTY);
   public static final ExtendedRational NEG_INFTY = new ExtendedRational(NumberType.NEG_INFTY);
@@ -30,7 +34,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
 
   public ExtendedRational(Rational pRational) {
     numberType = NumberType.RATIONAL;
-    rational = pRational;
+    rational = checkNotNull(pRational);
   }
 
   public boolean isRational() {
@@ -138,7 +142,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   @Override
-  public boolean equals(Object y) {
+  public boolean equals(@Nullable Object y) {
     if (this == y) {
       return true;
     }

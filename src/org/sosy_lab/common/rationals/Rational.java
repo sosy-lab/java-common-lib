@@ -1,6 +1,10 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigInteger;
+
+import javax.annotation.Nullable;
 
 import com.google.common.base.Objects;
 
@@ -48,6 +52,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    * Function responsible for maintaining the internal invariants.
    */
   public static Rational of(BigInteger numerator, BigInteger denominator) {
+    checkNotNull(numerator);
     int denSignum = denominator.signum();
     if (denSignum == 0) {
       throw new IllegalArgumentException(
@@ -126,6 +131,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   /** Arithmetic operations. **/
 
   public Rational times(Rational b) {
+    checkNotNull(b);
     Rational a = this;
     if (a == ZERO || b == ZERO) {
       return ZERO;
@@ -144,6 +150,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   public Rational plus(Rational b) {
+    checkNotNull(b);
     Rational a = this;
     if (a == ZERO) {
       return b;
@@ -224,7 +231,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   @Override
-  public boolean equals(Object y) {
+  public boolean equals(@Nullable Object y) {
     if (this == y) {
       return true;
     }
