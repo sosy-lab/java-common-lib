@@ -77,6 +77,7 @@
     <module name="EmptyForIteratorPad"/>
     <module name="NoWhitespaceAfter">
       <property name="allowLineBreaks" value="false"/>
+      <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS"/>
     </module>
     <module name="NoWhitespaceBefore"/>
     <module name="OperatorWrap"/>
@@ -85,9 +86,7 @@
     <module name="TypecastParenPad">
       <property name="tokens" value="RPAREN,TYPECAST"/>
     </module>
-    <module name="WhitespaceAfter">
-      <property name="tokens" value="COMMA,SEMI"/>
-    </module>
+    <module name="WhitespaceAfter"/>
     <module name="WhitespaceAround">
       <property name="tokens" value="BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,LAND,LCURLY,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,LITERAL_ASSERT,TYPE_EXTENSION_AND"/>
       <property name="allowEmptyConstructors" value="true"/>
@@ -145,6 +144,9 @@
     <module name="ArrayTypeStyle"/>
     <module name="UpperEll"/>
     <module name="OuterTypeFilename"/>
+    <module name="NoWhitespaceAfter">
+      <property name="tokens" value="ARRAY_INIT"/>
+    </module>
     <module name="AvoidStarImport"/>
     <module name="com.github.sevntu.checkstyle.checks.annotation.ForbidAnnotation">
       <property name="annotationNames" value="Test"/>

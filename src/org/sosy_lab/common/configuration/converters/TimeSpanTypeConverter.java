@@ -55,7 +55,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
       throw new UnsupportedOperationException(
           "Time span options need to be annotated with @TimeSpanOption");
     }
-    TimeSpanOption option = (TimeSpanOption)pOption;
+    TimeSpanOption option = (TimeSpanOption) pOption;
 
     // find unit in input string
     int i = valueStr.length() - 1;
@@ -94,7 +94,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException("Value for option " + optionName
             + " is larger than " + Integer.MAX_VALUE);
       }
-      result = (int)value;
+      result = (int) value;
     } else if (pType.equals(Long.class)) {
       result = value;
     } else {

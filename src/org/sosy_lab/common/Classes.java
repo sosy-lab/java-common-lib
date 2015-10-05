@@ -333,7 +333,7 @@ public final class Classes {
     checkArgument(type instanceof ParameterizedType,
         "Cannot extract generic parameter from non-parameterized type %s", type);
 
-    ParameterizedType pType = (ParameterizedType)type;
+    ParameterizedType pType = (ParameterizedType) type;
     Type[] parameterTypes = pType.getActualTypeArguments();
 
     checkArgument(parameterTypes.length == 1,
@@ -346,13 +346,13 @@ public final class Classes {
 
     ParameterizedType componentGenericType = null;
     if (paramType instanceof ParameterizedType) {
-      componentGenericType = (ParameterizedType)paramType;
+      componentGenericType = (ParameterizedType) paramType;
       paramType = componentGenericType.getRawType();
     }
 
     Class<?> componentType;
     if (paramType instanceof Class<?>) {
-      componentType = (Class<?>)paramType;
+      componentType = (Class<?>) paramType;
     } else {
       throw new UnsupportedOperationException(
           "Cannot extract generic base type from type " + paramType);
@@ -373,12 +373,12 @@ public final class Classes {
   public static Type extractUpperBoundFromType(Type type) {
     checkNotNull(type);
     if (type instanceof WildcardType) {
-      WildcardType wcType = (WildcardType)type;
+      WildcardType wcType = (WildcardType) type;
       if (wcType.getLowerBounds().length > 0) {
         throw new UnsupportedOperationException(
             "Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
       }
-      Type[] upperBounds = ((WildcardType)type).getUpperBounds();
+      Type[] upperBounds = ((WildcardType) type).getUpperBounds();
       if (upperBounds.length != 1) {
         throw new UnsupportedOperationException(
             "Currently only type bounds with one upper bound are supported, not \"" + type + "\"");

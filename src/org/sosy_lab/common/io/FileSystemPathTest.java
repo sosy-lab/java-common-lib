@@ -139,7 +139,7 @@ public class FileSystemPathTest {
 
   @Test
   public void testEquals() throws Exception {
-    Path pathA = new FileSystemPath("1", (String[])null);
+    Path pathA = new FileSystemPath("1", (String[]) null);
     Path pathB = new FileSystemPath(null, "1");
     assertThat(pathA).isEqualTo(pathB);
 

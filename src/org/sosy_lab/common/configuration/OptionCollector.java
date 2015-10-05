@@ -580,7 +580,7 @@ public class OptionCollector {
       final Object[] enums = type.getEnumConstants();
       final String[] enumTitles = new String[enums.length];
       for (int i = 0; i < enums.length; i++) {
-        enumTitles[i] = ((Enum<?>)enums[i]).name();
+        enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
       allowedValues = "  enum:     "
           + formatText(java.util.Arrays.toString(enumTitles), "             ", false);

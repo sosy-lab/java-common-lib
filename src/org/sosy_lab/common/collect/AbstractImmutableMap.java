@@ -82,7 +82,7 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   @Override
   public boolean equals(Object pObj) {
     if (pObj instanceof Map<?, ?>) {
-      return entrySet().equals(((Map<?, ?>)pObj).entrySet());
+      return entrySet().equals(((Map<?, ?>) pObj).entrySet());
     }
     return false;
   }

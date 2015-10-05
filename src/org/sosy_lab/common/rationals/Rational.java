@@ -251,16 +251,16 @@ public final class Rational extends Number implements Comparable<Rational> {
 
   @Override
   public int intValue() {
-    return (int)doubleValue();
+    return (int) doubleValue();
   }
 
   @Override
   public long longValue() {
-    return (long)doubleValue();
+    return (long) doubleValue();
   }
 
   @Override
   public float floatValue() {
-    return (float)doubleValue();
+    return (float) doubleValue();
   }
 }

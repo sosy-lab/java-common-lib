@@ -513,11 +513,11 @@ public final class Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    final T typedDefaultValue = (T)defaultValue;
+    final T typedDefaultValue = (T) defaultValue;
 
     // determine type of option
     @SuppressWarnings("unchecked")
-    final Class<T> type = (Class<T>)field.getType();
+    final Class<T> type = (Class<T>) field.getType();
     final Type genericType = field.getGenericType();
 
     // get value
@@ -885,7 +885,7 @@ public final class Configuration {
     if (pType.isArray()) {
 
       @SuppressWarnings("unchecked")
-      Class<T> arrayComponentType = (Class<T>)componentType;
+      Class<T> arrayComponentType = (Class<T>) componentType;
       T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
       return values.toArray(result);
@@ -1027,7 +1027,7 @@ public final class Configuration {
   @SuppressWarnings("unchecked")
   private static <T extends Enum<T>> EnumSet<?> createEnumSetUnchecked(
       Class<?> enumType, Collection<?> values) {
-    EnumSet<T> result = EnumSet.noneOf((Class<T>)enumType);
+    EnumSet<T> result = EnumSet.noneOf((Class<T>) enumType);
     result.addAll((Collection<? extends T>) values);
     return result;
   }

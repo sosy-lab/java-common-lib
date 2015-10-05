@@ -338,7 +338,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       Object o = firstNonNull(args[i], "null");
       String arg;
       if (o instanceof Appender && (truncateSize > 0)) {
-        arg = Appenders.toStringWithTruncation((Appender)o, truncateSize + 1);
+        arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
       } else {
         arg = o.toString();
       }

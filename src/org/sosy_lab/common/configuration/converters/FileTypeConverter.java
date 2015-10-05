@@ -200,7 +200,7 @@ public class FileTypeConverter implements TypeConverter {
     checkApplicability(pType, secondaryOption, optionName);
 
     return handleFileOption(optionName, Paths.get(pValue),
-        ((FileOption)secondaryOption).value(), pType, pSource);
+        ((FileOption) secondaryOption).value(), pType, pSource);
   }
 
   @Override
@@ -210,7 +210,7 @@ public class FileTypeConverter implements TypeConverter {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    FileOption.Type typeInfo = ((FileOption)secondaryOption).value();
+    FileOption.Type typeInfo = ((FileOption) secondaryOption).value();
 
     if (pDefaultValue == null) {
       if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
@@ -231,15 +231,15 @@ public class FileTypeConverter implements TypeConverter {
     if (pType.equals(File.class)) {
       defaultValue = Paths.get((File) pDefaultValue);
     } else if (pType.equals(PathTemplate.class)) {
-      defaultValue = Paths.get(((PathTemplate)pDefaultValue).getTemplate());
+      defaultValue = Paths.get(((PathTemplate) pDefaultValue).getTemplate());
     } else if (pType.equals(PathCounterTemplate.class)) {
-      defaultValue = Paths.get(((PathCounterTemplate)pDefaultValue).getTemplate());
+      defaultValue = Paths.get(((PathCounterTemplate) pDefaultValue).getTemplate());
     } else {
-      defaultValue = (Path)pDefaultValue;
+      defaultValue = (Path) pDefaultValue;
     }
 
     @SuppressWarnings("unchecked")
-    T value = (T)handleFileOption(optionName, defaultValue, typeInfo, pType, null);
+    T value = (T) handleFileOption(optionName, defaultValue, typeInfo, pType, null);
     return value;
   }
 

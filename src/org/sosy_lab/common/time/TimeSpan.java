@@ -127,7 +127,7 @@ public final class TimeSpan implements Comparable<TimeSpan> {
     // Example case: we have nanoseconds, but we want seconds
     long scaleFactor = unit.convert(1L, dest);
     assert scaleFactor > 0;
-    return String.format(Locale.US, "%9.3f%s", (double)span / scaleFactor, TIME_UNITS.get(dest));
+    return String.format(Locale.US, "%9.3f%s", (double) span / scaleFactor, TIME_UNITS.get(dest));
   }
 
   /**
@@ -146,7 +146,7 @@ public final class TimeSpan implements Comparable<TimeSpan> {
     if (!(obj instanceof TimeSpan)) {
       return false;
     }
-    TimeSpan other = (TimeSpan)obj;
+    TimeSpan other = (TimeSpan) obj;
     if (this.unit == other.unit) {
       return this.span == other.span;
     }
