@@ -1,5 +1,7 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -9,88 +11,118 @@ import org.junit.Test;
 
 public class ExtendedRationalTest {
   @Test
-  public void testTypes() {
-    ExtendedRational x;
-
-    x = new ExtendedRational(Rational.ofLongs(23, 7));
-    Assert.assertEquals(true, x.isRational());
-
-    x = ExtendedRational.INFTY;
-    Assert.assertEquals(false, x.isRational());
+  public void testIsRationalNumber() {
+    ExtendedRational x = new ExtendedRational(Rational.ofLongs(23, 7));
+    assertThat(x.isRational()).isTrue();
   }
 
-  @Test public void testInstantiation() {
+  @Test
+  public void testIsRationalInfty() {
+    ExtendedRational x = ExtendedRational.INFTY;
+    assertThat(x.isRational()).isFalse();
+  }
+
+  @Test
+  public void testInstantiation() {
     ExtendedRational x;
     x = new ExtendedRational(Rational.ofLongs(108, 96));
     Assert.assertEquals("9/8", x.toString());
+    assertThat(x.toString()).isEqualTo("9/8");
   }
 
-  @Test public void testAddition() {
-    ExtendedRational a, b;
-    a = new ExtendedRational(Rational.ofLongs(12, 8));
-    b = new ExtendedRational(Rational.ofLongs(-54, 12));
-    Assert.assertEquals("-3", a.plus(b).toString());
-
-    b = ExtendedRational.INFTY;
-    Assert.assertEquals("Infinity", a.plus(b).toString());
-
-    b = ExtendedRational.NaN;
-    Assert.assertEquals("NaN", a.plus(b).toString());
-
-    a = ExtendedRational.INFTY;
-    b = ExtendedRational.NEG_INFTY;
-    Assert.assertEquals("NaN", a.plus(b).toString());
-
-
-    a = ExtendedRational.ofString("2309820938409238490");
-    b = ExtendedRational.NEG_INFTY;
-    Assert.assertEquals("-Infinity", a.plus(b).toString());
+  @Test
+  public void testAdditionNumbers() {
+    ExtendedRational a = new ExtendedRational(Rational.ofLongs(12, 8));
+    ExtendedRational b = new ExtendedRational(Rational.ofLongs(-54, 12));
+    assertThat(a.plus(b)).isEqualTo(new ExtendedRational(Rational.ofLong(-3)));
   }
 
-  @Test public void testSubtraction() {
-    ExtendedRational a, b;
-
-    a = ExtendedRational.ofString("5/2");
-    b = ExtendedRational.ofString("3/2");
-
-    Assert.assertEquals("1", a.minus(b).toString());
+  @Test
+  public void testAdditionInfty() {
+    ExtendedRational a = new ExtendedRational(Rational.ofLongs(12, 8));
+    ExtendedRational b = ExtendedRational.INFTY;
+    assertThat(a.plus(b)).isEqualTo(ExtendedRational.INFTY);
   }
 
-  @Test public void testMultiplication() {
-    ExtendedRational a, b;
-    a = ExtendedRational.ofString("2/4");
-    b = ExtendedRational.ofString("-1/3");
-    Assert.assertEquals(ExtendedRational.ofString("-2/12"), a.times(b));
-
-    a = ExtendedRational.ofString("100/4");
-    b = ExtendedRational.ofString("1/100");
-    Assert.assertEquals(ExtendedRational.ofString("1/4"), a.times(b));
-
-    a = ExtendedRational.ofString("100/4");
-    b = ExtendedRational.ofString("Infinity");
-    Assert.assertEquals(ExtendedRational.ofString("Infinity"), a.times(b));
+  @Test
+  public void testAdditionNaN() {
+    ExtendedRational a = new ExtendedRational(Rational.ofLongs(12, 8));
+    ExtendedRational b = ExtendedRational.NaN;
+    assertThat(a.plus(b)).isEqualTo(ExtendedRational.NaN);
   }
 
-  @Test public void testDivision() {
-    ExtendedRational a, b;
-    a = ExtendedRational.ofString("2/4");
-    b = ExtendedRational.ofString("1/4");
-    Assert.assertEquals("2", a.divides(b).toString());
-
-    a = ExtendedRational.ofString("234234");
-    b = ExtendedRational.INFTY;
-    Assert.assertEquals("0", a.divides(b).toString());
-
-    a = ExtendedRational.ofString("234234");
-    b = ExtendedRational.NEG_INFTY;
-    Assert.assertEquals("0", a.divides(b).toString());
-
-    a = ExtendedRational.ofString("234234");
-    b = ExtendedRational.NaN;
-    Assert.assertEquals("NaN", a.divides(b).toString());
+  @Test
+  public void testAdditionInfinities() {
+    ExtendedRational a = ExtendedRational.INFTY;
+    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    assertThat(a.plus(b)).isEqualTo(ExtendedRational.NaN);
   }
 
-  @Test public void testComparison() {
+  @Test
+  public void testAdditionNegInfty() {
+    ExtendedRational a = ExtendedRational.ofString("2309820938409238490");
+    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    assertThat(a.plus(b)).isEqualTo(ExtendedRational.NEG_INFTY);
+  }
+
+  @Test
+  public void testSubtraction() {
+    ExtendedRational a = ExtendedRational.ofString("5/2");
+    ExtendedRational b = ExtendedRational.ofString("3/2");
+    assertThat(a.minus(b)).isEqualTo(new ExtendedRational(Rational.ofLong(1)));
+  }
+
+  @Test
+  public void testMultiplication1() {
+    ExtendedRational a = ExtendedRational.ofString("2/4");
+    ExtendedRational b = ExtendedRational.ofString("-1/3");
+    assertThat(a.times(b)).isEqualTo(new ExtendedRational(Rational.ofLongs(-2, 12)));
+  }
+
+  @Test
+  public void testMultiplication2() {
+    ExtendedRational a = ExtendedRational.ofString("100/4");
+    ExtendedRational b = ExtendedRational.ofString("1/100");
+    assertThat(a.times(b)).isEqualTo(new ExtendedRational(Rational.ofLongs(1, 4)));
+  }
+
+  @Test
+  public void testMultiplicationInfty() {
+    ExtendedRational a = ExtendedRational.ofString("100/4");
+    ExtendedRational b = ExtendedRational.ofString("Infinity");
+    assertThat(a.times(b)).isEqualTo(ExtendedRational.INFTY);
+  }
+
+  @Test
+  public void testDivisionNumber() {
+    ExtendedRational a = ExtendedRational.ofString("2/4");
+    ExtendedRational b = ExtendedRational.ofString("1/4");
+    assertThat(a.divides(b)).isEqualTo(new ExtendedRational(Rational.ofLong(2)));
+  }
+
+  @Test
+  public void testDivisionInfty() {
+    ExtendedRational a = ExtendedRational.ofString("234234");
+    ExtendedRational b = ExtendedRational.INFTY;
+    assertThat(a.divides(b)).isEqualTo(new ExtendedRational(Rational.ofLong(0)));
+  }
+
+  @Test
+  public void testDivisionNegInfty() {
+    ExtendedRational a = ExtendedRational.ofString("234234");
+    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    assertThat(a.divides(b)).isEqualTo(new ExtendedRational(Rational.ofLong(0)));
+  }
+
+  @Test
+  public void testDivisionNaN() {
+    ExtendedRational a = ExtendedRational.ofString("234234");
+    ExtendedRational b = ExtendedRational.NaN;
+    assertThat(a.divides(b)).isEqualTo(ExtendedRational.NaN);
+  }
+
+  @Test
+  public void testComparison() {
     List<ExtendedRational> unsorted = Arrays.asList(
        ExtendedRational.NaN,
        ExtendedRational.NEG_INFTY,
@@ -112,22 +144,30 @@ public class ExtendedRationalTest {
 
     Collections.sort(unsorted);
 
-    Assert.assertEquals(sorted, unsorted);
+    assertThat(unsorted).containsExactlyElementsIn(sorted).inOrder();
   }
 
-  @Test public void testOfString() {
-    ExtendedRational a;
-    a = ExtendedRational.ofString("Infinity");
-    Assert.assertEquals(ExtendedRational.INFTY, a);
+  @Test
+  public void testOfStringInfty() {
+    ExtendedRational a = ExtendedRational.ofString("Infinity");
+    assertThat(a).isEqualTo(ExtendedRational.INFTY);
+  }
 
-    a = ExtendedRational.ofString("-Infinity");
-    Assert.assertEquals(ExtendedRational.NEG_INFTY, a);
+  @Test
+  public void testOfStringNegInfty() {
+    ExtendedRational a = ExtendedRational.ofString("-Infinity");
+    assertThat(a).isEqualTo(ExtendedRational.NEG_INFTY);
+  }
 
-    a = ExtendedRational.ofString("NaN");
-    Assert.assertEquals(ExtendedRational.NaN, a);
+  @Test
+  public void testOfStringNaN() {
+    ExtendedRational a = ExtendedRational.ofString("NaN");
+    assertThat(a).isEqualTo(ExtendedRational.NaN);
+  }
 
-    a = ExtendedRational.ofString("-2");
+  @Test
+  public void testOfStringNumber() {
+    ExtendedRational a = ExtendedRational.ofString("-2");
     Assert.assertEquals(new ExtendedRational(Rational.ofLong(-2)), a);
   }
-
 }
