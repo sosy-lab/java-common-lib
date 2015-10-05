@@ -1,62 +1,70 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class RationalTest {
   @Test
-  public void testInstantiation() {
-    Rational x;
-    x = Rational.ofLongs(108, 96);
-    Assert.assertEquals("9/8", x.toString());
-
-    x = Rational.ofLong(50);
-    Assert.assertEquals("50", x.toString());
-
-    x = Rational.of(BigInteger.ZERO, BigInteger.ONE);
-    Assert.assertEquals("0", x.toString());
+  public void testInstantiationLongs() {
+    Rational x = Rational.ofLongs(108, 96);
+    assertThat(x.toString()).isEqualTo("9/8");
   }
 
-  @Test public void testAddition() {
-    Rational a, b;
-    a = Rational.ofLongs(12, 8);
-    b = Rational.ofLongs(-54, 12);
-    Assert.assertEquals("-3", a.plus(b).toString());
+  @Test
+  public void testInstantiationLong() {
+    Rational x = Rational.ofLong(50);
+    assertThat(x.toString()).isEqualTo("50");
   }
 
-  @Test public void testSubtraction() {
-    Rational a, b;
-
-    a = Rational.ofString("5/2");
-    b = Rational.ofString("3/2");
-
-    Assert.assertEquals("1", a.minus(b).toString());
+  @Test
+  public void testInstantiationBigIntegers() {
+    Rational x = Rational.of(BigInteger.ZERO, BigInteger.ONE);
+    assertThat(x).isEqualTo(Rational.ZERO);
   }
 
-  @Test public void testMultiplication() {
-    Rational a, b;
-    a = Rational.ofString("2/4");
-    b = Rational.ofString("-1/3");
-    Assert.assertEquals(Rational.ofString("-2/12"), a.times(b));
-
-    a = Rational.ofString("100/4");
-    b = Rational.ofString("1/100");
-    Assert.assertEquals(Rational.ofString("1/4"), a.times(b));
+  @Test
+  public void testAddition() {
+    Rational a = Rational.ofLongs(12, 8);
+    Rational b = Rational.ofLongs(-54, 12);
+    assertThat(a.plus(b)).isEqualTo(Rational.ofLong(-3));
   }
 
-  @Test public void testDivision() {
-    Rational a, b;
-    a = Rational.ofString("2/4");
-    b = Rational.ofString("1/4");
-    Assert.assertEquals("2", a.divides(b).toString());
+  @Test
+  public void testSubtraction() {
+    Rational a = Rational.ofString("5/2");
+    Rational b = Rational.ofString("3/2");
+    assertThat(a.minus(b)).isEqualTo(Rational.ofLong(1));
   }
 
-  @Test public void testComparison() {
+  @Test
+  public void testMultiplication1() {
+    Rational a = Rational.ofString("2/4");
+    Rational b = Rational.ofString("-1/3");
+    assertThat(a.times(b)).isEqualTo(Rational.ofLongs(-2, 12));
+  }
+
+  @Test
+  public void testMultiplication2() {
+    Rational a = Rational.ofString("100/4");
+    Rational b = Rational.ofString("1/100");
+    assertThat(a.times(b)).isEqualTo(Rational.ofLongs(1, 4));
+  }
+
+  @Test
+  public void testDivision() {
+    Rational a = Rational.ofString("2/4");
+    Rational b = Rational.ofString("1/4");
+    assertThat(a.divides(b)).isEqualTo(Rational.ofLong(2));
+  }
+
+  @Test
+  public void testComparison() {
     List<Rational> unsorted = Arrays.asList(
         Rational.ofLongs(-2, 4),
         Rational.ofLongs(1, 3),
@@ -72,31 +80,45 @@ public class RationalTest {
 
     Collections.sort(unsorted);
 
-    Assert.assertEquals(sorted, unsorted);
+    assertThat(unsorted).containsExactlyElementsIn(sorted).inOrder();
   }
 
-  @Test public void testOfString() {
-    Rational a;
-    a = Rational.ofString("6/8");
-    Assert.assertEquals(Rational.ofLongs(3, 4), a);
-
-    a = Rational.ofString("-2");
-    Assert.assertEquals(Rational.ofLongs(-2, 1), a);
+  @Test
+  public void testOfString1() {
+    Rational a = Rational.ofString("6/8");
+    assertThat(a).isEqualTo(Rational.ofLongs(3, 4));
   }
 
-  @Test public void testCanonicity() {
-    Rational a, b;
-    a = Rational.ofString("6/8");
-    b = Rational.ofString("-6/8");
-    Assert.assertTrue(Rational.ZERO == a.plus(b));
+  @Test
+  public void testOfString2() {
+    Rational a = Rational.ofString("-2");
+    assertThat(a).isEqualTo(Rational.ofLongs(-2, 1));
+  }
 
-    a = Rational.ofString("2");
-    b = Rational.ofString("-1");
-    Assert.assertTrue(Rational.NEG_ONE == b);
-    Assert.assertTrue(Rational.ONE == a.plus(b));
+  @Test
+  public void testCanonicity1() {
+    Rational a = Rational.ofString("6/8");
+    Rational b = Rational.ofString("-6/8");
+    assertThat(a.plus(b)).isSameAs(Rational.ZERO);
+  }
 
-    a = Rational.ofString("-2");
-    b = Rational.ofString("1");
-    Assert.assertTrue(Rational.NEG_ONE == a.plus(b));
+  @Test
+  public void testCanonicity2() {
+    Rational x = Rational.ofString("-1");
+    assertThat(x).isSameAs(Rational.NEG_ONE);
+  }
+
+  @Test
+  public void testCanonicity3() {
+    Rational a = Rational.ofString("2");
+    Rational b = Rational.ofString("-1");
+    assertThat(a.plus(b)).isSameAs(Rational.ONE);
+  }
+
+  @Test
+  public void testCanonicity4() {
+    Rational a = Rational.ofString("-2");
+    Rational b = Rational.ofString("1");
+    assertThat(a.plus(b)).isSameAs(Rational.NEG_ONE);
   }
 }
