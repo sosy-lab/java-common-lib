@@ -152,7 +152,7 @@ public class CommonNativeLibraries {
         throw new AssertionError(e);
       }
 
-      nativePath = Paths.get(pathToJar).getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
+      nativePath = Paths.get(pathToJar).getParent().getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
     }
     return nativePath;
   }
