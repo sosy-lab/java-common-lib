@@ -34,9 +34,9 @@ import javax.annotation.Nullable;
 /**
  * Helper class for loading native libraries.
  */
-public class CommonNativeLibraries {
+public class NativeLibraries {
 
-  private CommonNativeLibraries() {}
+  private NativeLibraries() {}
 
   public enum OS { LINUX, MACOSX, WINDOWS;
 
@@ -147,7 +147,7 @@ public class CommonNativeLibraries {
       String os = OS.guessOperatingSystem().name().toLowerCase();
       URI pathToJar;
       try {
-        pathToJar = CommonNativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+        pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
       } catch (URISyntaxException e) {
         throw new AssertionError(e);
       }
