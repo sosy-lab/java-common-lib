@@ -52,16 +52,27 @@ public class PersistentSortedMapsTest {
                                                           "c", "3",
                                                           "d", "4"));
 
+  private static final PersistentSortedMap<String, String> HALF1_MAP_INVERSE =
+      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "4",
+                                                          "c", "2"));
+
+  private static final PersistentSortedMap<String, String> FULL_MAP_INVERSE =
+      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "4",
+                                                          "b", "2",
+                                                          "c", "3",
+                                                          "d", "4"));
+
   @Test
   public void testMerge_Equal() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              FULL_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            FULL_MAP,
+            FULL_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
     assertThat(differences).isEmpty();
@@ -70,163 +81,214 @@ public class PersistentSortedMapsTest {
   @Test
   public void testMerge_map1Empty() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(EMPTY_MAP,
-              FULL_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            EMPTY_MAP,
+            FULL_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", null, "1"),
-      Triple.of("b", null, "2"),
-      Triple.of("c", null, "3"),
-      Triple.of("d", null, "4")
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forRightValueOnly("a", "1"),
+            MapsDifference.Entry.forRightValueOnly("b", "2"),
+            MapsDifference.Entry.forRightValueOnly("c", "3"),
+            MapsDifference.Entry.forRightValueOnly("d", "4"));
   }
 
   @Test
   public void testMerge_map2Empty() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              EMPTY_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            FULL_MAP,
+            EMPTY_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", "1", null),
-      Triple.of("b", "2", null),
-      Triple.of("c", "3", null),
-      Triple.of("d", "4", null)
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forLeftValueOnly("a", "1"),
+            MapsDifference.Entry.forLeftValueOnly("b", "2"),
+            MapsDifference.Entry.forLeftValueOnly("c", "3"),
+            MapsDifference.Entry.forLeftValueOnly("d", "4"));
   }
 
   @Test
   public void testMerge_map1Half1() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(HALF1_MAP,
-              FULL_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            HALF1_MAP,
+            FULL_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("b", null, "2"),
-      Triple.of("d", null, "4")
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forRightValueOnly("b", "2"),
+            MapsDifference.Entry.forRightValueOnly("d", "4"));
   }
 
   @Test
   public void testMerge_map1Half2() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(HALF2_MAP,
-              FULL_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            HALF2_MAP,
+            FULL_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", null, "1"),
-      Triple.of("c", null, "3")
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forRightValueOnly("a", "1"),
+            MapsDifference.Entry.forRightValueOnly("c", "3"));
   }
 
   @Test
   public void testMerge_map2Half1() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              HALF1_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            FULL_MAP,
+            HALF1_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("b", "2", null),
-      Triple.of("d", "4", null)
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forLeftValueOnly("b", "2"),
+            MapsDifference.Entry.forLeftValueOnly("d", "4"));
   }
 
   @Test
   public void testMerge_map2Half2() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              HALF2_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            FULL_MAP,
+            HALF2_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", "1", null),
-      Triple.of("c", "3", null)
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forLeftValueOnly("a", "1"),
+            MapsDifference.Entry.forLeftValueOnly("c", "3"));
   }
 
   @Test
   public void testMerge_map1Half1_map2Half2() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(HALF1_MAP,
-              HALF2_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            HALF1_MAP,
+            HALF2_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", "1", null),
-      Triple.of("b", null, "2"),
-      Triple.of("c", "3", null),
-      Triple.of("d", null, "4")
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forLeftValueOnly("a", "1"),
+            MapsDifference.Entry.forRightValueOnly("b", "2"),
+            MapsDifference.Entry.forLeftValueOnly("c", "3"),
+            MapsDifference.Entry.forRightValueOnly("d", "4"));
   }
 
   @Test
   public void testMerge_map1Half2_map2Half1() {
 
-    List<Triple<String, String, String>> differences = new ArrayList<>();
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
     PersistentSortedMap<String, String> result =
-        merge(HALF2_MAP,
-              HALF1_MAP,
-              Equivalence.equals(),
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
-              differences);
+        merge(
+            HALF2_MAP,
+            HALF1_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
 
     assertThat(result).isEqualTo(FULL_MAP);
 
-    assertThat(differences).iteratesAs(
-      Triple.of("a", null, "1"),
-      Triple.of("b", "2", null),
-      Triple.of("c", null, "3"),
-      Triple.of("d", "4", null)
-      );
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forRightValueOnly("a", "1"),
+            MapsDifference.Entry.forLeftValueOnly("b", "2"),
+            MapsDifference.Entry.forRightValueOnly("c", "3"),
+            MapsDifference.Entry.forLeftValueOnly("d", "4"));
   }
 
+  @Test
+  public void testMerge_map1Differences() {
+
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
+    PersistentSortedMap<String, String> result =
+        merge(
+            HALF1_MAP_INVERSE,
+            FULL_MAP,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getMaximumMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
+
+    assertThat(result).isEqualTo(FULL_MAP_INVERSE);
+
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forDifferingValues("a", "4", "1"),
+            MapsDifference.Entry.forRightValueOnly("b", "2"),
+            MapsDifference.Entry.forDifferingValues("c", "2", "3"),
+            MapsDifference.Entry.forRightValueOnly("d", "4"));
+  }
+
+  @Test
+  public void testMerge_map2Differences() {
+
+    List<MapsDifference.Entry<String, String>> differences = new ArrayList<>();
+    PersistentSortedMap<String, String> result =
+        merge(
+            FULL_MAP,
+            HALF1_MAP_INVERSE,
+            Equivalence.equals(),
+            PersistentSortedMaps.<String, String>getMaximumMergeConflictHandler(),
+            MapsDifference.collectMapsDifferenceTo(differences));
+
+    assertThat(result).isEqualTo(FULL_MAP_INVERSE);
+
+    assertThat(differences)
+        .iteratesAs(
+            MapsDifference.Entry.forDifferingValues("a", "1", "4"),
+            MapsDifference.Entry.forLeftValueOnly("b", "2"),
+            MapsDifference.Entry.forDifferingValues("c", "3", "2"),
+            MapsDifference.Entry.forLeftValueOnly("d", "4"));
+  }
 
 
   @Test

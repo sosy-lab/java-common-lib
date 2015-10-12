@@ -28,12 +28,9 @@ import com.google.common.collect.Ordering;
 
 import org.sosy_lab.common.Triple;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 /**
  * Utility class for {@link PersistentSortedMap}s.
@@ -140,15 +137,20 @@ public class PersistentSortedMaps {
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
-    final PersistentSortedMap<K, V> map1,
-    final PersistentSortedMap<K, V> map2,
-    final MergeConflictHandler<K, V> conflictHandler) {
+      final PersistentSortedMap<K, V> map1,
+      final PersistentSortedMap<K, V> map2,
+      final MergeConflictHandler<K, V> conflictHandler) {
 
     if (map1.size() >= map2.size()) {
-      return merge(map1, map2, Equivalence.equals(), conflictHandler, null);
+      return merge(
+          map1, map2, Equivalence.equals(), conflictHandler, MapsDifference.ignoreMapsDifference());
     } else {
-      return merge(map2, map1, Equivalence.equals(),
-          inverseMergeConflictHandler(conflictHandler), null);
+      return merge(
+          map2,
+          map1,
+          Equivalence.equals(),
+          inverseMergeConflictHandler(conflictHandler),
+          MapsDifference.ignoreMapsDifference());
     }
   }
 
@@ -173,8 +175,8 @@ public class PersistentSortedMaps {
    * @param valueEquals The {@link Equivalence} that will determine
    * whether two values are considered equal.
    * @param conflictHandler The handler that is called for a key with two different values.
-   * @param collectDifferences Null or a modifiable list
-   * into which keys with different values are put.
+   * @param collectDifferences A visitor which receives keys with two different values
+   * or keys that are present only in one of the maps.
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
@@ -182,12 +184,13 @@ public class PersistentSortedMaps {
       final PersistentSortedMap<K, V> map2,
       final Equivalence<? super V> valueEquals,
       final MergeConflictHandler<? super K, V> conflictHandler,
-      final @Nullable List<Triple<K, V, V>> collectDifferences) {
+      final MapsDifference.Visitor<? super K, ? super V> collectDifferences) {
 
     checkNotNull(map1);
     checkNotNull(map2);
     checkNotNull(valueEquals);
     checkNotNull(conflictHandler);
+    checkNotNull(collectDifferences);
 
     if (map1 == map2) {
       // Check for identity may be profitable for persistent data structures.
@@ -230,9 +233,7 @@ public class PersistentSortedMaps {
         final K key = e1.getKey();
         final V value1 = e1.getValue();
 
-        if (collectDifferences != null) {
-          collectDifferences.add(Triple.<K, V, V>of(key, value1, null));
-        }
+        collectDifferences.leftValueOnly(key, value1);
 
         // forward e1 until it catches up with e2
         e1 = null;
@@ -247,9 +248,7 @@ public class PersistentSortedMaps {
         assert !result.containsKey(key);
         result = result.putAndCopy(key, value2);
 
-        if (collectDifferences != null) {
-          collectDifferences.add(Triple.<K, V, V>of(key, null, value2));
-        }
+        collectDifferences.rightValueOnly(key, value2);
 
         // forward e2 until it catches up with e1
         e2 = null;
@@ -265,9 +264,7 @@ public class PersistentSortedMaps {
           V newValue = conflictHandler.resolveConflict(key, value1, value2);
           result = result.putAndCopy(key, newValue);
 
-          if (collectDifferences != null) {
-            collectDifferences.add(Triple.of(key, value1, value2));
-          }
+          collectDifferences.differingValues(key, value1, value2);
         }
 
         // forward both iterators
@@ -278,7 +275,7 @@ public class PersistentSortedMaps {
 
     // Now we would copy the rest of the mappings from s1 (e1 and it1),
     // but we don't need them as s1 was the base of result.
-    if (collectDifferences != null) {
+    if (collectDifferences != MapsDifference.ignoreMapsDifference()) {
       Iterator<Map.Entry<K, V>> rest =
           (e1 != null)
           ? concat(singletonIterator(e1), it1)
@@ -287,7 +284,7 @@ public class PersistentSortedMaps {
       while (rest.hasNext()) {
         e1 = rest.next();
 
-        collectDifferences.add(Triple.<K, V, V>of(e1.getKey(), e1.getValue(), null));
+        collectDifferences.leftValueOnly(e1.getKey(), e1.getValue());
       }
     }
 
@@ -304,9 +301,7 @@ public class PersistentSortedMaps {
 
       result = result.putAndCopy(key, value2);
 
-      if (collectDifferences != null) {
-        collectDifferences.add(Triple.<K, V, V>of(key, null, value2));
-      }
+      collectDifferences.rightValueOnly(key, value2);
     }
 
     assert result.size() >= Math.max(map1.size(), map2.size());
@@ -345,20 +340,21 @@ public class PersistentSortedMaps {
       return Triple.of(result.getSecond(), result.getFirst(), result.getThird());
     }
 
-    List<Triple<K, V, V>> differences = new ArrayList<>();
+    Accumulator<MapEntryDifference<K, V>, List<MapEntryDifference<K, V>>> differences =
+        Accumulate.toArrayList();
     PersistentSortedMap<K, V> union = merge(map1, map2, Equivalence.equals(),
-        conflictHandler, differences);
+        conflictHandler, Accumulate.mapDifferenceTo(differences));
 
     PersistentSortedMap<K, V> fromSet1 = union.empty();
     PersistentSortedMap<K, V> fromSet2 = union.empty();
 
-    for (Triple<K, V, V> difference : differences) {
-      if (difference.getSecond() == null) {
+    for (MapEntryDifference<K, V> difference : differences.getResult()) {
+      if (!difference.getLeftValue().isPresent()) {
         // first value is null, key was only in second map
-        fromSet2 = fromSet2.putAndCopy(difference.getFirst(), difference.getThird());
-      } else if (difference.getThird() == null) {
+        fromSet2 = fromSet2.putAndCopy(difference.getKey(), difference.getRightValue().get());
+      } else if (!difference.getRightValue().isPresent()) {
         // second value is null, key was only in first map
-        fromSet1 = fromSet1.putAndCopy(difference.getFirst(), difference.getSecond());
+        fromSet1 = fromSet1.putAndCopy(difference.getKey(), difference.getLeftValue().get());
       } else {
         // both values present, key was in both maps
       }
