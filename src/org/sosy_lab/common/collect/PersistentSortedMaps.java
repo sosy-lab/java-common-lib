@@ -26,10 +26,7 @@ import static com.google.common.collect.Iterators.singletonIterator;
 import com.google.common.base.Equivalence;
 import com.google.common.collect.Ordering;
 
-import org.sosy_lab.common.Triple;
-
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -307,59 +304,5 @@ public class PersistentSortedMaps {
     assert result.size() >= Math.max(map1.size(), map2.size());
 
     return result;
-  }
-
-  /**
-   * Merges two {@link PersistentSortedMap}s with the given conflict handler
-   * (in the same way as {@link #merge(set1, set2, conflictHandler)} does)
-   * and returns two additional {@link PersistentSortedMap}s:
-   * one with elements from the first map that do not exist in the second map,
-   * and the other with the elements from the second map that do not exist in the first map.
-   * If both maps contain the same key with different values,
-   * the conflict handler will be used to resolve this,
-   * and the key won't be in any of the difference maps.
-   * @param map1 the first map
-   * @param map2 the second map
-   * @param conflictHandler the conflict handler
-   * @return The {@link Triple} {@code (from1, from2, union)}
-   * where {@code from1} and {@code from2} are the
-   * first and the second map mentioned above.
-   */
-  public static <K extends Comparable<? super K>, V>
-  Triple<PersistentSortedMap<K, V>, PersistentSortedMap<K, V>, PersistentSortedMap<K, V>>
-  mergeWithKeyDifferences(final PersistentSortedMap<K, V> map1,
-      final PersistentSortedMap<K, V> map2,
-      final MergeConflictHandler<K, V> conflictHandler) {
-
-    if (map1.size() < map2.size()) {
-      // swap order for more efficient implementation
-      Triple<PersistentSortedMap<K, V>,
-             PersistentSortedMap<K, V>,
-             PersistentSortedMap<K, V>> result =
-          mergeWithKeyDifferences(map2, map1, inverseMergeConflictHandler(conflictHandler));
-      return Triple.of(result.getSecond(), result.getFirst(), result.getThird());
-    }
-
-    Accumulator<MapEntryDifference<K, V>, List<MapEntryDifference<K, V>>> differences =
-        Accumulate.toArrayList();
-    PersistentSortedMap<K, V> union = merge(map1, map2, Equivalence.equals(),
-        conflictHandler, Accumulate.mapDifferenceTo(differences));
-
-    PersistentSortedMap<K, V> fromSet1 = union.empty();
-    PersistentSortedMap<K, V> fromSet2 = union.empty();
-
-    for (MapEntryDifference<K, V> difference : differences.getResult()) {
-      if (!difference.getLeftValue().isPresent()) {
-        // first value is null, key was only in second map
-        fromSet2 = fromSet2.putAndCopy(difference.getKey(), difference.getRightValue().get());
-      } else if (!difference.getRightValue().isPresent()) {
-        // second value is null, key was only in first map
-        fromSet1 = fromSet1.putAndCopy(difference.getKey(), difference.getLeftValue().get());
-      } else {
-        // both values present, key was in both maps
-      }
-    }
-
-    return Triple.of(fromSet1, fromSet2, union);
   }
 }

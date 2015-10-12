@@ -21,13 +21,11 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.common.collect.PersistentSortedMaps.merge;
-import static org.sosy_lab.common.collect.PersistentSortedMaps.mergeWithKeyDifferences;
 
 import com.google.common.base.Equivalence;
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
-import org.sosy_lab.common.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -388,124 +386,5 @@ public class PersistentSortedMapsTest {
               PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
-  }
-
-
-
-  @Test
-  public void testMergeWithKeyDifferences_Equal() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(FULL_MAP,
-                        FULL_MAP,
-                        PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEmpty();
-    assertThat(result.getSecond()).isEmpty();
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map1Empty() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(EMPTY_MAP,
-                        FULL_MAP,
-                        PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEmpty();
-    assertThat(result.getSecond()).isEqualTo(FULL_MAP);
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map2Empty() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(FULL_MAP,
-                        EMPTY_MAP,
-                        PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEqualTo(FULL_MAP);
-    assertThat(result.getSecond()).isEmpty();
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map1Half1() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(HALF1_MAP,
-                        FULL_MAP,
-                        PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEmpty();
-    assertThat(result.getSecond()).isEqualTo(HALF2_MAP);
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map1Half2() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(HALF2_MAP,
-              FULL_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEmpty();
-    assertThat(result.getSecond()).isEqualTo(HALF1_MAP);
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map2Half1() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(FULL_MAP,
-              HALF1_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEqualTo(HALF2_MAP);
-    assertThat(result.getSecond()).isEmpty();
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map2Half2() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(FULL_MAP,
-              HALF2_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEqualTo(HALF1_MAP);
-    assertThat(result.getSecond()).isEmpty();
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map1Half1_map2Half2() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(HALF1_MAP,
-              HALF2_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEqualTo(HALF1_MAP);
-    assertThat(result.getSecond()).isEqualTo(HALF2_MAP);
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
-  }
-
-  @Test
-  public void testMergeWithKeyDifferences_map1Half2_map2Half1() {
-
-    Triple<PersistentSortedMap<String, String>, PersistentSortedMap<String, String>, PersistentSortedMap<String, String>> result =
-        mergeWithKeyDifferences(HALF2_MAP,
-              HALF1_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
-
-    assertThat(result.getFirst()).isEqualTo(HALF2_MAP);
-    assertThat(result.getSecond()).isEqualTo(HALF1_MAP);
-    assertThat(result.getThird()).isEqualTo(FULL_MAP);
   }
 }
