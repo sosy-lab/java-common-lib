@@ -21,12 +21,12 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.IllegalFormatException;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.google.common.base.MoreObjects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.IllegalFormatException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A template for {@link Path} objects that uses a counter

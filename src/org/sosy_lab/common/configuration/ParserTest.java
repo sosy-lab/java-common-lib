@@ -21,12 +21,7 @@ package org.sosy_lab.common.configuration;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.google.common.io.CharSource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +30,12 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.io.CharSource;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class ParserTest {
 

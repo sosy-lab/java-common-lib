@@ -21,6 +21,13 @@ package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterators;
+import com.google.common.io.Resources;
+
+import org.sosy_lab.common.Pair;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -42,13 +49,6 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Pair;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Iterators;
-import com.google.common.io.Resources;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {

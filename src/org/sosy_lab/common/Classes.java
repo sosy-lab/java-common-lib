@@ -23,6 +23,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.google.common.base.Throwables;
+
+import org.sosy_lab.common.annotations.Unmaintained;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,12 +39,6 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.annotations.Unmaintained;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-
-import com.google.common.base.Throwables;
 
 /**
  * Helper class for various methods related to handling Java classes and types.

@@ -19,6 +19,10 @@
  */
 package org.sosy_lab.common;
 
+import com.google.common.base.Strings;
+
+import org.sosy_lab.common.io.Path;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
@@ -27,10 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.io.Path;
-
-import com.google.common.base.Strings;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1

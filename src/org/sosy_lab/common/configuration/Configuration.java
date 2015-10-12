@@ -23,6 +23,39 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.MapConstraint;
+import com.google.common.collect.MapConstraints;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.ObjectArrays;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Primitives;
+
+import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.Pair;
+import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
+import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
+import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
+import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.log.NullLogManager;
+import org.sosy_lab.common.log.TestLogManager;
+
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -49,39 +82,6 @@ import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.Pair;
-import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
-import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
-import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
-import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.NullLogManager;
-import org.sosy_lab.common.log.TestLogManager;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.MapConstraint;
-import com.google.common.collect.MapConstraints;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.ObjectArrays;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Primitives;
 
 
 /**

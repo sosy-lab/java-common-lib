@@ -21,13 +21,13 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.StandardSystemProperty;
+import com.google.common.base.Strings;
+
 import java.io.File;
 import java.io.IOException;
 
 import javax.annotation.Nullable;
-
-import com.google.common.base.StandardSystemProperty;
-import com.google.common.base.Strings;
 
 
 public class FileSystemPathFactory implements AbstractPathFactory {

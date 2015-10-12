@@ -21,10 +21,10 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.Arrays;
 import java.util.IllegalFormatException;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * A template for paths, from which a real path can be constructed

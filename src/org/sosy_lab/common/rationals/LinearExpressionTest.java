@@ -2,9 +2,9 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Test;
-
 import com.google.common.testing.EqualsTester;
+
+import org.junit.Test;
 
 public class LinearExpressionTest {
 

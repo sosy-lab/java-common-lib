@@ -21,11 +21,6 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
 import com.google.common.collect.testing.ListTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringListGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
@@ -36,6 +31,11 @@ import com.google.common.collect.testing.testers.ListSubListTester;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class PersistentLinkedListTest extends TestCase {
 

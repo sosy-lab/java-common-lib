@@ -19,14 +19,13 @@
  */
 package org.sosy_lab.common.time;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-
-import javax.annotation.Nullable;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
+
+import javax.annotation.Nullable;
 
 /**
  * This class represents a timer like a stop watch. It can be started and

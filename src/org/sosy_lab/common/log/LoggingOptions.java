@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
-import java.util.List;
-import java.util.logging.Level;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -31,7 +30,8 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.logging.Level;
 
 @Options(prefix = "log",
     description = "Possible log levels in descending order "

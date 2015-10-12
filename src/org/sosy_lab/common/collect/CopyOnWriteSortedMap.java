@@ -21,6 +21,10 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ForwardingCollection;
+import com.google.common.collect.ForwardingSortedMap;
+import com.google.common.collect.ForwardingSortedSet;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,10 +33,6 @@ import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
-
-import com.google.common.collect.ForwardingCollection;
-import com.google.common.collect.ForwardingSortedMap;
-import com.google.common.collect.ForwardingSortedSet;
 
 
 /**

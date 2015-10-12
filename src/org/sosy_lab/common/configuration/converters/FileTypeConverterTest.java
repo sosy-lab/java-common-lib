@@ -19,12 +19,11 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import java.io.File;
-import java.io.IOException;
+import com.google.common.base.StandardSystemProperty;
+import com.google.common.io.CharSource;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,8 +45,8 @@ import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTy
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.base.StandardSystemProperty;
-import com.google.common.io.CharSource;
+import java.io.File;
+import java.io.IOException;
 
 @RunWith(Suite.class)
 @SuiteClasses({FileTypeConverterSafeModeTest.class, FileTypeConverterUnsafeModeTest.class})

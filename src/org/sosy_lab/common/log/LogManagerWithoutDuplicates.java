@@ -21,11 +21,11 @@ package org.sosy_lab.common.log;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * LogManager implementation which helps to get log messages printed only once,

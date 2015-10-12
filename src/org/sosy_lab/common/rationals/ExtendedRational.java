@@ -2,9 +2,9 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
+
+import javax.annotation.Nullable;
 
 /**
  * This class represents "extended rational": rationals which allow for infinities,

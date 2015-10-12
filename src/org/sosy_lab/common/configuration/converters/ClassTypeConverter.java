@@ -19,10 +19,7 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
+import com.google.common.collect.Iterables;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
@@ -30,7 +27,10 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
-import com.google.common.collect.Iterables;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class ClassTypeConverter implements TypeConverter {

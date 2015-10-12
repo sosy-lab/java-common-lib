@@ -21,10 +21,10 @@ package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.junit.Test;
 import org.sosy_lab.common.MoreStrings.WithLongString;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MoreStringsTest {
 

@@ -19,19 +19,18 @@
  */
 package org.sosy_lab.common.concurrency;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static com.google.common.truth.Truth.assertThat;
-
-import java.util.concurrent.ThreadFactory;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.concurrent.ThreadFactory;
 
 
 public class ThreadsTest {

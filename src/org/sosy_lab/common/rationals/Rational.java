@@ -2,11 +2,11 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Objects;
+
 import java.math.BigInteger;
 
 import javax.annotation.Nullable;
-
-import com.google.common.base.Objects;
 
 /**
  * Rational class, throws exceptions on

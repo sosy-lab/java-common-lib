@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.time;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
@@ -27,17 +29,14 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.EnumHashBiMap;
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Longs;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
-
-import com.google.common.collect.EnumHashBiMap;
-import com.google.common.collect.Ordering;
-import com.google.common.primitives.Longs;
 
 /**
  * This is an immutable representation of some time span,

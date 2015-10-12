@@ -21,10 +21,10 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.nio.file.Paths;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.nio.file.Paths;
 
 
 public class FileSystemPathTest {

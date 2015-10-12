@@ -21,14 +21,14 @@ package org.sosy_lab.common.concurrency;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nullable;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * This class implements the builder pattern to create a {@link ThreadFactory} with certain

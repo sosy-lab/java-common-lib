@@ -19,14 +19,14 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedSet;
 
 /**
  * Extension of {@link SortedMap} that specifies {@link SortedSet} as type

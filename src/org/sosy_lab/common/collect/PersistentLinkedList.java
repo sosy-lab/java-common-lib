@@ -23,6 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.FluentIterable.from;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.UnmodifiableListIterator;
+
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,10 +37,6 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.UnmodifiableListIterator;
 
 /**
  * A single-linked-list implementation of {@link PersistentList}.

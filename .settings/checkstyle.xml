@@ -56,8 +56,9 @@
     </module>
     <module name="ImportOrder">
       <property name="option" value="top"/>
-      <property name="groups" value="java,javax,org,com"/>
+      <property name="groups" value="com,edu,junit,org,sun,java,javax"/>
       <property name="separated" value="true"/>
+      <property name="sortStaticImportsAlphabetically" value="true"/>
     </module>
     <module name="RedundantImport"/>
     <module name="UnusedImports">

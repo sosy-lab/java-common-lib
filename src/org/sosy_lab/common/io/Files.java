@@ -21,17 +21,17 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
+import com.google.common.io.FileWriteMode;
+
+import org.sosy_lab.common.Appenders;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Appenders;
-
-import com.google.common.base.Strings;
-import com.google.common.io.FileWriteMode;
 
 /**
  * Provides helper functions for file access.

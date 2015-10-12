@@ -19,13 +19,16 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.nullToEmpty;
+import com.google.auto.service.AutoService;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -61,10 +64,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
-
-import com.google.auto.service.AutoService;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Annotation processor for checking constraints on {@link Option} and {@link Options}

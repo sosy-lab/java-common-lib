@@ -19,16 +19,15 @@
  */
 package org.sosy_lab.common.io;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import static com.google.common.truth.Truth.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
-
-import org.junit.Before;
-import org.junit.Test;
 
 
 public class PathsTest {

@@ -21,15 +21,15 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
+
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
 
 /**
  * Implementation of {@link SortedSet} to be used as the key set of a {@link SortedMap}.

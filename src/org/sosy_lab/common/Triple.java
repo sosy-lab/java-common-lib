@@ -22,15 +22,15 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Ordering.from;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
 
 
 /**
