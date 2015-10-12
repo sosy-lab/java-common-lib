@@ -19,9 +19,9 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.CharMatcher;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
@@ -29,9 +29,9 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Type converter for options annotated with {@link TimeSpanOption}.

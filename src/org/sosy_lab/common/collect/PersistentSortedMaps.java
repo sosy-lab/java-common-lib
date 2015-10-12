@@ -23,17 +23,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterators.concat;
 import static com.google.common.collect.Iterators.singletonIterator;
 
+import com.google.common.base.Equivalence;
+import com.google.common.collect.Ordering;
+
+import org.sosy_lab.common.Triple;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Triple;
-
-import com.google.common.base.Equivalence;
-import com.google.common.collect.Ordering;
 
 /**
  * Utility class for {@link PersistentSortedMap}s.

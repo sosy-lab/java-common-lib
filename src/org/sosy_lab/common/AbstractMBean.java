@@ -21,6 +21,8 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sosy_lab.common.log.LogManager;
+
 import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
 
@@ -29,8 +31,6 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-
-import org.sosy_lab.common.log.LogManager;
 
 /**
  * Abstract class that encapsulates the registration of an MBean with the

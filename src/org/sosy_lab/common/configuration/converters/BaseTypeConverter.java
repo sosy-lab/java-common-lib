@@ -19,6 +19,13 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import com.google.common.primitives.Primitives;
+
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.log.LogManager;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,13 +36,6 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.log.LogManager;
-
-import com.google.common.primitives.Primitives;
 
 /**
  * A {@link TypeConverter} which handles all the trivial cases like ints, Strings,

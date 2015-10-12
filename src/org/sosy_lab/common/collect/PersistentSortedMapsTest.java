@@ -19,19 +19,18 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.common.collect.PersistentSortedMaps.merge;
 import static org.sosy_lab.common.collect.PersistentSortedMaps.mergeWithKeyDifferences;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.Equivalence;
+import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
 import org.sosy_lab.common.Triple;
 
-import com.google.common.base.Equivalence;
-import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PersistentSortedMapsTest {

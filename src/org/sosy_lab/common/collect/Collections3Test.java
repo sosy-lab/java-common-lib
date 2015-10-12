@@ -21,12 +21,12 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Test;
+
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.junit.Test;
 
 public class Collections3Test {
 

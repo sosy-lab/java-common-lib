@@ -19,14 +19,14 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+
 import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 
 
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {

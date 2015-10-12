@@ -19,17 +19,17 @@
  */
 package org.sosy_lab.common.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import javax.annotation.Nullable;
-
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import javax.annotation.Nullable;
 
 
 /**

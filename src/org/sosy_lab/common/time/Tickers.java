@@ -22,6 +22,8 @@ package org.sosy_lab.common.time;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
+import com.google.common.base.Ticker;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
@@ -31,8 +33,6 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-
-import com.google.common.base.Ticker;
 
 /**
  * Class providing several convenient {@link Ticker} implementations.

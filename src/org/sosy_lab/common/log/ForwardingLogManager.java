@@ -19,11 +19,11 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.errorprone.annotations.ForOverride;
+
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
-
-import com.google.errorprone.annotations.ForOverride;
 
 public abstract class ForwardingLogManager implements LogManager {
 

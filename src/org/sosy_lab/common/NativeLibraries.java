@@ -21,13 +21,13 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.google.common.base.StandardSystemProperty;
 
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
-import com.google.common.base.StandardSystemProperty;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.annotation.Nullable;
 

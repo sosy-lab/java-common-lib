@@ -19,13 +19,13 @@
  */
 package org.sosy_lab.common;
 
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.annotation.Nullable;
-
-import com.google.common.base.Preconditions;
-import com.google.common.io.ByteStreams;
 
 /**
  * This class is an OutputStream implementation that sends everything to two

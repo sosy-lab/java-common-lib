@@ -19,12 +19,10 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-
-import javax.annotation.Nullable;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.base.StandardSystemProperty;
+import com.google.common.collect.ImmutableSet;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -38,10 +36,12 @@ import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.io.Paths;
 import org.sosy_lab.common.log.LogManager;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
-import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableSet;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import javax.annotation.Nullable;
 
 /**
  * A {@link TypeConverter} for options of type {@link File} or {@link Path} which offers some

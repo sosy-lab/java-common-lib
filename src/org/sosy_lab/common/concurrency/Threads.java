@@ -21,12 +21,12 @@ package org.sosy_lab.common.concurrency;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nullable;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 
 public class Threads {

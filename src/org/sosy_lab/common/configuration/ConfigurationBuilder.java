@@ -19,14 +19,14 @@
  */
 package org.sosy_lab.common.configuration;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import com.google.common.io.CharSource;
 
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 
-import com.google.common.io.CharSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 
 

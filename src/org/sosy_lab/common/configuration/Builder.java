@@ -19,6 +19,17 @@
  */
 package org.sosy_lab.common.configuration;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharSource;
+
+import org.sosy_lab.common.Pair;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -28,17 +39,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Pair;
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.ByteSource;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharSource;
 
 public class Builder implements ConfigurationBuilder {
 

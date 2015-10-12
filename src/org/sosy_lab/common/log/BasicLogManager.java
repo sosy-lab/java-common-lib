@@ -23,6 +23,19 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.errorprone.annotations.ForOverride;
+
+import org.sosy_lab.common.AbstractMBean;
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.Files;
+import org.sosy_lab.common.io.Path;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -34,19 +47,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.AbstractMBean;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
-import com.google.errorprone.annotations.ForOverride;
 
 
 /**

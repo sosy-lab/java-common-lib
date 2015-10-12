@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.common.time;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import javax.annotation.Nullable;
 

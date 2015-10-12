@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
@@ -27,7 +28,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import static com.google.common.truth.Truth.assertThat;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConfigurationBuilderFactory;
+import org.sosy_lab.common.log.LogManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -37,14 +44,6 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConfigurationBuilderFactory;
-import org.sosy_lab.common.log.LogManager;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 
 public class ConfigurationTest {
 

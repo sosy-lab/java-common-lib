@@ -22,12 +22,12 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Chars;
+
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Chars;
 
 /**
  * Utility class similar to {@link Collections} and {@link Collections2}.
