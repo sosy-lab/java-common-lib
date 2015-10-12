@@ -45,7 +45,6 @@ import com.google.common.primitives.Primitives;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
 import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
@@ -64,7 +63,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -866,13 +864,12 @@ public final class Configuration {
 
     // first get the real type of a single value (i.e., String[] => String)
     Class<?> componentType;
-    ParameterizedType componentGenericType = null;
+    Type componentGenericType = null;
     if (pType.isArray()) {
       componentType = pType.getComponentType();
     } else {
-      Pair<Class<?>, ParameterizedType> p = Classes.getComponentType(genericType);
-      componentType = p.getFirst();
-      componentGenericType = p.getSecond();
+      componentType = Classes.getComponentRawType(genericType);
+      componentGenericType = Classes.getComponentType(genericType);
     }
 
     componentType = Primitives.wrap(componentType);
@@ -972,7 +969,7 @@ public final class Configuration {
     if (type.isArray()) {
       innerType = type.getComponentType();
     } else if (COLLECTIONS.containsKey(type)) {
-      innerType = Classes.getComponentType(genericType).getFirst();
+      innerType = Classes.getComponentRawType(genericType);
     } else {
       innerType = type;
     }

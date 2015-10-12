@@ -320,15 +320,14 @@ public final class Classes {
    * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
    *
    * Example results:
-   * X<Foo>          : (Foo.class, null)
-   * X<? extends Foo>: (Foo.class, null)
-   * X<Foo<Bar>>     : (Foo.class, Foo<Bar>)
+   * X<Foo>          : Foo
+   * X<? extends Foo>: Foo
+   * X<Foo<Bar>>     : Foo<Bar>
    *
    * @param type The type (needs to be parameterized with exactly one parameter)
-   * @return A tuple of a class object and a ParameterizedType object
-   * (the latter is null if the type is not generic)
+   * @return A Type object.
    */
-  public static Pair<Class<?>, ParameterizedType> getComponentType(final Type type) {
+  public static Type getComponentType(final Type type) {
     checkNotNull(type);
     checkArgument(type instanceof ParameterizedType,
         "Cannot extract generic parameter from non-parameterized type %s", type);
@@ -340,25 +339,31 @@ public final class Classes {
         "Cannot extract generic parameter from parameterized type %s"
         + " which has not exactly one parameter", type);
 
-    Type paramType = parameterTypes[0];
+    return extractUpperBoundFromType(parameterTypes[0]);
+  }
 
-    paramType = extractUpperBoundFromType(paramType);
+  /**
+   * From a type "X<Foo>", extract the raw type of "Foo".
+   * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
+   *
+   * The method will return Foo.class for all of the following examples:
+   *
+   * @param type The type (needs to be parameterized with exactly one parameter)
+   * @return A class object.
+   */
+  public static Class<?> getComponentRawType(final Type type) {
+    Type paramType = getComponentType(type);
 
-    ParameterizedType componentGenericType = null;
     if (paramType instanceof ParameterizedType) {
-      componentGenericType = (ParameterizedType) paramType;
-      paramType = componentGenericType.getRawType();
+      paramType = ((ParameterizedType) paramType).getRawType();
     }
 
-    Class<?> componentType;
     if (paramType instanceof Class<?>) {
-      componentType = (Class<?>) paramType;
+      return (Class<?>) paramType;
     } else {
       throw new UnsupportedOperationException(
           "Cannot extract generic base type from type " + paramType);
     }
-
-    return Pair.<Class<?>, ParameterizedType>of(componentType, componentGenericType);
   }
 
   /**
