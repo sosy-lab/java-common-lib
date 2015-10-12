@@ -54,7 +54,7 @@ public class ClassTypeConverter implements TypeConverter {
     }
 
     // get value of type parameter
-    Class<?> targetType = Classes.getComponentType(genericType).getFirst();
+    Class<?> targetType = Classes.getComponentRawType(genericType);
 
     // get class object
     Class<?> cls = null;
