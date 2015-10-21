@@ -2,14 +2,15 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Simple <i>sparse</i> implementation for <i>homogeneous</i> linear expression
@@ -123,22 +124,24 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   /**
-   * @return Whether an expression is a multiple of another expression.
+   * @return {@code a} iff {@code other.multByConst(a) == this},
+   * {@code Optional.absent()} if no such constant exists.
    */
-  public boolean isMultipleOf(LinearExpression<T> other) {
+  public Optional<Rational> divide(LinearExpression<T> other) {
     if (other.size() != data.size()) {
-      return false;
+      return Optional.absent();
     }
     Rational multiplier = null;
     for (T key : data.keySet()) {
-      Rational div = other.getCoeff(key).divides(data.get(key));
+      Rational div = other.getCoeff(key).divides(data.get(key)).reciprocal();
       if (multiplier == null) {
         multiplier = div;
       } else if (!multiplier.equals(div)) {
-        return false;
+        return Optional.absent();
       }
     }
-    return true;
+    assert multiplier != null;
+    return Optional.of(multiplier);
   }
 
   @Override

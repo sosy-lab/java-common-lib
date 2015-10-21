@@ -2,6 +2,7 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.base.Optional;
 import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
@@ -77,6 +78,28 @@ public class LinearExpressionTest {
     assertThat(x.size()).isEqualTo(2);
     assertThat(x.getCoeff("x")).isEqualTo(Rational.ofString("10"));
     assertThat(x.getCoeff("y")).isEqualTo(Rational.ofString("6"));
+  }
+
+  @Test
+  public void testDivisionOK() {
+    LinearExpression<String> num = LinearExpression
+        .pair("x", Rational.ofString("3")).add(LinearExpression.pair("y",
+            Rational.ofString("6")));
+    LinearExpression<String> den = LinearExpression
+        .pair("x", Rational.ofString("1")).add(LinearExpression.pair("y",
+            Rational.ofString("2")));
+    assertThat(num.divide(den)).isEqualTo(Optional.of(Rational.ofString("3")));
+  }
+
+  @Test
+  public void testDivisionNotPossible() {
+    LinearExpression<String> num = LinearExpression
+        .pair("x", Rational.ofString("3")).add(LinearExpression.pair("y",
+            Rational.ofString("7")));
+    LinearExpression<String> den = LinearExpression
+        .pair("x", Rational.ofString("1")).add(LinearExpression.pair("y",
+            Rational.ofString("2")));
+    assertThat(num.divide(den)).isEqualTo(Optional.absent());
   }
 
   @Test
