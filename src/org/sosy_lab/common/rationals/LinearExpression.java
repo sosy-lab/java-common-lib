@@ -2,15 +2,15 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Simple <i>sparse</i> implementation for <i>homogeneous</i> linear expression

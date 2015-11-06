@@ -112,7 +112,7 @@ public class MapsDifference {
     public void differingValues(K pKey, V pLeftValue, V pRightValue) {}
   }
 
-  public static enum DummyVisitor implements Visitor<Object, Object> {
+  public enum DummyVisitor implements Visitor<Object, Object> {
     INSTANCE;
 
     @Override

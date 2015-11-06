@@ -76,7 +76,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
     private final Level fileLevel;
     private final Handler consoleHandler;
 
-    public LogManagerBean(Handler pConsoleHandler, Level pFileLevel) {
+    private LogManagerBean(Handler pConsoleHandler, Level pFileLevel) {
       super("org.sosy_lab.common.log:type=LogManager", BasicLogManager.this);
       consoleHandler = checkNotNull(pConsoleHandler);
       fileLevel = checkNotNull(pFileLevel);
