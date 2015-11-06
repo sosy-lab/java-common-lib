@@ -40,45 +40,48 @@ public class NativeLibraries {
 
   public enum OS { LINUX, MACOSX, WINDOWS;
 
-    @Nullable
-    private static OS CURRENT_OS = null;
+    private static @Nullable OS currentOS = null;
 
     public static OS guessOperatingSystem() throws UnsatisfiedLinkError {
-      if (CURRENT_OS != null) {
-        return CURRENT_OS;
+      if (currentOS != null) {
+        return currentOS;
       }
 
       String prop = StandardSystemProperty.OS_NAME.value();
       if (isNullOrEmpty(prop)) {
-        throw new UnsatisfiedLinkError("No value for os.name, "
-            + "please report this together with information about your system (OS, architecture, JVM).");
+        throw new UnsatisfiedLinkError(
+            "No value for os.name, "
+                + "please report this together with information about your system "
+                + "(OS, architecture, JVM).");
       }
 
       prop = prop.toLowerCase().replace(" ", "");
 
       if (prop.startsWith("linux")) {
-        CURRENT_OS = LINUX;
+        currentOS = LINUX;
       } else if (prop.startsWith("windows")) {
-        CURRENT_OS = WINDOWS;
+        currentOS = WINDOWS;
       } else if (prop.startsWith("macosx")) {
-        CURRENT_OS = MACOSX;
+        currentOS = MACOSX;
       } else {
-        throw new UnsatisfiedLinkError("Unknown value for os.name: '" + StandardSystemProperty.OS_NAME.value()
-            + "', please report this together with information about your system (OS, architecture, JVM).");
+        throw new UnsatisfiedLinkError(
+            "Unknown value for os.name: '"
+                + StandardSystemProperty.OS_NAME.value()
+                + "', please report this together with information about your system "
+                + "(OS, architecture, JVM).");
       }
 
-      return CURRENT_OS;
+      return currentOS;
     }
   }
 
   public enum Architecture { X86, X86_64;
 
-    @Nullable
-    private static Architecture CURRENT_ARCH = null;
+    private static @Nullable Architecture currentArch = null;
 
     public static Architecture guessVmArchitecture() throws UnsatisfiedLinkError {
-      if (CURRENT_ARCH != null) {
-        return CURRENT_ARCH;
+      if (currentArch != null) {
+        return currentArch;
       }
 
       String prop = System.getProperty("os.arch.data.model");
@@ -89,14 +92,17 @@ public class NativeLibraries {
       if (!isNullOrEmpty(prop)) {
         switch (prop) {
           case "32":
-            CURRENT_ARCH = Architecture.X86;
+            currentArch = Architecture.X86;
             break;
           case "64":
-            CURRENT_ARCH = Architecture.X86_64;
+            currentArch = Architecture.X86_64;
             break;
           default:
-            throw new UnsatisfiedLinkError("Unknown value for os.arch.data.model: '" + prop
-                + "', please report this together with information about your system (OS, architecture, JVM).");
+            throw new UnsatisfiedLinkError(
+                "Unknown value for os.arch.data.model: '"
+                    + prop
+                    + "', please report this together with information about your system "
+                    + "(OS, architecture, JVM).");
         }
       } else {
 
@@ -105,11 +111,9 @@ public class NativeLibraries {
           prop = prop.toLowerCase();
 
 
-          if (   prop.contains("32-bit")
-              || prop.contains("32bit")
-              || prop.contains("i386")) {
+          if (prop.contains("32-bit") || prop.contains("32bit") || prop.contains("i386")) {
 
-            CURRENT_ARCH = Architecture.X86;
+            currentArch = Architecture.X86;
           } else if (
               prop.contains("64-bit")
                   || prop.contains("64bit")
@@ -117,22 +121,24 @@ public class NativeLibraries {
                   || prop.contains("x86_64")
                   || prop.contains("amd64")) {
 
-            CURRENT_ARCH = Architecture.X86_64;
+            currentArch = Architecture.X86_64;
           } else {
-            throw new UnsatisfiedLinkError("Unknown value for java.vm.name: '" + prop
-                + "', please report this together with information about your system (OS, architecture, JVM).");
+            throw new UnsatisfiedLinkError(
+                "Unknown value for java.vm.name: '"
+                    + prop
+                    + "', please report this together with information about your system "
+                    + "(OS, architecture, JVM).");
           }
         } else {
           throw new UnsatisfiedLinkError("Could not detect system architecture");
         }
       }
 
-      return CURRENT_ARCH;
+      return currentArch;
     }
   }
 
-  @Nullable
-  private static Path nativePath = null;
+  private static @Nullable Path nativePath = null;
 
   public static Path getNativeLibraryPath() {
     // We expected the libraries to be in the directory lib/native/<arch>-<os>
@@ -147,12 +153,18 @@ public class NativeLibraries {
       String os = OS.guessOperatingSystem().name().toLowerCase();
       URI pathToJar;
       try {
-        pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+        pathToJar =
+            NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
       } catch (URISyntaxException e) {
         throw new AssertionError(e);
       }
 
-      nativePath = Paths.get(pathToJar).getParent().getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
+      nativePath =
+          Paths.get(pathToJar)
+              .getParent()
+              .getParent()
+              .getParent()
+              .resolve(Paths.get("native", arch + "-" + os));
     }
     return nativePath;
   }
