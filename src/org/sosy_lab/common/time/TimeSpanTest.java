@@ -170,4 +170,44 @@ public class TimeSpanTest {
   public void testMultiplyOverflow() {
     LARGE_AS_HOURS.multiply(1000 * 1000);
   }
+
+  private String format(TimeSpan t) {
+    return TimeSpan.FORMAT_HUMAN_READABLE_LARGE.apply(t);
+  }
+
+  @Test
+  public void testToStringMinute() {
+    TimeSpan time = TimeSpan.of(1, MINUTES);
+    assertThat(format(time)).isEqualTo("01min");
+  }
+
+  @Test
+  public void testToStringSeconds() {
+    TimeSpan time = TimeSpan.ofSeconds(45);
+    assertThat(format(time)).isEqualTo("45s");
+  }
+
+  @Test
+  public void testToStringHours() {
+    TimeSpan time = TimeSpan.of(2, HOURS);
+    assertThat(format(time)).isEqualTo("02h");
+  }
+
+  @Test
+  public void testToStringHoursMinutes() {
+    TimeSpan time = TimeSpan.of(2 * 60 + 16, MINUTES);
+    assertThat(format(time)).isEqualTo("02h 16min");
+  }
+
+  @Test
+  public void testToStringDaysHours() {
+    TimeSpan time = TimeSpan.of(2 * 24, HOURS);
+    assertThat(format(time)).isEqualTo("2d 00h");
+  }
+
+  @Test
+  public void testToStringDaysMinutes() {
+    TimeSpan time = TimeSpan.of(2 * 24 * 60 + 45, MINUTES);
+    assertThat(format(time)).isEqualTo("2d 00h 45min");
+  }
 }
