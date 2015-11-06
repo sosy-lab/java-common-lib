@@ -33,10 +33,12 @@ import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This is an immutable representation of some time span,
@@ -48,7 +50,10 @@ import javax.annotation.Nullable;
  * regardless of their unit,
  * for example, 60s and 1min are considered equal.
  */
-public final class TimeSpan implements Comparable<TimeSpan> {
+@Immutable
+public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
+
+  private static final long serialVersionUID = -4013592312989551009L;
 
   private static final EnumHashBiMap<TimeUnit, String> TIME_UNITS =
       EnumHashBiMap.create(TimeUnit.class);
