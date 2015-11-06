@@ -34,7 +34,7 @@ class LogLevelFilter implements Filter {
 
   private final Set<Level> excludeLevels;
 
-  public LogLevelFilter(List<Level> excludeLevels) {
+  LogLevelFilter(List<Level> excludeLevels) {
     this.excludeLevels = ImmutableSet.copyOf(excludeLevels);
   }
 

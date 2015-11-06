@@ -194,7 +194,7 @@ public class Pair<A, B> implements Serializable {
     private final Iterator<? extends A> a;
     private final Iterator<? extends B> b;
 
-    public ZipIterator(Iterator<? extends A> pA, Iterator<? extends B> pB) {
+    private ZipIterator(Iterator<? extends A> pA, Iterator<? extends B> pB) {
       a = pA;
       b = pB;
     }

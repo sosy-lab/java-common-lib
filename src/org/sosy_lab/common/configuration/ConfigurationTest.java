@@ -47,8 +47,10 @@ import java.util.regex.Pattern;
 
 public class ConfigurationTest {
 
-  private static enum TestEnum {
-    E1, E2, E3;
+  private enum TestEnum {
+    E1,
+    E2,
+    E3;
   }
 
   @Options
