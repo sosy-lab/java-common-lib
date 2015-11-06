@@ -34,9 +34,12 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -198,13 +201,53 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * Create a new time span that is the sum of several time spans.
    * The unit of the returned time span is the most precise one.
    */
-  public static TimeSpan sum(TimeSpan... t) {
-    checkArgument(t.length > 0);
+  public static TimeSpan sum(Iterable<TimeSpan> timeSpans) {
+    Iterator<TimeSpan> it = timeSpans.iterator();
+    checkArgument(it.hasNext());
 
-    TimeSpan result = t[0];
-    for (int i = 1; i < t.length; i++) {
-      result = sum(result, t[i]);
+    TimeSpan result = it.next();
+    while (it.hasNext()) {
+      result = sum(result, it.next());
     }
     return result;
+  }
+
+  /**
+   * Create a new time span that is the sum of several time spans.
+   * The unit of the returned time span is the most precise one.
+   */
+  public static TimeSpan sum(TimeSpan... t) {
+    return sum(Arrays.asList(t));
+  }
+
+  /**
+   * Create a new time span that is the difference of two time spans.
+   * The unit of the returned time span is the more precise one.
+   */
+  public static TimeSpan difference(TimeSpan a, TimeSpan b) {
+    TimeUnit leastCommonUnit = leastCommonUnit(a, b);
+    return new TimeSpan(a.get(leastCommonUnit) - b.get(leastCommonUnit),
+        leastCommonUnit);
+  }
+
+  /**
+   * Create a new time span that is the current one multiplied by an integral factor.
+   * The unit of the returned time span is the same as the current one.
+   */
+  @CheckReturnValue
+  public TimeSpan multiply(int factor) {
+    checkArgument(factor >= 0, "Cannot multiply TimeSpan with negative value %s", factor);
+    return new TimeSpan(span * factor, unit);
+  }
+
+  /**
+   * Create a new time span that is the current one divided by an integral value.
+   * The result of the division is rounded down (integer division).
+   * The unit of the returned time span is the same as the current one.
+   */
+  @CheckReturnValue
+  public TimeSpan divide(int divisor) {
+    checkArgument(divisor >= 0, "Cannot divide TimeSpan by negative value %s", divisor);
+    return new TimeSpan(span / divisor, unit);
   }
 }
