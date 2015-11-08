@@ -355,16 +355,17 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     checkEqualTo(comparison, map);
   }
 
-  private void checkEqualTo(SortedMap<String, String> comparison, SortedMap<String, String> map) {
-    new EqualsTester().addEqualityGroup(map, comparison).testEquals();
-    assertThat(map.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
-    assertThat(map).hasSize(comparison.size());
-    checkEqualTo(comparison.entrySet(), map.entrySet());
-    checkEqualTo(comparison.keySet(),   map.keySet());
-    checkEqualTo(comparison.values(),   map.values());
+  private void checkEqualTo(
+      SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
+    new EqualsTester().addEqualityGroup(testMap, comparison).testEquals();
+    assertThat(testMap.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
+    assertThat(testMap).hasSize(comparison.size());
+    checkEqualTo(comparison.entrySet(), testMap.entrySet());
+    checkEqualTo(comparison.keySet(), testMap.keySet());
+    checkEqualTo(comparison.values(), testMap.values());
     if (!comparison.isEmpty()) {
-      assertThat(map.firstKey()).named("firstKey").isEqualTo(comparison.firstKey());
-      assertThat(map.lastKey()).named("lastKey").isEqualTo(comparison.lastKey());
+      assertThat(testMap.firstKey()).named("firstKey").isEqualTo(comparison.firstKey());
+      assertThat(testMap.lastKey()).named("lastKey").isEqualTo(comparison.lastKey());
     }
   }
 

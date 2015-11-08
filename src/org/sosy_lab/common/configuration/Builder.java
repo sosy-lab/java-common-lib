@@ -109,10 +109,10 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#setPrefix(java.lang.String)
    */
   @Override
-  public ConfigurationBuilder setPrefix(String prefix) {
-    Preconditions.checkNotNull(prefix);
+  public ConfigurationBuilder setPrefix(String newPrefix) {
+    Preconditions.checkNotNull(newPrefix);
 
-    this.prefix = prefix;
+    this.prefix = newPrefix;
 
     return this;
   }
@@ -121,14 +121,14 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#copyFrom(org.sosy_lab.common.configuration.Configuration)
    */
   @Override
-  public ConfigurationBuilder copyFrom(Configuration oldConfig) {
-    Preconditions.checkNotNull(oldConfig);
+  public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
+    Preconditions.checkNotNull(sourceConfig);
     Preconditions.checkState(this.properties == null);
     Preconditions.checkState(this.sources == null);
     Preconditions.checkState(this.oldConfig == null);
     Preconditions.checkState(this.converters == null);
 
-    this.oldConfig = oldConfig;
+    this.oldConfig = sourceConfig;
 
     return this;
   }
@@ -137,15 +137,15 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#copyOptionFrom(org.sosy_lab.common.configuration.Configuration, java.lang.String)
    */
   @Override
-  public ConfigurationBuilder copyOptionFrom(Configuration oldConfig,
-      String option) throws IllegalArgumentException {
-    Preconditions.checkNotNull(oldConfig);
+  public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option)
+      throws IllegalArgumentException {
+    Preconditions.checkNotNull(sourceConfig);
     Preconditions.checkNotNull(option);
-    Preconditions.checkArgument(oldConfig.properties.containsKey(option));
+    Preconditions.checkArgument(sourceConfig.properties.containsKey(option));
     setupProperties();
 
-    properties.put(option, oldConfig.properties.get(option));
-    sources.put(option, oldConfig.sources.get(option));
+    properties.put(option, sourceConfig.properties.get(option));
+    sources.put(option, sourceConfig.sources.get(option));
 
     return this;
   }
