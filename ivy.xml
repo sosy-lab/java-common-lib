@@ -77,6 +77,10 @@
         <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.0.5" transitive="false" conf="build->default" />
         <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.0.5" conf="build->default; contrib->sources" />
 
+        <!-- google-java-format
+             A source-code formatter for Java -->
+        <dependency org="com.google.google-java-format" name="google-java-format" rev="0.1-SNAPSHOT-104-g79b7f0f" conf="build->runtime"/>
+
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.6" conf="checkstyle->default"/>
 
