@@ -11,6 +11,11 @@
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
+    <module name="IllegalTokenText">
+      <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
+      <property name="format" value="\\u00(08|09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
+      <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
+    </module>
     <module name="SuppressWarningsHolder"/>
     <module name="AnnotationUseStyle"/>
     <module name="MissingOverride"/>
@@ -64,14 +69,12 @@
     <module name="OuterTypeNumber"/>
     <module name="LineLength">
       <property name="severity" value="ignore"/>
-      <property name="ignorePattern" value="^ *(package|import|//|\*) .*$"/>
+      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
       <property name="max" value="100"/>
       <property name="tabWidth" value="2"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <module name="ParameterNumber">
-      <property name="max" value="6"/>
-    </module>
+    <module name="ParameterNumber"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
@@ -141,18 +144,32 @@
       <property name="tokens" value="ARRAY_INIT"/>
     </module>
     <module name="AvoidStarImport"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClasses"/>
-    <!-- NullPointerExceptions
+    <module name="AvoidDefaultSerializableInInnerClasses"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBoolean"/>
-    -->
-    <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinallyBlockCheck"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBoolean"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnBooleanFromTernary"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.NoNullForCollectionReturnCheck">
+    <module name="ForbidReturnInFinallyBlockCheck"/>
+    <module name="ReturnNullInsteadOfBoolean"/>
+    <module name="ReturnBooleanFromTernary"/>
+    <module name="NoNullForCollectionReturnCheck">
       <property name="searchThroughMethodBody" value="true"/>
     </module>
     <module name="com.github.sevntu.checkstyle.checks.design.NoMainMethodInAbstractClass"/>
     <module name="AnnotationLocation"/>
+    <module name="ModifiedControlVariable"/>
+    <module name="HiddenField">
+      <property name="ignoreConstructorParameter" value="true"/>
+      <property name="ignoreSetter" value="true"/>
+    </module>
+    <module name="CommentsIndentation"/>
+    <module name="OneTopLevelClass"/>
+    <module name="ForbidThrowAnonymousExceptionsCheck"/>
+    <module name="MapIterationInForEachLoop">
+      <property name="proposeKeySetUsage" value="true"/>
+      <property name="proposeEntrySetUsage" value="true"/>
+    </module>
+    <module name="UselessSingleCatchCheck"/>
+    <module name="UselessSuperCtorCallCheck"/>
+    <module name="AvoidConditionInversionCheck"/>
+    <module name="PublicReferenceToPrivateTypeCheck"/>
   </module>
   <module name="Header">
     <property name="header" value="/*\n *  SoSy-Lab Common is a library of useful utilities.\n *  This file is part of SoSy-Lab Common.\n *\n *  Copyright (C) 2007-2015  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>

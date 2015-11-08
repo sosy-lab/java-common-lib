@@ -320,7 +320,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
           if (rawTypeName.equals(collectionClass.getName())) {
             List<? extends TypeMirror> params = ((DeclaredType) optionType).getTypeArguments();
             if (params.size() != 1) {
-           // all collections have 1 type parameter, error is reported by compiler itself
+              // all collections have 1 type parameter, error is reported by compiler itself
               continue;
             }
             isCollection = true;

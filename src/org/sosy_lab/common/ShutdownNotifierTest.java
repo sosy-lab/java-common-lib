@@ -40,7 +40,7 @@ public class ShutdownNotifierTest {
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
 
-  private static final String reason = "Shutdown Request Reason";
+  private static final String REASON = "Shutdown Request Reason";
 
   private ShutdownNotifier instance = null;
 
@@ -68,17 +68,17 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testRequested() {
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertTrue(instance.shouldShutdown());
-    assertEquals(reason, instance.getReason());
+    assertEquals(REASON, instance.getReason());
   }
 
   @Test
   public void testRequestedException() throws InterruptedException {
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
 
     thrown.expect(InterruptedException.class);
-    thrown.expectMessage(reason);
+    thrown.expectMessage(REASON);
     instance.shutdownIfNecessary();
   }
 
@@ -105,7 +105,7 @@ public class ShutdownNotifierTest {
       }
     });
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertTrue(flag.get());
   }
 
@@ -120,8 +120,8 @@ public class ShutdownNotifierTest {
       }
     });
 
-    instance.requestShutdown(reason);
-    assertEquals(reason, reasonReference.get());
+    instance.requestShutdown(REASON);
+    assertEquals(REASON, reasonReference.get());
   }
 
   @Test
@@ -138,7 +138,7 @@ public class ShutdownNotifierTest {
       });
     }
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertEquals(count, i.get());
   }
 
@@ -155,7 +155,7 @@ public class ShutdownNotifierTest {
     instance.register(l);
     instance.unregister(l);
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertFalse(flag.get());
   }
 
@@ -171,7 +171,7 @@ public class ShutdownNotifierTest {
     });
 
     assertFalse(flag.get());
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertTrue(flag.get());
   }
 
@@ -179,7 +179,7 @@ public class ShutdownNotifierTest {
   public void testListenerNotificationOnRegister() {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(new ShutdownRequestListener() {
       @Override
       public void shutdownRequested(String reason) {
@@ -194,7 +194,7 @@ public class ShutdownNotifierTest {
   public void testListenerNotificationReasonOnRegister() {
     final AtomicReference<String> reasonReference = new AtomicReference<>();
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(new ShutdownRequestListener() {
       @Override
       public void shutdownRequested(String pReason) {
@@ -202,7 +202,7 @@ public class ShutdownNotifierTest {
       }
     });
 
-    assertEquals(reason, reasonReference.get());
+    assertEquals(REASON, reasonReference.get());
   }
 
   @Test
@@ -212,10 +212,10 @@ public class ShutdownNotifierTest {
     assertFalse(instance.shouldShutdown());
     assertFalse(child.shouldShutdown());
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
 
     assertTrue(child.shouldShutdown());
-    assertEquals(reason, child.getReason());
+    assertEquals(REASON, child.getReason());
   }
 
   @Test
@@ -225,11 +225,11 @@ public class ShutdownNotifierTest {
     assertFalse(instance.shouldShutdown());
     assertFalse(child.shouldShutdown());
 
-    child.requestShutdown(reason);
+    child.requestShutdown(REASON);
 
     assertFalse(instance.shouldShutdown());
     assertTrue(child.shouldShutdown());
-    assertEquals(reason, child.getReason());
+    assertEquals(REASON, child.getReason());
   }
 
   @Test
@@ -245,7 +245,7 @@ public class ShutdownNotifierTest {
       }
     });
 
-    instance.requestShutdown(reason);
+    instance.requestShutdown(REASON);
     assertTrue(flag.get());
   }
 
@@ -262,7 +262,7 @@ public class ShutdownNotifierTest {
       }
     });
 
-    instance.requestShutdown(reason);
-    assertEquals(reason, reasonReference.get());
+    instance.requestShutdown(REASON);
+    assertEquals(REASON, reasonReference.get());
   }
 }
