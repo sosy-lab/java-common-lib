@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.GuardedBy;
 
 /**
@@ -64,7 +63,6 @@ import javax.annotation.concurrent.GuardedBy;
  *
  * This class is completely thread safe.
  */
-@ParametersAreNonnullByDefault
 public final class ShutdownNotifier {
 
   /*
