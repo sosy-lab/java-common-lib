@@ -36,6 +36,7 @@
                 failonerror="false" failifexecutionfails="false"
                 logError="false" error="/dev/null">
             <arg value="diff"/>
+            <arg value="--cached"/>
             <arg value="-U0"/>
             <arg value="${source.dir}"/>
         </exec>
