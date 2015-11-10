@@ -26,11 +26,13 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
-import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.Resources;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +42,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -127,7 +127,7 @@ public class OptionCollector {
       if (c.isAnnotationPresent(Options.class)) {
         collectOptions(c);
       }
-      if (c.getPackage().getName().startsWith("org.sosy_lab.common")) {
+      if (c.getPackage() != null && c.getPackage().getName().startsWith("org.sosy_lab.common")) {
         appendCommonOptions = false;
       }
     }
@@ -677,91 +677,55 @@ public class OptionCollector {
   }
 
   /**
-   * Collects all classes accessible from the context class loader which
-   * belong to the given package and subpackages.
-   *
+   * Collects classes accessible from the context class loader.
+   * Ignores classes that are packaged inside JARs, certain blacklisted classes,
+   * and interfaces.
    * @return list of classes
    */
   private List<Class<?>> getClasses() {
-    Iterator<URL> resources = getClassLoaderResources();
+    final ClassPath classPath;
+    try {
+      classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
+    } catch (IOException e) {
+      errorMessages.add(
+          "INFO: Could not scan class path for getting Option annotations: " + e.getMessage());
+      return ImmutableList.of();
+    }
 
     final List<Class<?>> classes = new ArrayList<>();
-    while (resources.hasNext()) {
-      URL url = resources.next();
+
+    for (ClassInfo cls : classPath.getAllClasses()) {
+      // Ignore classes in JAR files etc, we want only classes of this project.
+      if (!cls.url().getProtocol().equals("file")) {
+        continue;
+      }
+      if (IGNORED_CLASSES.matcher(cls.getName()).matches()) {
+        continue;
+      }
+      final Class<?> foundClass;
+
       try {
-        File file = new File(url.toURI());
-        collectClasses(file, "", classes);
-      } catch (URISyntaxException e) {
-        System.err.println("Ignoring files in " + url);
+        foundClass = cls.load();
+      } catch (LinkageError e) {
+        // Because ClassInfo.load() does not link or initialize the class
+        // like Class.forName() does, most common problems with class loading
+        // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
+        // Currently no case is know why a LinkageError would occur..
+        errorMessages.add(
+            String.format(
+                "INFO: Could not load '%s' for getting Option annotations: %s: %s",
+                cls.getResourceName(),
+                e.getClass().getName(),
+                e.getMessage()));
+        continue;
       }
-    }
 
+      if (Modifier.isInterface(foundClass.getModifiers())) {
+        continue; // ignore interfaces
+      }
+      classes.add(foundClass);
+    }
     return classes;
-  }
-
-  /**
-   * Recursive method used to find all classes in a given directory and subdirs.
-   *
-   * @param directory the base directory
-   * @param packageName the package name for classes found inside the base directory
-   * @param classes list where the classes are added.
-   */
-  private void collectClasses(final File directory,
-      final String packageName, final List<Class<?>> classes) {
-    assert directory.isDirectory();
-    final File[] files = directory.listFiles();
-    if (files != null) {
-      Arrays.sort(files);
-      for (final File file : files) {
-        final String fileName = file.getName();
-
-        // recursive call for folders, exclude svn-folders
-        if (file.isDirectory() && !fileName.startsWith(".svn")) {
-          String newPackage = packageName.isEmpty() ? fileName
-                                                    : (packageName + "." + fileName);
-          collectClasses(file, newPackage, classes);
-
-        } else if (fileName.endsWith(".class")) {
-          final String nameOfClass = packageName + '.'
-                + fileName.substring(0, fileName.length() - 6);
-          if (IGNORED_CLASSES.matcher(nameOfClass).matches()) {
-            continue;
-          }
-          try {
-            final Class<?> foundClass = Class.forName(nameOfClass);
-
-            // collect only real classes
-            if (!Modifier.isInterface(foundClass.getModifiers())) {
-              classes.add(foundClass);
-            }
-          } catch (ClassNotFoundException e) {
-            // ignore, there is no class available for this file}
-          } catch (UnsatisfiedLinkError e) {
-            // if classpath is not set manually in Eclipse,
-            // OctWrapper throws this error,
-            // running cpa.sh in terminal does not throw this error
-            errorMessages.add("INFO: Could not load '" + fileName
-                + "' for getting Option annotations: " + e.getMessage());
-          } catch (NoClassDefFoundError e) {
-            // this error is thrown, if there is more than one classpath
-            // and one of them did not map the package-strukture,
-            // ignore it and return, another classpath should be correct
-            return;
-
-            //System.out.println("no classDef found for: " + nameOfClass);
-          } catch (ExceptionInInitializerError e) {
-            errorMessages.add("INFO: Cloud not load '" + fileName
-                + "' for getting Option annotations because of exception in class initializer: "
-                + Throwables.getStackTraceAsString(e.getCause()));
-          }
-        }
-        /*
-        else { // some files are no classes, ignore them
-          System.out.println("unhandled file/folder: " + fileName);
-        }
-        */
-      }
-    }
   }
 
   private static abstract class AnnotationInfo {
