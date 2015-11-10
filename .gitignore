@@ -1,4 +1,5 @@
 /bin
+/.apt-generated/
 /lib
 /ivy-*.xml
 /common-*.jar
@@ -15,5 +16,6 @@
 /FindBugs.diff.html
 /FindBugs.diff.xml
 
+/.factorypath
 .idea/workspace.xml
 .idea/uiDesigner.xml

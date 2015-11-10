@@ -9,6 +9,7 @@
     <!-- These properties can be overridden from including file. -->
     <property name="source.format" value="1.7"/>
     <property name="source.dir" value="src"/>
+    <property name="source.generated.dir" value=".apt-generated"/>
     <property name="class.format" value="1.7"/>
     <property name="class.dir" value="bin"/>
 
@@ -32,6 +33,7 @@
             <compilerarg value="-Xlint"/>
             <compilerarg value="-Xlint:-processing"/>
             <compilerarg value="-Werror"/>
+            <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
             <compilerclasspath refid="errorprone"/>
         </javac>
     </target>
