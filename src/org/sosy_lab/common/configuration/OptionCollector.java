@@ -325,24 +325,25 @@ public class OptionCollector {
 
     // split lines into more lines, if they are too long
     final List<String> splittedLines = new ArrayList<>();
-    for (String line : lines) {
-      while (line.length() > CHARS_PER_LINE) {
+    for (final String fullLine : lines) {
+      String remainingLine = fullLine;
+      while (remainingLine.length() > CHARS_PER_LINE) {
 
-        int spaceIndex = line.lastIndexOf(" ", CHARS_PER_LINE);
+        int spaceIndex = remainingLine.lastIndexOf(" ", CHARS_PER_LINE);
         if (spaceIndex == -1) {
-          spaceIndex = line.indexOf(" ");
+          spaceIndex = remainingLine.indexOf(" ");
         }
         if (spaceIndex == -1) {
-          spaceIndex = line.length() - 1;
+          spaceIndex = remainingLine.length() - 1;
         }
 
-        final String start = line.substring(0, spaceIndex);
+        final String start = remainingLine.substring(0, spaceIndex);
         if (!start.isEmpty()) {
           splittedLines.add(start);
         }
-        line = line.substring(spaceIndex + 1);
+        remainingLine = remainingLine.substring(spaceIndex + 1);
       }
-      splittedLines.add(line);
+      splittedLines.add(remainingLine);
     }
 
     // remove last element, if empty (useful if previous line is too long)
