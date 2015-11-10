@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Verify.verifyNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.auto.value.AutoValue;
@@ -234,14 +235,14 @@ public class OptionCollector {
   private void collectOptions(final Class<?> c) {
     String classSource = getContentOfFile(c);
 
-    if (c.isAnnotationPresent(Options.class)) {
-      final Options classOption = c.getAnnotation(Options.class);
-      options.put(classOption.prefix(), OptionsInfo.create(c));
-    }
+    final Options classOption = c.getAnnotation(Options.class);
+    verifyNotNull(classOption, "Class without @Options annotation");
+    options.put(classOption.prefix(), OptionsInfo.create(c));
 
     for (final Field field : c.getDeclaredFields()) {
       if (field.isAnnotationPresent(Option.class)) {
-        final String optionName = getOptionName(c, field);
+        Option option = field.getAnnotation(Option.class);
+        final String optionName = Configuration.getOptionName(classOption, field, option);
         final String defaultValue = getDefaultValue(field, classSource);
         options.put(
             optionName, OptionInfo.create(field, optionName, field.getType(), defaultValue));
@@ -249,6 +250,7 @@ public class OptionCollector {
     }
 
     // TODO: Add OptionInfo for @Option at methods
+
   }
 
   /** This function returns the formatted description of an {@link Option}.
@@ -364,33 +366,6 @@ public class OptionCollector {
     }
 
     return formattedLines.toString();
-  }
-
-  /** This function returns the name of an {@link Option}.
-   * If no optionname is defined, the name of the field is returned.
-   * If a prefix is defined, it is added in front of the name.
-   *
-   * @param c class with the field
-   * @param field field with the option */
-  private static String getOptionName(final Class<?> c, final Field field) {
-    String optionName = "";
-
-    // get prefix from Options-annotation of class
-    if (c.isAnnotationPresent(Options.class)) {
-      final Options classOption = c.getAnnotation(Options.class);
-      if (!classOption.prefix().isEmpty()) {
-        optionName += classOption.prefix() + ".";
-      }
-    }
-
-    // get info about option
-    final Option option = field.getAnnotation(Option.class);
-    if (option.name().isEmpty()) {
-      optionName += field.getName();
-    } else {
-      optionName += option.name();
-    }
-    return optionName;
   }
 
   /** This function searches for the default field value of an {@link Option}

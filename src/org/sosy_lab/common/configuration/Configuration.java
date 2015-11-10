@@ -606,7 +606,7 @@ public final class Configuration {
     }
   }
 
-  private String getOptionName(final Options options, final Member member, final Option option) {
+  static String getOptionName(final Options options, final Member member, final Option option) {
     return getOptionName(options, member, option, false);
   }
 
@@ -620,8 +620,8 @@ public final class Configuration {
    * @param isDeprecated flag specifying whether the deprecated prefix should be
    *                     used.
    */
-  private String getOptionName(final Options options, final Member member, final Option option,
-                               boolean isDeprecated) {
+  private static String getOptionName(
+      final Options options, final Member member, final Option option, boolean isDeprecated) {
     String name = option.name();
     if (name.isEmpty()) {
       name = member.getName();
