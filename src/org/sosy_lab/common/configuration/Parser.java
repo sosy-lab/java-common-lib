@@ -26,7 +26,6 @@ import com.google.common.io.CharSource;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
@@ -79,8 +78,6 @@ import javax.annotation.Nullable;
  */
 class Parser {
 
-  private Parser() {}
-
   static class InvalidConfigurationFileException extends InvalidConfigurationException {
 
     private static final long serialVersionUID = 8146907093750189669L;
@@ -97,21 +94,38 @@ class Parser {
   private static final Pattern OPTION_NAME =
       Pattern.compile("^[a-zA-Z0-9_+-]+(\\.[a-zA-Z0-9_+-]+)*$");
 
+  private final Map<String, String> options = new HashMap<>();
+  private final Map<String, Path> sources = new HashMap<>();
+
+  private Parser() {}
+
+  /**
+   * Get the map with all configuration directives in the parsed file.
+   */
+  Map<String, String> getOptions() {
+    return Collections.unmodifiableMap(options);
+  }
+
+  /**
+   * Get the map with the source location of each defined option.
+   */
+  Map<String, Path> getSources() {
+    return Collections.unmodifiableMap(sources);
+  }
+
   /**
    * Parse a configuration file with the format as defined above.
    *
    * @param file The file to parse.
    * @param basePath If filename is relative, use this as parent path
    * (if null or empty, the current working directory is used).
-   * @return A map with all configuration directives in this file,
-   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Pair<Map<String, String>, Map<String, Path>> parse(Path file, @Nullable String basePath)
+  static Parser parse(Path file, @Nullable String basePath)
       throws IOException, InvalidConfigurationException {
 
-    return parse(file, basePath, Collections.<String>emptySet());
+    return Parser.parse(file, basePath, Collections.<String>emptySet());
   }
 
   /**
@@ -121,13 +135,10 @@ class Parser {
    * (if null or empty, the current working directory is used).
    * @param file The file to parse.
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file,
-   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Pair<Map<String, String>, Map<String, Path>> parse(
-      Path file, @Nullable String basePath, Set<String> includeStack)
+  private static Parser parse(Path file, @Nullable String basePath, Set<String> includeStack)
           throws IOException, InvalidConfigurationException {
 
     if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
@@ -143,9 +154,11 @@ class Parser {
           "Circular inclusion of file " + file.toAbsolutePath());
     }
 
+    Parser parser = new Parser();
     try (BufferedReader r = file.asCharSource(StandardCharsets.UTF_8).openBufferedStream()) {
-      return parse(r, file.getParent().getPath(), file.getPath(), includeStack);
+      parser.parse(r, file.getParent().getPath(), file.getPath(), includeStack);
     }
+    return parser;
   }
 
   /**
@@ -160,18 +173,17 @@ class Parser {
    * (if null or empty, the current working directory is used).
    * @param sourceName A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
-   * @return A map with all configuration directives in this file,
-   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  static Pair<Map<String, String>, Map<String, Path>> parse(
-      CharSource source, @Nullable String basePath, String sourceName)
+  static Parser parse(CharSource source, @Nullable String basePath, String sourceName)
           throws IOException, InvalidConfigurationException {
 
+    Parser parser = new Parser();
     try (BufferedReader r = source.openBufferedStream()) {
-      return parse(r, basePath, sourceName, Collections.<String>emptySet());
+      parser.parse(r, basePath, sourceName, Collections.<String>emptySet());
     }
+    return parser;
   }
 
   /**
@@ -187,15 +199,12 @@ class Parser {
    * @param source A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
    * @param includeStack A set of all files present in the current stack of #include directives.
-   * @return A map with all configuration directives in this file,
-   * and a map with the source location of each defined option.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @SuppressFBWarnings(value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
       justification = "performance irrelevant compared to I/O, String much more convenient")
-  private static Pair<Map<String, String>, Map<String, Path>> parse(
-      BufferedReader r, @Nullable String basePath,
+  private void parse(BufferedReader r, @Nullable String basePath,
       String source, Set<String> includeStack) throws IOException, InvalidConfigurationException {
     checkNotNull(source);
 
@@ -205,8 +214,6 @@ class Parser {
     String currentOptionName = null;
     String currentValue = null;
     Map<String, String> definedOptions = new HashMap<>();
-    Map<String, String> includedOptions = new HashMap<>();
-    Map<String, Path> includedOptionsSources = new HashMap<>();
 
     while ((line = r.readLine()) != null) {
       lineno++;
@@ -240,10 +247,9 @@ class Parser {
               "Include without filename", lineno, source, fullLine);
         }
 
-        final Pair<Map<String, String>, Map<String, Path>> includedContent =
-            parse(Paths.get(line), basePath, includeStack);
-        includedOptions.putAll(includedContent.getFirst());
-        includedOptionsSources.putAll(includedContent.getSecond());
+        final Parser includedContent = Parser.parse(Paths.get(line), basePath, includeStack);
+        options.putAll(includedContent.getOptions());
+        sources.putAll(includedContent.getSources());
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {
@@ -311,14 +317,11 @@ class Parser {
     }
 
     // now overwrite included options with local ones
-    includedOptions.putAll(definedOptions);
+    options.putAll(definedOptions);
 
     Path thisSource = Paths.get(source);
     for (String name : definedOptions.keySet()) {
-      includedOptionsSources.put(name, thisSource);
+      sources.put(name, thisSource);
     }
-
-    return Pair.of(includedOptions, includedOptionsSources);
   }
-
 }
