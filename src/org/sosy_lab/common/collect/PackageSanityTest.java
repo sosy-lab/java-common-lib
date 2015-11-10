@@ -22,10 +22,13 @@ package org.sosy_lab.common.collect;
 import com.google.common.base.Predicates;
 import com.google.common.testing.AbstractPackageSanityTests;
 
+import org.sosy_lab.common.Classes;
+
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDefault(PersistentLinkedList.class, PersistentLinkedList.of());
     ignoreClasses(Predicates.<Class<?>>equalTo(SortedMapKeySet.class));
+    ignoreClasses(Classes.IS_GENERATED);
   }
 }

@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 
 import org.sosy_lab.common.annotations.Unmaintained;
@@ -411,4 +412,12 @@ public final class Classes {
           + " and may not work correctly.", typeName, cls.getSimpleName());
     }
   }
+
+  public static final Predicate<Class<?>> IS_GENERATED =
+      new Predicate<Class<?>>() {
+        @Override
+        public boolean apply(Class<?> pInput) {
+          return pInput.getSimpleName().startsWith("AutoValue_");
+        }
+      };
 }
