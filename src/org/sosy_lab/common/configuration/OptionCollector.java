@@ -244,13 +244,17 @@ public class OptionCollector {
         Option option = field.getAnnotation(Option.class);
         final String optionName = Configuration.getOptionName(classOption, field, option);
         final String defaultValue = getDefaultValue(field, classSource);
-        options.put(
-            optionName, OptionInfo.create(field, optionName, field.getType(), defaultValue));
+        options.put(optionName, OptionInfo.createForField(field, optionName, defaultValue));
       }
     }
 
-    // TODO: Add OptionInfo for @Option at methods
-
+    for (final Method method : c.getDeclaredMethods()) {
+      if (method.isAnnotationPresent(Option.class)) {
+        Option option = method.getAnnotation(Option.class);
+        final String optionName = Configuration.getOptionName(classOption, method, option);
+        options.put(optionName, OptionInfo.createForMethod(method, optionName));
+      }
+    }
   }
 
   /** This function returns the formatted description of an {@link Option}.
@@ -771,9 +775,13 @@ public class OptionCollector {
   @AutoValue
   static abstract class OptionInfo extends AnnotationInfo {
 
-    static OptionInfo create(
-        AnnotatedElement element, String name, Class<?> type, String defaultValue) {
-      return new AutoValue_OptionCollector_OptionInfo(element, name, type, defaultValue);
+    static OptionInfo createForField(Field field, String name, String defaultValue) {
+      return new AutoValue_OptionCollector_OptionInfo(field, name, field.getType(), defaultValue);
+    }
+
+    static OptionInfo createForMethod(Method method, String name) {
+      // methods with @Option have no usable default value
+      return new AutoValue_OptionCollector_OptionInfo(method, name, method.getReturnType(), "");
     }
 
     @Override
