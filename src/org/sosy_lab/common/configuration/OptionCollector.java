@@ -260,7 +260,7 @@ public class OptionCollector {
   /** This function returns the formatted description of an {@link Option}.
    *
    * @param element field with the option */
-  private static String getOptionDescription(final AnnotatedElement element) {
+  static String getOptionDescription(final AnnotatedElement element) {
     String text;
     if (element.isAnnotationPresent(Option.class)) {
       text = element.getAnnotation(Option.class).description();
@@ -314,13 +314,13 @@ public class OptionCollector {
 
   /** This function formats text and splits lines, if they are too long.
    * This functions adds "#" before each line.*/
-  public static String formatText(final String text) {
+  private static String formatText(final String text) {
     return formatText(text, "# ", true);
   }
 
   /** This function formats text and splits lines, if they are too long. */
-  public static String formatText(final String text, final String lineStart,
-      final boolean useLineStartInFirstLine) {
+  private static String formatText(
+      final String text, final String lineStart, final boolean useLineStartInFirstLine) {
     checkNotNull(lineStart);
     if (text.isEmpty()) {
       return text;
