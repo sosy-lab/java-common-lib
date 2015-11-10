@@ -20,16 +20,21 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.FluentIterable.from;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.io.Resources;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
@@ -38,12 +43,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -86,7 +91,15 @@ public class OptionCollector {
 
   // The map where we will collect all options.
   // TreeMap for alphabetical order of keys
-  private final SortedMap<String, OptionInfo> options = new TreeMap<>();
+  private final Multimap<String, AnnotationInfo> options =
+      Multimaps.newMultimap(
+          new TreeMap<String, Collection<AnnotationInfo>>(),
+          new Supplier<Collection<AnnotationInfo>>() {
+            @Override
+            public Collection<AnnotationInfo> get() {
+              return new ArrayList<>();
+            }
+          });
 
   /**
    * @param pVerbose short or long output?
@@ -136,15 +149,29 @@ public class OptionCollector {
       }
     }
 
-    String description = "";
-    for (OptionInfo descriptionAndInfo : options.values()) {
-      if (descriptionAndInfo.description().isEmpty()
-          || !description.equals(descriptionAndInfo.description())) {
-        content.append("\n");
-        content.append(descriptionAndInfo.description());
-        description = descriptionAndInfo.description();
+    // Dump all options, avoiding repeated information.
+    String lastDescription = "";
+    String lastInfo = "";
+    for (Collection<AnnotationInfo> allInstances : options.asMap().values()) {
+      boolean first = true;
+      for (AnnotationInfo annotation : allInstances) {
+        String description = getOptionDescription(annotation.element());
+        if (!description.isEmpty() && !lastDescription.equals(description)) {
+          if (first) {
+            content.append("\n");
+            first = false;
+          }
+          content.append(description);
+          lastDescription = description;
+        }
       }
-      content.append(descriptionAndInfo.info());
+      for (OptionInfo option : from(allInstances).filter(OptionInfo.class)) {
+        String infoText = getOptionInfo(option.element(), option.name(), option.defaultValue());
+        if (!lastInfo.equals(infoText)) {
+          content.append(infoText);
+          lastInfo = infoText;
+        }
+      }
     }
 
     return content.toString();
@@ -209,81 +236,68 @@ public class OptionCollector {
 
       if (field.isAnnotationPresent(Option.class)) {
 
-        getOptionsDescription(c);
+        if (c.isAnnotationPresent(Options.class)) {
+          final Options classOption = c.getAnnotation(Options.class);
+          options.put(classOption.prefix(), OptionsInfo.create(c));
+        }
 
-        // get info about option
         final String optionName = getOptionName(c, field);
         final String defaultValue = getDefaultValue(field, classSource);
-        final StringBuilder optionInfo = new StringBuilder();
-        optionInfo.append(optionName);
-
-        if (verbose) {
-          optionInfo.append("\n  field:    " + field.getName() + "\n");
-          optionInfo.append("  class:    "
-              + field.getDeclaringClass().toString().substring(6) + "\n");
-          optionInfo.append("  type:     " + field.getType().getSimpleName()
-              + "\n");
-
-          optionInfo.append("  default value: ");
-          if (!defaultValue.isEmpty()) {
-            optionInfo.append(defaultValue);
-          } else {
-            optionInfo.append("not available");
-          }
-
-        } else {
-          if (!defaultValue.isEmpty()) {
-            optionInfo.append(" = " + defaultValue);
-          } else {
-            optionInfo.append(" = no default value");
-          }
-        }
-        optionInfo.append("\n");
-        optionInfo.append(getAllowedValues(field, verbose));
-
-        // check if a option was found before, some options are used twice
-        if (options.containsKey(optionName)) {
-          OptionInfo oldValue = options.get(optionName);
-
-          options.put(optionName,
-              oldValue.append(getOptionDescription(field), optionInfo.toString()));
-
-        } else {
-          options.put(optionName,
-              OptionInfo.create(getOptionDescription(field), optionInfo.toString()));
-        }
+        options.put(optionName, OptionInfo.create(field, optionName, defaultValue));
       }
     }
   }
 
   /** This function returns the formatted description of an {@link Option}.
    *
-   * @param field field with the option */
-  private static String getOptionDescription(final Field field) {
-    final Option option = field.getAnnotation(Option.class);
-    String text = option.description();
+   * @param element field with the option */
+  private static String getOptionDescription(final AnnotatedElement element) {
+    String text;
+    if (element.isAnnotationPresent(Option.class)) {
+      text = element.getAnnotation(Option.class).description();
+    } else if (element.isAnnotationPresent(Options.class)) {
+      text = element.getAnnotation(Options.class).description();
+    } else {
+      throw new AssertionError();
+    }
 
-    if (field.getAnnotation(Deprecated.class) != null) {
+    if (element.isAnnotationPresent(Deprecated.class)) {
       text = "DEPRECATED: " + text;
     }
 
     return formatText(text);
   }
 
-  /** This function adds the formatted description of {@link Options}
-   * to the map, if a prefix is defined.
-   *
-   * @param c class with options
-   */
-  private void getOptionsDescription(final Class<?> c) {
-    if (c.isAnnotationPresent(Options.class)) {
-      final Options classOption = c.getAnnotation(Options.class);
-      if (!classOption.prefix().isEmpty()
-          && !classOption.description().isEmpty()) {
-        options.put(classOption.prefix(),
-            OptionInfo.create(formatText(classOption.description()), ""));
+  /** This function returns the formatted information about an {@link Option}. */
+  private String getOptionInfo(
+      final Field field, final String optionName, final String defaultValue) {
+    final StringBuilder optionInfo = new StringBuilder();
+    optionInfo.append(optionName);
+
+    if (verbose) {
+      optionInfo.append("\n  field:    " + field.getName() + "\n");
+      optionInfo.append("  class:    " + field.getDeclaringClass().toString().substring(6) + "\n");
+      optionInfo.append("  type:     " + field.getType().getSimpleName() + "\n");
+
+      optionInfo.append("  default value: ");
+      if (!defaultValue.isEmpty()) {
+        optionInfo.append(defaultValue);
+      } else {
+        optionInfo.append("not available");
+      }
+
+    } else {
+      if (!defaultValue.isEmpty()) {
+        optionInfo.append(" = " + defaultValue);
+      } else {
+        optionInfo.append(" = no default value");
       }
     }
+    optionInfo.append("\n");
+    optionInfo.append(getAllowedValues(field, verbose));
+
+    final String info = optionInfo.toString();
+    return info;
   }
 
   /** This function formats text and splits lines, if they are too long.
@@ -766,33 +780,37 @@ public class OptionCollector {
     }
   }
 
+  private static abstract class AnnotationInfo {
+
+    /**
+     * The annotated element or class.
+     */
+    abstract AnnotatedElement element();
+  }
+
   @AutoValue
-  static abstract class OptionInfo {
+  static abstract class OptionInfo extends AnnotationInfo {
 
-    static OptionInfo create(String description, String info) {
-      return new AutoValue_OptionCollector_OptionInfo(description, info);
+    static OptionInfo create(Field element, String name, String defaultValue) {
+      return new AutoValue_OptionCollector_OptionInfo(element, name, defaultValue);
     }
 
-    OptionInfo append(String newDescription, String newInfo) {
-      if (!newDescription.equals(description())) {
-        newDescription = description() + newDescription;
-      }
+    @Override
+    abstract Field element();
 
-      if (!newInfo.equals(info())) {
-        newInfo = info() + newInfo;
-      }
+    abstract String name();
 
-      return create(newDescription, newInfo);
+    abstract String defaultValue();
+  }
+
+  @AutoValue
+  static abstract class OptionsInfo extends AnnotationInfo {
+
+    static OptionsInfo create(Class<?> c) {
+      return new AutoValue_OptionCollector_OptionsInfo(c);
     }
 
-    /**
-     * The content of {@link Option#description()}.
-     */
-    abstract String description();
-
-    /**
-     * All other information about the option (name, default value, etc.).
-     */
-    abstract String info();
+    @Override
+    abstract Class<?> element();
   }
 }
