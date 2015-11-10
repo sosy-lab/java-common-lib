@@ -21,12 +21,11 @@ package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterators;
 import com.google.common.io.Resources;
-
-import org.sosy_lab.common.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +86,7 @@ public class OptionCollector {
 
   // The map where we will collect all options.
   // TreeMap for alphabetical order of keys
-  private final SortedMap<String, Pair<String, String>> options = new TreeMap<>();
+  private final SortedMap<String, OptionInfo> options = new TreeMap<>();
 
   /**
    * @param pVerbose short or long output?
@@ -138,14 +137,14 @@ public class OptionCollector {
     }
 
     String description = "";
-    for (Pair<String, String> descriptionAndInfo : options.values()) {
-      if (descriptionAndInfo.getFirst().isEmpty()
-          || !description.equals(descriptionAndInfo.getFirst())) {
+    for (OptionInfo descriptionAndInfo : options.values()) {
+      if (descriptionAndInfo.description().isEmpty()
+          || !description.equals(descriptionAndInfo.description())) {
         content.append("\n");
-        content.append(descriptionAndInfo.getFirst());
-        description = descriptionAndInfo.getFirst();
+        content.append(descriptionAndInfo.description());
+        description = descriptionAndInfo.description();
       }
-      content.append(descriptionAndInfo.getSecond());
+      content.append(descriptionAndInfo.info());
     }
 
     return content.toString();
@@ -244,23 +243,14 @@ public class OptionCollector {
 
         // check if a option was found before, some options are used twice
         if (options.containsKey(optionName)) {
-          Pair<String, String> oldValues = options.get(optionName);
+          OptionInfo oldValue = options.get(optionName);
 
-          String description = getOptionDescription(field);
-          if (!description.equals(oldValues.getFirst())) {
-            description += oldValues.getFirst();
-          }
-
-          String commonOptionInfo = optionInfo.toString();
-          if (!commonOptionInfo.equals(oldValues.getSecond())) {
-            commonOptionInfo += oldValues.getSecond();
-          }
-
-          options.put(optionName, Pair.of(description, commonOptionInfo));
+          options.put(optionName,
+              oldValue.append(getOptionDescription(field), optionInfo.toString()));
 
         } else {
           options.put(optionName,
-              Pair.of(getOptionDescription(field), optionInfo.toString()));
+              OptionInfo.create(getOptionDescription(field), optionInfo.toString()));
         }
       }
     }
@@ -291,7 +281,7 @@ public class OptionCollector {
       if (!classOption.prefix().isEmpty()
           && !classOption.description().isEmpty()) {
         options.put(classOption.prefix(),
-            Pair.of(formatText(classOption.description()), ""));
+            OptionInfo.create(formatText(classOption.description()), ""));
       }
     }
   }
@@ -776,4 +766,33 @@ public class OptionCollector {
     }
   }
 
+  @AutoValue
+  static abstract class OptionInfo {
+
+    static OptionInfo create(String description, String info) {
+      return new AutoValue_OptionCollector_OptionInfo(description, info);
+    }
+
+    OptionInfo append(String newDescription, String newInfo) {
+      if (!newDescription.equals(description())) {
+        newDescription = description() + newDescription;
+      }
+
+      if (!newInfo.equals(info())) {
+        newInfo = info() + newInfo;
+      }
+
+      return create(newDescription, newInfo);
+    }
+
+    /**
+     * The content of {@link Option#description()}.
+     */
+    abstract String description();
+
+    /**
+     * All other information about the option (name, default value, etc.).
+     */
+    abstract String info();
+  }
 }
