@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -166,7 +168,7 @@ public class OptionCollector {
         }
       }
       for (OptionInfo option : from(allInstances).filter(OptionInfo.class)) {
-        String infoText = getOptionInfo(option.element(), option.name(), option.defaultValue());
+        String infoText = getOptionInfo(option);
         if (!lastInfo.equals(infoText)) {
           content.append(infoText);
           lastInfo = infoText;
@@ -232,20 +234,21 @@ public class OptionCollector {
   private void collectOptions(final Class<?> c) {
     String classSource = getContentOfFile(c);
 
+    if (c.isAnnotationPresent(Options.class)) {
+      final Options classOption = c.getAnnotation(Options.class);
+      options.put(classOption.prefix(), OptionsInfo.create(c));
+    }
+
     for (final Field field : c.getDeclaredFields()) {
-
       if (field.isAnnotationPresent(Option.class)) {
-
-        if (c.isAnnotationPresent(Options.class)) {
-          final Options classOption = c.getAnnotation(Options.class);
-          options.put(classOption.prefix(), OptionsInfo.create(c));
-        }
-
         final String optionName = getOptionName(c, field);
         final String defaultValue = getDefaultValue(field, classSource);
-        options.put(optionName, OptionInfo.create(field, optionName, defaultValue));
+        options.put(
+            optionName, OptionInfo.create(field, optionName, field.getType(), defaultValue));
       }
     }
+
+    // TODO: Add OptionInfo for @Option at methods
   }
 
   /** This function returns the formatted description of an {@link Option}.
@@ -269,35 +272,38 @@ public class OptionCollector {
   }
 
   /** This function returns the formatted information about an {@link Option}. */
-  private String getOptionInfo(
-      final Field field, final String optionName, final String defaultValue) {
+  private String getOptionInfo(OptionInfo info) {
     final StringBuilder optionInfo = new StringBuilder();
-    optionInfo.append(optionName);
+    optionInfo.append(info.name());
 
     if (verbose) {
-      optionInfo.append("\n  field:    " + field.getName() + "\n");
-      optionInfo.append("  class:    " + field.getDeclaringClass().toString().substring(6) + "\n");
-      optionInfo.append("  type:     " + field.getType().getSimpleName() + "\n");
+      if (info.element() instanceof Field) {
+        optionInfo.append("\n  field:    " + ((Field) info.element()).getName() + "\n");
+      } else if (info.element() instanceof Method) {
+        optionInfo.append("\n  method:   " + ((Method) info.element()).getName() + "\n");
+      }
 
+      Class<?> cls = ((Member) info.element()).getDeclaringClass();
+      optionInfo.append("  class:    " + cls.toString().substring(6) + "\n");
+      optionInfo.append("  type:     " + info.type().getSimpleName() + "\n");
       optionInfo.append("  default value: ");
-      if (!defaultValue.isEmpty()) {
-        optionInfo.append(defaultValue);
+      if (!info.defaultValue().isEmpty()) {
+        optionInfo.append(info.defaultValue());
       } else {
         optionInfo.append("not available");
       }
 
     } else {
-      if (!defaultValue.isEmpty()) {
-        optionInfo.append(" = " + defaultValue);
+      if (!info.defaultValue().isEmpty()) {
+        optionInfo.append(" = " + info.defaultValue());
       } else {
         optionInfo.append(" = no default value");
       }
     }
     optionInfo.append("\n");
-    optionInfo.append(getAllowedValues(field, verbose));
+    optionInfo.append(getAllowedValues(info.element(), info.type(), verbose));
 
-    final String info = optionInfo.toString();
-    return info;
+    return optionInfo.toString();
   }
 
   /** This function formats text and splits lines, if they are too long.
@@ -572,11 +578,9 @@ public class OptionCollector {
    *
    * @param field field with the {@link Option}-annotation
    * @param verbose short or long output? */
-  private static String getAllowedValues(final Field field,
-      final boolean verbose) {
+  private static String getAllowedValues(
+      final AnnotatedElement field, final Class<?> type, final boolean verbose) {
     String allowedValues = "";
-
-    final Class<?> type = field.getType();
 
     // if the type is enum,
     // the allowed values can be extracted the enum-class
@@ -601,7 +605,7 @@ public class OptionCollector {
 
   /** This method returns text representing the values,
    * that are defined in the {@link Option}-annotation. */
-  private static String getOptionValues(Field field, boolean verbose) {
+  private static String getOptionValues(AnnotatedElement field, boolean verbose) {
     final Option option = field.getAnnotation(Option.class);
     assert option != null;
     String str = "";
@@ -622,7 +626,7 @@ public class OptionCollector {
 
   /** This method returns text representing the values,
    * that are defined in the {@link ClassOption}-annotation. */
-  private static String getClassOptionValues(Field field, boolean verbose) {
+  private static String getClassOptionValues(AnnotatedElement field, boolean verbose) {
     final ClassOption classOption = field.getAnnotation(ClassOption.class);
     String str = "";
     if (classOption != null) {
@@ -635,7 +639,7 @@ public class OptionCollector {
 
   /** This method returns text representing the values,
    * that are defined in the {@link FileOption}-annotation. */
-  private static String getFileOptionValues(Field field, boolean verbose) {
+  private static String getFileOptionValues(AnnotatedElement field, boolean verbose) {
     final FileOption fileOption = field.getAnnotation(FileOption.class);
     String str = "";
     if (fileOption != null) {
@@ -648,7 +652,7 @@ public class OptionCollector {
 
   /** This method returns text representing the values,
    * that are defined in the {@link IntegerOption}-annotation. */
-  private static String getIntegerOptionValues(Field field, boolean verbose) {
+  private static String getIntegerOptionValues(AnnotatedElement field, boolean verbose) {
     final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
     String str = "";
     if (intOption != null) {
@@ -670,7 +674,7 @@ public class OptionCollector {
 
   /** This method returns text representing the values,
    * that are defined in the {@link TimeSpanOption}-annotation. */
-  private static String getTimeSpanOptionValues(Field field, boolean verbose) {
+  private static String getTimeSpanOptionValues(AnnotatedElement field, boolean verbose) {
     final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
     String str = "";
     if (timeSpanOption != null) {
@@ -791,14 +795,17 @@ public class OptionCollector {
   @AutoValue
   static abstract class OptionInfo extends AnnotationInfo {
 
-    static OptionInfo create(Field element, String name, String defaultValue) {
-      return new AutoValue_OptionCollector_OptionInfo(element, name, defaultValue);
+    static OptionInfo create(
+        AnnotatedElement element, String name, Class<?> type, String defaultValue) {
+      return new AutoValue_OptionCollector_OptionInfo(element, name, type, defaultValue);
     }
 
     @Override
-    abstract Field element();
+    abstract AnnotatedElement element();
 
     abstract String name();
+
+    abstract Class<?> type();
 
     abstract String defaultValue();
   }
