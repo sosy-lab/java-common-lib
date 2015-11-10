@@ -713,7 +713,7 @@ public final class Configuration {
     }
 
     if (exportUsedOptions) {
-      printOptionInfos(type, option, optionName, valueStr, defaultValue);
+      printOptionInfos(member, optionName, valueStr, defaultValue);
     }
     return value;
   }
@@ -814,21 +814,28 @@ public final class Configuration {
     }
   }
 
-  private void printOptionInfos(final Class<?> type, final Option option,
-      final String name, final String valueStr, final Object defaultValue) {
+  private void printOptionInfos(
+      final AnnotatedElement element,
+      final String name,
+      final String valueStr,
+      final Object defaultValue) {
 
-    // create optionInfo for file
-    final StringBuilder optionInfo =
-        new StringBuilder(OptionCollector.formatText(option.description()));
+    final StringBuilder optionInfo = new StringBuilder();
+    optionInfo.append(OptionCollector.getOptionDescription(element));
     optionInfo.append(name + "\n");
-    if (type.isArray()) {
-      optionInfo.append("    default value:  "
-          + java.util.Arrays.deepToString((Object[]) defaultValue) + "\n");
-    } else if (type.equals(String.class)) {
-      optionInfo.append("    default value:  '" + defaultValue + "'\n");
-    } else {
-      optionInfo.append("    default value:  " + defaultValue + "\n");
+
+    if (defaultValue != null) {
+      String defaultStr;
+
+      if (defaultValue instanceof Object[]) {
+        defaultStr = Arrays.deepToString((Object[]) defaultValue);
+      } else {
+        defaultStr = defaultValue.toString();
+      }
+
+      optionInfo.append("    default value:  ").append(defaultStr).append("\n");
     }
+
     if (valueStr != null) {
       optionInfo.append("--> used value:     " + valueStr + "\n");
     }
