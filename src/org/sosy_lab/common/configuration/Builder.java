@@ -25,7 +25,6 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharSource;
 
-import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
@@ -160,10 +159,9 @@ public class Builder implements ConfigurationBuilder {
     Preconditions.checkNotNull(basePath);
     setupProperties();
 
-    final Pair<Map<String, String>, Map<String, Path>> content =
-        Parser.parse(source, basePath, sourceName);
-    properties.putAll(content.getFirst());
-    sources.putAll(content.getSecond());
+    final Parser parser = Parser.parse(source, basePath, sourceName);
+    properties.putAll(parser.getOptions());
+    sources.putAll(parser.getSources());
 
     return this;
   }
@@ -218,9 +216,9 @@ public class Builder implements ConfigurationBuilder {
 
     setupProperties();
 
-    final Pair<Map<String, String>, Map<String, Path>> content = Parser.parse(file, "");
-    properties.putAll(content.getFirst());
-    sources.putAll(content.getSecond());
+    final Parser parser = Parser.parse(file, "");
+    properties.putAll(parser.getOptions());
+    sources.putAll(parser.getSources());
 
     return this;
   }

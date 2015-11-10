@@ -52,7 +52,7 @@ public class ParserTest {
   }
 
   private Map<String, String> test(String content) throws IOException, InvalidConfigurationException {
-    return Parser.parse(CharSource.wrap(content), basePath, "test").getFirst();
+    return Parser.parse(CharSource.wrap(content), basePath, "test").getOptions();
   }
 
   private void testEmpty(String content) {
