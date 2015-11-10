@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
@@ -33,13 +34,14 @@ import org.sosy_lab.common.io.Paths;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -97,6 +99,9 @@ class Parser {
   private final Map<String, String> options = new HashMap<>();
   private final Map<String, Path> sources = new HashMap<>();
 
+  // inclusion stack for finding circular includes
+  private final Deque<String> includeStack = new ArrayDeque<>();
+
   private Parser() {}
 
   /**
@@ -122,24 +127,27 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
+  @CheckReturnValue
   static Parser parse(Path file, @Nullable String basePath)
       throws IOException, InvalidConfigurationException {
 
-    return Parser.parse(file, basePath, Collections.<String>emptySet());
+    Parser parser = new Parser();
+    parser.parse0(file, basePath);
+    verify(parser.includeStack.isEmpty());
+    return parser;
   }
 
   /**
    * Parse a configuration file with the format as defined above.
    *
+   * @param file The file to parse.
    * @param basePath If filename is relative, use this as parent path
    * (if null or empty, the current working directory is used).
-   * @param file The file to parse.
-   * @param includeStack A set of all files present in the current stack of #include directives.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private static Parser parse(Path file, @Nullable String basePath, Set<String> includeStack)
-          throws IOException, InvalidConfigurationException {
+  private void parse0(Path file, @Nullable String basePath)
+      throws IOException, InvalidConfigurationException {
 
     if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
       file = Paths.get(basePath, file.getPath());
@@ -147,18 +155,17 @@ class Parser {
 
     Files.checkReadableFile(file);
 
-    includeStack = new HashSet<>(includeStack);
-    boolean newFile = includeStack.add(file.toAbsolutePath().getPath());
-    if (!newFile) {
+    String fileName = file.toAbsolutePath().getPath();
+    if (includeStack.contains(fileName)) {
       throw new InvalidConfigurationFileException(
           "Circular inclusion of file " + file.toAbsolutePath());
     }
+    includeStack.addLast(fileName);
 
-    Parser parser = new Parser();
     try (BufferedReader r = file.asCharSource(StandardCharsets.UTF_8).openBufferedStream()) {
-      parser.parse(r, file.getParent().getPath(), file.getPath(), includeStack);
+      parse(r, file.getParent().getPath(), file.getPath());
     }
-    return parser;
+    includeStack.removeLast();
   }
 
   /**
@@ -176,13 +183,15 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
+  @CheckReturnValue
   static Parser parse(CharSource source, @Nullable String basePath, String sourceName)
-          throws IOException, InvalidConfigurationException {
+      throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
     try (BufferedReader r = source.openBufferedStream()) {
-      parser.parse(r, basePath, sourceName, Collections.<String>emptySet());
+      parser.parse(r, basePath, sourceName);
     }
+    verify(parser.includeStack.isEmpty());
     return parser;
   }
 
@@ -198,14 +207,13 @@ class Parser {
    * (if null or empty, the current working directory is used).
    * @param source A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
-   * @param includeStack A set of all files present in the current stack of #include directives.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @SuppressFBWarnings(value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
       justification = "performance irrelevant compared to I/O, String much more convenient")
-  private void parse(BufferedReader r, @Nullable String basePath,
-      String source, Set<String> includeStack) throws IOException, InvalidConfigurationException {
+  private void parse(BufferedReader r, @Nullable String basePath, String source)
+      throws IOException, InvalidConfigurationException {
     checkNotNull(source);
 
     String line;
@@ -247,9 +255,8 @@ class Parser {
               "Include without filename", lineno, source, fullLine);
         }
 
-        final Parser includedContent = Parser.parse(Paths.get(line), basePath, includeStack);
-        options.putAll(includedContent.getOptions());
-        sources.putAll(includedContent.getSources());
+        // parse included file (content will be in fields of this class)
+        parse0(Paths.get(line), basePath);
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {
