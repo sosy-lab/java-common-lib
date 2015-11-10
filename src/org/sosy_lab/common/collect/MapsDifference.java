@@ -21,13 +21,10 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.MoreObjects;
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Optional;
 
 import java.util.Collection;
-import java.util.Objects;
-
-import javax.annotation.Nullable;
 
 /**
  * Utilities for handling differences between maps.
@@ -131,83 +128,39 @@ public class MapsDifference {
    * @param <K> The type of the key.
    * @param <V> The type of the values.
    */
-  public static final class Entry<K, V> {
+  @AutoValue
+  public static abstract class Entry<K, V> {
 
-    private final K key;
-    private final @Nullable V leftValue;
-    private final @Nullable V rightValue;
-
-    private Entry(K pKey, V pLeftValue, V pRightValue) {
-      key = checkNotNull(pKey);
-      leftValue = pLeftValue;
-      rightValue = pRightValue;
-    }
+    Entry() {}
 
     public static <K, V> Entry<K, V> forLeftValueOnly(K pKey, V pLeftValue) {
-      return new Entry<>(pKey, checkNotNull(pLeftValue), null);
+      return new AutoValue_MapsDifference_Entry<>(
+          pKey, Optional.of(pLeftValue), Optional.<V>absent());
     }
 
     public static <K, V> Entry<K, V> forRightValueOnly(K pKey, V pRightValue) {
-      return new Entry<>(pKey, null, checkNotNull(pRightValue));
+      return new AutoValue_MapsDifference_Entry<>(
+          pKey, Optional.<V>absent(), Optional.of(pRightValue));
     }
 
     public static <K, V> Entry<K, V> forDifferingValues(K pKey, V pLeftValue, V pRightValue) {
-      return new Entry<>(pKey, checkNotNull(pLeftValue), checkNotNull(pRightValue));
+      return new AutoValue_MapsDifference_Entry<>(
+          pKey, Optional.of(pLeftValue), Optional.of(pRightValue));
     }
 
     /**
      * Returns the map key.
      */
-    public K getKey() {
-      return key;
-    }
+    public abstract K getKey();
 
     /**
      * Returns the left value, if present.
      */
-    public Optional<V> getLeftValue() {
-      return Optional.fromNullable(leftValue);
-    }
+    public abstract Optional<V> getLeftValue();
 
     /**
      * Returns the right value, if present.
      */
-    public Optional<V> getRightValue() {
-      return Optional.fromNullable(rightValue);
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + key.hashCode();
-      result = prime * result + Objects.hashCode(leftValue);
-      result = prime * result + Objects.hashCode(rightValue);
-      return result;
-    }
-
-    @Override
-    public boolean equals(@Nullable Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof Entry<?, ?>)) {
-        return false;
-      }
-      Entry<?, ?> other = (Entry<?, ?>) obj;
-      return key.equals(other.key)
-          && Objects.equals(leftValue, other.leftValue)
-          && Objects.equals(rightValue, other.rightValue);
-    }
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this)
-          .omitNullValues()
-          .add("key", key)
-          .add("value1", leftValue)
-          .add("value2", rightValue)
-          .toString();
-    }
+    public abstract Optional<V> getRightValue();
   }
 }

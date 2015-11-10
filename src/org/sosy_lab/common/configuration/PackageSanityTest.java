@@ -19,23 +19,17 @@
  */
 package org.sosy_lab.common.configuration;
 
-import com.google.common.base.Predicate;
 import com.google.common.io.CharSource;
 import com.google.common.testing.AbstractPackageSanityTests;
 
+import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.Paths;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
-    ignoreClasses(
-        new Predicate<Class<?>>() {
-          @Override
-          public boolean apply(Class<?> pInput) {
-            return pInput.getSimpleName().startsWith("AutoValue_");
-          }
-        });
+    ignoreClasses(Classes.IS_GENERATED);
 
     setDefault(String[].class, new String[]{"test"});
     setDefault(Path.class, Paths.get("test"));
