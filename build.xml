@@ -21,7 +21,7 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-service.jar build/auto-common.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-service.jar build/auto-value.jar build/auto-common.jar build/error_prone_annotations.jar"/>
     </path>
 
 
@@ -29,11 +29,11 @@
 
     <target name="clean" description="Clean">
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar"/>
+            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ${source.generated.dir}/**"/>
         </delete>
     </target>
 
-    <target name="build" depends="build-project, build-documentation" description="Build"/>
+    <target name="build" depends="-warn-factorypath, build-project, build-documentation" description="Build"/>
 
     <target name="dist" depends="jar, sources" description="Make a distributable release"/>
 
@@ -47,6 +47,13 @@
     <target name="init" depends="determine-version">
         <echo message="Building ${ant.project.name} ${version}"/>
         <mkdir dir="${class.dir}"/>
+        <mkdir dir="${source.generated.dir}"/>
+    </target>
+
+    <available file=".factorypath" property="factorypath.present"/>
+    <target name="-warn-factorypath" unless="factorypath.present">
+        <echo level="warning">If you use Eclipse, please copy .factorypath.template to .factorypath and (if necessary) adjust the path to your project directory in it.</echo>
+        <echo level="warning">Otherwise you won't be able to compile the project with Eclipse.</echo>
     </target>
 
     <target name="build-dependencies" depends="init, resolve-dependencies"/>
