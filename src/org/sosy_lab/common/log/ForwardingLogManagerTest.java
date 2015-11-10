@@ -45,12 +45,12 @@ public class ForwardingLogManagerTest {
 
                   @Override
                   public LogManager withComponentName(String pName) {
-                    return delegate().withComponentName(pName);
+                    return pInput.withComponentName(pName);
                   }
 
                   @Override
                   public String toString() {
-                    return delegate().toString();
+                    return pInput.toString();
                   }
                 };
               }
