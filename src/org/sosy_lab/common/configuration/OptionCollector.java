@@ -78,15 +78,17 @@ public class OptionCollector {
       }
     }
 
-    System.out.println(getCollectedOptions(verbose));
+    collectOptions(verbose, System.out);
   }
 
-  /** This function collect options from all classes
-   * and return a formatted String.
+  /** This function collects options from all classes and outputs them.
+   * Error message are written to System.err.
    *
-   * @param verbose short or long output? */
-  public static String getCollectedOptions(final boolean verbose) {
-    return new OptionCollector(verbose).getCollectedOptions();
+   * @param verbose short or long output?
+   * @param out the output target
+   */
+  public static void collectOptions(final boolean verbose, final PrintStream out) {
+    new OptionCollector(verbose).collectOptions(out);
   }
 
   private final Set<String> errorMessages = new LinkedHashSet<>();
@@ -107,7 +109,7 @@ public class OptionCollector {
   /**
    * @param pVerbose short or long output?
    */
-  public OptionCollector(boolean pVerbose) {
+  private OptionCollector(boolean pVerbose) {
     verbose = pVerbose;
   }
 
@@ -115,7 +117,7 @@ public class OptionCollector {
    * This function collects options from all classes
    * and returns a formatted String.
    */
-  public String getCollectedOptions() {
+  private void collectOptions(final PrintStream out) {
     // redirect stdout to stderr so that error messages that are printed
     // when classes are loaded appear in stderr
     PrintStream originalStdOut = System.out;
@@ -139,13 +141,11 @@ public class OptionCollector {
       System.err.println(error);
     }
 
-    final StringBuilder content = new StringBuilder();
-
     // add options of this library
     if (appendCommonOptions) {
       try {
         URL resource = Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt");
-        content.append(Resources.toString(resource, StandardCharsets.UTF_8));
+        out.append(Resources.toString(resource, StandardCharsets.UTF_8));
       } catch (Exception e) {
         System.err.println("Could not find options of org.sosy-lab.common classes: "
             + e.getMessage());
@@ -161,23 +161,21 @@ public class OptionCollector {
         String description = getOptionDescription(annotation.element());
         if (!description.isEmpty() && !lastDescription.equals(description)) {
           if (first) {
-            content.append("\n");
+            out.append("\n");
             first = false;
           }
-          content.append(description);
+          out.append(description);
           lastDescription = description;
         }
       }
       for (OptionInfo option : from(allInstances).filter(OptionInfo.class)) {
         String infoText = getOptionInfo(option);
         if (!lastInfo.equals(infoText)) {
-          content.append(infoText);
+          out.append(infoText);
           lastInfo = infoText;
         }
       }
     }
-
-    return content.toString();
   }
 
   /** This method tries to get Source-Path. This path is used
