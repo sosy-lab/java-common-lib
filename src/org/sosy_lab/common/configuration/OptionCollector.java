@@ -28,6 +28,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -133,7 +134,9 @@ public class OptionCollector {
     }
 
     for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
-      if (resourceInfo.getResourceName().contains("ConfigurationOptions.txt")) {
+      String resourceName = resourceInfo.getResourceName();
+      if (Files.getFileExtension(resourceName).equals("txt") &&
+          Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
         try {
           out.append(Resources.toString(resourceInfo.url(), StandardCharsets.UTF_8));
         } catch (IOException e) {
