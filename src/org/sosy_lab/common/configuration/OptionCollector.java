@@ -26,8 +26,6 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.Resources;
@@ -42,20 +40,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
@@ -123,33 +117,36 @@ public class OptionCollector {
     PrintStream originalStdOut = System.out;
     System.setOut(System.err);
 
-    boolean appendCommonOptions = true;
+    ClassPath classPath;
+    try {
+      classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
+    } catch (IOException e) {
+      errorMessages.add(
+          "INFO: Could not scan class path for getting Option annotations: " + e.getMessage());
+      return;
+    }
 
-    for (Class<?> c : getClasses()) {
+    for (Class<?> c : getClasses(classPath)) {
       if (c.isAnnotationPresent(Options.class)) {
         collectOptions(c);
       }
-      if (c.getPackage() != null && c.getPackage().getName().startsWith("org.sosy_lab.common")) {
-        appendCommonOptions = false;
+    }
+
+    for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
+      if (resourceInfo.getResourceName().contains("ConfigurationOptions.txt")) {
+        try {
+          out.append(Resources.toString(resourceInfo.url(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+          errorMessages.add("Could not find the required resource " +
+              resourceInfo.url());
+        }
       }
     }
 
-    // reset stdout redirection
     System.setOut(originalStdOut);
 
     for (String error : errorMessages) {
       System.err.println(error);
-    }
-
-    // add options of this library
-    if (appendCommonOptions) {
-      try {
-        URL resource = Resources.getResource("org/sosy_lab/common/ConfigurationOptions.txt");
-        out.append(Resources.toString(resource, StandardCharsets.UTF_8));
-      } catch (Exception e) {
-        System.err.println("Could not find options of org.sosy-lab.common classes: "
-            + e.getMessage());
-      }
     }
 
     // Dump all options, avoiding repeated information.
@@ -209,21 +206,6 @@ public class OptionCollector {
     }
 
     return "";
-  }
-
-  /** This function returns the contextClassLoader-Resources. */
-  @Nullable
-  private static Iterator<URL> getClassLoaderResources() {
-    final ClassLoader classLoader =
-        Thread.currentThread().getContextClassLoader();
-    assert classLoader != null;
-
-    try {
-      return Iterators.forEnumeration(classLoader.getResources(""));
-    } catch (IOException e) {
-      System.err.println("Could not get recources of classloader.");
-    }
-    return Collections.emptyIterator();
   }
 
   /** This method collects every {@link Option} of a class.
@@ -680,15 +662,7 @@ public class OptionCollector {
    * and interfaces.
    * @return list of classes
    */
-  private List<Class<?>> getClasses() {
-    final ClassPath classPath;
-    try {
-      classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
-    } catch (IOException e) {
-      errorMessages.add(
-          "INFO: Could not scan class path for getting Option annotations: " + e.getMessage());
-      return ImmutableList.of();
-    }
+  private List<Class<?>> getClasses(ClassPath classPath) {
 
     final List<Class<?>> classes = new ArrayList<>();
 
