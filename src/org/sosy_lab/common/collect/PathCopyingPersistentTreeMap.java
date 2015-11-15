@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
@@ -242,7 +241,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   @Nullable
   private static <K extends Comparable<? super K>, V> Node<K, V> findNode(
       K key, Node<K, V> root) {
-    Preconditions.checkNotNull(key);
+    checkNotNull(key);
 
     Node<K, V> current = root;
     while (current != null) {
@@ -309,7 +308,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    */
   private static @Nullable <K extends Comparable<? super K>, V> Node<K, V>
       findNextGreaterOrEqualNode(K key, Node<K, V> root) {
-    Preconditions.checkNotNull(key);
+    checkNotNull(key);
 
     Node<K, V> result = null; // this is always greater than or equal to key
 
@@ -360,7 +359,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    */
   private static @Nullable <K extends Comparable<? super K>, V> Node<K, V>
       findNextStrictlySmallerNode(K key, Node<K, V> root) {
-    Preconditions.checkNotNull(key);
+    checkNotNull(key);
 
     Node<K, V> result = null; // this is always smaller than key
 

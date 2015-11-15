@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.common.configuration;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
@@ -64,8 +67,8 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder setOption(String name, String value) {
-    Preconditions.checkNotNull(name);
-    Preconditions.checkNotNull(value);
+    checkNotNull(name);
+    checkNotNull(value);
     setupProperties();
 
     properties.put(name, value);
@@ -79,7 +82,7 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder clearOption(String name) {
-    Preconditions.checkNotNull(name);
+    checkNotNull(name);
     setupProperties();
 
     properties.remove(name);
@@ -93,7 +96,7 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder setOptions(Map<String, String> options) {
-    Preconditions.checkNotNull(options);
+    checkNotNull(options);
     setupProperties();
 
     properties.putAll(options);
@@ -109,7 +112,7 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder setPrefix(String newPrefix) {
-    Preconditions.checkNotNull(newPrefix);
+    checkNotNull(newPrefix);
 
     this.prefix = newPrefix;
 
@@ -121,11 +124,11 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
-    Preconditions.checkNotNull(sourceConfig);
-    Preconditions.checkState(this.properties == null);
-    Preconditions.checkState(this.sources == null);
-    Preconditions.checkState(this.oldConfig == null);
-    Preconditions.checkState(this.converters == null);
+    checkNotNull(sourceConfig);
+    checkState(this.properties == null);
+    checkState(this.sources == null);
+    checkState(this.oldConfig == null);
+    checkState(this.converters == null);
 
     this.oldConfig = sourceConfig;
 
@@ -138,9 +141,9 @@ public class Builder implements ConfigurationBuilder {
   @Override
   public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option)
       throws IllegalArgumentException {
-    Preconditions.checkNotNull(sourceConfig);
-    Preconditions.checkNotNull(option);
-    Preconditions.checkArgument(sourceConfig.properties.containsKey(option));
+    checkNotNull(sourceConfig);
+    checkNotNull(option);
+    checkArgument(sourceConfig.properties.containsKey(option));
     setupProperties();
 
     properties.put(option, sourceConfig.properties.get(option));
@@ -155,8 +158,8 @@ public class Builder implements ConfigurationBuilder {
   @Override
   public ConfigurationBuilder loadFromSource(CharSource source, String basePath,
       String sourceName) throws IOException, InvalidConfigurationException {
-    Preconditions.checkNotNull(source);
-    Preconditions.checkNotNull(basePath);
+    checkNotNull(source);
+    checkNotNull(basePath);
     setupProperties();
 
     final Parser parser = Parser.parse(source, basePath, sourceName);
@@ -173,8 +176,8 @@ public class Builder implements ConfigurationBuilder {
   @Override
   public ConfigurationBuilder loadFromStream(InputStream stream, String basePath,
       String sourceName) throws IOException, InvalidConfigurationException {
-    Preconditions.checkNotNull(stream);
-    Preconditions.checkNotNull(basePath);
+    checkNotNull(stream);
+    checkNotNull(basePath);
 
     byte[] rawContent = ByteStreams.toByteArray(stream);
     CharSource source = ByteSource.wrap(rawContent)
@@ -208,7 +211,7 @@ public class Builder implements ConfigurationBuilder {
   @Override
   public ConfigurationBuilder loadFromFile(Path file)
       throws IOException, InvalidConfigurationException {
-    Preconditions.checkNotNull(file);
+    checkNotNull(file);
 
     if (!file.exists()) {
       throw new IOException("The file does not exist.");
@@ -228,8 +231,8 @@ public class Builder implements ConfigurationBuilder {
    */
   @Override
   public ConfigurationBuilder addConverter(Class<?> cls, TypeConverter converter) {
-    Preconditions.checkNotNull(cls);
-    Preconditions.checkNotNull(converter);
+    checkNotNull(cls);
+    checkNotNull(converter);
 
     if (converters == null) {
       converters = Configuration.createConverterMap();

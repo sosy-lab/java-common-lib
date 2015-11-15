@@ -1,8 +1,7 @@
 package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
 
 import javax.annotation.Nullable;
 
@@ -55,7 +54,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   private ExtendedRational(NumberType pType) {
-    Preconditions.checkState(pType != NumberType.RATIONAL);
+    checkState(pType != NumberType.RATIONAL);
     numberType = pType;
     rational = null;
   }

@@ -27,7 +27,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -441,9 +440,9 @@ public final class Configuration {
    * @param cls The static class type of the object to inject.
    */
   public void inject(Object obj, Class<?> cls) throws InvalidConfigurationException {
-    Preconditions.checkNotNull(obj);
-    Preconditions.checkNotNull(cls);
-    Preconditions.checkArgument(cls.isAssignableFrom(obj.getClass()));
+    checkNotNull(obj);
+    checkNotNull(cls);
+    checkArgument(cls.isAssignableFrom(obj.getClass()));
 
     final Options options = cls.getAnnotation(Options.class);
     checkArgument(
