@@ -34,7 +34,9 @@ import javax.annotation.Nullable;
 
 /**
  * This interface provides operations on a file path.
- * It mimics the behavior of {@link java.nio.file.Path}.
+ * It mimics the behavior of {@link java.nio.file.Path}
+ * but is usable on platforms where the latter is not available.
+ * For creating Path instances, use {@link Paths}.
  * To reads and writes it provides access via the following interfaces:
  * - {@link com.google.common.io.CharSource}
  * - {@link com.google.common.io.CharSink}

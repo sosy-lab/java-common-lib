@@ -38,6 +38,9 @@ import javax.annotation.Nullable;
 /**
  * This class provides operations on a file path by backing the path
  * with the {@link java.io.File} implementation.
+ *
+ * Do not access this class directly, use the {@link Path} interface
+ * and the {@link Paths} factory.
  */
 public class FileSystemPath implements Path {
 
@@ -51,7 +54,7 @@ public class FileSystemPath implements Path {
    * If null the empty string will be used.
    * @param more Additional path strings to use when creating the Path object.
    */
-  public FileSystemPath(@Nullable String path, @Nullable String... more) {
+  protected FileSystemPath(@Nullable String path, @Nullable String... more) {
     /*
      * new File() will throw a NullPointerException if the path is null.
      * Therefore use the empty path instead to prevent nasty exceptions.
