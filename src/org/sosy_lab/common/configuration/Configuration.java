@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -416,8 +417,10 @@ public final class Configuration {
    */
   public void recursiveInject(Object obj) throws InvalidConfigurationException {
     Class<?> cls = obj.getClass();
-    Preconditions.checkNotNull(cls.getAnnotation(Options.class), "Class "
-        + cls.getName() + " must have @Options annotation.");
+    checkArgument(
+        cls.isAnnotationPresent(Options.class),
+        "Class %s must have @Options annotation.",
+        cls.getName());
 
     do {
       if (cls.isAnnotationPresent(Options.class)) {
@@ -443,9 +446,11 @@ public final class Configuration {
     Preconditions.checkArgument(cls.isAssignableFrom(obj.getClass()));
 
     final Options options = cls.getAnnotation(Options.class);
-    Preconditions.checkNotNull(options, "Class " + cls.getName()
-        + " must have @Options annotation.  If you used inject(Object), try"
-        + " inject(Object, Class) instead.");
+    checkArgument(
+        options != null,
+        "Class %s must have @Options annotation. "
+            + "If you used inject(Object), try inject(Object, Class) instead.",
+        cls.getName());
 
     /*
      * Get all injectable members and override their final & private modifiers.
