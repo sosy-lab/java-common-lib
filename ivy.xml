@@ -86,7 +86,7 @@
         <dependency org="com.google.google-java-format" name="google-java-format" rev="0.1-SNAPSHOT-104-g79b7f0f" conf="build->runtime"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.6" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.17.0" conf="checkstyle->default"/>
 
         <!-- FindBugs -->
         <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>

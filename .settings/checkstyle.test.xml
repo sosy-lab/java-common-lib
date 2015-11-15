@@ -140,12 +140,12 @@
       <property name="tokens" value="ARRAY_INIT"/>
     </module>
     <module name="AvoidStarImport"/>
-    <module name="AvoidDefaultSerializableInInnerClasses"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClasses"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBoolean"/>
-    <module name="ForbidReturnInFinallyBlockCheck"/>
-    <module name="ReturnNullInsteadOfBoolean"/>
-    <module name="ReturnBooleanFromTernary"/>
-    <module name="NoNullForCollectionReturnCheck">
+    <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinallyBlockCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBoolean"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnBooleanFromTernary"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.NoNullForCollectionReturnCheck">
       <property name="searchThroughMethodBody" value="true"/>
     </module>
     <module name="com.github.sevntu.checkstyle.checks.design.NoMainMethodInAbstractClass"/>
@@ -157,15 +157,15 @@
     </module>
     <module name="CommentsIndentation"/>
     <module name="OneTopLevelClass"/>
-    <module name="ForbidThrowAnonymousExceptionsCheck"/>
-    <module name="MapIterationInForEachLoop">
+    <module name="com.github.sevntu.checkstyle.checks.coding.ForbidThrowAnonymousExceptionsCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.MapIterationInForEachLoop">
       <property name="proposeKeySetUsage" value="true"/>
       <property name="proposeEntrySetUsage" value="true"/>
     </module>
-    <module name="UselessSingleCatchCheck"/>
-    <module name="UselessSuperCtorCallCheck"/>
-    <module name="AvoidConditionInversionCheck"/>
-    <module name="PublicReferenceToPrivateTypeCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.UselessSingleCatchCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.UselessSuperCtorCallCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
   </module>
   <module name="Header">
     <property name="severity" value="ignore"/>

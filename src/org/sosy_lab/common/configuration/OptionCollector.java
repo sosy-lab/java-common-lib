@@ -140,8 +140,8 @@ public class OptionCollector {
         try {
           out.append(Resources.toString(resourceInfo.url(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-          errorMessages.add("Could not find the required resource " +
-              resourceInfo.url());
+          errorMessages.add("Could not find the required resource "
+              + resourceInfo.url());
         }
       }
     }
