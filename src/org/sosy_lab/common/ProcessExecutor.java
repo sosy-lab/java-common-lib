@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
@@ -123,11 +123,11 @@ public class ProcessExecutor<E extends Exception> {
    */
   public ProcessExecutor(final LogManager logger, Class<E> exceptionClass,
       Map<String, String> environmentOverride, String... cmd) throws IOException {
-    Preconditions.checkNotNull(cmd);
-    Preconditions.checkArgument(cmd.length > 0);
+    checkNotNull(cmd);
+    checkArgument(cmd.length > 0);
 
-    this.logger = Preconditions.checkNotNull(logger);
-    this.exceptionClass = Preconditions.checkNotNull(exceptionClass);
+    this.logger = checkNotNull(logger);
+    this.exceptionClass = checkNotNull(exceptionClass);
     this.name = cmd[0];
 
     logger.log(Level.FINEST, "Executing", name);

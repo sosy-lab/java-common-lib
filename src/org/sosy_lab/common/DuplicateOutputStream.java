@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.common;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.io.ByteStreams;
 
 import java.io.IOException;
@@ -39,8 +40,8 @@ public class DuplicateOutputStream extends OutputStream {
   private final OutputStream stream2;
 
   public DuplicateOutputStream(OutputStream pStream1, OutputStream pStream2) {
-    stream1 = Preconditions.checkNotNull(pStream1);
-    stream2 = Preconditions.checkNotNull(pStream2);
+    stream1 = checkNotNull(pStream1);
+    stream2 = checkNotNull(pStream2);
   }
 
   /**
