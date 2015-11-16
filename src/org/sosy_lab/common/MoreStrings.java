@@ -28,7 +28,7 @@ import javax.annotation.CheckReturnValue;
  * similar to {@link com.google.common.base.Strings}.
  */
 public final class MoreStrings {
-  private MoreStrings() { }
+  private MoreStrings() {}
 
   /**
    * Check whether a string starts with a given prefix
@@ -62,11 +62,11 @@ public final class MoreStrings {
   public static Object longStringOf(final WithLongString obj) {
     checkNotNull(obj);
     return new Object() {
-        @Override
-        public String toString() {
-          return checkNotNull(obj.toLongString());
-        }
-      };
+      @Override
+      public String toString() {
+        return checkNotNull(obj.toLongString());
+      }
+    };
   }
 
   /**
@@ -85,5 +85,4 @@ public final class MoreStrings {
     @CheckReturnValue
     String toLongString();
   }
-
 }

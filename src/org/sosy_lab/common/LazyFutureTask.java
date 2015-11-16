@@ -52,8 +52,10 @@ public class LazyFutureTask<V> extends FutureTask<V> {
     super(pCallable);
   }
 
-  @SuppressFBWarnings(value = "NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION",
-      justification = "bogus warning because JDK class does not has @Nullable annotations")
+  @SuppressFBWarnings(
+    value = "NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION",
+    justification = "bogus warning because JDK class does not has @Nullable annotations"
+  )
   public LazyFutureTask(Runnable pRunnable, @Nullable V pResult) {
     super(pRunnable, pResult);
   }

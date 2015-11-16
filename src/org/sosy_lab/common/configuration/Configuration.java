@@ -81,7 +81,6 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-
 /**
  * Immutable wrapper around a {@link Properties} instance, providing some
  * useful access helper methods.
@@ -150,9 +149,12 @@ public final class Configuration {
    * Creates a configuration with all values set to default.
    */
   public static Configuration defaultConfiguration() {
-    return new Configuration(ImmutableMap.<String, String>of(),
-        ImmutableMap.<String, Path>of(), "",
-        ImmutableMap.copyOf(DEFAULT_CONVERTERS), new HashSet<String>(0),
+    return new Configuration(
+        ImmutableMap.<String, String>of(),
+        ImmutableMap.<String, Path>of(),
+        "",
+        ImmutableMap.copyOf(DEFAULT_CONVERTERS),
+        new HashSet<String>(0),
         new HashSet<String>(0),
         null);
   }
@@ -161,10 +163,15 @@ public final class Configuration {
    * Creates a copy of a configuration with just the prefix set to a new value.
    */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
-    Configuration newConfig = new Configuration(oldConfig.properties,
-        oldConfig.sources, newPrefix,
-        oldConfig.converters, oldConfig.unusedProperties, oldConfig.deprecatedProperties,
-        oldConfig.logger);
+    Configuration newConfig =
+        new Configuration(
+            oldConfig.properties,
+            oldConfig.sources,
+            newPrefix,
+            oldConfig.converters,
+            oldConfig.unusedProperties,
+            oldConfig.deprecatedProperties,
+            oldConfig.logger);
 
     // instead of calling inject() set options manually
     // this avoids the "throws InvalidConfigurationException" in the signature
@@ -173,8 +180,7 @@ public final class Configuration {
     return newConfig;
   }
 
-  @Option (name="log.usedOptions.export",
-      description="all used options are printed")
+  @Option(name = "log.usedOptions.export", description = "all used options are printed")
   private boolean exportUsedOptions = false;
 
   /** Splitter to create string arrays. */
@@ -182,24 +188,25 @@ public final class Configuration {
 
   /** Map that stores which implementation we use for the collection classes. */
   static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
+
   static {
     ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder =
         ImmutableMap.builder();
 
-    putSafely(builder, EnumSet.class,    EnumSet.class); // Caution: needs special casing
+    putSafely(builder, EnumSet.class, EnumSet.class); // Caution: needs special casing
 
-    putSafely(builder, Iterable.class,   ImmutableList.class);
+    putSafely(builder, Iterable.class, ImmutableList.class);
     putSafely(builder, Collection.class, ImmutableList.class);
-    putSafely(builder, List.class,       ImmutableList.class);
-    putSafely(builder, Set.class,        ImmutableSet.class);
-    putSafely(builder, SortedSet.class,  ImmutableSortedSet.class);
-    putSafely(builder, Multiset.class,   ImmutableMultiset.class);
+    putSafely(builder, List.class, ImmutableList.class);
+    putSafely(builder, Set.class, ImmutableSet.class);
+    putSafely(builder, SortedSet.class, ImmutableSortedSet.class);
+    putSafely(builder, Multiset.class, ImmutableMultiset.class);
 
     putSafely(builder, ImmutableCollection.class, ImmutableList.class);
-    putSafely(builder, ImmutableList.class,       ImmutableList.class);
-    putSafely(builder, ImmutableSet.class,        ImmutableSet.class);
-    putSafely(builder, ImmutableSortedSet.class,  ImmutableSortedSet.class);
-    putSafely(builder, ImmutableMultiset.class,   ImmutableMultiset.class);
+    putSafely(builder, ImmutableList.class, ImmutableList.class);
+    putSafely(builder, ImmutableSet.class, ImmutableSet.class);
+    putSafely(builder, ImmutableSortedSet.class, ImmutableSortedSet.class);
+    putSafely(builder, ImmutableMultiset.class, ImmutableMultiset.class);
 
     COLLECTIONS = builder.build();
   }
@@ -208,16 +215,17 @@ public final class Configuration {
   // each implementation really implements the interface
   private static <T extends Iterable<?>> void putSafely(
       ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder,
-      Class<T> iface, Class<? extends T> impl) {
+      Class<T> iface,
+      Class<? extends T> impl) {
     assert !impl.isInterface();
     builder.put(iface, impl);
   }
-
 
   // Mutable static state on purpose here!
   // See below for explanation.
   static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS =
       Collections.synchronizedMap(createConverterMap());
+
   static {
     DEFAULT_CONVERTERS.put(Class.class, new ClassTypeConverter());
     DEFAULT_CONVERTERS.put(IntegerOption.class, new IntegerTypeConverter());
@@ -251,26 +259,27 @@ public final class Configuration {
    * @return A new map.
    */
   static Map<Class<?>, TypeConverter> createConverterMap() {
-    return MapConstraints.constrainedMap(new HashMap<Class<?>, TypeConverter>(),
+    return MapConstraints.constrainedMap(
+        new HashMap<Class<?>, TypeConverter>(),
         new MapConstraint<Class<?>, TypeConverter>() {
 
           @Override
           public void checkKeyValue(@Nonnull Class<?> cls, @Nonnull TypeConverter pValue) {
             checkNotNull(cls);
             checkNotNull(pValue);
-            if (cls.isAnnotation()
-                && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
-              throw new IllegalArgumentException("Can register type converters"
-                  + " only for annotations which are option detail annotations");
+            if (cls.isAnnotation() && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
+              throw new IllegalArgumentException(
+                  "Can register type converters"
+                      + " only for annotations which are option detail annotations");
             }
           }
+
           @Override
           public String toString() {
             return "valid type converter registration";
           }
         });
   }
-
 
   final ImmutableMap<String, String> properties;
   final ImmutableMap<String, Path> sources;
@@ -294,11 +303,13 @@ public final class Configuration {
    * the caller needs to make sure to set the values or inject them.
    */
   @SuppressWarnings("options")
-  Configuration(ImmutableMap<String, String> pProperties,
+  Configuration(
+      ImmutableMap<String, String> pProperties,
       ImmutableMap<String, Path> pSources,
       String pPrefix,
       ImmutableMap<Class<?>, TypeConverter> pConverters,
-      Set<String> pUnusedProperties, Set<String> pDeprecatedProperties,
+      Set<String> pUnusedProperties,
+      Set<String> pDeprecatedProperties,
       @Nullable LogManager pLogger) {
 
     checkNotNull(pProperties);
@@ -349,8 +360,7 @@ public final class Configuration {
    */
   public boolean hasProperty(String key) {
     checkNotNull(key);
-    return properties.containsKey(prefix + key)
-        || properties.containsKey(key);
+    return properties.containsKey(prefix + key) || properties.containsKey(key);
   }
 
   public Set<String> getUnusedProperties() {
@@ -494,16 +504,18 @@ public final class Configuration {
    * @param obj the object to be injected
    * @param field the field of the value to be injected
    * @param options options-annotation of the class of the object */
-  private <T> void setOptionValueForField(final Object obj, final Field field,
-      final Options options) throws InvalidConfigurationException, IllegalAccessException {
+  private <T> void setOptionValueForField(
+      final Object obj, final Field field, final Options options)
+      throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of field
     if (Modifier.isStatic(field.getModifiers())) {
       throw new UnsupportedOperationException("@Option is not allowed on static members");
     }
     if (Modifier.isFinal(field.getModifiers())) {
-      throw new UnsupportedOperationException("@Option is not allowed on final fields"
-          + " because Java doesn't guarantee visibility of new value");
+      throw new UnsupportedOperationException(
+          "@Option is not allowed on final fields"
+              + " because Java doesn't guarantee visibility of new value");
     }
 
     // try to read default value
@@ -525,20 +537,33 @@ public final class Configuration {
     // get value
     final Option option = field.getAnnotation(Option.class);
     final String name = getOptionName(options, field, option);
-    final Object value = getValue(
-        options, field, typedDefaultValue, type, genericType, option, field);
+    final Object value =
+        getValue(options, field, typedDefaultValue, type, genericType, option, field);
 
     // options which were not changed need not to be set
     if (value == defaultValue) {
-      logger.log(Level.CONFIG, "Option:", name,
-          "Class:", field.getDeclaringClass().getName(),
-          "field:", field.getName(), "value: <DEFAULT>");
+      logger.log(
+          Level.CONFIG,
+          "Option:",
+          name,
+          "Class:",
+          field.getDeclaringClass().getName(),
+          "field:",
+          field.getName(),
+          "value: <DEFAULT>");
       return;
     }
 
-    logger.log(Level.CONFIG, "Option:", name,
-        "Class:", field.getDeclaringClass().getName(),
-        "field:", field.getName(), "value:", value);
+    logger.log(
+        Level.CONFIG,
+        "Option:",
+        name,
+        "Class:",
+        field.getDeclaringClass().getName(),
+        "field:",
+        field.getName(),
+        "value:",
+        value);
 
     // set value to field
     try {
@@ -555,16 +580,16 @@ public final class Configuration {
    * @param obj the object to be injected
    * @param method the method of the value to be injected
    * @param options options-annotation of the class of the object */
-  private void setOptionValueForMethod(final Object obj, final Method method,
-      final Options options) throws InvalidConfigurationException, IllegalAccessException {
+  private void setOptionValueForMethod(final Object obj, final Method method, final Options options)
+      throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of method
     if (Modifier.isStatic(method.getModifiers())) {
       throw new UnsupportedOperationException("@Option is not allowed on static members");
     }
 
-    String exception = Classes.verifyDeclaredExceptions(
-        method, InvalidConfigurationException.class);
+    String exception =
+        Classes.verifyDeclaredExceptions(method, InvalidConfigurationException.class);
     if (exception != null) {
       throw new UnsupportedOperationException("Method with @Option may not throw " + exception);
     }
@@ -583,9 +608,16 @@ public final class Configuration {
     final String name = getOptionName(options, method, option);
     final Object value = getValue(options, method, null, type, genericType, option, method);
 
-    logger.log(Level.CONFIG, "Option:", name,
-        "Class:", method.getDeclaringClass().getName(),
-        "method:", method.getName(), "value:", value);
+    logger.log(
+        Level.CONFIG,
+        "Option:",
+        name,
+        "Class:",
+        method.getDeclaringClass().getName(),
+        "method:",
+        method.getName(),
+        "value:",
+        value);
 
     // set value to field
     try {
@@ -600,9 +632,14 @@ public final class Configuration {
       if (t instanceof IllegalArgumentException) {
         // this is an expected exception if the value is wrong,
         // so create a nice message for the user
-        throw new InvalidConfigurationException("Invalid value in configuration file: \""
-            + name + " = " + value + '\"'
-            + (t.getMessage() != null ? " (" + t.getMessage() + ")" : ""), t);
+        throw new InvalidConfigurationException(
+            "Invalid value in configuration file: \""
+                + name
+                + " = "
+                + value
+                + '\"'
+                + (t.getMessage() != null ? " (" + t.getMessage() + ")" : ""),
+            t);
       }
 
       Throwables.propagateIfPossible(t, InvalidConfigurationException.class);
@@ -671,23 +708,27 @@ public final class Configuration {
     final Object value;
     if (!options.deprecatedPrefix().equals(NO_DEPRECATED_PREFIX)) {
       String optionDeprecatedName = getOptionName(options, method, option, true);
-      String deprecatedValueStr = getValueString(optionDeprecatedName, option,
-          type.isEnum());
+      String deprecatedValueStr = getValueString(optionDeprecatedName, option, type.isEnum());
       if (deprecatedValueStr != null && !deprecatedValueStr.equals(valueStr)) {
         if (valueStr == null) {
           valueStr = deprecatedValueStr;
-          logger.logf(Level.WARNING,
+          logger.logf(
+              Level.WARNING,
               "Using deprecated name for option '%s'%s, "
-              + "please update your config to use the option name '%s' instead.",
-              optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+                  + "please update your config to use the option name '%s' instead.",
+              optionDeprecatedName,
+              getOptionSourceForLogging(optionDeprecatedName),
               optionName);
         } else {
-          logger.logf(Level.WARNING,
+          logger.logf(
+              Level.WARNING,
               "Option '%s'%s is set to a different value "
-              + "than its deprecated previous name '%s'%s, "
-              + "using the value '%s' of the former and ignoring the latter.",
-              optionName, getOptionSourceForLogging(optionName),
-              optionDeprecatedName, getOptionSourceForLogging(optionDeprecatedName),
+                  + "than its deprecated previous name '%s'%s, "
+                  + "using the value '%s' of the former and ignoring the latter.",
+              optionName,
+              getOptionSourceForLogging(optionName),
+              optionDeprecatedName,
+              getOptionSourceForLogging(optionDeprecatedName),
               valueStr);
         }
       }
@@ -697,8 +738,10 @@ public final class Configuration {
       // option was specified
 
       if (secureMode && !option.secure()) {
-        throw new InvalidConfigurationException("Configuration option " + optionName
-            + " was specified, but is not allowed in secure mode.");
+        throw new InvalidConfigurationException(
+            "Configuration option "
+                + optionName
+                + " was specified, but is not allowed in secure mode.");
       }
 
       value = convertValue(optionName, valueStr, type, genericType, secondaryOption);
@@ -710,7 +753,7 @@ public final class Configuration {
     } else {
       if (option.required()) {
         throw new InvalidConfigurationException(
-          "Required configuration option " + optionName  + " is missing.");
+            "Required configuration option " + optionName + " is missing.");
       }
 
       value = convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
@@ -745,8 +788,9 @@ public final class Configuration {
    * @param alwaysUppercase how to write the value
    */
   @Nullable
-  private String getValueString(final String name, final Option option,
-      final boolean alwaysUppercase) throws InvalidConfigurationException {
+  private String getValueString(
+      final String name, final Option option, final boolean alwaysUppercase)
+      throws InvalidConfigurationException {
 
     // get value in String representation
     String valueStr = trimToNull(getProperty(name));
@@ -761,19 +805,28 @@ public final class Configuration {
 
     // check if it is included in the allowed values list
     final String[] allowedValues = option.values();
-    if (allowedValues.length > 0
-        && !java.util.Arrays.asList(allowedValues).contains(valueStr)) {
+    if (allowedValues.length > 0 && !java.util.Arrays.asList(allowedValues).contains(valueStr)) {
       throw new InvalidConfigurationException(
-        "Invalid value in configuration file: \"" + name + " = " + valueStr
-            + '\"' + " (not listed as allowed value)");
+          "Invalid value in configuration file: \""
+              + name
+              + " = "
+              + valueStr
+              + '\"'
+              + " (not listed as allowed value)");
     }
 
     // check if it matches the specification regexp
     final String regexp = option.regexp();
     if (!regexp.isEmpty() && !valueStr.matches(regexp)) {
       throw new InvalidConfigurationException(
-        "Invalid value in configuration file: \"" + name + " = " + valueStr
-            + '\"' + " (does not match RegExp \"" + regexp + "\")");
+          "Invalid value in configuration file: \""
+              + name
+              + " = "
+              + valueStr
+              + '\"'
+              + " (does not match RegExp \""
+              + regexp
+              + "\")");
     }
 
     return valueStr;
@@ -788,8 +841,8 @@ public final class Configuration {
     for (Annotation a : element.getDeclaredAnnotations()) {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
         if (result != null) {
-          throw new UnsupportedOperationException("Both " + result + " and " + a
-              + " are present at " + element.toString());
+          throw new UnsupportedOperationException(
+              "Both " + result + " and " + a + " are present at " + element.toString());
         }
         result = a;
       }
@@ -809,12 +862,16 @@ public final class Configuration {
       return;
     }
 
-    List<Class<?>> applicableTypes = Arrays.asList(
-        annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
+    List<Class<?>> applicableTypes =
+        Arrays.asList(
+            annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
 
     if (!applicableTypes.contains(optionType)) {
-      throw new UnsupportedOperationException("Annotation " + annotation
-          + " is not applicable for options of type " + optionType.getCanonicalName());
+      throw new UnsupportedOperationException(
+          "Annotation "
+              + annotation
+              + " is not applicable for options of type "
+              + optionType.getCanonicalName());
     }
   }
 
@@ -857,8 +914,12 @@ public final class Configuration {
    * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option
    */
-  private <T> Object convertValue(final String optionName, final String valueStr,
-      final Class<?> pType, final Type genericType, final Annotation secondaryOption)
+  private <T> Object convertValue(
+      final String optionName,
+      final String valueStr,
+      final Class<?> pType,
+      final Type genericType,
+      final Annotation secondaryOption)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
@@ -887,8 +948,9 @@ public final class Configuration {
 
     checkApplicability(secondaryOption, componentType);
 
-    List<?> values = convertMultipleValues(optionName, valueStr,
-        componentType, componentGenericType, secondaryOption);
+    List<?> values =
+        convertMultipleValues(
+            optionName, valueStr, componentType, componentGenericType, secondaryOption);
 
     if (pType.isArray()) {
 
@@ -908,16 +970,16 @@ public final class Configuration {
         && (collectionClass == Set.class || collectionClass == ImmutableSet.class)) {
       // There is a specialized ImmutableSet for enums in Guava that is more efficient.
       // We use it if we can.
-      return BaseTypeConverter.invokeStaticMethod(Sets.class, "immutableEnumSet",
-          Iterable.class, values, optionName);
+      return BaseTypeConverter.invokeStaticMethod(
+          Sets.class, "immutableEnumSet", Iterable.class, values, optionName);
 
     } else {
       // we now that it's a Collection<componentType> / Set<? extends componentType> etc.,
       // so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
-      return BaseTypeConverter.invokeStaticMethod(collectionClass, "copyOf",
-          Iterable.class, values, optionName);
+      return BaseTypeConverter.invokeStaticMethod(
+          collectionClass, "copyOf", Iterable.class, values, optionName);
     }
   }
 
@@ -934,15 +996,25 @@ public final class Configuration {
    * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option (needs to fit to the type)
    */
-  private Object convertSingleValue(final String optionName, final String valueStr,
-      final Class<?> type, final Type genericType, final Annotation secondaryOption)
+  private Object convertSingleValue(
+      final String optionName,
+      final String valueStr,
+      final Class<?> type,
+      final Type genericType,
+      final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
-    return converter.convert(optionName, valueStr, type, genericType, secondaryOption,
-        sources.get(optionName), MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
+    return converter.convert(
+        optionName,
+        valueStr,
+        type,
+        genericType,
+        secondaryOption,
+        sources.get(optionName),
+        MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
   }
 
   /**
@@ -957,8 +1029,12 @@ public final class Configuration {
    * @return
    * @throws InvalidConfigurationException
    */
-  private List<?> convertMultipleValues(final String optionName, final String valueStr,
-      final Class<?> type, final Type genericType, final Annotation secondaryOption)
+  private List<?> convertMultipleValues(
+      final String optionName,
+      final String valueStr,
+      final Class<?> type,
+      final Type genericType,
+      final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
@@ -972,9 +1048,13 @@ public final class Configuration {
     return result;
   }
 
-  private <T> Object convertDefaultValue(final String optionName, final T defaultValue,
-      final Class<T> type, final Type genericType, final Annotation secondaryOption)
-          throws InvalidConfigurationException {
+  private <T> Object convertDefaultValue(
+      final String optionName,
+      final T defaultValue,
+      final Class<T> type,
+      final Type genericType,
+      final Annotation secondaryOption)
+      throws InvalidConfigurationException {
 
     Class<?> innerType;
     if (type.isArray()) {
@@ -995,13 +1075,12 @@ public final class Configuration {
       // TODO: Also pass default values inside a collection.
 
       TypeConverter converter = getConverter(type, secondaryOption);
-      return converter.convertDefaultValue(optionName, defaultValue,
-          type, genericType, secondaryOption);
+      return converter.convertDefaultValue(
+          optionName, defaultValue, type, genericType, secondaryOption);
     }
 
     return defaultValue;
   }
-
 
   /**
    * Find a type converter for an option.
@@ -1042,7 +1121,10 @@ public final class Configuration {
 
   @Override
   public String toString() {
-    return "Configuration" + (!prefix.isEmpty() ? " with prefix " + prefix : "")
-        + ": [" + Joiner.on(", ").withKeyValueSeparator("=").join(properties) + "]";
+    return "Configuration"
+        + (!prefix.isEmpty() ? " with prefix " + prefix : "")
+        + ": ["
+        + Joiner.on(", ").withKeyValueSeparator("=").join(properties)
+        + "]";
   }
 }

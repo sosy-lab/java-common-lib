@@ -210,8 +210,10 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  @SuppressFBWarnings(value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
-      justification = "performance irrelevant compared to I/O, String much more convenient")
+  @SuppressFBWarnings(
+    value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
+    justification = "performance irrelevant compared to I/O, String much more convenient"
+  )
   private void parse(BufferedReader r, @Nullable String basePath, String source)
       throws IOException, InvalidConfigurationException {
     checkNotNull(source);
@@ -278,8 +280,7 @@ class Parser {
         continue;
 
       } else if (line.length() < 3) {
-        throw new InvalidConfigurationFileException(
-            "Illegal content", lineno, source, fullLine);
+        throw new InvalidConfigurationFileException("Illegal content", lineno, source, fullLine);
 
       } else {
         // normal key=value line
@@ -297,12 +298,13 @@ class Parser {
         if (definedOptions.containsKey(currentPrefix + currentOptionName)) {
           throw new InvalidConfigurationFileException(
               "Duplicate option \"" + currentPrefix + currentOptionName + "\"",
-              lineno, source, fullLine);
+              lineno,
+              source,
+              fullLine);
         }
 
         currentValue = bits[1].trim();
       }
-
 
       assert (currentValue != null) && (currentOptionName != null);
 

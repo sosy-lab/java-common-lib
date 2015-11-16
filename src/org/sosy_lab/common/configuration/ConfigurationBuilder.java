@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-
-
 public interface ConfigurationBuilder {
 
   /**
@@ -95,9 +93,8 @@ public interface ConfigurationBuilder {
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
-  ConfigurationBuilder loadFromSource(CharSource source, String basePath,
-      String sourceName) throws IOException,
-      InvalidConfigurationException;
+  ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName)
+      throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from an InputStream with a "key = value" format.
@@ -112,9 +109,8 @@ public interface ConfigurationBuilder {
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
   @Deprecated
-  ConfigurationBuilder loadFromStream(InputStream stream, String basePath,
-      String source) throws IOException,
-      InvalidConfigurationException;
+  ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String source)
+      throws IOException, InvalidConfigurationException;
 
   /**
    * Load options from an InputStream with a "key = value" format.
@@ -179,5 +175,4 @@ public interface ConfigurationBuilder {
    * for the configuration options of the Configuration class
    */
   Configuration build() throws InvalidConfigurationException;
-
 }

@@ -56,14 +56,12 @@ public class ConfigurationTest {
   @Options
   private static class TestEnumSetOptions {
 
-    @Option(secure=true, description="Test injection of EnumSet")
+    @Option(secure = true, description = "Test injection of EnumSet")
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
   }
 
   private Configuration enumTestConfiguration() throws InvalidConfigurationException {
-    return Configuration.builder()
-                        .setOption("values", "E3, E2")
-                        .build();
+    return Configuration.builder().setOption("values", "E3, E2").build();
   }
 
   @Before
@@ -83,11 +81,10 @@ public class ConfigurationTest {
     testDefault(TestEnumSetOptions.class);
   }
 
-
   @Options
   private static class TestSetOfEnumsOptions {
 
-    @Option(secure=true, description="Test injection of a set of enum values")
+    @Option(secure = true, description = "Test injection of a set of enum values")
     private Set<TestEnum> values = Sets.immutableEnumSet(TestEnum.E1, TestEnum.E3);
   }
 
@@ -98,7 +95,7 @@ public class ConfigurationTest {
     assertThat(options.values).iteratesAs(TestEnum.E2, TestEnum.E3);
   }
 
-  @Test(expected=UnsupportedOperationException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testSetOfEnumsIsImmutable() throws InvalidConfigurationException {
     TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
     enumTestConfiguration().inject(options);
@@ -117,38 +114,31 @@ public class ConfigurationTest {
     testDefault(TestSetOfEnumsOptions.class);
   }
 
-
   @Options
   private static class TestCharsetOptions {
 
-    @Option(secure=true, description="Test injection of Charset instances")
+    @Option(secure = true, description = "Test injection of Charset instances")
     private Charset charset = Charset.defaultCharset();
   }
 
   @Test
   public void testCharset() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("charset", "utf8")
-                           .build();
+    Configuration config = Configuration.builder().setOption("charset", "utf8").build();
     TestCharsetOptions options = new TestCharsetOptions();
     config.inject(options);
     assertThat(options.charset).isEqualTo(StandardCharsets.UTF_8);
   }
 
-  @Test(expected=InvalidConfigurationException.class)
+  @Test(expected = InvalidConfigurationException.class)
   public void testInvalidCharsetName() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("charset", "invalid;name")
-                           .build();
+    Configuration config = Configuration.builder().setOption("charset", "invalid;name").build();
     TestCharsetOptions options = new TestCharsetOptions();
     config.inject(options);
   }
 
-  @Test(expected=InvalidConfigurationException.class)
+  @Test(expected = InvalidConfigurationException.class)
   public void testUnsupportedCharset() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("charset", "foo-bar")
-                           .build();
+    Configuration config = Configuration.builder().setOption("charset", "foo-bar").build();
     TestCharsetOptions options = new TestCharsetOptions();
     config.inject(options);
   }
@@ -156,15 +146,13 @@ public class ConfigurationTest {
   @Options
   private static class TestPatternOptions {
 
-    @Option(secure=true, description="Test injection of Pattern instances")
+    @Option(secure = true, description = "Test injection of Pattern instances")
     private Pattern regexp = Pattern.compile(".*");
   }
 
   @Test
   public void testPattern() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("regexp", "foo.*bar")
-                           .build();
+    Configuration config = Configuration.builder().setOption("regexp", "foo.*bar").build();
 
     TestPatternOptions options = new TestPatternOptions();
     config.inject(options);
@@ -172,11 +160,9 @@ public class ConfigurationTest {
     assertThat("barTESTfoo").doesNotMatch(options.regexp);
   }
 
-  @Test(expected=InvalidConfigurationException.class)
+  @Test(expected = InvalidConfigurationException.class)
   public void testInvalidPattern() throws InvalidConfigurationException {
-    Configuration config = Configuration.builder()
-                           .setOption("regexp", "*foo.*bar")
-                           .build();
+    Configuration config = Configuration.builder().setOption("regexp", "*foo.*bar").build();
 
     TestPatternOptions options = new TestPatternOptions();
     config.inject(options);
@@ -243,9 +229,9 @@ public class ConfigurationTest {
     }
   }
 
-  @Options(prefix="prefix", deprecatedPrefix="deprecated")
+  @Options(prefix = "prefix", deprecatedPrefix = "deprecated")
   private static class DeprecatedOptions {
-    @Option(secure=true, description="test")
+    @Option(secure = true, description = "test")
     private String test = "test";
   }
 
@@ -256,8 +242,7 @@ public class ConfigurationTest {
   public void testDeprecatedOptionsWarning() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
-    Configuration c = Configuration.builder()
-        .setOption("deprecated.test", "myValue").build();
+    Configuration c = Configuration.builder().setOption("deprecated.test", "myValue").build();
     c.enableLogging(mockLogger);
 
     DeprecatedOptions opts = new DeprecatedOptions();
@@ -274,9 +259,11 @@ public class ConfigurationTest {
   public void testDuplicateOptions() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
-    Configuration c = Configuration.builder()
-        .setOption("deprecated.test", "myDeprecatedValue")
-        .setOption("prefix.test", "myNewValue").build();
+    Configuration c =
+        Configuration.builder()
+            .setOption("deprecated.test", "myDeprecatedValue")
+            .setOption("prefix.test", "myNewValue")
+            .build();
     c.enableLogging(mockLogger);
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
@@ -288,9 +275,11 @@ public class ConfigurationTest {
   public void testDuplicateOptionsSameValue() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
-    Configuration c = Configuration.builder()
-        .setOption("deprecated.test", "myValue")
-        .setOption("prefix.test", "myValue").build();
+    Configuration c =
+        Configuration.builder()
+            .setOption("deprecated.test", "myValue")
+            .setOption("prefix.test", "myValue")
+            .build();
     c.enableLogging(mockLogger);
 
     DeprecatedOptions opts = new DeprecatedOptions();
@@ -304,10 +293,12 @@ public class ConfigurationTest {
   public void testCopyWithNewPrefix() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
-    final Configuration c = Configuration.builder()
-        .setOption("start.deprecated.test", "myDeprecatedValue")
-        .setOption("start.prefix.test", "myNewValue")
-        .setPrefix("start").build();
+    final Configuration c =
+        Configuration.builder()
+            .setOption("start.deprecated.test", "myDeprecatedValue")
+            .setOption("start.prefix.test", "myNewValue")
+            .setPrefix("start")
+            .build();
     c.enableLogging(mockLogger);
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);

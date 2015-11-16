@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
 
-
 /**
  * This is a map implementation that uses copy-on-write behavior.
  * This may be a good fit when you want to keep old snapshots of the map
@@ -80,7 +79,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * {@link PersistentSortedMap} implementation and pass it to this method.
    */
   public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(
-      PersistentSortedMap<K, V> pMap)  {
+      PersistentSortedMap<K, V> pMap) {
     return new CopyOnWriteSortedMap<>(pMap);
   }
 
@@ -148,7 +147,6 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
     PersistentSortedMap<K, V> oldMap;
     PersistentSortedMap<K, V> newMap;
 
-
     do {
       oldMap = map.get();
       if (!oldMap.containsKey(pKey)) {
@@ -195,11 +193,11 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
   public SortedSet<Map.Entry<K, V>> entrySet() {
     return new ForwardingSortedSet<Map.Entry<K, V>>() {
 
-        @Override
-        protected SortedSet<Map.Entry<K, V>> delegate() {
-          return map.get().entrySet();
-        }
-      };
+      @Override
+      protected SortedSet<Map.Entry<K, V>> delegate() {
+        return map.get().entrySet();
+      }
+    };
   }
 
   @Override

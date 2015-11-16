@@ -57,14 +57,14 @@ public final class NestedTimer {
   private final Timer totalTimer = new Timer();
 
   /** The sum of times of all intervals up to the last call to stopOuter(). */
-  private long innerSumTime           = 0;
+  private long innerSumTime = 0;
 
   /** Volatile to make {@link #isRunning()} thread-safe. */
   private volatile @Nullable Timer currentInnerTimer = null;
 
   /** The maximal time of all intervals. */
-  private long innerMaxTime           = 0;
-  private long outerMaxTime           = 0;
+  private long innerMaxTime = 0;
+  private long outerMaxTime = 0;
 
   /** The length of the last measured interval. */
   private long lastOuterIntervalLength = 0;
@@ -171,9 +171,7 @@ public final class NestedTimer {
   private long currentOuterInterval() {
     // TODO This is slightly imprecise if inner timer is running
     // because two clock reads will be made by currentTotalInterval and currentInnerTimer.sumTime().
-    return isRunning()
-          ? totalTimer.currentInterval() - currentInnerTimer.sumTime()
-          : 0;
+    return isRunning() ? totalTimer.currentInterval() - currentInnerTimer.sumTime() : 0;
   }
 
   /**
@@ -268,9 +266,7 @@ public final class NestedTimer {
    * If the timer was never started, this method returns 0.
    */
   public TimeSpan getLengthOfLastOuterInterval() {
-    return totalTimer.export(isRunning()
-                            ? currentOuterInterval()
-                            : lastOuterIntervalLength);
+    return totalTimer.export(isRunning() ? currentOuterInterval() : lastOuterIntervalLength);
   }
 
   /**
@@ -281,7 +277,7 @@ public final class NestedTimer {
    */
   public TimeSpan getLengthOfLastTotalInterval() {
     return totalTimer.getLengthOfLastInterval();
-}
+  }
 
   /**
    * Return the average of all outer intervals.

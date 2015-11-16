@@ -55,14 +55,15 @@ public class FileTypeConverterTest {
   @Options
   static class FileInjectionTestOptions {
     @FileOption(Type.OPTIONAL_INPUT_FILE)
-    @Option(secure=true, description="none", name="test.path")
+    @Option(secure = true, description = "none", name = "test.path")
     Path path;
   }
 
   public static class FileTypeConverterSafeModeTest extends FileTypeConverterTestBase {
 
     @Override
-    FileTypeConverter createFileTypeConverter(Configuration pConfig) throws InvalidConfigurationException {
+    FileTypeConverter createFileTypeConverter(Configuration pConfig)
+        throws InvalidConfigurationException {
       return FileTypeConverter.createWithSafePathsOnly(pConfig);
     }
 
@@ -75,7 +76,8 @@ public class FileTypeConverterTest {
   public static class FileTypeConverterUnsafeModeTest extends FileTypeConverterTestBase {
 
     @Override
-    FileTypeConverter createFileTypeConverter(Configuration pConfig) throws InvalidConfigurationException {
+    FileTypeConverter createFileTypeConverter(Configuration pConfig)
+        throws InvalidConfigurationException {
       return FileTypeConverter.create(pConfig);
     }
 
@@ -88,24 +90,24 @@ public class FileTypeConverterTest {
   @RunWith(Parameterized.class)
   public abstract static class FileTypeConverterTestBase {
 
-    @Parameters(name="{0} (safe={1}, safeInFile={2})")
+    @Parameters(name = "{0} (safe={1}, safeInFile={2})")
     public static Object[][] testPaths() {
       return new Object[][] {
-          // path and whether it is allowed in safe mode and when included from config/file
-          {"/etc/passwd", false, false},
-          {"relative/dir" + File.pathSeparator + "/etc", false, false},
-          {"file::name", true, true},
-          {"file::name:illegal", false, false},
-          {"file:::illegal", false, false},
-          {"file", true, true},
-          {"dir/../file", true, true},
-          {"./dir/file", true, true},
-          {"../dir", false, true},
-          {"dir/../../file", false, true},
-          {"../../file", false, false},
-          {"dir/../../../file", false, false},
-          {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
-          {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
+        // path and whether it is allowed in safe mode and when included from config/file
+        {"/etc/passwd", false, false},
+        {"relative/dir" + File.pathSeparator + "/etc", false, false},
+        {"file::name", true, true},
+        {"file::name:illegal", false, false},
+        {"file:::illegal", false, false},
+        {"file", true, true},
+        {"dir/../file", true, true},
+        {"./dir/file", true, true},
+        {"../dir", false, true},
+        {"dir/../../file", false, true},
+        {"../../file", false, false},
+        {"dir/../../../file", false, false},
+        {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
+        {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
       };
     }
 
@@ -118,17 +120,18 @@ public class FileTypeConverterTest {
     @Parameter(2)
     public boolean isSafeWhenInConfigFile;
 
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
+    @Rule public final ExpectedException thrown = ExpectedException.none();
 
     @Options
     static class FileInjectionTestOptions {
       @FileOption(Type.OPTIONAL_INPUT_FILE)
-      @Option(secure=true, description="none", name="test.path")
+      @Option(secure = true, description = "none", name = "test.path")
       Path path;
     }
 
-    abstract FileTypeConverter createFileTypeConverter(Configuration config) throws InvalidConfigurationException;
+    abstract FileTypeConverter createFileTypeConverter(Configuration config)
+        throws InvalidConfigurationException;
+
     abstract boolean isAllowed(boolean isInFile);
 
     @Test
@@ -149,9 +152,7 @@ public class FileTypeConverterTest {
 
     @Test
     public void testCreation_RootDirectory() throws InvalidConfigurationException {
-      Configuration config = Configuration.builder()
-          .setOption("rootDirectory", testPath)
-          .build();
+      Configuration config = Configuration.builder().setOption("rootDirectory", testPath).build();
 
       if (!isAllowed(false)) {
         thrown.expect(InvalidConfigurationException.class);
@@ -162,14 +163,12 @@ public class FileTypeConverterTest {
 
       FileTypeConverter conv = createFileTypeConverter(config);
       assertThat(conv.getOutputDirectory())
-                .isEqualTo(Paths.get(testPath).resolve("output").getOriginalPath());
+          .isEqualTo(Paths.get(testPath).resolve("output").getOriginalPath());
     }
 
     @Test
     public void testCreation_OutputPath() throws InvalidConfigurationException {
-      Configuration config = Configuration.builder()
-          .setOption("output.path", testPath)
-          .build();
+      Configuration config = Configuration.builder().setOption("output.path", testPath).build();
 
       if (!isAllowed(false)) {
         thrown.expect(InvalidConfigurationException.class);
@@ -178,16 +177,16 @@ public class FileTypeConverterTest {
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
-      assertThat(conv.getOutputDirectory())
-                .isEqualTo(Paths.get(".").resolve(testPath).getPath());
+      assertThat(conv.getOutputDirectory()).isEqualTo(Paths.get(".").resolve(testPath).getPath());
     }
 
     @Test
     public void testConvert_InjectPath() throws InvalidConfigurationException {
-      Configuration config = Configuration.builder()
-          .setOption("test.path", testPath)
-          .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
-          .build();
+      Configuration config =
+          Configuration.builder()
+              .setOption("test.path", testPath)
+              .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
+              .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
       if (!isAllowed(false)) {
@@ -203,10 +202,11 @@ public class FileTypeConverterTest {
 
     @Test
     public void testConvert_DefaultPath() throws InvalidConfigurationException {
-      Configuration config = Configuration.builder()
-          .setOption("test.path", testPath)
-          .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
-          .build();
+      Configuration config =
+          Configuration.builder()
+              .setOption("test.path", testPath)
+              .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
+              .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
       options.path = Paths.get(testPath);
 
@@ -224,10 +224,11 @@ public class FileTypeConverterTest {
     @Test
     public void testConvert_InjectPathFromFile() throws InvalidConfigurationException, IOException {
       CharSource configFile = CharSource.wrap("test.path = " + testPath);
-      Configuration config = Configuration.builder()
-          .loadFromSource(configFile, "config", "config/file")
-          .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
-          .build();
+      Configuration config =
+          Configuration.builder()
+              .loadFromSource(configFile, "config", "config/file")
+              .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
+              .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
       if (!isAllowed(true)) {

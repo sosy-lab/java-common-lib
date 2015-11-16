@@ -38,7 +38,9 @@ import javax.annotation.Nullable;
  */
 public final class Files {
 
-  private Files() { /* utility class */ }
+  private Files() {
+    /* utility class */
+  }
 
   /**
    * Creates a temporary file with an optional content. The file is marked for
@@ -55,8 +57,8 @@ public final class Files {
    *          characters
    * @throws  IOException  If a file could not be created
    */
-  public static Path createTempFile(String prefix, @Nullable String suffix,
-      @Nullable String content) throws IOException {
+  public static Path createTempFile(
+      String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
     Path path = Paths.createTempPath(prefix, suffix);
     path.deleteOnExit();
 
@@ -95,8 +97,8 @@ public final class Files {
    * @return
    * @throws IOException
    */
-  public static DeleteOnCloseFile createTempFile(String prefix,
-      @Nullable String suffix) throws IOException {
+  public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix)
+      throws IOException {
     Path tempFile = Paths.createTempPath(prefix, suffix);
     return new DeleteOnCloseFile(tempFile);
   }
@@ -189,8 +191,8 @@ public final class Files {
    * Open a buffered Writer to a file.
    * This method creates necessary parent directories beforehand.
    */
-  public static Writer openOutputFile(Path file, Charset charset,
-      FileWriteMode... options) throws IOException {
+  public static Writer openOutputFile(Path file, Charset charset, FileWriteMode... options)
+      throws IOException {
     checkNotNull(charset);
     checkNotNull(options);
     createParentDirs(file);
@@ -210,7 +212,6 @@ public final class Files {
       Appenders.appendTo(w, content);
     }
   }
-
 
   /**
    * Verifies if a file exists, is a normal file and is readable. If this is not

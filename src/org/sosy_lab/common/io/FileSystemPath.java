@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.common.io;
 
-
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import javax.annotation.Nullable;
-
 
 /**
  * This class provides operations on a file path by backing the path

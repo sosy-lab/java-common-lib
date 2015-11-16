@@ -65,18 +65,12 @@ public class RationalTest {
 
   @Test
   public void testComparison() {
-    List<Rational> unsorted = Arrays.asList(
-        Rational.ofLongs(-2, 4),
-        Rational.ofLongs(1, 3),
-        Rational.ofLongs(2, 3)
-    );
+    List<Rational> unsorted =
+        Arrays.asList(Rational.ofLongs(-2, 4), Rational.ofLongs(1, 3), Rational.ofLongs(2, 3));
     Collections.shuffle(unsorted);
 
-    List<Rational> sorted = Arrays.asList(
-        Rational.ofLongs(-2, 4),
-        Rational.ofLongs(1, 3),
-        Rational.ofLongs(2, 3)
-    );
+    List<Rational> sorted =
+        Arrays.asList(Rational.ofLongs(-2, 4), Rational.ofLongs(1, 3), Rational.ofLongs(2, 3));
 
     Collections.sort(unsorted);
 

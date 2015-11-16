@@ -25,7 +25,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * This is an optional annotation for all configuration options (i.e., elements
  * that are annotated with {@link Option}) whose type is an integer number
@@ -33,7 +32,7 @@ import java.lang.annotation.Target;
  *
  * It serves to specify minimal and/or maximal values.
  */
-@OptionDetailAnnotation(applicableTo= {Integer.class, Long.class})
+@OptionDetailAnnotation(applicableTo = {Integer.class, Long.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

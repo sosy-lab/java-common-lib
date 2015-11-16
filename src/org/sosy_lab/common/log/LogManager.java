@@ -130,5 +130,4 @@ public interface LogManager extends AutoCloseable {
 
   @Override
   void close();
-
 }

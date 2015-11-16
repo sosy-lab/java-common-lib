@@ -33,7 +33,7 @@ import java.net.URLClassLoader;
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
-    setDefault(String[].class, new String[]{"test"});
+    setDefault(String[].class, new String[] {"test"});
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
     setDefault(Path.class, Paths.get(""));
@@ -46,5 +46,5 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   }
 
   @SuppressWarnings("unused")
-  private void defaultMethod() { }
+  private void defaultMethod() {}
 }

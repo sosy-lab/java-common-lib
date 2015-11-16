@@ -36,7 +36,5 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={PACKAGE, TYPE})
-public @interface Unmaintained {
-
-}
+@Target(value = {PACKAGE, TYPE})
+public @interface Unmaintained {}

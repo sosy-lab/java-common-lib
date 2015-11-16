@@ -31,8 +31,7 @@ import java.util.logging.Level;
  * LogManager implementation which helps to get log messages printed only once,
  * and avoid duplicate messages.
  */
-public class LogManagerWithoutDuplicates extends ForwardingLogManager
-                                         implements LogManager {
+public class LogManagerWithoutDuplicates extends ForwardingLogManager implements LogManager {
 
   private final LogManager delegate;
 

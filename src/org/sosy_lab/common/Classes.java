@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
  */
 public final class Classes {
 
-  private Classes() { }
+  private Classes() {}
 
   /**
    * Exception thrown by {@link Classes#createInstance(Class, Class[], Object[], Class)}.
@@ -75,11 +75,12 @@ public final class Classes {
     private static final long serialVersionUID = -8706288432548996095L;
 
     public UnexpectedCheckedException(String message, Throwable source) {
-      super("Unexpected checked exception "
-            + source.getClass().getSimpleName()
-            + (isNullOrEmpty(message)             ? "" : " during "  + message)
-            + (isNullOrEmpty(source.getMessage()) ? "" : ": " + source.getMessage()),
-        source);
+      super(
+          "Unexpected checked exception "
+              + source.getClass().getSimpleName()
+              + (isNullOrEmpty(message) ? "" : " during " + message)
+              + (isNullOrEmpty(source.getMessage()) ? "" : ": " + source.getMessage()),
+          source);
 
       assert (source instanceof Exception) && !(source instanceof RuntimeException);
     }
@@ -97,8 +98,11 @@ public final class Classes {
    * (like class cannot be found or has no constructor).
    * @throws InvocationTargetException If the constructor throws an exception.
    */
-  public static <T> T createInstance(Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes, @Nullable Object[] argumentValues, Class<T> type)
+  public static <T> T createInstance(
+      Class<? extends T> cls,
+      @Nullable Class<?>[] argumentTypes,
+      @Nullable Object[] argumentValues,
+      Class<T> type)
       throws ClassInstantiationException, InvocationTargetException {
     checkNotNull(type);
     try {
@@ -108,15 +112,14 @@ public final class Classes {
     } catch (SecurityException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(),
-          "Matching constructor not found!", e);
+      throw new ClassInstantiationException(
+          cls.getCanonicalName(), "Matching constructor not found!", e);
     } catch (InstantiationException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (IllegalAccessException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     }
   }
-
 
   /**
    * Creates an instance of class cls, passing the objects from argumentList
@@ -132,9 +135,12 @@ public final class Classes {
    * @param argumentValues Array with the values
    * that will be passed to the constructor.
    */
-  public static <T> T createInstance(Class<T> type, Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes, Object[] argumentValues)
-          throws InvalidConfigurationException {
+  public static <T> T createInstance(
+      Class<T> type,
+      Class<? extends T> cls,
+      @Nullable Class<?>[] argumentTypes,
+      Object[] argumentValues)
+      throws InvalidConfigurationException {
     return createInstance(type, cls, argumentTypes, argumentValues, RuntimeException.class);
   }
 
@@ -152,9 +158,13 @@ public final class Classes {
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
-  public static <T, X extends Exception> T createInstance(Class<T> type, Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes, Object[] argumentValues,
-      Class<X> exceptionType) throws X, InvalidConfigurationException {
+  public static <T, X extends Exception> T createInstance(
+      Class<T> type,
+      Class<? extends T> cls,
+      @Nullable Class<?>[] argumentTypes,
+      Object[] argumentValues,
+      Class<X> exceptionType)
+      throws X, InvalidConfigurationException {
     checkNotNull(exceptionType);
     if (argumentTypes == null) {
       // fill argumenTypes array
@@ -176,16 +186,21 @@ public final class Classes {
     try {
       ct = cls.getConstructor(argumentTypes);
     } catch (NoSuchMethodException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName
-          + " " + className + ", no matching constructor", e);
+      throw new InvalidConfigurationException(
+          "Invalid " + typeName + " " + className + ", no matching constructor", e);
     }
 
     // verify signature
-    String exception = Classes.verifyDeclaredExceptions(ct, exceptionType,
-        InvalidConfigurationException.class);
+    String exception =
+        Classes.verifyDeclaredExceptions(ct, exceptionType, InvalidConfigurationException.class);
     if (exception != null) {
-      throw new InvalidConfigurationException("Invalid " + typeName
-          + " " + className + ", constructor declares unsupported checked exception " + exception);
+      throw new InvalidConfigurationException(
+          "Invalid "
+              + typeName
+              + " "
+              + className
+              + ", constructor declares unsupported checked exception "
+              + exception);
     }
 
     // instantiate
@@ -193,12 +208,19 @@ public final class Classes {
       return ct.newInstance(argumentValues);
 
     } catch (InstantiationException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName
-          + " " + className + ", class cannot be instantiated (" + e.getMessage() + ")", e);
+      throw new InvalidConfigurationException(
+          "Invalid "
+              + typeName
+              + " "
+              + className
+              + ", class cannot be instantiated ("
+              + e.getMessage()
+              + ")",
+          e);
 
     } catch (IllegalAccessException e) {
-      throw new InvalidConfigurationException("Invalid " + typeName
-          + " " + className + ", constructor is not accessible", e);
+      throw new InvalidConfigurationException(
+          "Invalid " + typeName + " " + className + ", constructor is not accessible", e);
 
     } catch (InvocationTargetException e) {
       Throwable t = e.getCause();
@@ -267,8 +289,8 @@ public final class Classes {
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static @Nullable String verifyDeclaredExceptions(Constructor<?> constructor,
-      Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(
+      Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(constructor.getExceptionTypes(), allowedExceptionTypes);
   }
 
@@ -282,13 +304,13 @@ public final class Classes {
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
-  public static @Nullable String verifyDeclaredExceptions(Method method,
-      Class<?>... allowedExceptionTypes) {
+  public static @Nullable String verifyDeclaredExceptions(
+      Method method, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(method.getExceptionTypes(), allowedExceptionTypes);
   }
 
-  private static @Nullable String verifyDeclaredExceptions(Class<?>[] declaredExceptionTypes,
-      Class<?>[] allowedExceptionTypes) {
+  private static @Nullable String verifyDeclaredExceptions(
+      Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
     checkNotNull(allowedExceptionTypes);
     for (Class<?> declaredException : declaredExceptionTypes) {
 
@@ -330,15 +352,19 @@ public final class Classes {
    */
   public static Type getComponentType(final Type type) {
     checkNotNull(type);
-    checkArgument(type instanceof ParameterizedType,
-        "Cannot extract generic parameter from non-parameterized type %s", type);
+    checkArgument(
+        type instanceof ParameterizedType,
+        "Cannot extract generic parameter from non-parameterized type %s",
+        type);
 
     ParameterizedType pType = (ParameterizedType) type;
     Type[] parameterTypes = pType.getActualTypeArguments();
 
-    checkArgument(parameterTypes.length == 1,
+    checkArgument(
+        parameterTypes.length == 1,
         "Cannot extract generic parameter from parameterized type %s"
-        + " which has not exactly one parameter", type);
+            + " which has not exactly one parameter",
+        type);
 
     return extractUpperBoundFromType(parameterTypes[0]);
   }
@@ -394,22 +420,27 @@ public final class Classes {
     return type;
   }
 
-  public static void produceClassLoadingWarning(LogManager logger, Class<?> cls,
-      @Nullable Class<?> type) {
+  public static void produceClassLoadingWarning(
+      LogManager logger, Class<?> cls, @Nullable Class<?> type) {
     checkNotNull(logger);
     Package pkg = cls.getPackage();
     String typeName = type == null ? "class" : type.getSimpleName();
 
-    if (cls.isAnnotationPresent(Deprecated.class)
-        || pkg.isAnnotationPresent(Deprecated.class)) {
-      logger.logf(Level.WARNING, "Using %s %s, which is marked as deprecated"
-          + " and should not be used.", typeName, cls.getSimpleName());
+    if (cls.isAnnotationPresent(Deprecated.class) || pkg.isAnnotationPresent(Deprecated.class)) {
+      logger.logf(
+          Level.WARNING,
+          "Using %s %s, which is marked as deprecated" + " and should not be used.",
+          typeName,
+          cls.getSimpleName());
 
     } else if (cls.isAnnotationPresent(Unmaintained.class)
         || pkg.isAnnotationPresent(Unmaintained.class)) {
 
-      logger.logf(Level.WARNING, "Using %s %s, which is unmaintained"
-          + " and may not work correctly.", typeName, cls.getSimpleName());
+      logger.logf(
+          Level.WARNING,
+          "Using %s %s, which is unmaintained" + " and may not work correctly.",
+          typeName,
+          cls.getSimpleName());
     }
   }
 

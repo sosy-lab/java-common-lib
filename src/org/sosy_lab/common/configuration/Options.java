@@ -51,5 +51,4 @@ public @interface Options {
    * An optional text, that describes the current options.
    */
   String description() default "";
-
 }

@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
-public interface ConfigurationBuilderFactory  {
+public interface ConfigurationBuilderFactory {
   ConfigurationBuilder getBuilder();
 
   enum DefaultConfigurationBuilderFactory implements ConfigurationBuilderFactory {

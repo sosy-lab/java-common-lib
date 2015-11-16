@@ -78,14 +78,15 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   private static final EnumHashBiMap<TimeUnit, String> TIME_UNITS =
       EnumHashBiMap.create(TimeUnit.class);
+
   static {
-    TIME_UNITS.put(NANOSECONDS,  "ns");
+    TIME_UNITS.put(NANOSECONDS, "ns");
     TIME_UNITS.put(MICROSECONDS, "µs");
     TIME_UNITS.put(MILLISECONDS, "ms");
-    TIME_UNITS.put(SECONDS,      "s");
-    TIME_UNITS.put(MINUTES,      "min");
-    TIME_UNITS.put(HOURS,        "h");
-    TIME_UNITS.put(DAYS,         "d");
+    TIME_UNITS.put(SECONDS, "s");
+    TIME_UNITS.put(MINUTES, "min");
+    TIME_UNITS.put(HOURS, "h");
+    TIME_UNITS.put(DAYS, "d");
   }
 
   private static final Pattern onlyNumbers = Pattern.compile(" *([0-9]+) *");

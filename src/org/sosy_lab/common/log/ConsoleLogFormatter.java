@@ -31,10 +31,10 @@ import java.util.logging.LogRecord;
 /**
  * Class to handle formatting for console output.
  */
-@Options(prefix="log")
+@Options(prefix = "log")
 public class ConsoleLogFormatter extends Formatter {
 
-  @Option(secure=true, description="use colors for log messages on console")
+  @Option(secure = true, description = "use colors for log messages on console")
   private boolean useColors = true;
 
   public ConsoleLogFormatter(Configuration config) throws InvalidConfigurationException {
@@ -47,8 +47,7 @@ public class ConsoleLogFormatter extends Formatter {
     // We assume that most users only redirect stderr if they also redirect
     // stdout, so this should be ok.
     if (useColors) {
-      if ((System.console() == null)
-          || System.getProperty("os.name", "").startsWith("Windows")) {
+      if ((System.console() == null) || System.getProperty("os.name", "").startsWith("Windows")) {
         useColors = false;
       }
     }

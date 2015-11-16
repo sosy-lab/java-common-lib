@@ -36,16 +36,16 @@ public interface AbstractPathFactory {
   Path getPath(@Nullable String pathName, @Nullable String... more);
 
   /**
-  * Creates a temporary path and returns the according Path instance.
-  *
-  * @param prefix The path's prefix. At least 3 characters long.
-  * @param suffix The path's suffix. Will default to .tmp if null.
-  *
-  * @return The temporary Path.
-  *
-  * @throws IOException If the path could not be created.
-  * @throws NullPointerException If the prefix is null.
-  * @throws IllegalArgumentException if the prefix is shorter than 3 characters.
-  */
+   * Creates a temporary path and returns the according Path instance.
+   *
+   * @param prefix The path's prefix. At least 3 characters long.
+   * @param suffix The path's suffix. Will default to .tmp if null.
+   *
+   * @return The temporary Path.
+   *
+   * @throws IOException If the path could not be created.
+   * @throws NullPointerException If the prefix is null.
+   * @throws IllegalArgumentException if the prefix is shorter than 3 characters.
+   */
   Path getTempPath(String prefix, @Nullable String suffix) throws IOException;
 }

@@ -96,6 +96,7 @@ public class Tickers {
     static final TickerWithUnit INSTANCE = new CurrentThreadCputime();
 
     private final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+
     {
       if (!threadMxBean.isThreadCpuTimeSupported()) {
         throw new UnsupportedOperationException(

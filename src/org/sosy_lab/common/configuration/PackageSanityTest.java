@@ -31,7 +31,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   {
     ignoreClasses(Classes.IS_GENERATED);
 
-    setDefault(String[].class, new String[]{"test"});
+    setDefault(String[].class, new String[] {"test"});
     setDefault(Path.class, Paths.get("test"));
     setDefault(Configuration.class, Configuration.defaultConfiguration());
     setDefault(CharSource.class, CharSource.wrap("test"));

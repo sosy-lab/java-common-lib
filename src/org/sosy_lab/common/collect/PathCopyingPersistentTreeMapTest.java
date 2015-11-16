@@ -46,32 +46,32 @@ import java.util.TreeMap;
 
 public class PathCopyingPersistentTreeMapTest extends TestCase {
 
-  private static final TestStringSortedMapGenerator mapGenerator = new TestStringSortedMapGenerator() {
+  private static final TestStringSortedMapGenerator mapGenerator =
+      new TestStringSortedMapGenerator() {
 
-    @Override
-    protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
-      PersistentSortedMap<String, String> result = PathCopyingPersistentTreeMap.of();
-      for (Entry<String, String> entry : pEntries) {
-        result = result.putAndCopy(entry.getKey(), entry.getValue());
-      }
-      return result;
-    }
-  };
+        @Override
+        protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
+          PersistentSortedMap<String, String> result = PathCopyingPersistentTreeMap.of();
+          for (Entry<String, String> entry : pEntries) {
+            result = result.putAndCopy(entry.getKey(), entry.getValue());
+          }
+          return result;
+        }
+      };
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
     suite.addTestSuite(PathCopyingPersistentTreeMapTest.class);
 
-    suite.addTest(SortedMapTestSuiteBuilder.using(mapGenerator)
-        .named("PathCopyingPersistentTreeMap")
-        .withFeatures(MapFeature.ALLOWS_NULL_VALUES,
-                      CollectionFeature.KNOWN_ORDER,
-                      CollectionSize.ANY)
+    suite.addTest(
+        SortedMapTestSuiteBuilder.using(mapGenerator)
+            .named("PathCopyingPersistentTreeMap")
+            .withFeatures(
+                MapFeature.ALLOWS_NULL_VALUES, CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
 
-        // We throw ClassCastException as allowed by the JavaDoc of SortedMap
-        .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
-
-        .createTestSuite());
+            // We throw ClassCastException as allowed by the JavaDoc of SortedMap
+            .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
+            .createTestSuite());
 
     return suite;
   }
@@ -346,7 +346,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
     checkEqualTo(comparison.headMap(key1), map.headMap(key1));
     checkEqualTo(comparison.headMap(key2), map.headMap(key2));
 
-    String lowKey  = Ordering.natural().min(key1, key2);
+    String lowKey = Ordering.natural().min(key1, key2);
     String highKey = Ordering.natural().max(key1, key2);
     checkEqualTo(comparison.subMap(lowKey, highKey), map.subMap(lowKey, highKey));
   }

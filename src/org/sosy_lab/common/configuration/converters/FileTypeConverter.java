@@ -61,23 +61,33 @@ import javax.annotation.Nullable;
 @Options
 public class FileTypeConverter implements TypeConverter {
 
-  private static final ImmutableSet<Class<?>> SUPPORTED_TYPES = ImmutableSet.<Class<?>>of(
-      File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
+  private static final ImmutableSet<Class<?>> SUPPORTED_TYPES =
+      ImmutableSet.<Class<?>>of(
+          File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
   private static final String TEMP_DIR =
       StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;
 
-  @Option(secure=true, name="output.path", description="directory to put all output files in")
+  @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";
+
   private final Path outputPath;
 
-  @Option(secure=true, name="output.disable", description="disable all default output files"
-    + "\n(any explicitly given file will still be written)")
+  @Option(
+    secure = true,
+    name = "output.disable",
+    description =
+        "disable all default output files" + "\n(any explicitly given file will still be written)"
+  )
   private boolean disableOutput = false;
 
-  @Option (description="base directory for all input & output files"
-    + "\n(except for the configuration file itself)")
+  @Option(
+    description =
+        "base directory for all input & output files"
+            + "\n(except for the configuration file itself)"
+  )
   private String rootDirectory = ".";
+
   private final Path rootPath;
 
   // Allow only paths below the current directory,
@@ -135,38 +145,49 @@ public class FileTypeConverter implements TypeConverter {
         path = path.substring(TEMP_DIR.length());
 
       } else {
-        throw new InvalidConfigurationException("The option " + optionName
-            + " specifies the path '" + pPath
-            + "' that is forbidden in safe mode because it is absolute.");
+        throw new InvalidConfigurationException(
+            "The option "
+                + optionName
+                + " specifies the path '"
+                + pPath
+                + "' that is forbidden in safe mode because it is absolute.");
       }
     }
 
     // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
     if (path.replaceAll("::", "").contains(File.pathSeparator)) {
-      throw new InvalidConfigurationException("The option " + optionName
-          + " specifies the path '" + pPath
-          + "' that is forbidden in safe mode because it contains the character '"
-          + File.pathSeparator + "'.");
+      throw new InvalidConfigurationException(
+          "The option "
+              + optionName
+              + " specifies the path '"
+              + pPath
+              + "' that is forbidden in safe mode because it contains the character '"
+              + File.pathSeparator
+              + "'.");
     }
 
     int depth = 0;
     for (String component : Splitter.on(File.separator).split(path)) {
       switch (component) {
-      case "":
-      case ".":
-        break;
-      case "..":
-        depth--;
-        break;
-      default:
-        depth++;
-        break;
+        case "":
+        case ".":
+          break;
+        case "..":
+          depth--;
+          break;
+        default:
+          depth++;
+          break;
       }
 
       if (depth < 0) {
-        throw new InvalidConfigurationException("The option " + optionName
-            + " specifies the path '" + pPath + "' that is forbidden in safe mode"
-            + " because it is not below the current directory.");
+        throw new InvalidConfigurationException(
+            "The option "
+                + optionName
+                + " specifies the path '"
+                + pPath
+                + "' that is forbidden in safe mode"
+                + " because it is not below the current directory.");
       }
     }
 
@@ -181,32 +202,43 @@ public class FileTypeConverter implements TypeConverter {
     return outputPath;
   }
 
-  private void checkApplicability(Class<?> type,
-      @Nullable Annotation secondaryOption, String optionName) {
-    if (!SUPPORTED_TYPES.contains(type)
-        || !(secondaryOption instanceof FileOption)) {
+  private void checkApplicability(
+      Class<?> type, @Nullable Annotation secondaryOption, String optionName) {
+    if (!SUPPORTED_TYPES.contains(type) || !(secondaryOption instanceof FileOption)) {
 
       throw new UnsupportedOperationException(
           "A FileTypeConverter can handle only options of type File"
-          + " and with a @FileOption annotation, but " + optionName + " does not fit.");
+              + " and with a @FileOption annotation, but "
+              + optionName
+              + " does not fit.");
     }
   }
 
   @Override
-  public Object convert(String optionName, String pValue, Class<?> pType, Type pGenericType,
-      Annotation secondaryOption, Path pSource, LogManager logger)
-          throws InvalidConfigurationException {
+  public Object convert(
+      String optionName,
+      String pValue,
+      Class<?> pType,
+      Type pGenericType,
+      Annotation secondaryOption,
+      Path pSource,
+      LogManager logger)
+      throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 
-    return handleFileOption(optionName, Paths.get(pValue),
-        ((FileOption) secondaryOption).value(), pType, pSource);
+    return handleFileOption(
+        optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), pType, pSource);
   }
 
   @Override
-  public <T> T convertDefaultValue(String optionName, T pDefaultValue,
-      Class<T> pType, Type pGenericType,
-      Annotation secondaryOption) throws InvalidConfigurationException {
+  public <T> T convertDefaultValue(
+      String optionName,
+      T pDefaultValue,
+      Class<T> pType,
+      Type pGenericType,
+      Annotation secondaryOption)
+      throws InvalidConfigurationException {
 
     checkApplicability(pType, secondaryOption, optionName);
 
@@ -214,9 +246,11 @@ public class FileTypeConverter implements TypeConverter {
 
     if (pDefaultValue == null) {
       if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
-        throw new UnsupportedOperationException("The option " + optionName
-            + " specifies a required input file,"
-            + " but the option is neither required nor has a default value.");
+        throw new UnsupportedOperationException(
+            "The option "
+                + optionName
+                + " specifies a required input file,"
+                + " but the option is neither required nor has a default value.");
       }
 
       return null;
@@ -243,16 +277,19 @@ public class FileTypeConverter implements TypeConverter {
     return value;
   }
 
-
   /** This function returns a file. It sets the path of the file to
    * the given outputDirectory in the given rootDirectory.
    *
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
-  private Object handleFileOption(final String optionName, Path file,
-      final FileOption.Type typeInfo, final Class<?> targetType, final Path source)
-          throws InvalidConfigurationException {
+  private Object handleFileOption(
+      final String optionName,
+      Path file,
+      final FileOption.Type typeInfo,
+      final Class<?> targetType,
+      final Path source)
+      throws InvalidConfigurationException {
 
     if (typeInfo == FileOption.Type.OUTPUT_FILE) {
       file = outputPath.resolve(file);
@@ -268,16 +305,16 @@ public class FileTypeConverter implements TypeConverter {
     checkSafePath(file, optionName); // throws exception if unsafe
 
     if (file.isDirectory()) {
-      throw new InvalidConfigurationException("Option " + optionName
-          + " specifies a directory instead of a file: " + file);
+      throw new InvalidConfigurationException(
+          "Option " + optionName + " specifies a directory instead of a file: " + file);
     }
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
       try {
         Files.checkReadableFile(file);
       } catch (FileNotFoundException e) {
-        throw new InvalidConfigurationException("Option " + optionName
-            + " specifies an invalid input file: " + e.getMessage(), e);
+        throw new InvalidConfigurationException(
+            "Option " + optionName + " specifies an invalid input file: " + e.getMessage(), e);
       }
     }
 

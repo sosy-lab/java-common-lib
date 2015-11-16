@@ -48,7 +48,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
-
 /**
  * Default implementation of {@link LogManager}.
  */
@@ -68,6 +67,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   public interface LogManagerMXBean {
 
     String getConsoleLevel();
+
     void setConsoleLevel(String newLevel);
   }
 
@@ -139,8 +139,11 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * instance will be used.
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
    */
-  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler,
-      @Nullable Handler fileOutputHandler) throws InvalidConfigurationException {
+  public BasicLogManager(
+      Configuration config,
+      @Nullable Handler consoleOutputHandler,
+      @Nullable Handler fileOutputHandler)
+      throws InvalidConfigurationException {
     LoggingOptions options = new LoggingOptions(config);
     Level fileLevel = options.getFileLevel();
     Level consoleLevel = options.getConsoleLevel();
@@ -157,8 +160,11 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       if (consoleOutputHandler == null) {
         consoleOutputHandler = new ConsoleHandler();
       }
-      setupHandler(consoleOutputHandler, new ConsoleLogFormatter(config),
-          consoleLevel, options.getConsoleExclude());
+      setupHandler(
+          consoleOutputHandler,
+          new ConsoleLogFormatter(config),
+          consoleLevel,
+          options.getConsoleExclude());
     }
 
     // create file logger
@@ -176,8 +182,9 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
             logger.getHandlers()[0].setLevel(fileLevel);
           }
 
-          logger.log(Level.WARNING, "Could not open log file " + e.getMessage()
-              + ", redirecting log output to console");
+          logger.log(
+              Level.WARNING,
+              "Could not open log file " + e.getMessage() + ", redirecting log output to console");
         }
       }
     } else {
@@ -202,8 +209,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
    */
   @ForOverride
-  protected void setupHandler(Handler handler, Formatter formatter, Level level,
-      List<Level> excludeLevels) {
+  protected void setupHandler(
+      Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
@@ -231,9 +238,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   public LogManager withComponentName(String pName) {
     checkArgument(!pName.isEmpty());
 
-    String name = componentName.isEmpty()
-        ? pName
-        : componentName + ":" + pName;
+    String name = componentName.isEmpty() ? pName : componentName + ":" + pName;
     return new BasicLogManager(this, name);
   }
 
@@ -263,7 +268,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
     //Since some toString() methods may be rather costly, only log if the level is
     //sufficiently high.
-    if (wouldBeLogged(priority))  {
+    if (wouldBeLogged(priority)) {
 
       log0(priority, findCallingMethod(), buildMessageText(args));
     }
@@ -301,8 +306,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
     int traceIndex = 3;
 
     String methodName = trace[traceIndex].getMethodName();
-    while (methodName.startsWith("log")
-        || methodName.startsWith("access$")) {
+    while (methodName.startsWith("log") || methodName.startsWith("access$")) {
       traceIndex++;
       methodName = trace[traceIndex].getMethodName();
     }
@@ -345,8 +349,11 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
         String length = (o instanceof Appender) ? ">= " + truncateSize : arg.length() + "";
-        argsStr[i] = arg.substring(0, TRUNCATE_REMAINING_SIZE)
-                   + "... <REMAINING ARGUMENT OMITTED BECAUSE " + length + " CHARACTERS LONG>";
+        argsStr[i] =
+            arg.substring(0, TRUNCATE_REMAINING_SIZE)
+                + "... <REMAINING ARGUMENT OMITTED BECAUSE "
+                + length
+                + " CHARACTERS LONG>";
       } else {
         argsStr[i] = arg;
       }
@@ -398,7 +405,8 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
         logMessage += additionalMessage;
 
         if (!exceptionMessage.isEmpty()) {
-          if ((e instanceof IOException) && logMessage.endsWith("file")
+          if ((e instanceof IOException)
+              && logMessage.endsWith("file")
               && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
             // nicer error message, so that we have something like
             // "could not write to file /FOO.txt (Permission denied)"
@@ -504,6 +512,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
       handler.flush();
     }
   }
+
   @Override
   public void close() {
     if (mxBean != null) {

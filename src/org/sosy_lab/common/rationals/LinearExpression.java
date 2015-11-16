@@ -28,8 +28,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   public static <T> LinearExpression<T> empty() {
-    return new LinearExpression<>(
-        ImmutableMap.<T, Rational>of());
+    return new LinearExpression<>(ImmutableMap.<T, Rational>of());
   }
 
   public static <T> LinearExpression<T> pair(T var, Rational coeff) {
@@ -169,9 +168,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   /**
    * Pretty-print monomial to the given {@link StringBuilder}.
    */
-  public static void writeMonomial(
-      String varSerialized, Rational coeff, StringBuilder b
-  ) {
+  public static void writeMonomial(String varSerialized, Rational coeff, StringBuilder b) {
     checkNotNull(varSerialized);
     if (b.length() != 0 && coeff.signum() >= 0) {
       b.append(" + ");

@@ -32,7 +32,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-
 /**
  * A generic Triple class based on Pair.java.
  *
@@ -54,17 +53,19 @@ public class Triple<A, B, C> implements Serializable {
     this.third = third;
   }
 
-  public static <A, B, C> Triple<A, B, C> of(@Nullable A first,
-      @Nullable B second, @Nullable C third) {
+  public static <A, B, C> Triple<A, B, C> of(
+      @Nullable A first, @Nullable B second, @Nullable C third) {
     return new Triple<>(first, second, third);
   }
 
   public final @Nullable A getFirst() {
     return first;
   }
+
   public final @Nullable B getSecond() {
     return second;
   }
+
   public final @Nullable C getThird() {
     return third;
   }
@@ -100,7 +101,6 @@ public class Triple<A, B, C> implements Serializable {
       return first.hashCode() * 17 + second.hashCode() * 5 + third.hashCode();
     }
   }
-
 
   public static <T> Function<Triple<? extends T, ?, ?>, T> getProjectionToFirst() {
     return Holder.<T>getInstance().PROJECTION_TO_FIRST;
@@ -163,10 +163,11 @@ public class Triple<A, B, C> implements Serializable {
    * @param f3 The function applied to the third element of the triple.
    * @return A component-wise composition of f1, f2, and f3.
    */
-  public static <A1, B1, A2, B2, A3, B3> Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>
-                componentWise(final Function<? super A1, ? extends B1> f1,
-                              final Function<? super A2, ? extends B2> f2,
-                              final Function<? super A3, ? extends B3> f3) {
+  public static <A1, B1, A2, B2, A3, B3>
+      Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>> componentWise(
+          final Function<? super A1, ? extends B1> f1,
+          final Function<? super A2, ? extends B2> f2,
+          final Function<? super A3, ? extends B3> f3) {
     checkNotNull(f1);
     checkNotNull(f2);
     checkNotNull(f3);
@@ -174,9 +175,8 @@ public class Triple<A, B, C> implements Serializable {
     return new Function<Triple<A1, A2, A3>, Triple<B1, B2, B3>>() {
       @Override
       public Triple<B1, B2, B3> apply(@Nonnull Triple<A1, A2, A3> pInput) {
-        return Triple.<B1, B2, B3>of(f1.apply(pInput.getFirst()),
-                                      f2.apply(pInput.getSecond()),
-                                      f3.apply(pInput.getThird()));
+        return Triple.<B1, B2, B3>of(
+            f1.apply(pInput.getFirst()), f2.apply(pInput.getSecond()), f3.apply(pInput.getThird()));
       }
     };
   }
@@ -185,14 +185,12 @@ public class Triple<A, B, C> implements Serializable {
    * Return a comparator for comparing triples lexicographically,
    * if their component types define a natural ordering.
    */
-  public static <A extends Comparable<? super A>,
-                  B extends Comparable<? super B>,
-                  C extends Comparable<? super C>>
+  public static <A extends Comparable<? super A>, B extends Comparable<? super B>,
+          C extends Comparable<? super C>>
       Ordering<Triple<A, B, C>> lexicographicalNaturalComparator() {
 
-    return lexicographicalComparator(Ordering.<A>natural(),
-                                      Ordering.<B>natural(),
-                                      Ordering.<C>natural());
+    return lexicographicalComparator(
+        Ordering.<A>natural(), Ordering.<B>natural(), Ordering.<C>natural());
   }
 
   /**
@@ -200,8 +198,7 @@ public class Triple<A, B, C> implements Serializable {
    * delegating the comparison of the components to three comparators.
    */
   public static <A, B, C> Ordering<Triple<A, B, C>> lexicographicalComparator(
-      Comparator<A> firstOrdering, Comparator<B> secondOrdering,
-      Comparator<C> thirdOrdering) {
+      Comparator<A> firstOrdering, Comparator<B> secondOrdering, Comparator<C> thirdOrdering) {
 
     Ordering<Triple<? extends A, ?, ?>> firstDimension =
         from(firstOrdering).onResultOf(Triple.<A>getProjectionToFirst());

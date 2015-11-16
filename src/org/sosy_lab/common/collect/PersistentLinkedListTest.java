@@ -39,72 +39,67 @@ import java.util.List;
 
 public class PersistentLinkedListTest extends TestCase {
 
-  private static final TestStringListGenerator listGenerator = new TestStringListGenerator() {
+  private static final TestStringListGenerator listGenerator =
+      new TestStringListGenerator() {
 
-    @Override
-    protected List<String> create(String[] pElements) {
-      return PersistentLinkedList.copyOf(pElements);
-    }
-  };
+        @Override
+        protected List<String> create(String[] pElements) {
+          return PersistentLinkedList.copyOf(pElements);
+        }
+      };
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
     suite.addTestSuite(PersistentLinkedListTest.class);
 
-    suite.addTest(ListTestSuiteBuilder.using(listGenerator)
-        .named("PersistentLinkedList")
-        .withFeatures(CollectionFeature.KNOWN_ORDER,
-                      CollectionSize.ANY)
-
-        .suppressing(
-            // These tests all rely on a fully implemented ListIterator.
-            ListLastIndexOfTester.class.getMethod("testFind_wrongType"),
-            ListLastIndexOfTester.class.getMethod("testFind_no"),
-            ListLastIndexOfTester.class.getMethod("testFind_yes"),
-            ListLastIndexOfTester.class.getMethod("testFind_nullNotContainedAndUnsupported"),
-            ListLastIndexOfTester.class.getMethod("testLastIndexOf_duplicate"),
-            ListListIteratorTester.class.getMethod("testListIterator_tooLow"),
-            ListListIteratorTester.class.getMethod("testListIterator_unmodifiable"),
-            ListSubListTester.class.getMethod("testSubList_lastIndexOf"))
-
-        .createTestSuite());
+    suite.addTest(
+        ListTestSuiteBuilder.using(listGenerator)
+            .named("PersistentLinkedList")
+            .withFeatures(CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
+            .suppressing(
+                // These tests all rely on a fully implemented ListIterator.
+                ListLastIndexOfTester.class.getMethod("testFind_wrongType"),
+                ListLastIndexOfTester.class.getMethod("testFind_no"),
+                ListLastIndexOfTester.class.getMethod("testFind_yes"),
+                ListLastIndexOfTester.class.getMethod("testFind_nullNotContainedAndUnsupported"),
+                ListLastIndexOfTester.class.getMethod("testLastIndexOf_duplicate"),
+                ListListIteratorTester.class.getMethod("testListIterator_tooLow"),
+                ListListIteratorTester.class.getMethod("testListIterator_unmodifiable"),
+                ListSubListTester.class.getMethod("testSubList_lastIndexOf"))
+            .createTestSuite());
 
     return suite;
   }
 
   @Test
   public void testOf1() {
-    assertThat(PersistentLinkedList.of("a"))
-              .iteratesAs("a");
+    assertThat(PersistentLinkedList.of("a")).iteratesAs("a");
   }
 
   @Test
   public void testOf2() {
-    assertThat(PersistentLinkedList.of("a", "b"))
-              .iteratesAs("a", "b");
+    assertThat(PersistentLinkedList.of("a", "b")).iteratesAs("a", "b");
   }
 
   @Test
   public void testOf3() {
-    assertThat(PersistentLinkedList.of("a", "b", "c"))
-              .iteratesAs("a", "b", "c");
+    assertThat(PersistentLinkedList.of("a", "b", "c")).iteratesAs("a", "b", "c");
   }
 
   @Test
   public void testOfVarArgs() {
-    assertThat(PersistentLinkedList.of("a", "b", "c", "d"))
-              .iteratesAs("a", "b", "c", "d");
+    assertThat(PersistentLinkedList.of("a", "b", "c", "d")).iteratesAs("a", "b", "c", "d");
   }
 
   @Test
   public void testWithAll() {
     assertThat(PersistentLinkedList.of("d").withAll(Arrays.asList("a", "b", "c")))
-              .iteratesAs("a", "b", "c", "d");
+        .iteratesAs("a", "b", "c", "d");
   }
 
   @Test
   public void testReversed() {
     assertThat(PersistentLinkedList.of("a", "b", "c", "d").reversed())
-              .iteratesAs("d", "c", "b", "a");
+        .iteratesAs("d", "c", "b", "a");
   }
 }

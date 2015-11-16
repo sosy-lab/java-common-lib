@@ -34,7 +34,7 @@ import java.util.SortedSet;
  */
 public class Collections3 {
 
-  private Collections3() { }
+  private Collections3() {}
 
   /**
    * Given a {@link SortedMap} with {@link String}s as key,

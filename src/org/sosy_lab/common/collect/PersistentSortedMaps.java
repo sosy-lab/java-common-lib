@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class PersistentSortedMaps {
 
-  private PersistentSortedMaps() { } // utility class
+  private PersistentSortedMaps() {} // utility class
 
   /**
    * A callback that is used when a key with two different values
@@ -76,8 +76,12 @@ public class PersistentSortedMaps {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
         throw new IllegalArgumentException(
-            "Conflicting value when merging maps for key " + key + ": "
-            + value1 + " and " + value2);
+            "Conflicting value when merging maps for key "
+                + key
+                + ": "
+                + value1
+                + " and "
+                + value2);
       }
     };
   }
@@ -87,8 +91,8 @@ public class PersistentSortedMaps {
    * (according to the natural order).
    * This may not be used if the map contains {@code null} as value.
    */
-  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V>
-      getMaximumMergeConflictHandler() {
+  public static <K, V extends Comparable<? super V>>
+      MergeConflictHandler<K, V> getMaximumMergeConflictHandler() {
     return new MergeConflictHandler<K, V>() {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
@@ -102,8 +106,8 @@ public class PersistentSortedMaps {
    * (according to the natural order).
    * This may not be used if the map contains {@code null} as value.
    */
-  public static <K, V extends Comparable<? super V>> MergeConflictHandler<K, V>
-      getMinimumMergeConflictHandler() {
+  public static <K, V extends Comparable<? super V>>
+      MergeConflictHandler<K, V> getMinimumMergeConflictHandler() {
     return new MergeConflictHandler<K, V>() {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
@@ -212,8 +216,7 @@ public class PersistentSortedMaps {
     // (n iterations, log(n) per update).
     // Invariant: The elements e1 and e2, and all the elements in the iterator
     //            still need to be handled.
-    while ((e1 != null || it1.hasNext())
-        && (e2 != null || it2.hasNext())) {
+    while ((e1 != null || it1.hasNext()) && (e2 != null || it2.hasNext())) {
 
       if (e1 == null) {
         e1 = it1.next();
@@ -273,10 +276,7 @@ public class PersistentSortedMaps {
     // Now we would copy the rest of the mappings from s1 (e1 and it1),
     // but we don't need them as s1 was the base of result.
     if (collectDifferences != MapsDifference.ignoreMapsDifference()) {
-      Iterator<Map.Entry<K, V>> rest =
-          (e1 != null)
-          ? concat(singletonIterator(e1), it1)
-          : it1;
+      Iterator<Map.Entry<K, V>> rest = (e1 != null) ? concat(singletonIterator(e1), it1) : it1;
 
       while (rest.hasNext()) {
         e1 = rest.next();
@@ -286,10 +286,7 @@ public class PersistentSortedMaps {
     }
 
     // Now copy the rest of the mappings from s2 (e2 and it2).
-    Iterator<Map.Entry<K, V>> rest =
-        (e2 != null)
-        ? concat(singletonIterator(e2), it2)
-        : it2;
+    Iterator<Map.Entry<K, V>> rest = (e2 != null) ? concat(singletonIterator(e2), it2) : it2;
 
     while (rest.hasNext()) {
       e2 = rest.next();
