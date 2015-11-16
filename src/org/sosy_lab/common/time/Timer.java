@@ -44,27 +44,28 @@ public final class Timer {
    * The clock we use for accessing the time.
    */
   static final @Nullable TickerWithUnit DEFAULT_CLOCK;
+
   static {
-    String clockToUse = System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS")
-        .toUpperCase().trim();
+    String clockToUse =
+        System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").toUpperCase().trim();
     switch (clockToUse) {
-    case "WALLTIME_MILLIS":
-      DEFAULT_CLOCK = Tickers.getWalltimeMillis();
-      break;
-    case "WALLTIME_NANOS":
-      DEFAULT_CLOCK = Tickers.getWalltimeNanos();
-      break;
-    case "THREAD_CPUTIME":
-      DEFAULT_CLOCK = Tickers.getCurrentThreadCputime();
-      break;
-    case "PROCESS_CPUTIME":
-      DEFAULT_CLOCK = Tickers.getProcessCputime();
-      break;
-    case "NONE":
-      DEFAULT_CLOCK = Tickers.getNullTicker();
-      break;
-    default:
-      DEFAULT_CLOCK = null;
+      case "WALLTIME_MILLIS":
+        DEFAULT_CLOCK = Tickers.getWalltimeMillis();
+        break;
+      case "WALLTIME_NANOS":
+        DEFAULT_CLOCK = Tickers.getWalltimeNanos();
+        break;
+      case "THREAD_CPUTIME":
+        DEFAULT_CLOCK = Tickers.getCurrentThreadCputime();
+        break;
+      case "PROCESS_CPUTIME":
+        DEFAULT_CLOCK = Tickers.getProcessCputime();
+        break;
+      case "NONE":
+        DEFAULT_CLOCK = Tickers.getNullTicker();
+        break;
+      default:
+        DEFAULT_CLOCK = null;
     }
   }
 
@@ -75,37 +76,41 @@ public final class Timer {
   private volatile boolean running = false;
 
   /** The time when the timer was last started. */
-  private long startTime             = 0;
+  private long startTime = 0;
 
   /**
    * The sum of times of all intervals.
    * This field should be accessed through {@link #sumTime()}
    * to account for a currently running interval.
    */
-  private long sumTime               = 0;
+  private long sumTime = 0;
 
   /** The maximal time of all intervals. */
-  private long maxTime               = 0;
+  private long maxTime = 0;
 
   /**
    * The number of intervals.
    * This field should be accessed through {@link #getNumberOfIntervals()}
    * to account for a currently running interval.
    */
-  private int  numberOfIntervals     = 0;
+  private int numberOfIntervals = 0;
 
   /** The length of the last measured interval. */
-  private long lastIntervalLength    = 0;
+  private long lastIntervalLength = 0;
 
   /**
    * Create a fresh timer in the not-running state.
    */
   public Timer() {
     if (DEFAULT_CLOCK == null) {
-      throw new IllegalArgumentException("Invalid value "
-          + "\'" + System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME) + "\'"
-          + " for property " + DEFAULT_CLOCK_PROPERTY_NAME
-          + ", cannot create Timer without explicitly specified clock.");
+      throw new IllegalArgumentException(
+          "Invalid value "
+              + "\'"
+              + System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME)
+              + "\'"
+              + " for property "
+              + DEFAULT_CLOCK_PROPERTY_NAME
+              + ", cannot create Timer without explicitly specified clock.");
     }
     clock = DEFAULT_CLOCK;
   }
@@ -171,9 +176,7 @@ public final class Timer {
   }
 
   long currentInterval() {
-    return running
-          ? clock.read() - startTime
-          : 0;
+    return running ? clock.read() - startTime : 0;
   }
 
   /**
@@ -222,9 +225,7 @@ public final class Timer {
   }
 
   long lengthOfLastInterval() {
-    return running
-          ? currentInterval()
-          : lastIntervalLength;
+    return running ? currentInterval() : lastIntervalLength;
   }
 
   /**

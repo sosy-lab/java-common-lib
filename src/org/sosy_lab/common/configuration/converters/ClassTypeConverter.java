@@ -32,13 +32,18 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 
-
 public class ClassTypeConverter implements TypeConverter {
 
   @Override
-  public Object convert(String optionName, String value, Class<?> type, Type genericType,
-      Annotation secondaryOption, Path pSource, LogManager logger)
-          throws InvalidConfigurationException {
+  public Object convert(
+      String optionName,
+      String value,
+      Class<?> type,
+      Type genericType,
+      Annotation secondaryOption,
+      Path pSource,
+      LogManager logger)
+      throws InvalidConfigurationException {
 
     // null means "no prefix"
     Iterable<String> packagePrefixes = Collections.<String>singleton(null);
@@ -49,8 +54,9 @@ public class ClassTypeConverter implements TypeConverter {
         throw new UnsupportedOperationException(
             "Options of type Class may not be annotated with " + secondaryOption);
       }
-      packagePrefixes = Iterables.concat(packagePrefixes,
-          Arrays.asList(((ClassOption) secondaryOption).packagePrefix()));
+      packagePrefixes =
+          Iterables.concat(
+              packagePrefixes, Arrays.asList(((ClassOption) secondaryOption).packagePrefix()));
     }
 
     // get value of type parameter
@@ -73,8 +79,12 @@ public class ClassTypeConverter implements TypeConverter {
     // check type
     if (!targetType.isAssignableFrom(cls)) {
       throw new InvalidConfigurationException(
-          "Class " + value + " specified in option " + optionName
-          + " is not an instance of " + targetType.getCanonicalName());
+          "Class "
+              + value
+              + " specified in option "
+              + optionName
+              + " is not an instance of "
+              + targetType.getCanonicalName());
     }
 
     Classes.produceClassLoadingWarning(logger, cls, targetType);
@@ -83,10 +93,13 @@ public class ClassTypeConverter implements TypeConverter {
   }
 
   @Override
-  public <T> T convertDefaultValue(String pOptionName, T pValue, Class<T> pType, Type pGenericType,
+  public <T> T convertDefaultValue(
+      String pOptionName,
+      T pValue,
+      Class<T> pType,
+      Type pGenericType,
       Annotation pSecondaryOption) {
 
     return pValue;
   }
-
 }

@@ -38,7 +38,10 @@ public class NativeLibraries {
 
   private NativeLibraries() {}
 
-  public enum OS { LINUX, MACOSX, WINDOWS;
+  public enum OS {
+    LINUX,
+    MACOSX,
+    WINDOWS;
 
     private static @Nullable OS currentOS = null;
 
@@ -75,7 +78,9 @@ public class NativeLibraries {
     }
   }
 
-  public enum Architecture { X86, X86_64;
+  public enum Architecture {
+    X86,
+    X86_64;
 
     private static @Nullable Architecture currentArch = null;
 
@@ -110,16 +115,14 @@ public class NativeLibraries {
         if (!isNullOrEmpty(prop)) {
           prop = prop.toLowerCase();
 
-
           if (prop.contains("32-bit") || prop.contains("32bit") || prop.contains("i386")) {
 
             currentArch = Architecture.X86;
-          } else if (
-              prop.contains("64-bit")
-                  || prop.contains("64bit")
-                  || prop.contains("x64")
-                  || prop.contains("x86_64")
-                  || prop.contains("amd64")) {
+          } else if (prop.contains("64-bit")
+              || prop.contains("64bit")
+              || prop.contains("x64")
+              || prop.contains("x86_64")
+              || prop.contains("amd64")) {
 
             currentArch = Architecture.X86_64;
           } else {

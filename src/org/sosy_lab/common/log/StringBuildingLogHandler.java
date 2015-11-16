@@ -72,7 +72,6 @@ public class StringBuildingLogHandler extends Handler {
     return sb.toString();
   }
 
-
   public synchronized void clear() {
     sb.setLength(0);
     sb.trimToSize(); // free memory

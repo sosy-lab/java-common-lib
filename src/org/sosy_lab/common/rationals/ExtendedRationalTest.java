@@ -123,24 +123,24 @@ public class ExtendedRationalTest {
 
   @Test
   public void testComparison() {
-    List<ExtendedRational> unsorted = Arrays.asList(
-       ExtendedRational.NaN,
-       ExtendedRational.NEG_INFTY,
-       ExtendedRational.ofString("-2/4"),
-       ExtendedRational.ofString("1/3"),
-       ExtendedRational.ofString("2/3"),
-       ExtendedRational.INFTY
-    );
+    List<ExtendedRational> unsorted =
+        Arrays.asList(
+            ExtendedRational.NaN,
+            ExtendedRational.NEG_INFTY,
+            ExtendedRational.ofString("-2/4"),
+            ExtendedRational.ofString("1/3"),
+            ExtendedRational.ofString("2/3"),
+            ExtendedRational.INFTY);
     Collections.shuffle(unsorted);
 
-    List<ExtendedRational> sorted = Arrays.asList(
-        ExtendedRational.NEG_INFTY,
-        ExtendedRational.ofString("-2/4"),
-        ExtendedRational.ofString("1/3"),
-        ExtendedRational.ofString("2/3"),
-        ExtendedRational.INFTY,
-        ExtendedRational.NaN
-    );
+    List<ExtendedRational> sorted =
+        Arrays.asList(
+            ExtendedRational.NEG_INFTY,
+            ExtendedRational.ofString("-2/4"),
+            ExtendedRational.ofString("1/3"),
+            ExtendedRational.ofString("2/3"),
+            ExtendedRational.INFTY,
+            ExtendedRational.NaN);
 
     Collections.sort(unsorted);
 

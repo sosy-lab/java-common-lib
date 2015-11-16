@@ -28,16 +28,17 @@ import java.io.IOException;
 
 public class AppendersTest {
 
-  private final Appender testAppender = new AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        out.append("123");
-        out.append("456");
-        out.append("7");
-        out.append("8");
-        out.append("9");
-      }
-    };
+  private final Appender testAppender =
+      new AbstractAppender() {
+        @Override
+        public void appendTo(Appendable out) throws IOException {
+          out.append("123");
+          out.append("456");
+          out.append("7");
+          out.append("8");
+          out.append("9");
+        }
+      };
 
   @Test
   public void testToStringWithTruncation_NoLimit() {

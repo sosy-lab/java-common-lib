@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  *
  * It serves to specify additional information which is required for class options.
  */
-@OptionDetailAnnotation(applicableTo=Class.class)
+@OptionDetailAnnotation(applicableTo = Class.class)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

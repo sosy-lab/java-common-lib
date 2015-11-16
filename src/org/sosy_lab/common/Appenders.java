@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
  */
 public class Appenders {
 
-  private Appenders() { }
+  private Appenders() {}
 
   /**
    * Return an {@link Appender} for the given object.
@@ -64,7 +64,7 @@ public class Appenders {
    * @param o The object which will be dumped, may be null.
    * @throws IOException If the appendable throws an IOException
    */
-  public static void appendTo(final Appendable output,  @Nullable final Object o)
+  public static void appendTo(final Appendable output, @Nullable final Object o)
       throws IOException {
     if (o instanceof Appender) {
       ((Appender) o).appendTo(output);
@@ -221,35 +221,36 @@ public class Appenders {
   public static String toStringWithTruncation(Appender a, final int truncateAt) {
     checkArgument(truncateAt >= 0, "Maximum size of String cannot be negative");
     final StringBuilder sb = new StringBuilder();
-    Appendable limiter = new Appendable() {
+    Appendable limiter =
+        new Appendable() {
 
-      private void checkSize() throws SizeLimitReachedException {
-        if (sb.length() >= truncateAt) {
-          throw new SizeLimitReachedException();
-        }
-      }
+          private void checkSize() throws SizeLimitReachedException {
+            if (sb.length() >= truncateAt) {
+              throw new SizeLimitReachedException();
+            }
+          }
 
-      @Override
-      public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
-        sb.append(pCsq, pStart, pEnd);
-        checkSize();
-        return this;
-      }
+          @Override
+          public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
+            sb.append(pCsq, pStart, pEnd);
+            checkSize();
+            return this;
+          }
 
-      @Override
-      public Appendable append(char pC) throws IOException {
-        sb.append(pC);
-        checkSize();
-        return this;
-      }
+          @Override
+          public Appendable append(char pC) throws IOException {
+            sb.append(pC);
+            checkSize();
+            return this;
+          }
 
-      @Override
-      public Appendable append(CharSequence pCsq) throws IOException {
-        sb.append(pCsq);
-        checkSize();
-        return this;
-      }
-    };
+          @Override
+          public Appendable append(CharSequence pCsq) throws IOException {
+            sb.append(pCsq);
+            checkSize();
+            return this;
+          }
+        };
 
     try {
       a.appendTo(limiter);

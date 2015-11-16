@@ -34,9 +34,15 @@ import java.lang.reflect.Type;
 public class IntegerTypeConverter implements TypeConverter {
 
   @Override
-  public Object convert(String optionName, String valueStr, Class<?> type,
-      Type pGenericType, Annotation pOption, Path pSource, LogManager logger)
-          throws InvalidConfigurationException {
+  public Object convert(
+      String optionName,
+      String valueStr,
+      Class<?> type,
+      Type pGenericType,
+      Annotation pOption,
+      Path pSource,
+      LogManager logger)
+      throws InvalidConfigurationException {
 
     if (!(pOption instanceof IntegerOption)) {
       throw new UnsupportedOperationException(
@@ -50,16 +56,28 @@ public class IntegerTypeConverter implements TypeConverter {
 
     long n = ((Number) value).longValue();
     if (option.min() > n || n > option.max()) {
-      throw new InvalidConfigurationException("Invalid value in configuration file: \""
-          + optionName + " = " + value + '\"'
-          + " (not in range [" + option.min() + ", " + option.max() + "])");
+      throw new InvalidConfigurationException(
+          "Invalid value in configuration file: \""
+              + optionName
+              + " = "
+              + value
+              + '\"'
+              + " (not in range ["
+              + option.min()
+              + ", "
+              + option.max()
+              + "])");
     }
 
     return value;
   }
 
   @Override
-  public <T> T convertDefaultValue(String pOptionName, T pValue, Class<T> pType, Type pGenericType,
+  public <T> T convertDefaultValue(
+      String pOptionName,
+      T pValue,
+      Class<T> pType,
+      Type pGenericType,
       Annotation pSecondaryOption) {
 
     return pValue;

@@ -38,46 +38,48 @@ import java.util.SortedMap;
 
 public class CopyOnWriteSortedMapTest {
 
-  private static final TestStringSortedMapGenerator mapGenerator = new TestStringSortedMapGenerator() {
+  private static final TestStringSortedMapGenerator mapGenerator =
+      new TestStringSortedMapGenerator() {
 
-    @Override
-    protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
-      CopyOnWriteSortedMap<String, String> result = CopyOnWriteSortedMap.copyOf(
-          PathCopyingPersistentTreeMap.<String, String>of());
-      for (Entry<String, String> entry : pEntries) {
-        result.put(entry.getKey(), entry.getValue());
-      }
-      return result;
-    }
-  };
+        @Override
+        protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
+          CopyOnWriteSortedMap<String, String> result =
+              CopyOnWriteSortedMap.copyOf(PathCopyingPersistentTreeMap.<String, String>of());
+          for (Entry<String, String> entry : pEntries) {
+            result.put(entry.getKey(), entry.getValue());
+          }
+          return result;
+        }
+      };
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
     suite.addTestSuite(PathCopyingPersistentTreeMapTest.class);
 
-    suite.addTest(SortedMapTestSuiteBuilder.using(mapGenerator)
-        .named("CopyOnWriteSortedMap")
-        .withFeatures(MapFeature.ALLOWS_NULL_VALUES,
-                      // MapFeature.GENERAL_PURPOSE Not possible because collection views are unmodifiable
-                      CollectionFeature.KNOWN_ORDER,
-                      CollectionSize.ANY)
+    suite.addTest(
+        SortedMapTestSuiteBuilder.using(mapGenerator)
+            .named("CopyOnWriteSortedMap")
+            .withFeatures(
+                MapFeature.ALLOWS_NULL_VALUES,
+                // MapFeature.GENERAL_PURPOSE Not possible because collection views are unmodifiable
+                CollectionFeature.KNOWN_ORDER,
+                CollectionSize.ANY)
 
-        // We throw ClassCastException as allowed by the JavaDoc of SortedMap
-        .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
+            // We throw ClassCastException as allowed by the JavaDoc of SortedMap
+            .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
 
-        // Map is actually mutable, can't select the appropriate tests (see above)
-        .suppressing(MapPutTester.class.getMethod("testPut_unsupportedNotPresent"))
-        .suppressing(MapPutTester.class.getMethod("testPut_unsupportedPresentDifferentValue"))
-        .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedSomePresent"))
-        .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedNonePresent"))
-        .suppressing(MapRemoveTester.class.getMethod("testRemove_unsupported"))
-        .suppressing(MapClearTester.class.getMethod("testClear_unsupported"))
+            // Map is actually mutable, can't select the appropriate tests (see above)
+            .suppressing(MapPutTester.class.getMethod("testPut_unsupportedNotPresent"))
+            .suppressing(MapPutTester.class.getMethod("testPut_unsupportedPresentDifferentValue"))
+            .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedSomePresent"))
+            .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedNonePresent"))
+            .suppressing(MapRemoveTester.class.getMethod("testRemove_unsupported"))
+            .suppressing(MapClearTester.class.getMethod("testClear_unsupported"))
 
-        // subMap is created lazily
-        // TODO change this and enable test
-        .suppressing(SortedMapNavigationTester.class.getMethod("testSubMapIllegal"))
-
-        .createTestSuite());
+            // subMap is created lazily
+            // TODO change this and enable test
+            .suppressing(SortedMapNavigationTester.class.getMethod("testSubMapIllegal"))
+            .createTestSuite());
 
     return suite;
   }

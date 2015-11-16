@@ -72,8 +72,8 @@ public abstract class AbstractMBean {
       try {
         oname = new ObjectName(checkNotNull(name));
       } catch (MalformedObjectNameException e) {
-        logger.logException(Level.WARNING, e,
-            "Invalid object name specified for management interface");
+        logger.logException(
+            Level.WARNING, e, "Invalid object name specified for management interface");
       }
     }
   }
@@ -118,11 +118,11 @@ public abstract class AbstractMBean {
       try {
         MBEAN_SERVER.unregisterMBean(oname);
       } catch (JMException e) {
-        logger.logException(Level.WARNING, e,
-            "Error during unregistration of management interface");
+        logger.logException(
+            Level.WARNING, e, "Error during unregistration of management interface");
       } catch (SecurityException e) {
-        logger.logException(Level.WARNING, e,
-            "Error during unregistration of management interface");
+        logger.logException(
+            Level.WARNING, e, "Error during unregistration of management interface");
       }
     }
   }

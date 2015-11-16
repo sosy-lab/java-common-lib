@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
  */
 public final class JSON {
 
-  private JSON() { }
+  private JSON() {}
 
   /**
    * Encode an object into JSON text and write it to a file.
@@ -95,8 +95,8 @@ public final class JSON {
       writeJSONString((List<?>) value, out);
 
     } else {
-      throw new NotSerializableException("Object of class " + value.getClass().getName()
-          + " cannot be written as JSON");
+      throw new NotSerializableException(
+          "Object of class " + value.getClass().getName() + " cannot be written as JSON");
     }
   }
 
@@ -118,7 +118,6 @@ public final class JSON {
     }
     out.append(']');
   }
-
 
   /**
    * Encode a map into JSON text and write it to out.
@@ -148,42 +147,42 @@ public final class JSON {
   private static void escape(CharSequence s, Appendable out) throws IOException {
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);
-      switch(ch) {
-      case '"':
-        out.append("\\\"");
-        break;
-      case '\\':
-        out.append("\\\\");
-        break;
-      case '\b':
-        out.append("\\b");
-        break;
-      case '\f':
-        out.append("\\f");
-        break;
-      case '\n':
-        out.append("\\n");
-        break;
-      case '\r':
-        out.append("\\r");
-        break;
-      case '\t':
-        out.append("\\t");
-        break;
-      case '/':
-        out.append("\\/");
-        break;
-      default:
-        //Reference: http://www.unicode.org/versions/Unicode5.1.0/
-        if ((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F')
-            || (ch>='\u2000' && ch<='\u20FF')) {
-          String ss = Integer.toHexString(ch)
-                             .toUpperCase();
-          out.append("\\u");
-          out.append(Strings.padStart(ss, 4, '0'));
-        } else {
-          out.append(ch);
-        }
+      switch (ch) {
+        case '"':
+          out.append("\\\"");
+          break;
+        case '\\':
+          out.append("\\\\");
+          break;
+        case '\b':
+          out.append("\\b");
+          break;
+        case '\f':
+          out.append("\\f");
+          break;
+        case '\n':
+          out.append("\\n");
+          break;
+        case '\r':
+          out.append("\\r");
+          break;
+        case '\t':
+          out.append("\\t");
+          break;
+        case '/':
+          out.append("\\/");
+          break;
+        default:
+          //Reference: http://www.unicode.org/versions/Unicode5.1.0/
+          if ((ch >= '\u0000' && ch <= '\u001F')
+              || (ch >= '\u007F' && ch <= '\u009F')
+              || (ch >= '\u2000' && ch <= '\u20FF')) {
+            String ss = Integer.toHexString(ch).toUpperCase();
+            out.append("\\u");
+            out.append(Strings.padStart(ss, 4, '0'));
+          } else {
+            out.append(ch);
+          }
       }
     }
   }

@@ -28,7 +28,6 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nullable;
 
-
 public class Threads {
 
   private static @Nullable ThreadFactory factory;
@@ -68,8 +67,8 @@ public class Threads {
    * @param priority The priority of the new thread.
    * @return A new Thread instance.
    */
-  public static Thread newThread(Runnable r, @Nullable String name,
-      @Nullable Boolean daemon, @Nullable Integer priority) {
+  public static Thread newThread(
+      Runnable r, @Nullable String name, @Nullable Boolean daemon, @Nullable Integer priority) {
     checkNotNull(r);
     CatchSecurityViolationThreadFactoryBuilder builder = threadFactoryBuilder();
 
@@ -83,9 +82,7 @@ public class Threads {
       builder.setPriority(priority);
     }
 
-    return builder
-        .build()
-        .newThread(r);
+    return builder.build().newThread(r);
   }
 
   /**

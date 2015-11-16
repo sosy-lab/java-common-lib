@@ -38,18 +38,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeSpanTypeConverter implements TypeConverter {
 
-  private static final BiMap<String, TimeUnit> TIME_UNITS = ImmutableBiMap.of(
-      "ns",  TimeUnit.NANOSECONDS,
-      "ms",  TimeUnit.MILLISECONDS,
-      "s",   TimeUnit.SECONDS,
-      "min", TimeUnit.MINUTES,
-      "h",   TimeUnit.HOURS
-      );
+  private static final BiMap<String, TimeUnit> TIME_UNITS =
+      ImmutableBiMap.of(
+          "ns", TimeUnit.NANOSECONDS,
+          "ms", TimeUnit.MILLISECONDS,
+          "s", TimeUnit.SECONDS,
+          "min", TimeUnit.MINUTES,
+          "h", TimeUnit.HOURS);
 
   @Override
-  public Object convert(String optionName, String valueStr, Class<?> pType,
-      Type pGenericType, Annotation pOption, Path pSource, LogManager logger)
-          throws InvalidConfigurationException {
+  public Object convert(
+      String optionName,
+      String valueStr,
+      Class<?> pType,
+      Type pGenericType,
+      Annotation pOption,
+      Path pSource,
+      LogManager logger)
+      throws InvalidConfigurationException {
 
     if (!(pOption instanceof TimeSpanOption)) {
       throw new UnsupportedOperationException(
@@ -82,17 +88,23 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     if (option.min() > value || value > option.max()) {
       String codeUnitStr = TIME_UNITS.inverse().get(codeUnit);
-      throw new InvalidConfigurationException(String.format(
-          "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
-          optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
+      throw new InvalidConfigurationException(
+          String.format(
+              "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
+              optionName,
+              value,
+              option.min(),
+              codeUnitStr,
+              option.max(),
+              codeUnitStr));
     }
 
     Object result;
 
     if (pType.equals(Integer.class)) {
       if (value > Integer.MAX_VALUE) {
-        throw new InvalidConfigurationException("Value for option " + optionName
-            + " is larger than " + Integer.MAX_VALUE);
+        throw new InvalidConfigurationException(
+            "Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
       }
       result = (int) value;
     } else if (pType.equals(Long.class)) {
@@ -105,7 +117,11 @@ public class TimeSpanTypeConverter implements TypeConverter {
   }
 
   @Override
-  public <T> T convertDefaultValue(String pOptionName, T pValue, Class<T> pType, Type pGenericType,
+  public <T> T convertDefaultValue(
+      String pOptionName,
+      T pValue,
+      Class<T> pType,
+      Type pGenericType,
       Annotation pSecondaryOption) {
 
     return pValue;

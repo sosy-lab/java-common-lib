@@ -36,8 +36,9 @@ import java.lang.annotation.Target;
  * In order to use it, you need to register an instance of {@link FileTypeConverter}
  * as a converter for {@link FileOption}.
  */
-@OptionDetailAnnotation(applicableTo={File.class, Path.class, PathTemplate.class,
-                                      PathCounterTemplate.class})
+@OptionDetailAnnotation(
+  applicableTo = {File.class, Path.class, PathTemplate.class, PathCounterTemplate.class}
+)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

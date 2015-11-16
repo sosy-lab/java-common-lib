@@ -39,5 +39,4 @@ class LogUtils {
     String className = fullClassName.substring(dotIndex + 1);
     return className;
   }
-
 }

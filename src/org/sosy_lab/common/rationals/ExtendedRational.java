@@ -28,6 +28,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
 
   public static final ExtendedRational INFTY = new ExtendedRational(NumberType.INFTY);
   public static final ExtendedRational NEG_INFTY = new ExtendedRational(NumberType.NEG_INFTY);
+
   @SuppressWarnings("checkstyle:constantname")
   public static final ExtendedRational NaN = new ExtendedRational(NumberType.NaN);
 
@@ -168,8 +169,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
       return NaN;
     } else if (this == NEG_INFTY ^ b == NEG_INFTY) {
       return NEG_INFTY;
-    } else if (this == INFTY || b == INFTY
-        || (this == NEG_INFTY && b == NEG_INFTY)) {
+    } else if (this == INFTY || b == INFTY || (this == NEG_INFTY && b == NEG_INFTY)) {
       return INFTY;
     }
     return new ExtendedRational(rational.times(b.rational));
@@ -178,8 +178,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   public ExtendedRational plus(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } else if (this == NEG_INFTY && b == INFTY
-        || this == INFTY && b == NEG_INFTY) {
+    } else if (this == NEG_INFTY && b == INFTY || this == INFTY && b == NEG_INFTY) {
       return NaN;
     } else if (this == INFTY || b == INFTY) {
       return INFTY;

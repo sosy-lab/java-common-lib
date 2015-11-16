@@ -32,14 +32,11 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.concurrent.ThreadFactory;
 
-
 public class ThreadsTest {
 
-  @Rule
-  public MockitoRule mockito = MockitoJUnit.rule();
+  @Rule public MockitoRule mockito = MockitoJUnit.rule();
 
-  @Mock
-  private Runnable mockRunnable;
+  @Mock private Runnable mockRunnable;
 
   @Test
   public void shouldReturnDefaultThreadFactory() throws Exception {

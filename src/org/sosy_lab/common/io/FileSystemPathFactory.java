@@ -29,7 +29,6 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-
 public class FileSystemPathFactory implements AbstractPathFactory {
 
   @Override
@@ -70,5 +69,4 @@ public class FileSystemPathFactory implements AbstractPathFactory {
       }
     }
   }
-
 }

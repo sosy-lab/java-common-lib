@@ -44,13 +44,18 @@ import java.util.regex.PatternSyntaxException;
  * This class should not have any relevance outside the {@link Configuration} class.
  */
 public enum BaseTypeConverter implements TypeConverter {
-
   INSTANCE;
 
   @Override
-  public Object convert(String optionName, String valueStr, Class<?> type, Type pGenericType,
-      Annotation pSecondaryOption, Path pSource, LogManager logger)
-          throws InvalidConfigurationException {
+  public Object convert(
+      String optionName,
+      String valueStr,
+      Class<?> type,
+      Type pGenericType,
+      Annotation pSecondaryOption,
+      Path pSource,
+      LogManager logger)
+      throws InvalidConfigurationException {
 
     if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
@@ -91,8 +96,14 @@ public enum BaseTypeConverter implements TypeConverter {
         return Pattern.compile(valueStr);
       } catch (PatternSyntaxException e) {
         throw new InvalidConfigurationException(
-            "Illegal regular expression " + valueStr + " in option " + optionName
-            + " (" + e.getMessage() + ")", e);
+            "Illegal regular expression "
+                + valueStr
+                + " in option "
+                + optionName
+                + " ("
+                + e.getMessage()
+                + ")",
+            e);
       }
 
     } else {
@@ -102,8 +113,9 @@ public enum BaseTypeConverter implements TypeConverter {
   }
 
   @Override
-  public <T> T convertDefaultValue(String pOptionName, T pValue, Class<T> pType, Type pGenericType,
-      Annotation pSecondaryOption) throws InvalidConfigurationException {
+  public <T> T convertDefaultValue(
+      String pOptionName, T pValue, Class<T> pType, Type pGenericType, Annotation pSecondaryOption)
+      throws InvalidConfigurationException {
 
     return pValue;
   }
@@ -122,9 +134,13 @@ public enum BaseTypeConverter implements TypeConverter {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
   }
 
-  public static <T> Object invokeStaticMethod(final Class<?> type, final String method,
-      final Class<T> paramType, final T value, final String optionName)
-          throws InvalidConfigurationException {
+  public static <T> Object invokeStaticMethod(
+      final Class<?> type,
+      final String method,
+      final Class<T> paramType,
+      final T value,
+      final String optionName)
+      throws InvalidConfigurationException {
     try {
       Method m = type.getMethod(method, paramType);
       if (!m.isAccessible()) {
@@ -133,17 +149,42 @@ public enum BaseTypeConverter implements TypeConverter {
       return m.invoke(null, value);
 
     } catch (NoSuchMethodException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without "
-          + method + "(" + paramType.getSimpleName() + ") method!");
+      throw new AssertionError(
+          "Class "
+              + type.getSimpleName()
+              + " without "
+              + method
+              + "("
+              + paramType.getSimpleName()
+              + ") method!");
     } catch (SecurityException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
+      throw new AssertionError(
+          "Class "
+              + type.getSimpleName()
+              + " without accessible "
+              + method
+              + "("
+              + paramType.getSimpleName()
+              + ") method!");
     } catch (IllegalAccessException e) {
-      throw new AssertionError("Class " + type.getSimpleName() + " without accessible "
-          + method + "(" + paramType.getSimpleName() + ") method!");
+      throw new AssertionError(
+          "Class "
+              + type.getSimpleName()
+              + " without accessible "
+              + method
+              + "("
+              + paramType.getSimpleName()
+              + ") method!");
     } catch (InvocationTargetException e) {
-      throw new InvalidConfigurationException("Could not parse \"" + optionName
-          + " = " + value + "\" (" + e.getTargetException().getMessage() + ")", e);
+      throw new InvalidConfigurationException(
+          "Could not parse \""
+              + optionName
+              + " = "
+              + value
+              + "\" ("
+              + e.getTargetException().getMessage()
+              + ")",
+          e);
     }
   }
 }

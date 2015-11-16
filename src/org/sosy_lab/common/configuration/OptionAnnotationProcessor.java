@@ -84,9 +84,9 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   // The set of known option-detail annotations.
   // For those we can check that @Option is not missing if one of them is present.
-  private static final Set<Class<? extends Annotation>> KNOWN_OPTION_DETAIL_ANNOTATIONS
-      = ImmutableSet.of(ClassOption.class, FileOption.class, IntegerOption.class,
-          TimeSpanOption.class);
+  private static final Set<Class<? extends Annotation>> KNOWN_OPTION_DETAIL_ANNOTATIONS =
+      ImmutableSet.of(
+          ClassOption.class, FileOption.class, IntegerOption.class, TimeSpanOption.class);
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -129,9 +129,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    */
   private void processOptionDetailAnnotation(Element elem, Class<? extends Annotation> annotation) {
     if (elem.getAnnotation(Option.class) == null) {
-      message(ERROR, elem, annotation,
-          "Option-detail annotation @" + annotation.getSimpleName()
-          + " is not valid without an @Option annotation at the same element.");
+      message(
+          ERROR,
+          elem,
+          annotation,
+          "Option-detail annotation @"
+              + annotation.getSimpleName()
+              + " is not valid without an @Option annotation at the same element.");
     }
   }
 
@@ -145,8 +149,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    */
   private void processOptions(Element elem) {
     if (elem.getKind() != ElementKind.CLASS) {
-      message(ERROR, elem, Options.class,
-          "@Options annotation can only be used on classes.");
+      message(ERROR, elem, Options.class, "@Options annotation can only be used on classes.");
       return;
     }
     TypeElement element = (TypeElement) elem;
@@ -175,9 +178,11 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
           }
         }
         if (!foundConfigurationParameter && warningsEnabled(constructor)) {
-          message(WARNING, constructor,
+          message(
+              WARNING,
+              constructor,
               "Constructor does not receive Configuration instance"
-              + " and may not be able to inject configuration options of this class.");
+                  + " and may not be able to inject configuration options of this class.");
         }
       }
     }
@@ -194,7 +199,10 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     } while (currentClass.getSuperclass().getKind() != TypeKind.NONE);
 
     if (!foundOption && warningsEnabled(element)) {
-      message(WARNING, element, Options.class,
+      message(
+          WARNING,
+          element,
+          Options.class,
           "@Options annotation on class without @Option fields or methods is useless.");
     }
   }
@@ -212,41 +220,52 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
     Element cls = elem.getEnclosingElement();
     if (cls.getAnnotation(Options.class) == null) {
-      message(ERROR, elem, Option.class,
+      message(
+          ERROR,
+          elem,
+          Option.class,
           "Annotation @Option is meaningless in class"
-          + " that does not use configuration-option injection."
-          + " Add @Options to surrounding class"
-          + " and call Configuration.inject(Object) in constructor.");
+              + " that does not use configuration-option injection."
+              + " Add @Options to surrounding class"
+              + " and call Configuration.inject(Object) in constructor.");
     }
 
     switch (elem.getKind()) {
-    case FIELD:
-      if (elem.getModifiers().contains(Modifier.FINAL)) {
-        message(ERROR, elem, "Modifier final on field annotated with @Option is illegal,"
-            + " as it will be written via reflection.");
-      }
-      break;
-    case METHOD:
-      // check signature (parameter count, declared exceptions)
-      final ExecutableElement method = (ExecutableElement) elem;
-      if (method.getParameters().size() != 1) {
-        message(ERROR, method,
-            "Methods annotated with @Option need to have exactly one parameter.");
-      }
-      for (TypeMirror exceptionType : method.getThrownTypes()) {
-        boolean allowedException
-            =  isSubtypeOf(exceptionType, RuntimeException.class.getName())
-            || isSubtypeOf(exceptionType, Error.class.getName())
-            || isSubtypeOf(exceptionType, InvalidConfigurationException.class.getName());
-        if (!allowedException) {
-          message(ERROR, method,
-              "Methods annotated with @Option may not throw " + exceptionType + ".");
+      case FIELD:
+        if (elem.getModifiers().contains(Modifier.FINAL)) {
+          message(
+              ERROR,
+              elem,
+              "Modifier final on field annotated with @Option is illegal,"
+                  + " as it will be written via reflection.");
         }
-      }
-      break;
-    default:
-      message(ERROR, elem, Option.class,
-          "Annotation @Option is only allowed for fields and methods.");
+        break;
+      case METHOD:
+        // check signature (parameter count, declared exceptions)
+        final ExecutableElement method = (ExecutableElement) elem;
+        if (method.getParameters().size() != 1) {
+          message(
+              ERROR, method, "Methods annotated with @Option need to have exactly one parameter.");
+        }
+        for (TypeMirror exceptionType : method.getThrownTypes()) {
+          boolean allowedException =
+              isSubtypeOf(exceptionType, RuntimeException.class.getName())
+                  || isSubtypeOf(exceptionType, Error.class.getName())
+                  || isSubtypeOf(exceptionType, InvalidConfigurationException.class.getName());
+          if (!allowedException) {
+            message(
+                ERROR,
+                method,
+                "Methods annotated with @Option may not throw " + exceptionType + ".");
+          }
+        }
+        break;
+      default:
+        message(
+            ERROR,
+            elem,
+            Option.class,
+            "Annotation @Option is only allowed for fields and methods.");
     }
 
     if (elem.getModifiers().contains(Modifier.STATIC)) {
@@ -256,7 +275,11 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     if (option.description().isEmpty() && warningsEnabled(elem)) {
       AnnotationMirror optionAnnotation = findAnnotationMirror(Option.class, elem);
       AnnotationValue value = findAnnotationValue(Option.class, "description", optionAnnotation);
-      message(WARNING, elem, optionAnnotation, value,
+      message(
+          WARNING,
+          elem,
+          optionAnnotation,
+          value,
           "@Option annotation should not have empty description.");
     }
   }
@@ -292,18 +315,18 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // Determine type of option as declared in source.
       TypeMirror optionType;
       switch (elem.getKind()) {
-      case FIELD:
-        optionType = elem.asType();
-        break;
-      case METHOD:
-        ExecutableElement method = (ExecutableElement) elem;
-        if (method.getParameters().size() != 1) {
-          continue; // error, already reported above
-        }
-        optionType = method.getParameters().get(0).asType();
-        break;
-      default:
-        continue; // error, prevented by compiler
+        case FIELD:
+          optionType = elem.asType();
+          break;
+        case METHOD:
+          ExecutableElement method = (ExecutableElement) elem;
+          if (method.getParameters().size() != 1) {
+            continue; // error, already reported above
+          }
+          optionType = method.getParameters().get(0).asType();
+          break;
+        default:
+          continue; // error, prevented by compiler
       }
 
       // If this option is an array or a collection, get the component type.
@@ -337,8 +360,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // acceptedClasses is a List<AnnotationValue>
       // where each AnnotationValue has a TypeMirror/DeclaredType instance as value,
       // because applicableTo is defined as array of Class instances.
-      AnnotationValue acceptedClasses = findAnnotationValue(
-          OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation);
+      AnnotationValue acceptedClasses =
+          findAnnotationValue(OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation);
 
       boolean foundMatchingType = false;
       final Set<String> acceptedTypeNames = new HashSet<>();
@@ -363,20 +386,30 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         } else {
           msgPrefix = "Option with incompatible type";
         }
-        message(ERROR, elem, am,
-            msgPrefix + " " + optionType
-            + " for annotation " + annotationName
-            + ", this annotation is only for types "
-            + Joiner.on(", ").join(acceptedTypeNames) + ".");
+        message(
+            ERROR,
+            elem,
+            am,
+            msgPrefix
+                + " "
+                + optionType
+                + " for annotation "
+                + annotationName
+                + ", this annotation is only for types "
+                + Joiner.on(", ").join(acceptedTypeNames)
+                + ".");
       }
     }
 
     if (usedDetailAnnotations.size() > 1) {
-      message(ERROR, elem,
+      message(
+          ERROR,
+          elem,
           "Elements annotated with @Option"
-          + " might have at most one additional option-detail annotation,"
-          + " but this element has the following annotations: "
-          + Joiner.on(", ").join(usedDetailAnnotations) + ".");
+              + " might have at most one additional option-detail annotation,"
+              + " but this element has the following annotations: "
+              + Joiner.on(", ").join(usedDetailAnnotations)
+              + ".");
     }
   }
 
@@ -433,9 +466,9 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * Check whether the given element contains any directly enclosed element
    * with a specific annotation.
    */
-  private boolean hasChildWithAnnotation(final Element element,
-      final Class<? extends Annotation> annotation) {
-    for (Element child :  element.getEnclosedElements()) {
+  private boolean hasChildWithAnnotation(
+      final Element element, final Class<? extends Annotation> annotation) {
+    for (Element child : element.getEnclosedElements()) {
       if (child.getAnnotation(annotation) != null) {
         return true;
       }
@@ -475,7 +508,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    */
   private @Nullable AnnotationValue findAnnotationValue(
       final Class<? extends Annotation> annotationClass,
-      final String fieldName, final AnnotationMirror annotation) {
+      final String fieldName,
+      final AnnotationMirror annotation) {
     checkArgument(annotation.getAnnotationType().toString().equals(annotationClass.getName()));
 
     // check whether annotation declares field
@@ -485,8 +519,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       throw new IllegalArgumentException(e);
     }
 
-    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
-        : annotation.getElementValues().entrySet()) {
+    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
+        annotation.getElementValues().entrySet()) {
       if (entry.getKey().getSimpleName().contentEquals(fieldName)) {
         return entry.getValue();
       }
@@ -518,8 +552,10 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public Iterable<? extends Completion> getCompletions(
-      final @Nullable Element element, final @Nullable AnnotationMirror annotation,
-      final @Nullable ExecutableElement field, final @Nullable String userText) {
+      final @Nullable Element element,
+      final @Nullable AnnotationMirror annotation,
+      final @Nullable ExecutableElement field,
+      final @Nullable String userText) {
 
     if (element == null || annotation == null || field == null) {
       return super.getCompletions(element, annotation, field, userText);
@@ -568,18 +604,22 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     processingEnv.getMessager().printMessage(level, message, elem);
   }
 
-  private void message(Diagnostic.Kind level, Element elem,
-      Class<? extends Annotation> annotation, String message) {
+  private void message(
+      Diagnostic.Kind level, Element elem, Class<? extends Annotation> annotation, String message) {
     message(level, elem, findAnnotationMirror(annotation, elem), message);
   }
 
-  private void message(Diagnostic.Kind level, Element elem,
-      AnnotationMirror annotationMirror, String message) {
+  private void message(
+      Diagnostic.Kind level, Element elem, AnnotationMirror annotationMirror, String message) {
     processingEnv.getMessager().printMessage(level, message, elem, annotationMirror);
   }
 
-  private void message(Diagnostic.Kind level, Element elem,
-      AnnotationMirror annotation, AnnotationValue value, String message) {
+  private void message(
+      Diagnostic.Kind level,
+      Element elem,
+      AnnotationMirror annotation,
+      AnnotationValue value,
+      String message) {
     processingEnv.getMessager().printMessage(level, message, elem, annotation, value);
   }
 }

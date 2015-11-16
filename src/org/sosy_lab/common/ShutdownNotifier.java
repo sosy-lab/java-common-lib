@@ -86,10 +86,11 @@ public final class ShutdownNotifier {
       // This creates a set which is backed by a thread-safe map
       // with identity comparison (== instead of equals())
       // and weak references for the keys
-      Collections.newSetFromMap(new MapMaker()
-                                .concurrencyLevel(1)
-                                .weakKeys()
-                                .<ShutdownRequestListener, Boolean>makeMap());
+      Collections.newSetFromMap(
+          new MapMaker()
+              .concurrencyLevel(1)
+              .weakKeys()
+              .<ShutdownRequestListener, Boolean>makeMap());
 
   // Separate flag for notification of listeners
   // in order to prevent a race condition when registering a listener
@@ -101,14 +102,15 @@ public final class ShutdownNotifier {
 
   // Do not remove this field, otherwise the listener will be garbage collected
   // and we could miss notifications.
-  private final ShutdownRequestListener ourListener = new ShutdownRequestListener() {
-    @Override
-    public void shutdownRequested(String reason) {
-      ShutdownNotifier.this.requestShutdown(reason);
-    }
-  };
+  private final ShutdownRequestListener ourListener =
+      new ShutdownRequestListener() {
+        @Override
+        public void shutdownRequested(String reason) {
+          ShutdownNotifier.this.requestShutdown(reason);
+        }
+      };
 
-  private ShutdownNotifier() { }
+  private ShutdownNotifier() {}
 
   /**
    * Create a fresh new instance of this class.
@@ -289,7 +291,7 @@ public final class ShutdownNotifier {
     };
   }
 
-  public interface ShutdownRequestListener  {
+  public interface ShutdownRequestListener {
 
     /**
      * This method is called on registered listeners the first time

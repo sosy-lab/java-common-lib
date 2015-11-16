@@ -31,7 +31,6 @@ import java.nio.charset.Charset;
 
 import javax.annotation.Nullable;
 
-
 /**
  * This interface provides operations on a file path.
  * It mimics the behavior of {@link java.nio.file.Path}
@@ -100,7 +99,8 @@ public interface Path {
    *
    * @return The contained files and directories
    */
-  @Nullable String[] list();
+  @Nullable
+  String[] list();
 
   /**
    * Returns the path's parent.
@@ -248,5 +248,4 @@ public interface Path {
    */
   @Override
   String toString();
-
 }

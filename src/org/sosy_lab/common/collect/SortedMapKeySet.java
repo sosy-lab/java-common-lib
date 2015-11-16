@@ -38,8 +38,7 @@ import java.util.SortedSet;
  *
  * @param <K> The type of keys.
  */
-class SortedMapKeySet<K extends Comparable<? super K>>
-    extends AbstractSet<K>
+class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
     implements SortedSet<K> {
 
   private final SortedMap<K, ?> map;
@@ -50,7 +49,8 @@ class SortedMapKeySet<K extends Comparable<? super K>>
 
   @Override
   public Iterator<K> iterator() {
-    return Iterators.transform(map.entrySet().iterator(),
+    return Iterators.transform(
+        map.entrySet().iterator(),
         new Function<Map.Entry<K, ?>, K>() {
           @Override
           public K apply(Map.Entry<K, ?> input) {

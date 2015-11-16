@@ -82,23 +82,23 @@ public class LinearExpressionTest {
 
   @Test
   public void testDivisionOK() {
-    LinearExpression<String> num = LinearExpression
-        .pair("x", Rational.ofString("3")).add(LinearExpression.pair("y",
-            Rational.ofString("6")));
-    LinearExpression<String> den = LinearExpression
-        .pair("x", Rational.ofString("1")).add(LinearExpression.pair("y",
-            Rational.ofString("2")));
+    LinearExpression<String> num =
+        LinearExpression.pair("x", Rational.ofString("3"))
+            .add(LinearExpression.pair("y", Rational.ofString("6")));
+    LinearExpression<String> den =
+        LinearExpression.pair("x", Rational.ofString("1"))
+            .add(LinearExpression.pair("y", Rational.ofString("2")));
     assertThat(num.divide(den)).isEqualTo(Optional.of(Rational.ofString("3")));
   }
 
   @Test
   public void testDivisionNotPossible() {
-    LinearExpression<String> num = LinearExpression
-        .pair("x", Rational.ofString("3")).add(LinearExpression.pair("y",
-            Rational.ofString("7")));
-    LinearExpression<String> den = LinearExpression
-        .pair("x", Rational.ofString("1")).add(LinearExpression.pair("y",
-            Rational.ofString("2")));
+    LinearExpression<String> num =
+        LinearExpression.pair("x", Rational.ofString("3"))
+            .add(LinearExpression.pair("y", Rational.ofString("7")));
+    LinearExpression<String> den =
+        LinearExpression.pair("x", Rational.ofString("1"))
+            .add(LinearExpression.pair("y", Rational.ofString("2")));
     assertThat(num.divide(den)).isEqualTo(Optional.absent());
   }
 

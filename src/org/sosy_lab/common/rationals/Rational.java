@@ -55,8 +55,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     checkNotNull(numerator);
     int denSignum = denominator.signum();
     if (denSignum == 0) {
-      throw new IllegalArgumentException(
-          "Infinity is not supported, use ExtendedRational instead");
+      throw new IllegalArgumentException("Infinity is not supported, use ExtendedRational instead");
     }
 
     if (denSignum == -1) {
@@ -75,8 +74,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   public static Rational ofLongs(long numerator, long denominator) {
-    return of(
-        BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
+    return of(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
   }
 
   public static Rational ofLong(long numerator) {
@@ -129,7 +127,6 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /** Arithmetic operations. **/
-
   public Rational times(Rational b) {
     checkNotNull(b);
     Rational a = this;
@@ -159,8 +156,7 @@ public final class Rational extends Number implements Comparable<Rational> {
       return a;
     }
 
-    return of((a.num.multiply(b.den).add(b.num.multiply(a.den))),
-        a.den.multiply(b.den));
+    return of((a.num.multiply(b.den).add(b.num.multiply(a.den))), a.den.multiply(b.den));
   }
 
   public Rational minus(Rational b) {

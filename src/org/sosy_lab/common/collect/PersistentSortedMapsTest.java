@@ -30,35 +30,44 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class PersistentSortedMapsTest {
 
   private static final PersistentSortedMap<String, String> EMPTY_MAP =
       PathCopyingPersistentTreeMap.<String, String>of();
 
   private static final PersistentSortedMap<String, String> HALF1_MAP =
-      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "1",
-                                                          "c", "3"));
+      PathCopyingPersistentTreeMap.copyOf(
+          ImmutableMap.of(
+              "a", "1",
+              "c", "3"));
 
   private static final PersistentSortedMap<String, String> HALF2_MAP =
-      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("b", "2",
-                                                          "d", "4"));
+      PathCopyingPersistentTreeMap.copyOf(
+          ImmutableMap.of(
+              "b", "2",
+              "d", "4"));
 
   private static final PersistentSortedMap<String, String> FULL_MAP =
-      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "1",
-                                                          "b", "2",
-                                                          "c", "3",
-                                                          "d", "4"));
+      PathCopyingPersistentTreeMap.copyOf(
+          ImmutableMap.of(
+              "a", "1",
+              "b", "2",
+              "c", "3",
+              "d", "4"));
 
   private static final PersistentSortedMap<String, String> HALF1_MAP_INVERSE =
-      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "4",
-                                                          "c", "2"));
+      PathCopyingPersistentTreeMap.copyOf(
+          ImmutableMap.of(
+              "a", "4",
+              "c", "2"));
 
   private static final PersistentSortedMap<String, String> FULL_MAP_INVERSE =
-      PathCopyingPersistentTreeMap.copyOf(ImmutableMap.of("a", "4",
-                                                          "b", "2",
-                                                          "c", "3",
-                                                          "d", "4"));
+      PathCopyingPersistentTreeMap.copyOf(
+          ImmutableMap.of(
+              "a", "4",
+              "b", "2",
+              "c", "3",
+              "d", "4"));
 
   @Test
   public void testMerge_Equal() {
@@ -288,14 +297,14 @@ public class PersistentSortedMapsTest {
             MapsDifference.Entry.forLeftValueOnly("d", "4"));
   }
 
-
   @Test
   public void testMerge0_Equal() {
 
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              FULL_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            FULL_MAP,
+            FULL_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -304,9 +313,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map1Empty() {
 
     PersistentSortedMap<String, String> result =
-        merge(EMPTY_MAP,
-              FULL_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            EMPTY_MAP,
+            FULL_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -315,9 +325,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map2Empty() {
 
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              EMPTY_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            FULL_MAP,
+            EMPTY_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -326,9 +337,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map1Half1() {
 
     PersistentSortedMap<String, String> result =
-        merge(HALF1_MAP,
-              FULL_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            HALF1_MAP,
+            FULL_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -337,9 +349,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map1Half2() {
 
     PersistentSortedMap<String, String> result =
-        merge(HALF2_MAP,
-              FULL_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            HALF2_MAP,
+            FULL_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -348,9 +361,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map2Half1() {
 
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              HALF1_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            FULL_MAP,
+            HALF1_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -359,9 +373,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map2Half2() {
 
     PersistentSortedMap<String, String> result =
-        merge(FULL_MAP,
-              HALF2_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            FULL_MAP,
+            HALF2_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -370,9 +385,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map1Half1_map2Half2() {
 
     PersistentSortedMap<String, String> result =
-        merge(HALF1_MAP,
-              HALF2_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            HALF1_MAP,
+            HALF2_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }
@@ -381,9 +397,10 @@ public class PersistentSortedMapsTest {
   public void testMerge0_map1Half2_map2Half1() {
 
     PersistentSortedMap<String, String> result =
-        merge(HALF2_MAP,
-              HALF1_MAP,
-              PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
+        merge(
+            HALF2_MAP,
+            HALF1_MAP,
+            PersistentSortedMaps.<String, String>getExceptionMergeConflictHandler());
 
     assertThat(result).isEqualTo(FULL_MAP);
   }

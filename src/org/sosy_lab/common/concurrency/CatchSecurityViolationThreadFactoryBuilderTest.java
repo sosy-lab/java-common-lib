@@ -34,14 +34,11 @@ import org.mockito.junit.MockitoRule;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 
-
 public class CatchSecurityViolationThreadFactoryBuilderTest {
 
-  @Rule
-  public MockitoRule mockito = MockitoJUnit.rule();
+  @Rule public MockitoRule mockito = MockitoJUnit.rule();
 
-  @Mock
-  private Runnable mockRunnable;
+  @Mock private Runnable mockRunnable;
 
   private CatchSecurityViolationThreadFactoryBuilder builder;
 

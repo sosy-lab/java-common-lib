@@ -55,18 +55,17 @@ import javax.annotation.concurrent.Immutable;
  * Two concurrent accesses to a modifying operation on the same instance will
  * create two new maps, each reflecting exactly the operation executed by the current thread,
  * and not reflecting the operation executed by the other thread.
-*/
+ */
 @Immutable
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
-public class PersistentLinkedList<T>
-    extends AbstractSequentialList<T>
+public class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {
 
   private final @Nullable T head; // only null for the empty list
   private final @Nullable PersistentLinkedList<T> tail; // only null for the empty list
 
-  private PersistentLinkedList(final @Nullable T head,
-      final @Nullable PersistentLinkedList<T> tail) {
+  private PersistentLinkedList(
+      final @Nullable T head, final @Nullable PersistentLinkedList<T> tail) {
     this.head = head;
     this.tail = tail;
   }
@@ -108,14 +107,14 @@ public class PersistentLinkedList<T>
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> of(final T v1, final T ... values) {
+  public static <T> PersistentLinkedList<T> of(final T v1, final T... values) {
     return copyOf(values).with(v1);
   }
 
   /** Returns a list containing the specified values.
    *  @return A list containing the specified values */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> copyOf(final T ... values) {
+  public static <T> PersistentLinkedList<T> copyOf(final T... values) {
     return copyOf(Arrays.asList(values));
   }
 

@@ -28,16 +28,15 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   static <V> Function<Entry<?, V>, V> getValueFunction() {
     return new Function<Map.Entry<?, V>, V>() {
-        @Override
-        public V apply(@Nonnull Map.Entry<?, V> input) {
-          return input.getValue();
-        }
-      };
+      @Override
+      public V apply(@Nonnull Map.Entry<?, V> input) {
+        return input.getValue();
+      }
+    };
   }
 
   @Deprecated

@@ -25,7 +25,6 @@ import java.net.URI;
 
 import javax.annotation.Nullable;
 
-
 public class Paths {
 
   private static @Nullable AbstractPathFactory factory = null;

@@ -54,7 +54,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
@@ -143,8 +142,7 @@ public class OptionCollector {
         try {
           Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
         } catch (IOException e) {
-          errorMessages.add("Could not find the required resource "
-              + resourceInfo.url());
+          errorMessages.add("Could not find the required resource " + resourceInfo.url());
         }
       }
     }
@@ -408,13 +406,11 @@ public class OptionCollector {
         String type = field.getType().toString();
         type = type.substring(type.lastIndexOf(".") + 1).replace("$", ".");
         fieldString =
-            Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+"
-                + field.getName();
+            Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+" + field.getName();
         defaultValue = getDefaultValueFromContent(classSource, fieldString);
       }
       if (defaultValue.contains(".")) {
-        defaultValue =
-            defaultValue.substring(defaultValue.lastIndexOf(".") + 1);
+        defaultValue = defaultValue.substring(defaultValue.lastIndexOf(".") + 1);
       }
     }
 
@@ -450,8 +446,7 @@ public class OptionCollector {
     try {
       return path.asCharSource(StandardCharsets.UTF_8).read();
     } catch (IOException e) {
-      errorMessages.add("INFO: Could not read sourcefiles "
-          + "for getting the default values.");
+      errorMessages.add("INFO: Could not read sourcefiles " + "for getting the default values.");
       return "";
     }
   }
@@ -462,16 +457,15 @@ public class OptionCollector {
    * @param content sourcecode where to search
    * @param fieldPattern regexp specifying the name of the field, whose value is returned
    */
-  private static String getDefaultValueFromContent(final String content,
-      final String fieldPattern) {
+  private static String getDefaultValueFromContent(
+      final String content, final String fieldPattern) {
     // search for fieldString and get the whole content after it (=rest),
     // in 'rest' search for ';' and return all before it (=defaultValue)
     String defaultValue = "";
     String[] splitted = content.split(fieldPattern);
     if (splitted.length > 1) { // first part is before fieldString, second part is after it
       final String rest = splitted[1];
-      defaultValue =
-          rest.substring(0, rest.indexOf(";")).trim();
+      defaultValue = rest.substring(0, rest.indexOf(";")).trim();
 
       // remove unnecessary parts of field
       if (defaultValue.startsWith("=")) {
@@ -493,30 +487,37 @@ public class OptionCollector {
         defaultValue = stripSurroundingFunctionCall(defaultValue, "new Path");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Pattern.compile");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "PathTemplate.ofFormatString");
-        defaultValue = stripSurroundingFunctionCall(defaultValue,
-            "PathCounterTemplate.ofFormatString");
+        defaultValue =
+            stripSurroundingFunctionCall(defaultValue, "PathCounterTemplate.ofFormatString");
 
         if (defaultValue.startsWith("TimeSpan.ofNanos(")) {
-          defaultValue = defaultValue.substring(
-              "TimeSpan.ofNanos(".length(), defaultValue.length() - 1) + "ns";
+          defaultValue =
+              defaultValue.substring("TimeSpan.ofNanos(".length(), defaultValue.length() - 1)
+                  + "ns";
         }
         if (defaultValue.startsWith("TimeSpan.ofMillis(")) {
-          defaultValue = defaultValue.substring(
-              "TimeSpan.ofMillis(".length(), defaultValue.length() - 1) + "ms";
+          defaultValue =
+              defaultValue.substring("TimeSpan.ofMillis(".length(), defaultValue.length() - 1)
+                  + "ms";
         }
         if (defaultValue.startsWith("TimeSpan.ofSeconds(")) {
-          defaultValue = defaultValue.substring(
-              "TimeSpan.ofSeconds(".length(), defaultValue.length() - 1) + "s";
+          defaultValue =
+              defaultValue.substring("TimeSpan.ofSeconds(".length(), defaultValue.length() - 1)
+                  + "s";
         }
 
         if (defaultValue.startsWith("ImmutableSet.of(")) {
-          defaultValue = "{" + defaultValue.substring(
-              "ImmutableSet.of(".length(), defaultValue.length() - 1) + "}";
+          defaultValue =
+              "{"
+                  + defaultValue.substring("ImmutableSet.of(".length(), defaultValue.length() - 1)
+                  + "}";
         }
 
         if (defaultValue.startsWith("ImmutableList.of(")) {
-          defaultValue = "[" + defaultValue.substring(
-              "ImmutableList.of(".length(), defaultValue.length() - 1) + "]";
+          defaultValue =
+              "["
+                  + defaultValue.substring("ImmutableList.of(".length(), defaultValue.length() - 1)
+                  + "]";
         }
       }
     } else {
@@ -560,8 +561,9 @@ public class OptionCollector {
       for (int i = 0; i < enums.length; i++) {
         enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
-      allowedValues = "  enum:     "
-          + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
+      allowedValues =
+          "  enum:     "
+              + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
     }
 
     allowedValues += getOptionValues(field, verbose);
@@ -580,8 +582,7 @@ public class OptionCollector {
     assert option != null;
     String str = "";
     if (option.values().length != 0) {
-      str += "  allowed values: "
-          + java.util.Arrays.toString(option.values()) + "\n";
+      str += "  allowed values: " + java.util.Arrays.toString(option.values()) + "\n";
     }
 
     if (verbose && !option.regexp().isEmpty()) {

@@ -156,8 +156,8 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromSource(com.google.common.io.CharSource, java.lang.String, java.lang.String)
    */
   @Override
-  public ConfigurationBuilder loadFromSource(CharSource source, String basePath,
-      String sourceName) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName)
+      throws IOException, InvalidConfigurationException {
     checkNotNull(source);
     checkNotNull(basePath);
     setupProperties();
@@ -174,14 +174,13 @@ public class Builder implements ConfigurationBuilder {
    */
   @Deprecated
   @Override
-  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath,
-      String sourceName) throws IOException, InvalidConfigurationException {
+  public ConfigurationBuilder loadFromStream(InputStream stream, String basePath, String sourceName)
+      throws IOException, InvalidConfigurationException {
     checkNotNull(stream);
     checkNotNull(basePath);
 
     byte[] rawContent = ByteStreams.toByteArray(stream);
-    CharSource source = ByteSource.wrap(rawContent)
-                                  .asCharSource(StandardCharsets.UTF_8);
+    CharSource source = ByteSource.wrap(rawContent).asCharSource(StandardCharsets.UTF_8);
 
     return loadFromSource(source, basePath, sourceName);
   }
@@ -311,9 +310,15 @@ public class Builder implements ConfigurationBuilder {
       newDeprecatedProperties = new HashSet<>(0);
     }
 
-    Configuration newConfig = new Configuration(newProperties, newSources, newPrefix,
-        newConverters, newUnusedProperties, newDeprecatedProperties,
-        oldConfig != null ? oldConfig.getLogger() : null);
+    Configuration newConfig =
+        new Configuration(
+            newProperties,
+            newSources,
+            newPrefix,
+            newConverters,
+            newUnusedProperties,
+            newDeprecatedProperties,
+            oldConfig != null ? oldConfig.getLogger() : null);
     newConfig.inject(newConfig);
 
     // reset builder instance so that it may be re-used

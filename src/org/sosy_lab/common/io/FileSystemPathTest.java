@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import java.nio.file.Paths;
 
-
 public class FileSystemPathTest {
 
   private java.nio.file.Path nioPath;
@@ -75,7 +74,8 @@ public class FileSystemPathTest {
   public void resolveTwoFiles() throws Exception {
     java.nio.file.Path nioOther = Paths.get("PathTest.java");
     FileSystemPath commonOther = new FileSystemPath("PathTest.java");
-    assertThat(nioPath.resolve(nioOther).toString()).isEqualTo(commonPath.resolve(commonOther).toString());
+    assertThat(nioPath.resolve(nioOther).toString())
+        .isEqualTo(commonPath.resolve(commonOther).toString());
   }
 
   @Test
@@ -119,7 +119,8 @@ public class FileSystemPathTest {
 
   @Test
   public void toAbsolutePath() throws Exception {
-    assertThat(nioPath.toAbsolutePath().toString()).isEqualTo(commonPath.toAbsolutePath().toString());
+    assertThat(nioPath.toAbsolutePath().toString())
+        .isEqualTo(commonPath.toAbsolutePath().toString());
   }
 
   @Test
@@ -159,5 +160,4 @@ public class FileSystemPathTest {
     pathB = pathA;
     assertThat(pathA).isEqualTo(pathB);
   }
-
 }

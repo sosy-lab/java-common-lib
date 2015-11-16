@@ -23,8 +23,7 @@ import java.util.Comparator;
 import java.util.SortedSet;
 
 abstract class AbstractImmutableSortedMap<K extends Comparable<? super K>, V>
-                                           extends AbstractImmutableMap<K, V>
-                                           implements OurSortedMap<K, V> {
+    extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V> {
 
   @Override
   public Comparator<? super K> comparator() {

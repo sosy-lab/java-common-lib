@@ -71,7 +71,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
    * @see ThreadFactoryBuilder#setPriority(int)
    */
   public CatchSecurityViolationThreadFactoryBuilder setPriority(int pPriority) {
-    priority =  pPriority;
+    priority = pPriority;
     return this;
   }
 
@@ -104,9 +104,10 @@ public class CatchSecurityViolationThreadFactoryBuilder {
     final Integer priority = builder.priority;
     final UncaughtExceptionHandler handler = builder.handler;
     final AtomicLong count = new AtomicLong(0);
-    final ThreadFactory factory = (builder.backingFactory != null)
-        ? builder.backingFactory
-        : Executors.defaultThreadFactory();
+    final ThreadFactory factory =
+        (builder.backingFactory != null)
+            ? builder.backingFactory
+            : Executors.defaultThreadFactory();
     return new ThreadFactory() {
       @Override
       public Thread newThread(Runnable r) {

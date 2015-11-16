@@ -34,11 +34,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 public class ShutdownNotifierTest {
 
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
+  @Rule public final ExpectedException thrown = ExpectedException.none();
 
   private static final String REASON = "Shutdown Request Reason";
 
@@ -84,10 +82,11 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testRegisterListenerTwice() {
-    ShutdownRequestListener l = new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) { }
-    };
+    ShutdownRequestListener l =
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {}
+        };
 
     instance.register(l);
     thrown.expect(IllegalArgumentException.class);
@@ -98,12 +97,13 @@ public class ShutdownNotifierTest {
   public void testListenerNotification() {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
-    instance.register(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) {
-        flag.set(true);
-      }
-    });
+    instance.register(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {
+            flag.set(true);
+          }
+        });
 
     instance.requestShutdown(REASON);
     assertTrue(flag.get());
@@ -113,12 +113,13 @@ public class ShutdownNotifierTest {
   public void testListenerNotificationReason() {
     final AtomicReference<String> reasonReference = new AtomicReference<>();
 
-    instance.register(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String pReason) {
-        reasonReference.set(pReason);
-      }
-    });
+    instance.register(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String pReason) {
+            reasonReference.set(pReason);
+          }
+        });
 
     instance.requestShutdown(REASON);
     assertEquals(REASON, reasonReference.get());
@@ -130,12 +131,13 @@ public class ShutdownNotifierTest {
     final AtomicInteger i = new AtomicInteger(0);
 
     for (int j = 0; j < count; j++) {
-      instance.register(new ShutdownRequestListener() {
-        @Override
-        public void shutdownRequested(String reason) {
-          i.incrementAndGet();
-        }
-      });
+      instance.register(
+          new ShutdownRequestListener() {
+            @Override
+            public void shutdownRequested(String reason) {
+              i.incrementAndGet();
+            }
+          });
     }
 
     instance.requestShutdown(REASON);
@@ -146,12 +148,13 @@ public class ShutdownNotifierTest {
   public void testUnregisterListener() {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
-    ShutdownRequestListener l = new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) {
-        flag.set(true);
-      }
-    };
+    ShutdownRequestListener l =
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {
+            flag.set(true);
+          }
+        };
     instance.register(l);
     instance.unregister(l);
 
@@ -163,12 +166,13 @@ public class ShutdownNotifierTest {
   public void testListenerRegisterAndCheck() {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
-    instance.registerAndCheckImmediately(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) {
-        flag.set(true);
-      }
-    });
+    instance.registerAndCheckImmediately(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {
+            flag.set(true);
+          }
+        });
 
     assertFalse(flag.get());
     instance.requestShutdown(REASON);
@@ -180,12 +184,13 @@ public class ShutdownNotifierTest {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
     instance.requestShutdown(REASON);
-    instance.registerAndCheckImmediately(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) {
-        flag.set(true);
-      }
-    });
+    instance.registerAndCheckImmediately(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {
+            flag.set(true);
+          }
+        });
 
     assertTrue(flag.get());
   }
@@ -195,12 +200,13 @@ public class ShutdownNotifierTest {
     final AtomicReference<String> reasonReference = new AtomicReference<>();
 
     instance.requestShutdown(REASON);
-    instance.registerAndCheckImmediately(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String pReason) {
-        reasonReference.set(pReason);
-      }
-    });
+    instance.registerAndCheckImmediately(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String pReason) {
+            reasonReference.set(pReason);
+          }
+        });
 
     assertEquals(REASON, reasonReference.get());
   }
@@ -238,12 +244,13 @@ public class ShutdownNotifierTest {
 
     ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
 
-    child.register(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String reason) {
-        flag.set(true);
-      }
-    });
+    child.register(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String reason) {
+            flag.set(true);
+          }
+        });
 
     instance.requestShutdown(REASON);
     assertTrue(flag.get());
@@ -255,12 +262,13 @@ public class ShutdownNotifierTest {
 
     ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
 
-    child.register(new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String pReason) {
-        reasonReference.set(pReason);
-      }
-    });
+    child.register(
+        new ShutdownRequestListener() {
+          @Override
+          public void shutdownRequested(String pReason) {
+            reasonReference.set(pReason);
+          }
+        });
 
     instance.requestShutdown(REASON);
     assertEquals(REASON, reasonReference.get());

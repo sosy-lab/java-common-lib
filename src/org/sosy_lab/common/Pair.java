@@ -38,7 +38,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-
 /**
  * A generic Pair class. Code borrowed from here:
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6229146
@@ -65,6 +64,7 @@ public class Pair<A, B> implements Serializable {
   public @Nullable A getFirst() {
     return first;
   }
+
   public @Nullable B getSecond() {
     return second;
   }
@@ -154,15 +154,14 @@ public class Pair<A, B> implements Serializable {
     private final Function<Entry<? extends T, ? extends T2>, Pair<T, T2>> PAIR_FROM_MAP_ENTRY =
         new Function<Entry<? extends T, ? extends T2>, Pair<T, T2>>() {
           @Override
-          public Pair<T, T2> apply(
-              @Nonnull Entry<? extends T, ? extends T2> pArg0) {
+          public Pair<T, T2> apply(@Nonnull Entry<? extends T, ? extends T2> pArg0) {
             return Pair.<T, T2>of(pArg0.getKey(), pArg0.getValue());
           }
         };
   }
 
-  public static <A, B> List<Pair<A, B>> zipList(Collection<? extends A> a,
-      Collection<? extends B> b) {
+  public static <A, B> List<Pair<A, B>> zipList(
+      Collection<? extends A> a, Collection<? extends B> b) {
     List<Pair<A, B>> result = new ArrayList<>(a.size());
 
     Iterator<? extends A> iteratorA = a.iterator();
@@ -177,8 +176,8 @@ public class Pair<A, B> implements Serializable {
     return result;
   }
 
-  public static <A, B> Iterable<Pair<A, B>> zipWithPadding(final Iterable<? extends A> a,
-      final Iterable<? extends B> b) {
+  public static <A, B> Iterable<Pair<A, B>> zipWithPadding(
+      final Iterable<? extends A> a, final Iterable<? extends B> b) {
     checkNotNull(a);
     checkNotNull(b);
     return new Iterable<Pair<A, B>>() {
@@ -230,17 +229,15 @@ public class Pair<A, B> implements Serializable {
    * @param f2 The function applied to the second element of the pair.
    * @return A component-wise composition of f1 and f2.
    */
-  public static <A1, B1, A2, B2> Function<Pair<A1, A2>, Pair<B1, B2>>
-                componentWise(final Function<? super A1, ? extends B1> f1,
-                              final Function<? super A2, ? extends B2> f2) {
+  public static <A1, B1, A2, B2> Function<Pair<A1, A2>, Pair<B1, B2>> componentWise(
+      final Function<? super A1, ? extends B1> f1, final Function<? super A2, ? extends B2> f2) {
     checkNotNull(f1);
     checkNotNull(f2);
 
     return new Function<Pair<A1, A2>, Pair<B1, B2>>() {
       @Override
       public Pair<B1, B2> apply(@Nonnull Pair<A1, A2> pInput) {
-        return Pair.<B1, B2>of(f1.apply(pInput.getFirst()),
-                               f2.apply(pInput.getSecond()));
+        return Pair.<B1, B2>of(f1.apply(pInput.getFirst()), f2.apply(pInput.getSecond()));
       }
     };
   }
@@ -249,8 +246,7 @@ public class Pair<A, B> implements Serializable {
    * Return a comparator for comparing pairs lexicographically,
    * if their component types define a natural ordering.
    */
-  public static <A extends Comparable<? super A>,
-                  B extends Comparable<? super B>>
+  public static <A extends Comparable<? super A>, B extends Comparable<? super B>>
       Ordering<Pair<A, B>> lexicographicalNaturalComparator() {
 
     return lexicographicalComparator(Ordering.<A>natural(), Ordering.<B>natural());
@@ -263,7 +259,8 @@ public class Pair<A, B> implements Serializable {
   public static <A, B> Ordering<Pair<A, B>> lexicographicalComparator(
       Comparator<A> firstOrdering, Comparator<B> secondOrdering) {
 
-    return from(firstOrdering).onResultOf(Pair.<A>getProjectionToFirst())
+    return from(firstOrdering)
+        .onResultOf(Pair.<A>getProjectionToFirst())
         .compound(from(secondOrdering).onResultOf(Pair.<B>getProjectionToSecond()));
   }
 }

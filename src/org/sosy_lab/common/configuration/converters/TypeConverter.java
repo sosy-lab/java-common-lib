@@ -71,9 +71,15 @@ public interface TypeConverter {
    * @throws InvalidConfigurationException If the user specified an invalid value.
    */
   @Nullable
-  Object convert(String optionName, String value, Class<?> type,
-      @Nullable Type genericType, @Nullable Annotation secondaryOption,
-      Path source, LogManager logger) throws InvalidConfigurationException;
+  Object convert(
+      String optionName,
+      String value,
+      Class<?> type,
+      @Nullable Type genericType,
+      @Nullable Annotation secondaryOption,
+      Path source,
+      LogManager logger)
+      throws InvalidConfigurationException;
 
   /**
    * Optionally convert the default value for an option that was given in the
@@ -90,7 +96,11 @@ public interface TypeConverter {
    * is invalid (e.g., a missing annotation).
    */
   @Nullable
-  <T> T convertDefaultValue(String optionName, @Nullable T value, Class<T> type,
-      @Nullable Type genericType, @Nullable Annotation secondaryOption)
-          throws InvalidConfigurationException;
+  <T> T convertDefaultValue(
+      String optionName,
+      @Nullable T value,
+      Class<T> type,
+      @Nullable Type genericType,
+      @Nullable Annotation secondaryOption)
+      throws InvalidConfigurationException;
 }
