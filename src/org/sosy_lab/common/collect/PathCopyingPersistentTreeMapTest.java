@@ -294,11 +294,12 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   @Test
   public void testRandom() {
+    final int iterations = 50;
     Random rnd = new Random(3987432434L); // static seed for reproducibility
     SortedMap<String, String> comparison = new TreeMap<>();
 
-    // Insert 500 nodes
-    for (int i = 0; i < 500; i++) {
+    // Insert nodes
+    for (int i = 0; i < iterations; i++) {
       String key = rnd.nextInt() + "";
       String value = rnd.nextInt() + "";
 
@@ -308,8 +309,8 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
       checkPartialMaps(comparison, rnd);
     }
 
-    // 500 random put/remove operations
-    for (int i = 0; i < 500; i++) {
+    // random put/remove operations
+    for (int i = 0; i < iterations; i++) {
       String key = rnd.nextInt() + "";
 
       if (rnd.nextBoolean()) {
@@ -357,7 +358,8 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   private void checkEqualTo(
       SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
-    new EqualsTester().addEqualityGroup(testMap, comparison).testEquals();
+    assertEquals(comparison, testMap);
+    assertEquals(comparison.hashCode(), testMap.hashCode());
     assertThat(testMap.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
     assertThat(testMap).hasSize(comparison.size());
     checkEqualTo(comparison.entrySet(), testMap.entrySet());
@@ -370,7 +372,8 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
   }
 
   private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
-    new EqualsTester().addEqualityGroup(set, comparison).testEquals();
+    assertEquals(comparison, set);
+    assertEquals(comparison.hashCode(), set.hashCode());
     checkEqualTo((Collection<T>) comparison, (Collection<T>) set);
   }
 
