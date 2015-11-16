@@ -26,6 +26,7 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.Files;
@@ -33,7 +34,9 @@ import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
-import java.io.File;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.Paths;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -41,7 +44,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.charset.Charset;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -180,35 +183,34 @@ public class OptionCollector {
 
   /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
-  private static String getSourcePath(Class<?> cls) {
-    String sourcePath = cls.getProtectionDomain().getCodeSource().getLocation().getPath();
-
-    // in case we have spaces in the filename these have to be fixed:
-    sourcePath = sourcePath.replace("%20", " ");
+  private static Path getSourcePath(Class<?> cls) throws URISyntaxException {
+    // Get base folder for classes, go via URI to handle escaping
+    Path basePath = Paths.get(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
 
     // check the folders known as source, depending on the current folder
     // structure for the class files
 
-    // this could be a usual eclipse environment, therefore src is the appropriate
-    // folder to search for sources
-    if (sourcePath.endsWith("bin/")) {
-      sourcePath = sourcePath.substring(0, sourcePath.length() - 4);
+    if (basePath.getName().equals("bin")) {
+      // this could be a usual eclipse environment, therefore src is the appropriate
+      // folder to search for sources
+      basePath = basePath.getParent();
 
+    } else if (basePath.getPath().endsWith("/build/classes/main")) {
       // this is a typical project layout for gradle, the sources should be in
       // src/main/java/
-    } else if (sourcePath.endsWith("build/classes/main/")) {
-      sourcePath = sourcePath.substring(0, sourcePath.length() - 19);
+      basePath = basePath.getParent().getParent().getParent();
     }
 
     // gradle projects do also in eclipse have another folder for sources
     // so check which folder is the actual source folder
-    if (new File(sourcePath + "src/main/java/").isDirectory()) {
-      return sourcePath + "src/main/java/";
-    } else if (new File(sourcePath + "src/").isDirectory()) {
-      return sourcePath + "src/";
+    List<Path> candidates = ImmutableList.of(Paths.get("src", "main", "java"), Paths.get("src"));
+    for (Path candidate : candidates) {
+      Path sourcePath = basePath.resolve(candidate);
+      if (sourcePath.isDirectory()) {
+        return sourcePath;
+      }
     }
-
-    return "";
+    return basePath;
   }
 
   /** This method collects every {@link Option} of a class.
@@ -437,11 +439,16 @@ public class OptionCollector {
     }
 
     // get name of source file
-    filename = getSourcePath(cls) + filename + ".java";
+    Path path;
+    try {
+      path = getSourcePath(cls).resolve(filename + ".java");
+    } catch (URISyntaxException e) {
+      errorMessages.add("INFO: Could not access source file for class " + cls.getName() + ": " + e);
+      return "";
+    }
 
     try {
-      return com.google.common.io.Files.toString(new File(filename),
-          Charset.defaultCharset());
+      return path.asCharSource(StandardCharsets.UTF_8).read();
     } catch (IOException e) {
       errorMessages.add("INFO: Could not read sourcefiles "
           + "for getting the default values.");
