@@ -89,9 +89,9 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     TIME_UNITS.put(DAYS, "d");
   }
 
-  private static final Pattern onlyNumbers = Pattern.compile(" *([0-9]+) *");
+  private static final Pattern ONLY_DIGITS = Pattern.compile(" *([0-9]+) *");
 
-  private static enum CharType {
+  private enum CharType {
     BEGIN,
     END,
     LETTER,
@@ -132,12 +132,13 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * Supported units are day, hour, minute and second.
    * @param input the {@link String} to convert
    * @return a {@link TimeSpan} represented by the given {@link String}
-   * @throws IllegalArgumentException if the input is not a valid string representation of a {@link TimeSpan}.
+   * @throws IllegalArgumentException
+   * if the input is not a valid string representation of a {@link TimeSpan}.
    */
   public static TimeSpan valueOf(String input) {
 
     // only seconds: use simple regex
-    Matcher secondMatcher = onlyNumbers.matcher(input);
+    Matcher secondMatcher = ONLY_DIGITS.matcher(input);
     if (secondMatcher.matches()) {
       return ofSeconds(Long.parseLong(secondMatcher.group(1)));
     }

@@ -105,7 +105,8 @@ public final class Timer {
     if (DEFAULT_CLOCK == null) {
       throw new IllegalArgumentException(
           String.format(
-              "Invalid value \'%s\' for property %s, cannot create Timer without explicitly specified clock.",
+              "Invalid value \'%s\' for property %s,"
+                  + "cannot create Timer without explicitly specified clock.",
               System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME),
               DEFAULT_CLOCK_PROPERTY_NAME));
     }
