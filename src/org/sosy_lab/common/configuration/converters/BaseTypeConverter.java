@@ -96,13 +96,11 @@ public enum BaseTypeConverter implements TypeConverter {
         return Pattern.compile(valueStr);
       } catch (PatternSyntaxException e) {
         throw new InvalidConfigurationException(
-            "Illegal regular expression "
-                + valueStr
-                + " in option "
-                + optionName
-                + " ("
-                + e.getMessage()
-                + ")",
+            String.format(
+                "Illegal regular expression %s in option  %s (%s).",
+                valueStr,
+                optionName,
+                e.getMessage()),
             e);
       }
 
@@ -148,42 +146,21 @@ public enum BaseTypeConverter implements TypeConverter {
       }
       return m.invoke(null, value);
 
-    } catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException e) {
       throw new AssertionError(
-          "Class "
-              + type.getSimpleName()
-              + " without "
-              + method
-              + "("
-              + paramType.getSimpleName()
-              + ") method!");
-    } catch (SecurityException e) {
-      throw new AssertionError(
-          "Class "
-              + type.getSimpleName()
-              + " without accessible "
-              + method
-              + "("
-              + paramType.getSimpleName()
-              + ") method!");
-    } catch (IllegalAccessException e) {
-      throw new AssertionError(
-          "Class "
-              + type.getSimpleName()
-              + " without accessible "
-              + method
-              + "("
-              + paramType.getSimpleName()
-              + ") method!");
+          String.format(
+              "Class %s without usable %s(%s) method.",
+              type.getSimpleName(),
+              method,
+              paramType.getSimpleName()),
+          e);
     } catch (InvocationTargetException e) {
       throw new InvalidConfigurationException(
-          "Could not parse \""
-              + optionName
-              + " = "
-              + value
-              + "\" ("
-              + e.getTargetException().getMessage()
-              + ")",
+          String.format(
+              "Could not parse \"%s = %s\" (%s).",
+              optionName,
+              value,
+              e.getTargetException().getMessage()),
           e);
     }
   }

@@ -195,12 +195,11 @@ public final class Classes {
         Classes.verifyDeclaredExceptions(ct, exceptionType, InvalidConfigurationException.class);
     if (exception != null) {
       throw new InvalidConfigurationException(
-          "Invalid "
-              + typeName
-              + " "
-              + className
-              + ", constructor declares unsupported checked exception "
-              + exception);
+          String.format(
+              "Invalid %s %s, constructor declares unsupported checked exception %s.",
+              typeName,
+              className,
+              exception));
     }
 
     // instantiate
@@ -209,13 +208,11 @@ public final class Classes {
 
     } catch (InstantiationException e) {
       throw new InvalidConfigurationException(
-          "Invalid "
-              + typeName
-              + " "
-              + className
-              + ", class cannot be instantiated ("
-              + e.getMessage()
-              + ")",
+          String.format(
+              "Invalid %s %s, class cannot be instantiated (%s).",
+              typeName,
+              className,
+              e.getMessage()),
           e);
 
     } catch (IllegalAccessException e) {
@@ -429,7 +426,7 @@ public final class Classes {
     if (cls.isAnnotationPresent(Deprecated.class) || pkg.isAnnotationPresent(Deprecated.class)) {
       logger.logf(
           Level.WARNING,
-          "Using %s %s, which is marked as deprecated" + " and should not be used.",
+          "Using %s %s, which is marked as deprecated and should not be used.",
           typeName,
           cls.getSimpleName());
 
@@ -438,7 +435,7 @@ public final class Classes {
 
       logger.logf(
           Level.WARNING,
-          "Using %s %s, which is unmaintained" + " and may not work correctly.",
+          "Using %s %s, which is unmaintained and may not work correctly.",
           typeName,
           cls.getSimpleName());
     }

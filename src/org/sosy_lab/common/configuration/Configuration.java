@@ -608,15 +608,12 @@ public final class Configuration {
     final String name = getOptionName(options, method, option);
     final Object value = getValue(options, method, null, type, genericType, option, method);
 
-    logger.log(
+    logger.logf(
         Level.CONFIG,
-        "Option:",
+        "Option: %s Class: %s method: %s value: %s",
         name,
-        "Class:",
         method.getDeclaringClass().getName(),
-        "method:",
         method.getName(),
-        "value:",
         value);
 
     // set value to field
@@ -633,12 +630,11 @@ public final class Configuration {
         // this is an expected exception if the value is wrong,
         // so create a nice message for the user
         throw new InvalidConfigurationException(
-            "Invalid value in configuration file: \""
-                + name
-                + " = "
-                + value
-                + '\"'
-                + (t.getMessage() != null ? " (" + t.getMessage() + ")" : ""),
+            String.format(
+                "Invalid value in configuration file: \"%s = %s\"%s",
+                name,
+                value,
+                (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
             t);
       }
 
@@ -807,26 +803,21 @@ public final class Configuration {
     final String[] allowedValues = option.values();
     if (allowedValues.length > 0 && !java.util.Arrays.asList(allowedValues).contains(valueStr)) {
       throw new InvalidConfigurationException(
-          "Invalid value in configuration file: \""
-              + name
-              + " = "
-              + valueStr
-              + '\"'
-              + " (not listed as allowed value)");
+          String.format(
+              "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)",
+              name,
+              valueStr));
     }
 
     // check if it matches the specification regexp
     final String regexp = option.regexp();
     if (!regexp.isEmpty() && !valueStr.matches(regexp)) {
       throw new InvalidConfigurationException(
-          "Invalid value in configuration file: \""
-              + name
-              + " = "
-              + valueStr
-              + '\"'
-              + " (does not match RegExp \""
-              + regexp
-              + "\")");
+          String.format(
+              "Invalid value in configuration file: \"%s = %s\" (does not match RegExp \"%s\").",
+              name,
+              valueStr,
+              regexp));
     }
 
     return valueStr;

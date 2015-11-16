@@ -19,9 +19,12 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import static com.google.common.collect.FluentIterable.from;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import org.sosy_lab.common.configuration.Configuration;
@@ -77,14 +80,13 @@ public class FileTypeConverter implements TypeConverter {
     secure = true,
     name = "output.disable",
     description =
-        "disable all default output files" + "\n(any explicitly given file will still be written)"
+        "disable all default output files\n(any explicitly given file will still be written)"
   )
   private boolean disableOutput = false;
 
   @Option(
     description =
-        "base directory for all input & output files"
-            + "\n(except for the configuration file itself)"
+        "base directory for all input & output files\n(except for the configuration file itself)"
   )
   private String rootDirectory = ".";
 
@@ -145,25 +147,14 @@ public class FileTypeConverter implements TypeConverter {
         path = path.substring(TEMP_DIR.length());
 
       } else {
-        throw new InvalidConfigurationException(
-            "The option "
-                + optionName
-                + " specifies the path '"
-                + pPath
-                + "' that is forbidden in safe mode because it is absolute.");
+        throw forbidden("because it is absolute", optionName, pPath);
       }
     }
 
     // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
     if (path.replaceAll("::", "").contains(File.pathSeparator)) {
-      throw new InvalidConfigurationException(
-          "The option "
-              + optionName
-              + " specifies the path '"
-              + pPath
-              + "' that is forbidden in safe mode because it contains the character '"
-              + File.pathSeparator
-              + "'.");
+      throw forbidden(
+          "because it contains the character '%s'", optionName, pPath, File.pathSeparator);
     }
 
     int depth = 0;
@@ -181,17 +172,20 @@ public class FileTypeConverter implements TypeConverter {
       }
 
       if (depth < 0) {
-        throw new InvalidConfigurationException(
-            "The option "
-                + optionName
-                + " specifies the path '"
-                + pPath
-                + "' that is forbidden in safe mode"
-                + " because it is not below the current directory.");
+        throw forbidden("because it is not below the current directory", optionName, pPath);
       }
     }
 
     return pPath;
+  }
+
+  private static InvalidConfigurationException forbidden(
+      String reason, String optionName, Path path, Object... args)
+      throws InvalidConfigurationException {
+    throw new InvalidConfigurationException(
+        String.format(
+            "The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".",
+            from(ImmutableList.of(optionName, path)).append(args).toArray(Object.class)));
   }
 
   public String getOutputDirectory() {

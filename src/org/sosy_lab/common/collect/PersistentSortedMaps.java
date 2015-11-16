@@ -76,12 +76,8 @@ public class PersistentSortedMaps {
       @Override
       public V resolveConflict(K key, V value1, V value2) {
         throw new IllegalArgumentException(
-            "Conflicting value when merging maps for key "
-                + key
-                + ": "
-                + value1
-                + " and "
-                + value2);
+            String.format(
+                "Conflicting value when merging maps for key %s: %s and %s", key, value1, value2));
       }
     };
   }
