@@ -446,7 +446,7 @@ public class OptionCollector {
     try {
       return path.asCharSource(StandardCharsets.UTF_8).read();
     } catch (IOException e) {
-      errorMessages.add("INFO: Could not read sourcefiles " + "for getting the default values.");
+      errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
       return "";
     }
   }

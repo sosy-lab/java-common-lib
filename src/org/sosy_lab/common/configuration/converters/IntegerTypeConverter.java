@@ -57,16 +57,12 @@ public class IntegerTypeConverter implements TypeConverter {
     long n = ((Number) value).longValue();
     if (option.min() > n || n > option.max()) {
       throw new InvalidConfigurationException(
-          "Invalid value in configuration file: \""
-              + optionName
-              + " = "
-              + value
-              + '\"'
-              + " (not in range ["
-              + option.min()
-              + ", "
-              + option.max()
-              + "])");
+          String.format(
+              "Invalid value in configuration file: \"%s = %s\" (not in range [%d, %d]).",
+              optionName,
+              value,
+              option.min(),
+              option.max()));
     }
 
     return value;
