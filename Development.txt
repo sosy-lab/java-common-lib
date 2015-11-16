@@ -1,0 +1,20 @@
+Style Guide
+-----------
+The style guide of this project is the Google Java Style:
+https://google.github.io/styleguide/javaguide.html
+
+IMPORTANT: We use an automatic code formatter to format all our code.
+Before committing, run "ant format-diff" to reformat your changes
+according to the style guide.
+For git users: You need to stage your changes first (with "git add"),
+then run "ant format-diff" and then stage the changes again.
+This allows you to view exactly what the reformatter changed after running it.
+
+Please report your experiences with this, we would like to learn how well this works!
+Git users: We are interested in experimenting with a pre-commit hook
+for the code formatter. If you have one, please share it.
+
+
+Before Committing
+-----------------
+Please run "ant tests findbugs checkstyle" and check and clear any reported problems.
