@@ -11,10 +11,10 @@
         <fileset dir="${source.dir}" id="source.files">
             <include name="**/*.java" />
         </fileset>
-        <pathconvert property="source.files" refid="source.files" pathsep=" "/>
+        <pathconvert property="source.files" refid="source.files" pathsep="' '"/>
         <java fork="true" jar="${ivy.lib.dir}/build/google-java-format.jar">
             <arg value="-i"/>
-            <arg line="${source.files}"/>
+            <arg line="'${source.files}'"/>
         </java>
     </target>
 
@@ -38,6 +38,7 @@
             <arg value="diff"/>
             <arg value="--cached"/>
             <arg value="-U0"/>
+            <arg value="--no-prefix"/>
             <arg value="${source.dir}"/>
         </exec>
 
@@ -48,7 +49,6 @@
         <exec executable="build/google-java-format-diff.py"
                 inputstring="${diff}">
             <arg value="-i"/>
-            <arg value="-p1"/>
         </exec>
     </target>
 </project>
