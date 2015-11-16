@@ -33,6 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.math.LongMath;
 import com.google.common.primitives.Longs;
@@ -41,8 +42,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -84,6 +88,16 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     TIME_UNITS.put(DAYS,         "d");
   }
 
+  private static final Pattern onlyNumbers = Pattern.compile(" *([0-9]+) *");
+
+  private static enum CharType {
+    BEGIN,
+    END,
+    LETTER,
+    DIGIT,
+    WHITESPACE;
+  }
+
   private final long span;
   private final TimeUnit unit;
 
@@ -110,6 +124,125 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   public static TimeSpan empty() {
     return new TimeSpan(0, DAYS);
+  }
+
+  /**
+   * Converts the given {@link String} into a {@link TimeSpan} object.
+   * Supported units are day, hour, minute and second.
+   * @param input the {@link String} to convert
+   * @return a {@link TimeSpan} represented by the given {@link String}
+   * @throws IllegalArgumentException if the input is not a valid string representation of a {@link TimeSpan}.
+   */
+  public static TimeSpan valueOf(String input) {
+
+    // only seconds: use simple regex
+    Matcher secondMatcher = onlyNumbers.matcher(input);
+    if (secondMatcher.matches()) {
+      return ofSeconds(Long.parseLong(secondMatcher.group(1)));
+    }
+
+    // values with units: more elaborate parsing necessary
+    List<String> tokens = splitIntoTokens(input);
+
+    long days = 0;
+    long hours = 0;
+    long minutes = 0;
+    long seconds = 0;
+
+    Iterator<String> it = tokens.iterator();
+
+    while (it.hasNext()) {
+      // first: value
+      String nextString = it.next();
+      long value = Long.parseLong(nextString);
+
+      // second: unit
+      if (!it.hasNext()) {
+        throw new IllegalArgumentException("Value " + nextString + " has no unit.");
+      }
+
+      String unit = it.next();
+      switch (unit) {
+        case "day":
+        case "days":
+        case "d":
+          if (days != 0) {
+            throw new IllegalArgumentException("Days set twice: " + unit);
+          }
+          days = value;
+          break;
+
+        case "h":
+        case "hour":
+        case "hours":
+          if (hours != 0) {
+            throw new IllegalArgumentException("Hours set twice: " + unit);
+          }
+          hours = value;
+          break;
+
+        case "min":
+        case "m":
+          if (minutes != 0) {
+            throw new IllegalArgumentException("Minutes set twice: " + unit);
+          }
+          minutes = value;
+          break;
+
+        case "s":
+          if (seconds != 0) {
+            throw new IllegalArgumentException("Seconds set twice: " + unit);
+          }
+          seconds = value;
+          break;
+
+        default:
+          throw new IllegalArgumentException("Unknown unit: " + unit);
+      }
+    }
+
+    return sum(of(seconds, SECONDS), of(minutes, MINUTES), of(hours, HOURS), of(days, DAYS));
+  }
+
+  private static List<String> splitIntoTokens(String input) throws IllegalArgumentException {
+    List<String> tokens = Lists.newArrayList();
+    CharType previous = CharType.BEGIN;
+    int pos = 0;
+
+    for (int i = 0; i <= input.length(); ++i) {
+
+      CharType current;
+      if (i == input.length()) {
+        current = CharType.END;
+      } else {
+        char currentChar = input.charAt(i);
+        if (Character.isLetter(currentChar)) {
+          current = CharType.LETTER;
+        } else if (Character.isDigit(currentChar)) {
+          current = CharType.DIGIT;
+        } else if (Character.isWhitespace(currentChar)) {
+          current = CharType.WHITESPACE;
+        } else {
+          throw new IllegalArgumentException(
+              "Unreconized character '" + currentChar + "' when parsing " + input);
+        }
+      }
+
+      if (current != previous) {
+        // we want to use the previous token
+        if (previous == CharType.LETTER || previous == CharType.DIGIT) {
+          tokens.add(input.substring(pos, i));
+        }
+
+        if (current == CharType.LETTER || current == CharType.DIGIT) {
+          pos = i;
+        }
+
+        previous = current;
+      }
+    }
+
+    return tokens;
   }
 
   /**
