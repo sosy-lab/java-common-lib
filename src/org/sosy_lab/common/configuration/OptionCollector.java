@@ -135,10 +135,10 @@ public class OptionCollector {
 
     for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
       String resourceName = resourceInfo.getResourceName();
-      if (Files.getFileExtension(resourceName).equals("txt") &&
-          Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
+      if (Files.getFileExtension(resourceName).equals("txt")
+          && Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
         try {
-          out.append(Resources.toString(resourceInfo.url(), StandardCharsets.UTF_8));
+          Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
         } catch (IOException e) {
           errorMessages.add("Could not find the required resource "
               + resourceInfo.url());
