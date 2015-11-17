@@ -1,6 +1,7 @@
+
+# /
 /bin
 /.apt-generated/
-/lib
 /ivy-*.xml
 /common-*.jar
 /TEST-*.txt
@@ -15,7 +16,13 @@
 /FindBugs.xml
 /FindBugs.diff.html
 /FindBugs.diff.xml
-
 /.factorypath
-.idea/workspace.xml
-.idea/uiDesigner.xml
+
+# /.idea/
+/.idea/workspace.xml
+/.idea/uiDesigner.xml
+
+# /lib/
+/lib/java
+/lib/java-contrib
+
