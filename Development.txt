@@ -18,3 +18,16 @@ for the code formatter. If you have one, please share it.
 Before Committing
 -----------------
 Please run "ant tests findbugs checkstyle" and check and clear any reported problems.
+
+
+Note for Eclipse Users
+----------------------
+This project uses Google AutoValue (https://github.com/google/auto/tree/master/value).
+Eclipse does not pick up its annotation processor automatically.
+You need to copy the file ".factorypath.template" to ".factorypath"
+and adjust the path inside if your Eclipse project is not named "SoSy-Lab Common".
+
+We recommend to install the Eclipse Checkstyle plugin (http://eclipse-cs.sourceforge.net/)
+and the plugin with additional Checkstyle checks (https://github.com/sevntu-checkstyle/sevntu.checkstyle)
+to be able to see the Checkstyle warnings in Eclipse
+(the necessary configuration is included in the repository).
