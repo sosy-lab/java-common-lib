@@ -2,7 +2,7 @@ language: java
 install:
   - ant resolve-dependencies
 script:
-  - ant tests
+  - ant unit-tests
   - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
 notifications:
   email:
