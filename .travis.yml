@@ -1,0 +1,12 @@
+language: java
+install:
+  - ant resolve-dependencies
+script:
+  - ant tests
+  - ant findbugs
+notifications:
+  email:
+    - Common-Lib@sosy-lab.org
+cache:
+  directories:
+  - $HOME/.ivy2
