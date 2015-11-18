@@ -3,7 +3,7 @@ install:
   - ant resolve-dependencies
 script:
   - ant tests
-  - ant findbugs
+  - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
 notifications:
   email:
     - Common-Lib@sosy-lab.org
