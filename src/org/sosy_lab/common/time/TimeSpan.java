@@ -49,6 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -574,7 +575,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   private static final Function<TimeSpan, String> FORMAT_SIMPLE =
       new Function<TimeSpan, String>() {
         @Override
-        public String apply(TimeSpan pInput) {
+        public String apply(@Nonnull TimeSpan pInput) {
           return pInput.span + TIME_UNITS.get(pInput.unit);
         }
       };
@@ -583,7 +584,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   static final Function<TimeSpan, String> FORMAT_HUMAN_READABLE_LARGE =
       new Function<TimeSpan, String>() {
         @Override
-        public String apply(TimeSpan pInput) {
+        public String apply(@Nonnull TimeSpan pInput) {
           final TimeUnit unit = pInput.getUnit();
           final StringBuilder result = new StringBuilder();
           boolean started = false;
