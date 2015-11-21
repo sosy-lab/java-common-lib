@@ -21,6 +21,7 @@ package org.sosy_lab.common.concurrency;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,5 +67,18 @@ public class Concurrency {
   public static ExecutorService createThreadPool() {
     final int processors = Runtime.getRuntime().availableProcessors();
     return Executors.newFixedThreadPool(processors);
+  }
+
+  /**
+   * Creates a thread pool of fixed size. Size is determined by processors
+   * available to the JVM.
+   *
+   * @param ThreadFactory
+   *            The thread factory to be used.
+   * @return thread pool
+   */
+  public static ExecutorService createThreadPool(ThreadFactory threadFactory) {
+    final int processors = Runtime.getRuntime().availableProcessors();
+    return Executors.newFixedThreadPool(processors, threadFactory);
   }
 }
