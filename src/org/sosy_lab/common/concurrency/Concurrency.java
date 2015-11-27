@@ -73,7 +73,7 @@ public class Concurrency {
    * Creates a thread pool of fixed size. Size is determined by processors
    * available to the JVM.
    *
-   * @param ThreadFactory
+   * @param threadFactory
    *            The thread factory to be used.
    * @return thread pool
    */
