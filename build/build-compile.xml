@@ -4,7 +4,7 @@
 
     <!-- Targets for compilation. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
 
     <!-- These properties can be overridden from including file. -->
     <property name="source.format" value="1.7"/>

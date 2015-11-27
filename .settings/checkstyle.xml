@@ -176,6 +176,10 @@
     <module name="com.github.sevntu.checkstyle.checks.coding.UselessSuperCtorCallCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
+    <module name="ForbidAnnotation">
+      <property name="annotationNames" value="Test"/>
+      <property name="annotationTargets" value="METHOD_DEF"/>
+    </module>
   </module>
   <module name="Header">
     <property name="severity" value="ignore"/>
