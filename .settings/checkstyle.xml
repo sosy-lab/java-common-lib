@@ -17,7 +17,9 @@
       <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
     </module>
     <module name="SuppressWarningsHolder"/>
-    <module name="AnnotationUseStyle"/>
+    <module name="AnnotationUseStyle">
+      <property name="trailingArrayComma" value="ignore"/>
+    </module>
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
@@ -37,7 +39,9 @@
     <module name="ClassTypeParameterName">
       <property name="format" value="^[A-Z][0-9]?$"/>
     </module>
-    <module name="ConstantName"/>
+    <module name="ConstantName">
+      <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$"/>
+    </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
       <property name="format" value="^([a-z][a-zA-Z0-9]*|_)$"/>
@@ -73,7 +77,9 @@
     <module name="ParameterNumber"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
-    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyForIteratorPad">
+      <property name="option" value="space"/>
+    </module>
     <module name="NoWhitespaceAfter">
       <property name="allowLineBreaks" value="false"/>
       <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS"/>
