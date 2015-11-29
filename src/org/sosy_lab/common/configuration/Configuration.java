@@ -1017,8 +1017,8 @@ public final class Configuration {
    * @param type type of each object
    * @param genericType type of each object
    * @param secondaryOption the optional second annotation of the option
-   * @return
-   * @throws InvalidConfigurationException
+   * @return a list of instances of arbitrary objects
+   * @throws InvalidConfigurationException if conversion fails
    */
   private List<?> convertMultipleValues(
       final String optionName,

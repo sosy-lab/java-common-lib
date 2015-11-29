@@ -90,8 +90,8 @@ public interface TypeConverter {
    * @param type The target type.
    * @param genericType The generic target type (may be null if not available).
    * @param secondaryOption An optional second annotation for the option
-   * @return An instance of the target type-
-   * @throws InvalidConfigurationException
+   * @return An instance of the target type.
+   * @throws InvalidConfigurationException If the default value is invalid for this option.
    * @throws UnsupportedOperationException If the option specification in the source code
    * is invalid (e.g., a missing annotation).
    */
