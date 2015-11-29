@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
 
 /**
- * An annotation similar to {@link @javax.annotation.ParametersAreNonnullByDefault}
+ * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault}
  * that defines that all methods inside the annotated element
  * do not return null, unless this is overridden with another annotation.
  *

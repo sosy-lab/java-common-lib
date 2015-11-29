@@ -49,8 +49,6 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /**
    * Replacement for {{@link #remove(Object)} that returns a fresh instance.
-   * @param key
-   * @return
    */
   @CheckReturnValue
   PersistentMap<K, V> removeAndCopy(Object key);

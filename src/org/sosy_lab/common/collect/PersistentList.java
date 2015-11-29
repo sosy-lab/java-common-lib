@@ -27,7 +27,7 @@ import javax.annotation.CheckReturnValue;
 /**
  * Interface for persistent lists.
  * A persistent data structure is immutable, but provides cheap copy-and-write
- * operations. Thus all write operations ({{@link #with(Object)}, {{@link #withOut(Object)}})
+ * operations. Thus all write operations ({{@link #with(Object)}, {{@link #without(Object)}})
  * will not modify the current instance, but return a new instance instead.
  *
  * All modifying operations inherited from {@link List} are not supported and
@@ -47,7 +47,7 @@ public interface PersistentList<T> extends List<T> {
   PersistentList<T> with(T value);
 
   /**
-   * Replacement for {@link #addAll(Iterable)} that returns a fresh new instance.
+   * Replacement for {@link #addAll(Collection)} that returns a fresh new instance.
    * The position of insertion is not specified.
    */
   @CheckReturnValue

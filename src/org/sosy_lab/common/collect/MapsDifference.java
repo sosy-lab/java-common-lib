@@ -71,9 +71,9 @@ public class MapsDifference {
    * Interface for visiting map entries differing between two maps.
    *
    * If you are interested in a visitor that collects all passed elements,
-   * please use {@link Accumulate#mapDifferenceTo(Accumulator)}.
+   * please use {@link MapsDifference#collectMapsDifferenceTo(Collection)}.
    * A dummy implementation that does nothing is available from
-   * {@link Accumulate#ignore()}. For implementing your own visitor,
+   * {@link MapsDifference#ignoreMapsDifference()}. For implementing your own visitor,
    * you can inherit from {@link DefaultVisitor}.
    *
    * @param <K> The type of the key.

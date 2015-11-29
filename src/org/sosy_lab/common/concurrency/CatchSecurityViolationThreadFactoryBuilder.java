@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
  * Unfortunately the original ThreadFactoryBuilder class cannot be sub-classed
  * because it declared as final.
  *
- * @see CatchSecurityViolationThreadFactoryBuilder
+ * @see ThreadFactoryBuilder
  */
 public class CatchSecurityViolationThreadFactoryBuilder {
   private @Nullable Boolean daemon;
@@ -51,7 +51,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   private @Nullable ThreadFactory backingFactory;
 
   /**
-   * @see CatchSecurityViolationThreadFactoryBuilder#setThreadFactory(ThreadFactory)
+   * @see ThreadFactoryBuilder#setThreadFactory(ThreadFactory)
    */
   public CatchSecurityViolationThreadFactoryBuilder setThreadFactory(ThreadFactory factory) {
     backingFactory = checkNotNull(factory);
@@ -59,7 +59,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   }
 
   /**
-   * @see ThreadFactoryBuilder#setUncaughtExceptionHandler(UncaughtExceptionHandler)
+   * @see ThreadFactoryBuilder#setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler)
    */
   public CatchSecurityViolationThreadFactoryBuilder setUncaughtExceptionHandler(
       UncaughtExceptionHandler pHandler) {

@@ -285,7 +285,6 @@ public class ProcessExecutor<E extends Exception> {
   /**
    * Write a String to the process. May only be called before {@link #join()}
    * was called, as afterwards the process is not running anymore.
-   * @throws IOException
    */
   public void println(String s) throws IOException {
     checkNotNull(s);
@@ -295,7 +294,6 @@ public class ProcessExecutor<E extends Exception> {
   /**
    * Write a String to the process. May only be called before {@link #join()}
    * was called, as afterwards the process is not running anymore.
-   * @throws IOException
    */
   public void print(String s) throws IOException {
     checkNotNull(s);
@@ -307,7 +305,6 @@ public class ProcessExecutor<E extends Exception> {
 
   /**
    * Sends the EOF (end of file) signal to stdin of the process.
-   * @throws IOException
    */
   public void sendEOF() throws IOException {
     checkState(!finished, "Cannot write to process that has already terminated.");

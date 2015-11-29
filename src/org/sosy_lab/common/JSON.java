@@ -46,7 +46,6 @@ public final class JSON {
 
   /**
    * Encode an object into JSON text and write it to a file.
-   * @throws IOException
    */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
     // We escape everything, so pure ASCII remains
@@ -57,7 +56,6 @@ public final class JSON {
 
   /**
    * Encode an object into JSON text and write it to out.
-   * @throws IOException
    */
   public static void writeJSONString(@Nullable Object value, Appendable out) throws IOException {
     if (value == null) {
