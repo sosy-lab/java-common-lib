@@ -43,9 +43,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
 
   /**
    * If the represented number is rational, return the wrapped object.
-   * Otherwise, throw exception.
    *
-   * @throws java.lang.UnsupportedOperationException
+   * @throws java.lang.UnsupportedOperationException in case the value is not rational
    */
   public Rational getRational() {
     if (rational != null) {

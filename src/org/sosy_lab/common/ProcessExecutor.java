@@ -317,10 +317,10 @@ public class ProcessExecutor<E extends Exception> {
    *
    * @param timelimit Maximum time to wait for process (in milliseconds)
    * @return The exit code of the process.
-   * @throws IOException
+   * @throws IOException passed from the handle* methods.
    * @throws E passed from the handle* methods.
    * @throws TimeoutException If timeout is hit.
-   * @throws InterruptedException
+   * @throws InterruptedException If the current thread is interrupted.
    */
   public int join(final long timelimit)
       throws IOException, E, TimeoutException, InterruptedException {
@@ -393,9 +393,9 @@ public class ProcessExecutor<E extends Exception> {
    * or the {@link #handleErrorOutput(String)} are called respectively.
    *
    * @return The exit code of the process.
-   * @throws IOException
+   * @throws IOException passed from the handle* methods.
    * @throws E passed from the handle* methods.
-   * @throws InterruptedException
+   * @throws InterruptedException If the current thread is interrupted.
    */
   public int join() throws IOException, E, InterruptedException {
     try {

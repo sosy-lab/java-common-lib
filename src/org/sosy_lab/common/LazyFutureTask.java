@@ -81,8 +81,7 @@ public class LazyFutureTask<V> extends FutureTask<V> {
   }
 
   /**
-   * Always throws {@link UnsupportedOperationException}.
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException Always
    */
   @Deprecated
   @Override
