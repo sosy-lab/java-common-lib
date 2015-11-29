@@ -41,9 +41,6 @@ import javax.annotation.Nullable;
 /**
  * A generic Pair class. Code borrowed from here:
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6229146
- *
- * @param <A>
- * @param <B>
  */
 public class Pair<A, B> implements Serializable {
 

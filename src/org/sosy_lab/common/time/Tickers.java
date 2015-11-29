@@ -25,7 +25,6 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import com.google.common.base.Ticker;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.TimeUnit;
 
@@ -183,7 +182,7 @@ public class Tickers {
 
   /**
    * Return a {@link TickerWithUnit} that delegates to
-   * {@link OperatingSystemMXBean#getProcessCputime()}.
+   * <code>com.sun.management.OperatingSystemMXBean.getProcessCpuTime()</code>.
    * This is available on Sun/Oracle/OpenJDK JVM for Linux,
    * but not guaranteed on other platforms.
    * @throws UnsupportedOperationException If the JVM does not support measuring process CPU time.

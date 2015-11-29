@@ -34,10 +34,6 @@ import javax.annotation.Nullable;
 
 /**
  * A generic Triple class based on Pair.java.
- *
- * @param <A>
- * @param <B>
- * @param <C>
  */
 public class Triple<A, B, C> implements Serializable {
 

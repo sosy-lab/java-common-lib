@@ -90,7 +90,6 @@ public interface Path {
    * Returns the path as canonical path.
    *
    * @return The canonical path.
-   * @throws IOException
    */
   String getCanonicalPath() throws IOException;
 
@@ -148,7 +147,7 @@ public interface Path {
   /**
    * Returns a CharSource instance that is backed by the underlying path.
    *
-   * @see com.google.common.io.CharSource
+   * @see CharSource
    *
    * @param charset The charset to use.
    *
@@ -159,7 +158,7 @@ public interface Path {
   /**
    * Returns a CharSink instance that is backed by the underlying path.
    *
-   * @see com.google.common.io.CharSink
+   * @see CharSink
    *
    * @param charset The charset to use.
    * @param writeModes The write mode to use
@@ -171,7 +170,7 @@ public interface Path {
   /**
    * Returns a ByteSource instance that is backed by the underlying path.
    *
-   * @see com.google.io.ByteSource
+   * @see ByteSource
    *
    * @return A ByteSource
    */
@@ -180,7 +179,7 @@ public interface Path {
   /**
    * Returns a ByteSink instance that is backed by the underlying path.
    *
-   * @see com.google.io.ByteSink
+   * @see ByteSink
    *
    * @param writeModes The write mode to use
    * @return A ByteSink

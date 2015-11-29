@@ -91,11 +91,6 @@ public final class Files {
    * </code>
    *
    * The file can be opened and closed multiple times, potentially from different processes.
-   *
-   * @param prefix
-   * @param suffix
-   * @return
-   * @throws IOException
    */
   public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix)
       throws IOException {
@@ -164,7 +159,6 @@ public final class Files {
    * Writes content to a file.
    * @param file The file.
    * @param content The content which shall be written.
-   * @throws IOException
    */
   public static void writeFile(Path file, Object content) throws IOException {
     checkNotNull(content);
@@ -204,7 +198,6 @@ public final class Files {
    * but creating it if necessary).
    * @param file The file.
    * @param content The content which will be written to the end of the file.
-   * @throws IOException
    */
   public static void appendToFile(Path file, Object content) throws IOException {
     checkNotNull(content);

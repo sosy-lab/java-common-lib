@@ -57,7 +57,7 @@ public class Collections3 {
 
   /**
    * Given a {@link SortedSet} of {@link String},
-   * return a set (similar to {@link SortedSet#subSet(Object)})
+   * return a set (similar to {@link SortedSet#subSet(Object, Object)})
    * of all entries that have a given prefix.
    *
    * @param set The set to filter.
