@@ -8,10 +8,12 @@
     <property environment="env"/>
 
     <property name="ivy.configurations" value="build, runtime, test, checkstyle, findbugs"/>
+    <property name="package" value="common"/>
 
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
+    <import file="build/build-documentation.xml"/>
     <import file="build/build-jar.xml"/>
     <import file="build/build-junit.xml"/>
     <import file="build/build-format-source.xml"/>
@@ -58,21 +60,5 @@
 
     <target name="build-dependencies" depends="init, resolve-dependencies"/>
 
-    <target name="build-documentation" depends="build-project">
-        <echo message="running OptionCollector..." level="info"/>
-
-        <!-- the output of OptionCollector is written into "doc/ConfigurationOptions.txt" -->
-        <java classname="org.sosy_lab.common.configuration.OptionCollector"
-            fork="true"
-            output="${class.dir}/org/sosy_lab/common/ConfigurationOptions.txt" append="false"
-            failonerror="true"
-            logError="true">
-
-            <classpath refid="classpath"/>
-
-            <!-- "-v" is a optional param for verbose output of OptionCollector -->
-            <!-- <arg value="-v"/> -->
-        </java>
-        <echo message="Options collected." level="info"/>
-    </target>
+    <target name="build-documentation" depends="collect-options" description="Build documentation"/>
 </project>
