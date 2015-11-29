@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="documentation" basedir=".">
+
+    <!-- Targets for building documentation. -->
+
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
+
+    <!-- These properties can be overridden from including file. -->
+    <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
+
+    <target name="collect-options" depends="build-project">
+        <echo message="running OptionCollector..." level="info"/>
+
+        <java classname="org.sosy_lab.common.configuration.OptionCollector"
+            fork="true"
+            output="${documentation.options.file}" append="false"
+            failonerror="true"
+            logError="true">
+
+            <classpath refid="classpath"/>
+
+            <!-- "-v" is a optional param for verbose output of OptionCollector -->
+            <!-- <arg value="-v"/> -->
+        </java>
+        <echo message="Options collected." level="info"/>
+    </target>
+</project>
