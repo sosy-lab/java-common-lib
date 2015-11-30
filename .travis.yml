@@ -13,6 +13,8 @@ deploy:
   skip_cleanup: true
   provider: script
   script: build/deploy-gh-pages.sh
+  on:
+    branch: trunk
 notifications:
   email:
     - Common-Lib@sosy-lab.org
