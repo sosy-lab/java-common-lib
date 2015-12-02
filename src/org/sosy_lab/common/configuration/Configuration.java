@@ -1044,7 +1044,7 @@ public final class Configuration {
       @Nullable final T defaultValue,
       final Class<T> type,
       final Type genericType,
-      @Nullable  final Annotation secondaryOption)
+      @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Class<?> innerType;

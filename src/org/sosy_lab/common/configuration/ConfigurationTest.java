@@ -297,9 +297,7 @@ public class ConfigurationTest {
 
   @Test
   public void testCopyWithNewPrefix() throws Exception {
-    Configuration c = Configuration.builder()
-            .setOption("new-prefix.hello", "world")
-            .build();
+    Configuration c = Configuration.builder().setOption("new-prefix.hello", "world").build();
     c = Configuration.copyWithNewPrefix(c, "new-prefix");
     assertThat(c.getProperty("hello")).isEqualTo("world");
   }
@@ -312,9 +310,7 @@ public class ConfigurationTest {
 
   @Test
   public void testSecureMode() throws Exception {
-    Configuration c = Configuration.builder()
-        .setOption("prefix.test", "value")
-        .build();
+    Configuration c = Configuration.builder().setOption("prefix.test", "value").build();
     Configuration.enableSecureModeGlobally();
 
     thrown.expect(InvalidConfigurationException.class);
@@ -331,9 +327,7 @@ public class ConfigurationTest {
 
   @Test
   public void testHasProperty() throws Exception {
-    Configuration c = Configuration.builder()
-        .setOption("blah", "blah2")
-        .build();
+    Configuration c = Configuration.builder().setOption("blah", "blah2").build();
     assertThat(c.hasProperty("blah")).isTrue();
   }
 
@@ -360,10 +354,7 @@ public class ConfigurationTest {
 
   @Test
   public void testGetDeprecatedProperties() throws Exception {
-    Configuration c =
-        Configuration.builder()
-            .setOption("prefix.test", "myDeprecatedValue")
-            .build();
+    Configuration c = Configuration.builder().setOption("prefix.test", "myDeprecatedValue").build();
     OptionsWithDeprecatedOption opts = new OptionsWithDeprecatedOption();
     c.inject(opts);
     assertThat(c.getDeprecatedProperties()).contains("prefix.test");
@@ -371,34 +362,24 @@ public class ConfigurationTest {
 
   @Test
   public void testAsPropertiesString() throws Exception {
-    Configuration c =
-        Configuration.builder()
-            .setOption("prefix.test", "myDeprecatedValue")
-            .build();
+    Configuration c = Configuration.builder().setOption("prefix.test", "myDeprecatedValue").build();
     assertThat(c.asPropertiesString()).contains("prefix.test = myDeprecatedValue");
   }
 
   @Options
   private static class OptionsSuperclass {
-    @Option(secure=true, description="blah")
+    @Option(secure = true, description = "blah")
     protected String test = "oldValue";
-
   }
 
   @Options
-  private static class OptionsSubclass extends OptionsSuperclass {
-
-  }
+  private static class OptionsSubclass extends OptionsSuperclass {}
 
   @Test
   public void testRecursiveInject() throws Exception {
-    Configuration c =
-        Configuration.builder()
-            .setOption("test", "newValue")
-            .build();
+    Configuration c = Configuration.builder().setOption("test", "newValue").build();
     OptionsSubclass opts2 = new OptionsSubclass();
     c.recursiveInject(opts2);
     assertThat(opts2.test).isEqualTo("newValue");
   }
-
 }
