@@ -94,6 +94,33 @@ public class ExtendedRationalTest {
   }
 
   @Test
+  public void testMultiplicationZero() {
+    ExtendedRational a = ExtendedRational.ZERO;
+    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    assertThat(a.times(b)).isEqualTo(ExtendedRational.ZERO);
+
+    a = ExtendedRational.ZERO;
+    b = ExtendedRational.INFTY;
+    assertThat(a.times(b)).isEqualTo(ExtendedRational.ZERO);
+  }
+
+  @Test
+  public void testMultiplicationNegInfty() {
+    ExtendedRational a = ExtendedRational.NEG_INFTY;
+    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    assertThat(a.times(b)).isEqualTo(ExtendedRational.INFTY);
+
+    b = ExtendedRational.INFTY;
+    assertThat(a.times(b)).isEqualTo(ExtendedRational.NEG_INFTY);
+  }
+
+  @Test
+  public void testGetRational() {
+    ExtendedRational a = ExtendedRational.ofString("3/4");
+    assertThat(a.getRational()).isEqualTo(Rational.ofString("3/4"));
+  }
+
+  @Test
   public void testDivisionNumber() {
     ExtendedRational a = ExtendedRational.ofString("2/4");
     ExtendedRational b = ExtendedRational.ofString("1/4");
