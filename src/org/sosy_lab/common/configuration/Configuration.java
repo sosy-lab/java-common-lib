@@ -73,7 +73,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
@@ -82,7 +81,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Immutable wrapper around a {@link Properties} instance, providing some
+ * Immutable wrapper around a map with properties, providing
  * useful access helper methods.
  */
 @Options
@@ -378,7 +377,7 @@ public final class Configuration {
       lines[i++] = entry.getKey() + " = " + entry.getValue();
     }
     Arrays.sort(lines, String.CASE_INSENSITIVE_ORDER);
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (String line : lines) {
       sb.append(line);
       sb.append('\n');
@@ -827,7 +826,7 @@ public final class Configuration {
    * Find any annotation which itself is annotated with {@link OptionDetailAnnotation}
    * on a member.
    */
-  private Annotation getSecondaryAnnotation(AnnotatedElement element) {
+  private @Nullable Annotation getSecondaryAnnotation(AnnotatedElement element) {
     Annotation result = null;
     for (Annotation a : element.getDeclaredAnnotations()) {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
@@ -847,7 +846,7 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(Annotation annotation, final Class<?> optionType)
+  private void checkApplicability(@Nullable Annotation annotation, final Class<?> optionType)
       throws UnsupportedOperationException {
     if (annotation == null) {
       return;
@@ -869,12 +868,12 @@ public final class Configuration {
   private void printOptionInfos(
       final AnnotatedElement element,
       final String name,
-      final String valueStr,
-      final Object defaultValue) {
+      @Nullable final String valueStr,
+      @Nullable final Object defaultValue) {
 
     final StringBuilder optionInfo = new StringBuilder();
     optionInfo.append(OptionCollector.getOptionDescription(element));
-    optionInfo.append(name + "\n");
+    optionInfo.append(name).append("\n");
 
     if (defaultValue != null) {
       String defaultStr;
@@ -889,7 +888,7 @@ public final class Configuration {
     }
 
     if (valueStr != null) {
-      optionInfo.append("--> used value:     " + valueStr + "\n");
+      optionInfo.append("--> used value:     ").append(valueStr).append("\n");
     }
 
     System.out.println(optionInfo.toString());
@@ -905,12 +904,12 @@ public final class Configuration {
    * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option
    */
-  private <T> Object convertValue(
+  private @Nullable <T> Object convertValue(
       final String optionName,
       final String valueStr,
       final Class<?> pType,
       final Type genericType,
-      final Annotation secondaryOption)
+      @Nullable final Annotation secondaryOption)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
@@ -949,6 +948,7 @@ public final class Configuration {
       Class<T> arrayComponentType = (Class<T>) componentType;
       T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
+      //noinspection SuspiciousToArrayCall
       return values.toArray(result);
     }
     assert collectionClass != null;
@@ -987,12 +987,12 @@ public final class Configuration {
    * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option (needs to fit to the type)
    */
-  private Object convertSingleValue(
+  private @Nullable Object convertSingleValue(
       final String optionName,
       final String valueStr,
       final Class<?> type,
-      final Type genericType,
-      final Annotation secondaryOption)
+      @Nullable final Type genericType,
+      @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     // try to find a type converter, either for the type of the annotation
@@ -1024,8 +1024,8 @@ public final class Configuration {
       final String optionName,
       final String valueStr,
       final Class<?> type,
-      final Type genericType,
-      final Annotation secondaryOption)
+      @Nullable final Type genericType,
+      @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
@@ -1039,12 +1039,12 @@ public final class Configuration {
     return result;
   }
 
-  private <T> Object convertDefaultValue(
+  private @Nullable <T> Object convertDefaultValue(
       final String optionName,
-      final T defaultValue,
+      @Nullable final T defaultValue,
       final Class<T> type,
       final Type genericType,
-      final Annotation secondaryOption)
+      @Nullable  final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Class<?> innerType;
@@ -1077,7 +1077,8 @@ public final class Configuration {
    * Find a type converter for an option.
    * @return A type converter.
    */
-  private TypeConverter getConverter(final Class<?> type, final Annotation secondaryOption) {
+  private TypeConverter getConverter(
+      final Class<?> type, @Nullable final Annotation secondaryOption) {
     TypeConverter converter = null;
     if (secondaryOption != null) {
       converter = converters.get(secondaryOption.annotationType());
@@ -1095,7 +1096,7 @@ public final class Configuration {
    * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
    */
   @Nullable
-  private static String trimToNull(String s) {
+  private static String trimToNull(@Nullable String s) {
     if (s == null) {
       return null;
     }
