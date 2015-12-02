@@ -28,6 +28,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
 
   public static final ExtendedRational INFTY = new ExtendedRational(NumberType.INFTY);
   public static final ExtendedRational NEG_INFTY = new ExtendedRational(NumberType.NEG_INFTY);
+  public static final ExtendedRational ZERO = new ExtendedRational(Rational.ZERO);
 
   @SuppressWarnings("checkstyle:constantname")
   public static final ExtendedRational NaN = new ExtendedRational(NumberType.NaN);
@@ -69,6 +70,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
       case NEG_INFTY:
         return Double.NEGATIVE_INFINITY;
       case RATIONAL:
+        assert rational != null;
         return rational.doubleValue();
       case INFTY:
         return Double.POSITIVE_INFINITY;
@@ -89,6 +91,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   public String toString() {
     switch (numberType) {
       case RATIONAL:
+        assert rational != null;
         return rational.toString();
       default:
         return Double.toString(toDouble());
@@ -129,6 +132,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     NumberType them = b.numberType;
     if (us == them) {
       if (us == NumberType.RATIONAL) {
+        assert this.rational != null;
+        assert b.rational != null;
         return this.rational.compareTo(b.rational);
       } else {
         return 0;
@@ -160,31 +165,35 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     return toString().hashCode();
   }
 
-  /**
-   * No modifications are necessary to support extra types as no division is performed.
-   */
   public ExtendedRational times(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } else if (this == NEG_INFTY ^ b == NEG_INFTY) {
-      return NEG_INFTY;
-    } else if (this == INFTY || b == INFTY || (this == NEG_INFTY && b == NEG_INFTY)) {
+    } if (this.equals(ExtendedRational.ZERO) || b.equals(ExtendedRational.ZERO)) {
+      return ExtendedRational.ZERO;
+    } else if (this == NEG_INFTY && b == NEG_INFTY) {
       return INFTY;
+    } else if (this == NEG_INFTY || b == NEG_INFTY) {
+      return NEG_INFTY;
+    } else if (this == INFTY || b == INFTY) {
+      return INFTY;
+    } else {
+      assert rational != null && b.rational != null;
+      return new ExtendedRational(rational.times(b.rational));
     }
-    return new ExtendedRational(rational.times(b.rational));
   }
 
   public ExtendedRational plus(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } else if (this == NEG_INFTY && b == INFTY || this == INFTY && b == NEG_INFTY) {
+    } else if (this == NEG_INFTY && b == INFTY
+        || this == INFTY && b == NEG_INFTY) {
       return NaN;
     } else if (this == INFTY || b == INFTY) {
       return INFTY;
     } else if (this == NEG_INFTY || b == NEG_INFTY) {
       return NEG_INFTY;
     }
-
+    assert rational != null && b.rational != null;
     return new ExtendedRational(rational.plus(b.rational));
   }
 
@@ -204,6 +213,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     } else if (this == INFTY || this == NEG_INFTY) {
       return new ExtendedRational(Rational.ZERO);
     }
+    assert rational != null;
     return new ExtendedRational(rational.reciprocal());
   }
 
@@ -215,6 +225,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     } else if (this == NEG_INFTY) {
       return INFTY;
     }
+    assert rational != null;
     return new ExtendedRational(rational.negate());
   }
 }
