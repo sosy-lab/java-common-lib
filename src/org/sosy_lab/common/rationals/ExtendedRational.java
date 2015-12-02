@@ -168,7 +168,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   public ExtendedRational times(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } if (this.equals(ExtendedRational.ZERO) || b.equals(ExtendedRational.ZERO)) {
+    }
+    if (this.equals(ExtendedRational.ZERO) || b.equals(ExtendedRational.ZERO)) {
       return ExtendedRational.ZERO;
     } else if (this == NEG_INFTY && b == NEG_INFTY) {
       return INFTY;
@@ -185,8 +186,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   public ExtendedRational plus(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } else if (this == NEG_INFTY && b == INFTY
-        || this == INFTY && b == NEG_INFTY) {
+    } else if (this == NEG_INFTY && b == INFTY || this == INFTY && b == NEG_INFTY) {
       return NaN;
     } else if (this == INFTY || b == INFTY) {
       return INFTY;
