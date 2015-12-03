@@ -1,7 +1,8 @@
 # SoSy-Lab Common
 
-[![Build Status](https://api.travis-ci.org/dbeyer/common-java.svg "Build Status")](https://travis-ci.org/dbeyer/common-java)
+[![Build Status](https://travis-ci.org/sosy-lab/java-common-lib.svg "Build Status")](https://travis-ci.org/sosy-lab/java-common-lib)
+[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 A collection of utilities for Java.
 
- - [JavaDoc documentation](http://dbeyer.github.io/common-java/)
+ - [JavaDoc documentation](https://sosy-lab.github.io/java-common-lib/)
