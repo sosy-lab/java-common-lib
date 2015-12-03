@@ -20,6 +20,16 @@ Before Committing
 Please run "ant tests findbugs checkstyle" and check and clear any reported problems.
 
 
+Mailing List for Notifications
+------------------------------
+There is a mailing list with notifications for commits and TravisCI builds:
+https://groups.google.com/forum/#!forum/common-java-dev
+It is recommended to subscribe to this list to get notified of failing builds.
+
+You can also use this list for discussion among developers,
+or use the GitHub issue tracker.
+
+
 Note for Eclipse Users
 ----------------------
 This project uses Google AutoValue (https://github.com/google/auto/tree/master/value).
