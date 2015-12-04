@@ -4,23 +4,19 @@
 
     <!-- Targets for determining the version number based on the version-control revision. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Java-Common-Lib and JavaSMT. -->
 
     <target name="determine-version">
-        <exec executable="svnversion"
-                outputproperty="svn.revision"
-                failonerror="false" failifexecutionfails="false"
-                logError="false" error="/dev/null">
-            <env key="LANG" value="C" />
-            <env key="LANGUAGE" value="C" />
+        <exec executable="git"
+                outputproperty="version"
+                failonerror="true"
+                logerror="true">
+            <arg value="describe"/>
+            <arg value="--always"/>
+            <arg value="--dirty"/>
         </exec>
-
-        <condition property="version" value="0.${svn.revision}" else="UNKNOWN">
-            <not><equals arg1="${svn.revision}" arg2="Unversioned directory"/></not>
-        </condition>
-
         <condition property="version.publishable">
-            <matches string="${version}" pattern="^0\.[0-9]+$" />
+            <not><matches string="${version}" pattern="(^[a-z0-9]*$|-dirty)" /></not>
         </condition>
     </target>
 </project>

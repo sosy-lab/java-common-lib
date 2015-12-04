@@ -19,6 +19,7 @@
 /Javadoc
 /gh-pages
 /.factorypath
+/repository
 
 # /.idea/
 /.idea/workspace.xml
