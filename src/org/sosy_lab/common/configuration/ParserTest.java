@@ -128,6 +128,8 @@ public class ParserTest {
     testSingleOption("// comment \n foo.bar=abc \n # comment", "foo.bar", "abc");
     testSingleOption("foo.bar=abc # no comment", "foo.bar", "abc # no comment");
     testSingleOption("foo.bar=abc // no comment", "foo.bar", "abc // no comment");
+    testSingleOption("#\n foo.bar=abc", "foo.bar", "abc");
+    testSingleOption("#    \n foo.bar=abc", "foo.bar", "abc");
   }
 
   @Test

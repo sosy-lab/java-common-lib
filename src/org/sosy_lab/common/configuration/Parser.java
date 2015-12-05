@@ -238,7 +238,10 @@ class Parser {
 
         // no continue here, we need to run the code at the end of the loop body
 
-      } else if (line.isEmpty() || line.startsWith("# ") || line.startsWith("//")) {
+      } else if (line.isEmpty()
+          || line.equals("#")
+          || line.startsWith("# ")
+          || line.startsWith("//")) {
         // empty or comment
         continue;
 
