@@ -40,11 +40,13 @@ public class ShutdownNotifierTest {
 
   private static final String REASON = "Shutdown Request Reason";
 
+  private ShutdownManager manager = null;
   private ShutdownNotifier instance = null;
 
   @Before
   public void setUp() {
-    instance = ShutdownNotifier.create();
+    manager = ShutdownManager.create();
+    instance = manager.getNotifier();
   }
 
   @After
@@ -213,7 +215,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testParentChild() {
-    ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
+    ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
     assertFalse(instance.shouldShutdown());
     assertFalse(child.shouldShutdown());
@@ -226,7 +228,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testChildParent() {
-    ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
+    ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
     assertFalse(instance.shouldShutdown());
     assertFalse(child.shouldShutdown());
@@ -242,7 +244,7 @@ public class ShutdownNotifierTest {
   public void testParentChildListenerNotification() {
     final AtomicBoolean flag = new AtomicBoolean(false);
 
-    ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
+    ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
     child.register(
         new ShutdownRequestListener() {
@@ -260,7 +262,7 @@ public class ShutdownNotifierTest {
   public void testParentChildListenerNotificationReason() {
     final AtomicReference<String> reasonReference = new AtomicReference<>();
 
-    ShutdownNotifier child = ShutdownNotifier.createWithParent(instance);
+    ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
     child.register(
         new ShutdownRequestListener() {
