@@ -382,4 +382,38 @@ public class ConfigurationTest {
     c.recursiveInject(opts2);
     assertThat(opts2.test).isEqualTo("newValue");
   }
+
+  @Test
+  public void testFromCmdLineArgumentsSimple() throws Exception {
+    Configuration config = Configuration.fromCmdLineArguments(
+        new String[]{
+            "--option1=value1",
+            "-setprop", "option2", "value2",
+            "--option3=value3"
+        }
+    );
+    assertThat(config.getProperty("option1")).isEqualTo("value1");
+    assertThat(config.getProperty("option2")).isEqualTo("value2");
+    assertThat(config.getProperty("option3")).isEqualTo("value3");
+  }
+
+  @Test
+  public void testFromCmdLineArgumentsFailFormat() throws Exception {
+    thrown.expect(IllegalStateException.class);
+
+    // No break should be there.
+    Configuration.fromCmdLineArguments(new String[]{
+      "--option1", "value1"
+    });
+  }
+
+  @Test
+  public void testFromCmdLineArgumentsFailFormat2() throws Exception {
+    thrown.expect(IllegalStateException.class);
+
+    // No break should be there.
+    Configuration.fromCmdLineArguments(new String[]{
+        "-option1", "value1"
+    });
+  }
 }

@@ -27,6 +27,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -1118,5 +1119,51 @@ public final class Configuration {
         + ": ["
         + Joiner.on(", ").withKeyValueSeparator("=").join(properties)
         + "]";
+  }
+
+  /**
+   * Construct a configuration object from the array of command line arguments.
+   *
+   * <p>Two (freely interchangeable) input formats are supported:
+   * <pre>
+   * <code>
+   *   --option=Value
+   * </code>
+   * </pre>
+   *
+   * and
+   *
+   * <pre>
+   * <code>
+   *   -setprop option Value
+   * </code>
+   * </pre>
+   *
+   * @param args Command line arguments
+   * @return Constructed {@link Configuration} instance
+   * @throws IllegalStateException On incorrect format
+   * @throws InvalidConfigurationException Whenever options are not supplied
+   * properly, see {@link ConfigurationBuilder#build}
+   */
+  public static Configuration fromCmdLineArguments(String[] args)
+      throws InvalidConfigurationException {
+    ConfigurationBuilder builder = Configuration.builder();
+    for (int i=0; i<args.length; i++) {
+      String arg = args[i];
+
+      if (arg.startsWith("--")) {
+        List<String> tokens
+            = Splitter.on("=").omitEmptyStrings().trimResults().splitToList(arg);
+        Preconditions.checkState(tokens.size() == 2,
+            "--option=Value syntax expected", tokens);
+        builder.setOption(tokens.get(0).substring(2), tokens.get(1));
+      } else {
+        Preconditions.checkState(arg.equals("-setprop"),
+            "Only two ways of setting options are supported: '--option=Value' " +
+                "and '-setprop option Value'");
+        builder.setOption(args[++i], args[++i]);
+      }
+    }
+    return builder.build();
   }
 }
