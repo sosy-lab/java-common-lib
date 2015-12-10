@@ -397,7 +397,7 @@ public class ConfigurationTest {
 
   @Test
   public void testFromCmdLineArgumentsFailFormat() throws Exception {
-    thrown.expect(IllegalStateException.class);
+    thrown.expect(InvalidConfigurationException.class);
 
     // No break should be there.
     Configuration.fromCmdLineArguments(
@@ -408,7 +408,7 @@ public class ConfigurationTest {
 
   @Test
   public void testFromCmdLineArgumentsFailFormat2() throws Exception {
-    thrown.expect(IllegalStateException.class);
+    thrown.expect(InvalidConfigurationException.class);
 
     // No break should be there.
     Configuration.fromCmdLineArguments(
