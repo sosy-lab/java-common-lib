@@ -5,9 +5,13 @@
 
 A collection of utilities for Java.
 
-### Java-Config
+### [Java-Config](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html)
 
-  - Library for [configuration options](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html) injection.
+  - Library for configuration options injection.
+
+### [Java-Rationals](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/rationals/package-summary.html)
+
+  - Working with rationals and extended rationals, plus linear expressions.
 
 
-[JavaDoc documentation](https://sosy-lab.github.io/java-common-lib/) for entire project.
+[Javadoc documentation](https://sosy-lab.github.io/java-common-lib/) for entire project.

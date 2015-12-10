@@ -38,11 +38,11 @@
  * <pre>
  * {@literal @}Options(prefix="grep")
  * public class Grep {
- *   {@literal @}Option(description="Ignore case of the query", secure=True)
+ *   {@literal @}Option(description="Ignore case of the query", secure=true)
  *   private boolean ignoreCase = false;
  *
- *   {@literal @}Option(description="File to search", secure=True)
- *   {@literal @}FileOption(Type.OUTPUT_FILE)
+ *   {@literal @}Option(description="File to search", secure=true)
+ *   {@literal @}FileOption(Type.REQUIRED_INPUT_FILE)
  *   private PathCounterTemplate haystack = null;
  *
  *   public Grep(Configuration c) {

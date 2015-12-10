@@ -9,8 +9,14 @@ import java.math.BigInteger;
 import javax.annotation.Nullable;
 
 /**
- * Rational class, throws exceptions on
- * unsupported operations (e.g. 1/0).
+ * Rational class, throws {@link IllegalArgumentException} on unsupported operations (e.g. {@code 1/0}).
+ *
+ * <p>The Rational object is immutable.
+ * All arithmetic operations return new instances.
+ *
+ * <p>For performance and convenience, there is always only a single instance
+ * representing 0, 1 or -1.
+ * Thus these numbers can be compared using {@code ==} operator.
  */
 @SuppressWarnings("NumberEquality")
 public final class Rational extends Number implements Comparable<Rational> {
@@ -47,9 +53,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   /** Factory functions **/
 
   /**
-   * Create a new rational.
-   *
-   * Function responsible for maintaining the internal invariants.
+   * Create a new rational from a numerator and a denominator.
    */
   public static Rational of(BigInteger numerator, BigInteger denominator) {
     checkNotNull(numerator);
@@ -73,27 +77,35 @@ public final class Rational extends Number implements Comparable<Rational> {
     return ofNormalForm(numerator, denominator);
   }
 
+  /**
+   * Create a new rational from two longs.
+   */
   public static Rational ofLongs(long numerator, long denominator) {
     return of(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
   }
 
+  /**
+   * Create a new rational equal to the given long.
+   */
   public static Rational ofLong(long numerator) {
     return of(BigInteger.valueOf(numerator), B_ONE);
   }
 
+  /**
+   * Create a new rational equal to the given BigInteger.
+   */
   public static Rational ofBigInteger(BigInteger numerator) {
     return of(numerator, B_ONE);
   }
 
   /**
    * Reverses the effect of {@link Rational#toString}.
-   * Supports 2 different formats: with slash (e.g. "25/17")
-   * or without slash (e.g. "5")
+   * Supports 2 different formats: with slash (e.g. {@code 25/17})
+   * or without slash (e.g. {@code 5})
    *
-   * @param s Input string,
-   * @throws NumberFormatException {@code s} is not a valid representation
+   * @param s Input string
+   * @throws NumberFormatException iff {@code s} is not a valid representation
    * of Rational.
-   * @return New {@link Rational}.
    */
   public static Rational ofString(String s) throws NumberFormatException {
     int idx = s.indexOf('/');
@@ -126,7 +138,9 @@ public final class Rational extends Number implements Comparable<Rational> {
     return new Rational(num, den);
   }
 
-  /** Arithmetic operations. **/
+  /**
+   * Multiply by {@code b}, return a new instance.
+   **/
   public Rational times(Rational b) {
     checkNotNull(b);
     Rational a = this;
@@ -146,6 +160,9 @@ public final class Rational extends Number implements Comparable<Rational> {
     return ofNormalForm(c.num.multiply(d.num), c.den.multiply(d.den));
   }
 
+  /**
+   * Return a new instance equal to the sum of {@code this} and {@code b}.
+   */
   public Rational plus(Rational b) {
     checkNotNull(b);
     Rational a = this;
@@ -159,16 +176,27 @@ public final class Rational extends Number implements Comparable<Rational> {
     return of((a.num.multiply(b.den).add(b.num.multiply(a.den))), a.den.multiply(b.den));
   }
 
+  /**
+   * Return a new instance equal to {@code this - b}.
+   */
   public Rational minus(Rational b) {
     return plus(b.negate());
   }
 
+  /**
+   * Return {@code this / b}.
+   */
   public Rational divides(Rational b) {
     // Reciprocal method will throw the exception for the division-by-zero
     // error if required.
     return times(b.reciprocal());
   }
 
+  /**
+   * Return reciprocal of {@code this}.
+   *
+   * @throws IllegalArgumentException If invoked on zero.
+   */
   public Rational reciprocal() throws IllegalArgumentException {
     if (num.equals(B_ZERO)) {
       throw new IllegalArgumentException(
@@ -177,13 +205,13 @@ public final class Rational extends Number implements Comparable<Rational> {
     return ofNormalForm(den, num);
   }
 
+  /**
+   * Return negation of {@code this}.
+   */
   public Rational negate() {
     return ofNormalForm(num.negate(), den);
   }
 
-  /**
-   * @return rational converted to double.
-   */
   @Override
   public double doubleValue() {
     return num.doubleValue() / den.doubleValue();
@@ -209,7 +237,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /**
-   * @return  String of the form num/den.
+   * @return String of the form num/den.
    */
   @Override
   public String toString() {
