@@ -53,11 +53,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 /**
- * This class can be used to execute a separate process and read it's output in
+ * This class can be used to execute a separate process and read its output in
  * a convenient way. It is only useful for processes which handle only one task
  * and exit afterwards.
  *
- * This class is not thread-safe, it assumes that never two of it's methods are
+ * This class is not thread-safe, it assumes that never two of its methods are
  * executed simultaneously.
  *
  * When an instance of this class is created, the corresponding process is

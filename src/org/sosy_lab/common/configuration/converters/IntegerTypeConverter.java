@@ -46,7 +46,7 @@ public class IntegerTypeConverter implements TypeConverter {
 
     if (!(pOption instanceof IntegerOption)) {
       throw new UnsupportedOperationException(
-          "IntegerTypeConverter needs otions annotated with @IntegerOption");
+          "IntegerTypeConverter needs options annotated with @IntegerOption");
     }
     IntegerOption option = (IntegerOption) pOption;
 
