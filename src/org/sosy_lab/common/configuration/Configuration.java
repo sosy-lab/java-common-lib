@@ -1138,7 +1138,7 @@ public final class Configuration {
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();
-    for (int i=0; i<args.length; i++) {
+    for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       if (!arg.startsWith("--")) {
         throw new InvalidConfigurationException(

@@ -385,13 +385,11 @@ public class ConfigurationTest {
 
   @Test
   public void testFromCmdLineArgumentsSimple() throws Exception {
-    Configuration config = Configuration.fromCmdLineArguments(
-        new String[]{
-            "--option1=value1",
-            "--option2=value2",
-            "--option3=value3",
-        }
-    );
+    Configuration config =
+        Configuration.fromCmdLineArguments(
+            new String[] {
+              "--option1=value1", "--option2=value2", "--option3=value3",
+            });
     assertThat(config.getProperty("option1")).isEqualTo("value1");
     assertThat(config.getProperty("option2")).isEqualTo("value2");
     assertThat(config.getProperty("option3")).isEqualTo("value3");
@@ -402,9 +400,10 @@ public class ConfigurationTest {
     thrown.expect(IllegalStateException.class);
 
     // No break should be there.
-    Configuration.fromCmdLineArguments(new String[]{
-      "--option1", "value1",
-    });
+    Configuration.fromCmdLineArguments(
+        new String[] {
+          "--option1", "value1",
+        });
   }
 
   @Test
@@ -412,8 +411,9 @@ public class ConfigurationTest {
     thrown.expect(IllegalStateException.class);
 
     // No break should be there.
-    Configuration.fromCmdLineArguments(new String[]{
-        "-option1", "value1",
-    });
+    Configuration.fromCmdLineArguments(
+        new String[] {
+          "-option1", "value1",
+        });
   }
 }
