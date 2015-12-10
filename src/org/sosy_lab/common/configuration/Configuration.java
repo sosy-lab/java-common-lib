@@ -1132,19 +1132,24 @@ public final class Configuration {
    *
    * @param args Command line arguments
    * @return Constructed {@link Configuration} instance
-   * @throws IllegalStateException On incorrect format
-   * @throws InvalidConfigurationException Whenever options are not supplied
-   * properly, see {@link ConfigurationBuilder#build}
+   * @throws InvalidConfigurationException On incorrect format
+   * or when configuration options for Configurations class are invalid
    */
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();
     for (int i=0; i<args.length; i++) {
       String arg = args[i];
-      checkState(arg.startsWith("--"), "--option=Value syntax expected");
+      if (!arg.startsWith("--")) {
+        throw new InvalidConfigurationException(
+            "Invalid command-line argument '" + arg + "', --option=value syntax expected.");
+      }
 
       List<String> tokens = Splitter.on("=").omitEmptyStrings().trimResults().splitToList(arg);
-      checkState(tokens.size() == 2, "--option=Value syntax expected", tokens);
+      if (tokens.size() != 2) {
+        throw new InvalidConfigurationException(
+            "Invalid command-line argument '" + arg + "', --option=value syntax expected.");
+      }
       builder.setOption(tokens.get(0).substring(2), tokens.get(1));
     }
     return builder.build();
