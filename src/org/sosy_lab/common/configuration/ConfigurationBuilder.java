@@ -28,6 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Interface for constructing {@link Configuration} instances.
+ */
 public interface ConfigurationBuilder {
 
   /**

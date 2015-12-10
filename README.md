@@ -5,4 +5,9 @@
 
 A collection of utilities for Java.
 
- - [JavaDoc documentation](https://sosy-lab.github.io/java-common-lib/)
+Includes:
+
+ - Library for [configuration options](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html) injection
+
+
+[JavaDoc documentation](https://sosy-lab.github.io/java-common-lib/)
