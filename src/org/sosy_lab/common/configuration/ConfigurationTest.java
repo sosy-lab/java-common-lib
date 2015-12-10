@@ -388,7 +388,7 @@ public class ConfigurationTest {
     Configuration config = Configuration.fromCmdLineArguments(
         new String[]{
             "--option1=value1",
-            "-setprop", "option2", "value2",
+            "--option2=value2",
             "--option3=value3",
         }
     );
