@@ -9,7 +9,8 @@ import java.math.BigInteger;
 import javax.annotation.Nullable;
 
 /**
- * Rational class, throws {@link IllegalArgumentException} on unsupported operations (e.g. {@code 1/0}).
+ * Rational class, throws {@link IllegalArgumentException} on unsupported
+ * operations (e.g. {@code 1/0}).
  *
  * <p>The Rational object is immutable.
  * All arithmetic operations return new instances.
