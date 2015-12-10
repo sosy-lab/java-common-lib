@@ -45,6 +45,7 @@
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 
+    <target name="all-checks" depends="clean, tests, findbugs, checkstyle, javadoc" description="Run all tests and checks"/>
 
     <!-- Auxiliary targets -->
 

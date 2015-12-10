@@ -17,7 +17,7 @@ for the code formatter. If you have one, please share it.
 
 Before Committing
 -----------------
-Please run "ant tests findbugs checkstyle" and check and clear any reported problems.
+Please run "ant all-checks" and check and clear any reported problems.
 
 
 Mailing List for Notifications
