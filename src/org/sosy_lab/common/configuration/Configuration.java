@@ -1145,6 +1145,7 @@ public final class Configuration {
    * @throws InvalidConfigurationException Whenever options are not supplied
    * properly, see {@link ConfigurationBuilder#build}
    */
+  @SuppressWarnings("checkstyle:modifiedcontrolvariable")
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();
@@ -1159,8 +1160,8 @@ public final class Configuration {
         builder.setOption(tokens.get(0).substring(2), tokens.get(1));
       } else {
         Preconditions.checkState(arg.equals("-setprop"),
-            "Only two ways of setting options are supported: '--option=Value' " +
-                "and '-setprop option Value'");
+            "Only two ways of setting options are supported: '--option=Value' "
+                + "and '-setprop option Value'");
         builder.setOption(args[++i], args[++i]);
       }
     }

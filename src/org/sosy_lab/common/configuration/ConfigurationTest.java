@@ -389,7 +389,7 @@ public class ConfigurationTest {
         new String[]{
             "--option1=value1",
             "-setprop", "option2", "value2",
-            "--option3=value3"
+            "--option3=value3",
         }
     );
     assertThat(config.getProperty("option1")).isEqualTo("value1");
@@ -403,7 +403,7 @@ public class ConfigurationTest {
 
     // No break should be there.
     Configuration.fromCmdLineArguments(new String[]{
-      "--option1", "value1"
+      "--option1", "value1",
     });
   }
 
@@ -413,7 +413,7 @@ public class ConfigurationTest {
 
     // No break should be there.
     Configuration.fromCmdLineArguments(new String[]{
-        "-option1", "value1"
+        "-option1", "value1",
     });
   }
 }
