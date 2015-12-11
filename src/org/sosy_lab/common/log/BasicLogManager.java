@@ -297,20 +297,21 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
    * Synthetic accessor methods are also excluded.
    */
   private StackTraceElement findCallingMethod() {
-    StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+    // We use lazy stack trace, because this exactly fits our use case:
+    // Typically we need only one or two StackTraceElements from the top of the trace.
+    List<StackTraceElement> trace = Throwables.lazyStackTrace(new Throwable());
 
-    // First method in stacktrace is Thread#getStackTrace(),
-    // second is this method, third is the log() method.
-    // So we can skip 3 stack trace elements in any case.
-    int traceIndex = 3;
+    // First method in stacktrace is this method, second is the log() method.
+    // So we can skip 2 stack trace elements in any case.
+    int traceIndex = 2;
 
-    String methodName = trace[traceIndex].getMethodName();
-    while (methodName.startsWith("log") || methodName.startsWith("access$")) {
+    StackTraceElement frame = trace.get(traceIndex);
+    while (frame.getMethodName().startsWith("log") || frame.getMethodName().startsWith("access$")) {
       traceIndex++;
-      methodName = trace[traceIndex].getMethodName();
+      frame = trace.get(traceIndex);
     }
 
-    return trace[traceIndex];
+    return frame;
   }
 
   /**
@@ -418,19 +419,21 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
       // use exception stack trace here so that the location where the exception
       // occurred appears in the message
-      StackTraceElement[] trace = e.getStackTrace();
-      int traceIndex = 0;
+      List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
+      StackTraceElement frame = trace.get(0);
 
       if (e instanceof InvalidConfigurationException) {
         // find first method outside of the Configuration class,
         // this is probably the most interesting trace element
         String confPackage = Configuration.class.getPackage().getName();
-        while (trace[traceIndex].getClassName().startsWith(confPackage)) {
+        int traceIndex = 0;
+        while (frame.getClassName().startsWith(confPackage)) {
           traceIndex++;
+          frame = trace.get(traceIndex);
         }
       }
 
-      log0(priority, trace[traceIndex], logMessage);
+      log0(priority, frame, logMessage);
     }
 
     logDebugException(e, additionalMessage);
