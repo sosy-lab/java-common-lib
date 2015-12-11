@@ -43,7 +43,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -488,21 +487,7 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
 
       logMessage += Throwables.getStackTraceAsString(e);
 
-      StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-      // first method in stacktrace is Thread#getStackTrace(), second is this method
-      int traceIndex = 2;
-
-      // find the first interesting method in the stack trace
-      // (we assume that methods starting with "log" are helper methods for logging
-      while (trace[traceIndex].getMethodName().startsWith("log")) {
-        traceIndex++;
-      }
-
-      LogRecord record = new LogRecord(priority, logMessage);
-      record.setSourceClassName(trace[traceIndex].getClassName());
-      record.setSourceMethodName(trace[traceIndex].getMethodName());
-
-      logger.log(record);
+      log0(priority, findCallingMethod(), logMessage);
     }
   }
 
