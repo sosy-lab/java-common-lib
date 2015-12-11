@@ -30,14 +30,13 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.MapConstraint;
-import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
@@ -77,7 +76,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -258,26 +256,44 @@ public final class Configuration {
    * @return A new map.
    */
   static Map<Class<?>, TypeConverter> createConverterMap() {
-    return MapConstraints.constrainedMap(
-        new HashMap<Class<?>, TypeConverter>(),
-        new MapConstraint<Class<?>, TypeConverter>() {
+    return new ForwardingMap<Class<?>, TypeConverter>() {
 
-          @Override
-          public void checkKeyValue(@Nonnull Class<?> cls, @Nonnull TypeConverter pValue) {
-            checkNotNull(cls);
-            checkNotNull(pValue);
-            if (cls.isAnnotation() && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
-              throw new IllegalArgumentException(
-                  "Can register type converters"
-                      + " only for annotations which are option detail annotations");
-            }
-          }
+      private final Map<Class<?>, TypeConverter> delegate = new HashMap<>();
 
-          @Override
-          public String toString() {
-            return "valid type converter registration";
-          }
-        });
+      @Override
+      protected Map<Class<?>, TypeConverter> delegate() {
+        return delegate;
+      }
+
+      private void check(Class<?> cls, TypeConverter pValue) throws IllegalArgumentException {
+        checkNotNull(cls);
+        checkNotNull(pValue);
+        if (cls.isAnnotation() && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
+          throw new IllegalArgumentException(
+              "Can register type converters"
+                  + " only for annotations which are option detail annotations");
+        }
+      }
+
+      @Override
+      public TypeConverter put(Class<?> cls, TypeConverter pValue) {
+        check(cls, pValue);
+        return super.put(cls, pValue);
+      }
+
+      @Override
+      public void putAll(Map<? extends Class<?>, ? extends TypeConverter> pMap) {
+        for (Map.Entry<? extends Class<?>, ? extends TypeConverter> entry : pMap.entrySet()) {
+          check(entry.getKey(), entry.getValue());
+        }
+        super.putAll(pMap);
+      }
+
+      @Override
+      public Set<java.util.Map.Entry<Class<?>, TypeConverter>> entrySet() {
+        return Collections.unmodifiableSet(super.entrySet());
+      }
+    };
   }
 
   final ImmutableMap<String, String> properties;
