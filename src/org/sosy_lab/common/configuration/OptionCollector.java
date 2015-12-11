@@ -69,27 +69,34 @@ public class OptionCollector {
 
     // parse args
     boolean verbose = false;
+    boolean includeLibraryOptions = false;
     for (String arg : args) {
       if ("-v".equals(arg) || "-verbose".equals(arg)) {
         verbose = true;
+      } else if ("-includeLibraryOptions".equals(arg)) {
+        includeLibraryOptions = true;
       }
     }
 
-    collectOptions(verbose, System.out);
+    collectOptions(verbose, includeLibraryOptions, System.out);
   }
 
   /** This function collects options from all classes and outputs them.
    * Error message are written to System.err.
    *
    * @param verbose short or long output?
+   * @param includeLibraryOptions whether options defined by libraries on the classpath
+   * should be included
    * @param out the output target
    */
-  public static void collectOptions(final boolean verbose, final PrintStream out) {
-    new OptionCollector(verbose).collectOptions(out);
+  public static void collectOptions(
+      final boolean verbose, final boolean includeLibraryOptions, final PrintStream out) {
+    new OptionCollector(verbose, includeLibraryOptions).collectOptions(out);
   }
 
   private final Set<String> errorMessages = new LinkedHashSet<>();
   private final boolean verbose;
+  private final boolean includeLibraryOptions;
 
   // The map where we will collect all options.
   // TreeMap for alphabetical order of keys
@@ -103,11 +110,9 @@ public class OptionCollector {
             }
           });
 
-  /**
-   * @param pVerbose short or long output?
-   */
-  private OptionCollector(boolean pVerbose) {
+  private OptionCollector(boolean pVerbose, boolean pIncludeLibraryOptions) {
     verbose = pVerbose;
+    includeLibraryOptions = pIncludeLibraryOptions;
   }
 
   /**
@@ -135,14 +140,16 @@ public class OptionCollector {
       }
     }
 
-    for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
-      String resourceName = resourceInfo.getResourceName();
-      if (Files.getFileExtension(resourceName).equals("txt")
-          && Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
-        try {
-          Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
-        } catch (IOException e) {
-          errorMessages.add("Could not find the required resource " + resourceInfo.url());
+    if (includeLibraryOptions) {
+      for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
+        String resourceName = resourceInfo.getResourceName();
+        if (Files.getFileExtension(resourceName).equals("txt")
+            && Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
+          try {
+            Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
+          } catch (IOException e) {
+            errorMessages.add("Could not find the required resource " + resourceInfo.url());
+          }
         }
       }
     }
