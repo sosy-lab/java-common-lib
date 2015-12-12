@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import com.google.common.collect.Iterables;
+import static com.google.common.collect.FluentIterable.from;
+
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
@@ -29,7 +31,6 @@ import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class ClassTypeConverter implements TypeConverter {
@@ -55,12 +56,11 @@ public class ClassTypeConverter implements TypeConverter {
             "Options of type Class may not be annotated with " + secondaryOption);
       }
       packagePrefixes =
-          Iterables.concat(
-              packagePrefixes, Arrays.asList(((ClassOption) secondaryOption).packagePrefix()));
+          from(packagePrefixes).append(((ClassOption) secondaryOption).packagePrefix());
     }
 
     // get value of type parameter
-    Class<?> targetType = Classes.getComponentRawType(genericType);
+    final TypeToken<?> targetType = TypeToken.of(Classes.getComponentType(genericType));
 
     // get class object
     Class<?> cls = null;
@@ -77,17 +77,17 @@ public class ClassTypeConverter implements TypeConverter {
     }
 
     // check type
-    if (!targetType.isAssignableFrom(cls)) {
+    if (!targetType.isSupertypeOf(cls)) {
       throw new InvalidConfigurationException(
           "Class "
               + value
               + " specified in option "
               + optionName
               + " is not an instance of "
-              + targetType.getCanonicalName());
+              + targetType);
     }
 
-    Classes.produceClassLoadingWarning(logger, cls, targetType);
+    Classes.produceClassLoadingWarning(logger, cls, targetType.getRawType());
 
     return cls;
   }
