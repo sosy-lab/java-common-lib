@@ -1003,8 +1003,7 @@ public final class Configuration {
     return converter.convert(
         optionName,
         valueStr,
-        type.getRawType(),
-        type.getType(),
+        type,
         secondaryOption,
         sources.get(optionName),
         MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
@@ -1065,8 +1064,7 @@ public final class Configuration {
       // TODO: Also pass default values inside a collection.
 
       TypeConverter converter = getConverter(type, secondaryOption);
-      return converter.convertDefaultValue(
-          optionName, defaultValue, type.getRawType(), type.getType(), secondaryOption);
+      return converter.convertDefaultValue(optionName, defaultValue, type, secondaryOption);
     }
 
     return defaultValue;

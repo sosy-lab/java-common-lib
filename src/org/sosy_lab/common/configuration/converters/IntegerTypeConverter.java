@@ -19,13 +19,14 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import com.google.common.reflect.TypeToken;
+
 import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 /**
  * Type converter for options of types Integer/Long annotated
@@ -37,12 +38,12 @@ public class IntegerTypeConverter implements TypeConverter {
   public Object convert(
       String optionName,
       String valueStr,
-      Class<?> type,
-      Type pGenericType,
+      TypeToken<?> pType,
       Annotation pOption,
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
+    final Class<?> type = pType.getRawType();
 
     if (!(pOption instanceof IntegerOption)) {
       throw new UnsupportedOperationException(
@@ -70,11 +71,7 @@ public class IntegerTypeConverter implements TypeConverter {
 
   @Override
   public <T> T convertDefaultValue(
-      String pOptionName,
-      T pValue,
-      Class<T> pType,
-      Type pGenericType,
-      Annotation pSecondaryOption) {
+      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption) {
 
     return pValue;
   }

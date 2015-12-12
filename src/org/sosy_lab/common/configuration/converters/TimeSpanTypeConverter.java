@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration.converters;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
@@ -30,7 +31,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,12 +50,12 @@ public class TimeSpanTypeConverter implements TypeConverter {
   public Object convert(
       String optionName,
       String valueStr,
-      Class<?> pType,
-      Type pGenericType,
+      TypeToken<?> pType,
       Annotation pOption,
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
+    final Class<?> type = pType.getRawType();
 
     if (!(pOption instanceof TimeSpanOption)) {
       throw new UnsupportedOperationException(
@@ -101,16 +101,16 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     Object result;
 
-    if (pType.equals(Integer.class)) {
+    if (type.equals(Integer.class)) {
       if (value > Integer.MAX_VALUE) {
         throw new InvalidConfigurationException(
             "Value for option " + optionName + " is larger than " + Integer.MAX_VALUE);
       }
       result = (int) value;
-    } else if (pType.equals(Long.class)) {
+    } else if (type.equals(Long.class)) {
       result = value;
     } else {
-      assert pType.equals(TimeSpan.class);
+      assert type.equals(TimeSpan.class);
       result = TimeSpan.of(rawValue, userUnit);
     }
     return result;
@@ -118,11 +118,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
   @Override
   public <T> T convertDefaultValue(
-      String pOptionName,
-      T pValue,
-      Class<T> pType,
-      Type pGenericType,
-      Annotation pSecondaryOption) {
+      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption) {
 
     return pValue;
   }

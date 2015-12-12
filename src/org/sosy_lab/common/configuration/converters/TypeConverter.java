@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import com.google.common.reflect.TypeToken;
+
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
@@ -27,7 +29,6 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 import javax.annotation.Nullable;
 
@@ -50,7 +51,7 @@ public interface TypeConverter {
    *
    * Although the signature of this method does not enforce it,
    * the class of the returned value needs to be assignable to "type" as defined
-   * by {@link Class#isAssignableFrom(Class)}.
+   * by {@link TypeToken#isSupertypeOf(java.lang.reflect.Type)}.
    *
    * Before this method is called, the caller ensures that all requirements for
    * the option defined with the {@link Option} annotation are met.
@@ -58,7 +59,6 @@ public interface TypeConverter {
    * @param optionName The name of the option (should only be used for nice error messages).
    * @param value The string to parse.
    * @param type The target type.
-   * @param genericType The generic target type (may be null if not available).
    * @param secondaryOption An optional second annotation for the option
    * (this is one of the annotations marked with {@link OptionDetailAnnotation}).
    * @param source The file where the configuration option was read from.
@@ -74,8 +74,7 @@ public interface TypeConverter {
   Object convert(
       String optionName,
       String value,
-      Class<?> type,
-      @Nullable Type genericType,
+      TypeToken<?> type,
       @Nullable Annotation secondaryOption,
       Path source,
       LogManager logger)
@@ -88,7 +87,6 @@ public interface TypeConverter {
    * @param optionName The name of the option (should only be used for nice error messages).
    * @param value The default value (may be null).
    * @param type The target type.
-   * @param genericType The generic target type (may be null if not available).
    * @param secondaryOption An optional second annotation for the option
    * @return An instance of the target type.
    * @throws InvalidConfigurationException If the default value is invalid for this option.
@@ -97,10 +95,6 @@ public interface TypeConverter {
    */
   @Nullable
   <T> T convertDefaultValue(
-      String optionName,
-      @Nullable T value,
-      Class<T> type,
-      @Nullable Type genericType,
-      @Nullable Annotation secondaryOption)
+      String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException;
 }

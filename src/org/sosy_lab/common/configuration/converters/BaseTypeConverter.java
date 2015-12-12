@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration.converters;
 
 import com.google.common.primitives.Primitives;
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -29,7 +30,6 @@ import org.sosy_lab.common.log.LogManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -50,12 +50,12 @@ public enum BaseTypeConverter implements TypeConverter {
   public Object convert(
       String optionName,
       String valueStr,
-      Class<?> type,
-      Type pGenericType,
+      TypeToken<?> pType,
       Annotation pSecondaryOption,
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
+    Class<?> type = pType.getRawType();
 
     if (Primitives.isWrapperType(type)) {
       // all wrapper types have valueOf method
@@ -112,7 +112,7 @@ public enum BaseTypeConverter implements TypeConverter {
 
   @Override
   public <T> T convertDefaultValue(
-      String pOptionName, T pValue, Class<T> pType, Type pGenericType, Annotation pSecondaryOption)
+      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption)
       throws InvalidConfigurationException {
 
     return pValue;

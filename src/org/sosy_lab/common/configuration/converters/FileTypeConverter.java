@@ -26,6 +26,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -42,7 +43,6 @@ import org.sosy_lab.common.log.LogManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 import javax.annotation.Nullable;
 
@@ -212,29 +212,26 @@ public class FileTypeConverter implements TypeConverter {
   public Object convert(
       String optionName,
       String pValue,
-      Class<?> pType,
-      Type pGenericType,
+      TypeToken<?> pType,
       Annotation secondaryOption,
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
 
-    checkApplicability(pType, secondaryOption, optionName);
+    Class<?> type = pType.getRawType();
+    checkApplicability(type, secondaryOption, optionName);
 
     return handleFileOption(
-        optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), pType, pSource);
+        optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), type, pSource);
   }
 
   @Override
   public <T> T convertDefaultValue(
-      String optionName,
-      T pDefaultValue,
-      Class<T> pType,
-      Type pGenericType,
-      Annotation secondaryOption)
+      String optionName, T pDefaultValue, TypeToken<T> pType, Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    checkApplicability(pType, secondaryOption, optionName);
+    final Class<?> type = pType.getRawType();
+    checkApplicability(type, secondaryOption, optionName);
 
     FileOption.Type typeInfo = ((FileOption) secondaryOption).value();
 
@@ -256,18 +253,18 @@ public class FileTypeConverter implements TypeConverter {
     }
 
     Path defaultValue;
-    if (pType.equals(File.class)) {
+    if (type.equals(File.class)) {
       defaultValue = Paths.get((File) pDefaultValue);
-    } else if (pType.equals(PathTemplate.class)) {
+    } else if (type.equals(PathTemplate.class)) {
       defaultValue = Paths.get(((PathTemplate) pDefaultValue).getTemplate());
-    } else if (pType.equals(PathCounterTemplate.class)) {
+    } else if (type.equals(PathCounterTemplate.class)) {
       defaultValue = Paths.get(((PathCounterTemplate) pDefaultValue).getTemplate());
     } else {
       defaultValue = (Path) pDefaultValue;
     }
 
     @SuppressWarnings("unchecked")
-    T value = (T) handleFileOption(optionName, defaultValue, typeInfo, pType, null);
+    T value = (T) handleFileOption(optionName, defaultValue, typeInfo, type, null);
     return value;
   }
 

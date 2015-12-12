@@ -30,7 +30,6 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.Collections;
 
 public class ClassTypeConverter implements TypeConverter {
@@ -39,8 +38,7 @@ public class ClassTypeConverter implements TypeConverter {
   public Object convert(
       String optionName,
       String value,
-      Class<?> type,
-      Type genericType,
+      TypeToken<?> type,
       Annotation secondaryOption,
       Path pSource,
       LogManager logger)
@@ -60,7 +58,7 @@ public class ClassTypeConverter implements TypeConverter {
     }
 
     // get value of type parameter
-    final TypeToken<?> targetType = Classes.getSingleTypeArgument(TypeToken.of(genericType));
+    final TypeToken<?> targetType = Classes.getSingleTypeArgument(type);
 
     // get class object
     Class<?> cls = null;
@@ -94,11 +92,7 @@ public class ClassTypeConverter implements TypeConverter {
 
   @Override
   public <T> T convertDefaultValue(
-      String pOptionName,
-      T pValue,
-      Class<T> pType,
-      Type pGenericType,
-      Annotation pSecondaryOption) {
+      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption) {
 
     return pValue;
   }
