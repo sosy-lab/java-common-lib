@@ -60,7 +60,7 @@ public class ClassTypeConverter implements TypeConverter {
     }
 
     // get value of type parameter
-    final TypeToken<?> targetType = TypeToken.of(Classes.getComponentType(genericType));
+    final TypeToken<?> targetType = Classes.getSingleTypeArgument(TypeToken.of(genericType));
 
     // get class object
     Class<?> cls = null;

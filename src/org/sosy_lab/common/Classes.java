@@ -25,6 +25,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.annotations.Unmaintained;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -337,7 +338,15 @@ public final class Classes {
   }
 
   /**
+   * @see #getSingleTypeArgument(Type)
+   */
+  public static TypeToken<?> getSingleTypeArgument(final TypeToken<?> type) {
+    return TypeToken.of(getSingleTypeArgument(type.getType()));
+  }
+
+  /**
    * From a type "X<Foo>", extract the "Foo".
+   * This is the value of {@link ParameterizedType#getActualTypeArguments()}.
    * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
    *
    * Example results:
@@ -348,7 +357,7 @@ public final class Classes {
    * @param type The type (needs to be parameterized with exactly one parameter)
    * @return A Type object.
    */
-  public static Type getComponentType(final Type type) {
+  public static Type getSingleTypeArgument(final Type type) {
     checkNotNull(type);
     checkArgument(
         type instanceof ParameterizedType,
@@ -365,30 +374,6 @@ public final class Classes {
         type);
 
     return extractUpperBoundFromType(parameterTypes[0]);
-  }
-
-  /**
-   * From a type "X<Foo>", extract the raw type of "Foo".
-   * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
-   *
-   * The method will return Foo.class for all of the following examples:
-   *
-   * @param type The type (needs to be parameterized with exactly one parameter)
-   * @return A class object.
-   */
-  public static Class<?> getComponentRawType(final Type type) {
-    Type paramType = getComponentType(type);
-
-    if (paramType instanceof ParameterizedType) {
-      paramType = ((ParameterizedType) paramType).getRawType();
-    }
-
-    if (paramType instanceof Class<?>) {
-      return (Class<?>) paramType;
-    } else {
-      throw new UnsupportedOperationException(
-          "Cannot extract generic base type from type " + paramType);
-    }
   }
 
   /**

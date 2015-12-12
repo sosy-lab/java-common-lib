@@ -937,7 +937,7 @@ public final class Configuration {
     if (pType.isArray()) {
       componentType = pType.getComponentType();
     } else {
-      componentType = TypeToken.of(Classes.getComponentType(pType.getType()));
+      componentType = Classes.getSingleTypeArgument(pType);
     }
 
     componentType = componentType.wrap();
@@ -1050,7 +1050,7 @@ public final class Configuration {
     if (type.isArray()) {
       innerType = type.getComponentType();
     } else if (COLLECTIONS.containsKey(type.getRawType())) {
-      innerType = TypeToken.of(Classes.getComponentType(type.getType()));
+      innerType = Classes.getSingleTypeArgument(type);
     } else {
       innerType = type;
     }
