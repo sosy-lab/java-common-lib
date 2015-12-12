@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Primitives;
+import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
@@ -546,14 +546,12 @@ public final class Configuration {
 
     // determine type of option
     @SuppressWarnings("unchecked")
-    final Class<T> type = (Class<T>) field.getType();
-    final Type genericType = field.getGenericType();
+    final TypeToken<T> type = (TypeToken<T>) TypeToken.of(field.getGenericType());
 
     // get value
     final Option option = field.getAnnotation(Option.class);
     final String name = getOptionName(options, field, option);
-    final Object value =
-        getValue(options, field, typedDefaultValue, type, genericType, option, field);
+    final Object value = getValue(options, field, typedDefaultValue, type, option, field);
 
     // options which were not changed need not to be set
     if (value == defaultValue) {
@@ -610,18 +608,17 @@ public final class Configuration {
     }
 
     // determine type of option
-    final Class<?>[] parameters = method.getParameterTypes();
+    final Type[] parameters = method.getGenericParameterTypes();
     if (parameters.length != 1) {
       throw new UnsupportedOperationException(
           "Method with @Option must have exactly one parameter!");
     }
-    final Class<?> type = parameters[0];
-    final Type genericType = method.getGenericParameterTypes()[0];
+    final TypeToken<?> type = TypeToken.of(parameters[0]);
 
     // get value
     final Option option = method.getAnnotation(Option.class);
     final String name = getOptionName(options, method, option);
-    final Object value = getValue(options, method, null, type, genericType, option, method);
+    final Object value = getValue(options, method, null, type, option, method);
 
     logger.logf(
         Level.CONFIG,
@@ -692,7 +689,6 @@ public final class Configuration {
    * @param method Member the annotation is attached to.
    * @param defaultValue The default value (may be null).
    * @param type The type of the option.
-   * @param genericType The type of the option.
    * @param option The annotation of the option.
    * @param member The member that declares the option.
    * @return The value to assign (may be null).
@@ -706,20 +702,20 @@ public final class Configuration {
       final Options options,
       final Member method,
       @Nullable final T defaultValue,
-      final Class<T> type,
-      final Type genericType,
+      final TypeToken<T> type,
       final Option option,
       final AnnotatedElement member)
       throws UnsupportedOperationException, InvalidConfigurationException {
 
+    final boolean isEnum = type.getRawType().isEnum();
     final String optionName = getOptionName(options, method, option);
-    String valueStr = getValueString(optionName, option, type.isEnum());
+    String valueStr = getValueString(optionName, option, isEnum);
     final Annotation secondaryOption = getSecondaryAnnotation(member);
 
     final Object value;
     if (!options.deprecatedPrefix().equals(NO_DEPRECATED_PREFIX)) {
       String optionDeprecatedName = getOptionName(options, method, option, true);
-      String deprecatedValueStr = getValueString(optionDeprecatedName, option, type.isEnum());
+      String deprecatedValueStr = getValueString(optionDeprecatedName, option, isEnum);
       if (deprecatedValueStr != null && !deprecatedValueStr.equals(valueStr)) {
         if (valueStr == null) {
           valueStr = deprecatedValueStr;
@@ -755,7 +751,7 @@ public final class Configuration {
                 + " was specified, but is not allowed in secure mode.");
       }
 
-      value = convertValue(optionName, valueStr, type, genericType, secondaryOption);
+      value = convertValue(optionName, valueStr, type, secondaryOption);
 
       if (member.isAnnotationPresent(Deprecated.class)) {
         deprecatedProperties.add(optionName);
@@ -767,7 +763,7 @@ public final class Configuration {
             "Required configuration option " + optionName + " is missing.");
       }
 
-      value = convertDefaultValue(optionName, defaultValue, type, genericType, secondaryOption);
+      value = convertDefaultValue(optionName, defaultValue, type, secondaryOption);
     }
 
     if (exportUsedOptions) {
@@ -862,7 +858,7 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(@Nullable Annotation annotation, final Class<?> optionType)
+  private void checkApplicability(@Nullable Annotation annotation, final TypeToken<?> optionType)
       throws UnsupportedOperationException {
     if (annotation == null) {
       return;
@@ -872,12 +868,10 @@ public final class Configuration {
         Arrays.asList(
             annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
 
-    if (!applicableTypes.contains(optionType)) {
+    if (!applicableTypes.contains(optionType.getRawType())) {
       throw new UnsupportedOperationException(
-          "Annotation "
-              + annotation
-              + " is not applicable for options of type "
-              + optionType.getCanonicalName());
+          String.format(
+              "Annotation %s is not applicable for options of type %s.", annotation, optionType));
     }
   }
 
@@ -917,51 +911,45 @@ public final class Configuration {
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
    * @param pType type of the object
-   * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option
    */
   private @Nullable <T> Object convertValue(
       final String optionName,
       final String valueStr,
-      final Class<?> pType,
-      final Type genericType,
+      final TypeToken<?> pType,
       @Nullable final Annotation secondaryOption)
       throws UnsupportedOperationException, InvalidConfigurationException {
     // convert value to correct type
 
-    Class<?> collectionClass = COLLECTIONS.get(pType);
+    Class<?> collectionClass = COLLECTIONS.get(pType.getRawType());
 
     if (collectionClass == null && !pType.isArray()) {
-      Class<?> type = Primitives.wrap(pType);
+      TypeToken<?> type = pType.wrap();
 
       // single value, easy case
       checkApplicability(secondaryOption, type);
 
-      return convertSingleValue(optionName, valueStr, type, genericType, secondaryOption);
+      return convertSingleValue(optionName, valueStr, type, secondaryOption);
     }
 
     // first get the real type of a single value (i.e., String[] => String)
-    Class<?> componentType;
-    Type componentGenericType = null;
+    TypeToken<?> componentType;
     if (pType.isArray()) {
       componentType = pType.getComponentType();
     } else {
-      componentType = Classes.getComponentRawType(genericType);
-      componentGenericType = Classes.getComponentType(genericType);
+      componentType = TypeToken.of(Classes.getComponentType(pType.getType()));
     }
 
-    componentType = Primitives.wrap(componentType);
+    componentType = componentType.wrap();
 
     checkApplicability(secondaryOption, componentType);
 
-    List<?> values =
-        convertMultipleValues(
-            optionName, valueStr, componentType, componentGenericType, secondaryOption);
+    List<?> values = convertMultipleValues(optionName, valueStr, componentType, secondaryOption);
 
     if (pType.isArray()) {
 
       @SuppressWarnings("unchecked")
-      Class<T> arrayComponentType = (Class<T>) componentType;
+      Class<T> arrayComponentType = (Class<T>) componentType.getRawType();
       T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
       //noinspection SuspiciousToArrayCall
@@ -970,10 +958,10 @@ public final class Configuration {
     assert collectionClass != null;
 
     if (collectionClass == EnumSet.class) {
-      assert componentType.isEnum() : "";
-      return createEnumSetUnchecked(componentType, values);
+      assert componentType.getRawType().isEnum();
+      return createEnumSetUnchecked(componentType.getRawType(), values);
 
-    } else if (componentType.isEnum()
+    } else if (componentType.getRawType().isEnum()
         && (collectionClass == Set.class || collectionClass == ImmutableSet.class)) {
       // There is a specialized ImmutableSet for enums in Guava that is more efficient.
       // We use it if we can.
@@ -981,7 +969,7 @@ public final class Configuration {
           Sets.class, "immutableEnumSet", Iterable.class, values, optionName);
 
     } else {
-      // we now that it's a Collection<componentType> / Set<? extends componentType> etc.,
+      // we know that it's a Collection<componentType> / Set<? extends componentType> etc.,
       // so we can safely assign to it
 
       // invoke ImmutableSet.copyOf(Iterable) etc.
@@ -1000,14 +988,12 @@ public final class Configuration {
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
    * @param type type of the object
-   * @param genericType type of the object
    * @param secondaryOption the optional second annotation of the option (needs to fit to the type)
    */
   private @Nullable Object convertSingleValue(
       final String optionName,
       final String valueStr,
-      final Class<?> type,
-      @Nullable final Type genericType,
+      final TypeToken<?> type,
       @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
@@ -1017,8 +1003,8 @@ public final class Configuration {
     return converter.convert(
         optionName,
         valueStr,
-        type,
-        genericType,
+        type.getRawType(),
+        type.getType(),
         secondaryOption,
         sources.get(optionName),
         MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
@@ -1031,7 +1017,6 @@ public final class Configuration {
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
    * @param type type of each object
-   * @param genericType type of each object
    * @param secondaryOption the optional second annotation of the option
    * @return a list of instances of arbitrary objects
    * @throws InvalidConfigurationException if conversion fails
@@ -1039,8 +1024,7 @@ public final class Configuration {
   private List<?> convertMultipleValues(
       final String optionName,
       final String valueStr,
-      final Class<?> type,
-      @Nullable final Type genericType,
+      final TypeToken<?> type,
       @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
@@ -1049,7 +1033,7 @@ public final class Configuration {
     List<Object> result = new ArrayList<>();
 
     for (String item : values) {
-      result.add(convertSingleValue(optionName, item, type, genericType, secondaryOption));
+      result.add(convertSingleValue(optionName, item, type, secondaryOption));
     }
 
     return result;
@@ -1058,21 +1042,20 @@ public final class Configuration {
   private @Nullable <T> Object convertDefaultValue(
       final String optionName,
       @Nullable final T defaultValue,
-      final Class<T> type,
-      final Type genericType,
+      final TypeToken<T> type,
       @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    Class<?> innerType;
+    TypeToken<?> innerType;
     if (type.isArray()) {
       innerType = type.getComponentType();
-    } else if (COLLECTIONS.containsKey(type)) {
-      innerType = Classes.getComponentRawType(genericType);
+    } else if (COLLECTIONS.containsKey(type.getRawType())) {
+      innerType = TypeToken.of(Classes.getComponentType(type.getType()));
     } else {
       innerType = type;
     }
 
-    innerType = Primitives.wrap(innerType);
+    innerType = innerType.wrap();
 
     checkApplicability(secondaryOption, innerType);
 
@@ -1083,7 +1066,7 @@ public final class Configuration {
 
       TypeConverter converter = getConverter(type, secondaryOption);
       return converter.convertDefaultValue(
-          optionName, defaultValue, type, genericType, secondaryOption);
+          optionName, defaultValue, type.getRawType(), type.getType(), secondaryOption);
     }
 
     return defaultValue;
@@ -1094,13 +1077,13 @@ public final class Configuration {
    * @return A type converter.
    */
   private TypeConverter getConverter(
-      final Class<?> type, @Nullable final Annotation secondaryOption) {
+      final TypeToken<?> type, @Nullable final Annotation secondaryOption) {
     TypeConverter converter = null;
     if (secondaryOption != null) {
       converter = converters.get(secondaryOption.annotationType());
     }
     if (converter == null) {
-      converter = converters.get(type);
+      converter = converters.get(type.getRawType());
     }
     if (converter == null) {
       converter = BaseTypeConverter.INSTANCE;
