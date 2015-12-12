@@ -65,7 +65,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     // find unit in input string
     int i = valueStr.length() - 1;
-    CharMatcher letterMatcher = CharMatcher.JAVA_LETTER;
+    CharMatcher letterMatcher = CharMatcher.javaLetter();
     while (i >= 0 && letterMatcher.matches(valueStr.charAt(i))) {
       i--;
     }
