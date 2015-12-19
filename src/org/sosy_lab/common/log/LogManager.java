@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
  * The main advantage of this interface is that the arguments to the log methods
  * are only converted to strings, if the message is really logged.
  */
-public interface LogManager extends AutoCloseable {
+public interface LogManager {
 
   /**
    * Returns a new LogManager instance which may use the given name
@@ -127,7 +127,4 @@ public interface LogManager extends AutoCloseable {
   void logException(Level priority, Throwable e, @Nullable String additionalMessage);
 
   void flush();
-
-  @Override
-  void close();
 }

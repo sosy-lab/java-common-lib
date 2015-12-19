@@ -69,9 +69,4 @@ public abstract class ForwardingLogManager implements LogManager {
   public void flush() {
     delegate().flush();
   }
-
-  @Override
-  public void close() {
-    delegate().close();
-  }
 }

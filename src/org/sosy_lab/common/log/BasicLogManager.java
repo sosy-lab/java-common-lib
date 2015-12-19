@@ -52,7 +52,7 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of {@link LogManager}.
  */
-public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
+public class BasicLogManager implements LogManager, AutoCloseable {
 
   // Number of characters taken from the start of the original output strings when truncating
   private static final int TRUNCATE_REMAINING_SIZE = 100;

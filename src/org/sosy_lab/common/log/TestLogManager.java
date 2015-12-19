@@ -99,7 +99,4 @@ public enum TestLogManager implements LogManager {
 
   @Override
   public void flush() {}
-
-  @Override
-  public void close() {}
 }

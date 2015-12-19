@@ -66,7 +66,4 @@ public enum NullLogManager implements LogManager {
 
   @Override
   public void flush() {}
-
-  @Override
-  public void close() {}
 }
