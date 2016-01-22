@@ -26,6 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.io.CharStreams;
 import com.google.errorprone.annotations.ForOverride;
 
 import org.sosy_lab.common.AbstractMBean;
@@ -37,6 +38,7 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -482,15 +484,19 @@ public class BasicLogManager implements org.sosy_lab.common.log.LogManager {
   public void logException(Level priority, Throwable e, @Nullable String additionalMessage) {
     checkNotNull(e);
     if (wouldBeLogged(priority)) {
-      String logMessage = "";
+      StringBuilder logMessage = new StringBuilder();
 
       if (!Strings.isNullOrEmpty(additionalMessage)) {
-        logMessage = additionalMessage + "\n";
+        logMessage.append(additionalMessage).append("\n");
       }
 
-      logMessage += Throwables.getStackTraceAsString(e);
+      logMessage
+          .append("Exception in thread \"")
+          .append(Thread.currentThread().getName())
+          .append("\" ");
+      e.printStackTrace(new PrintWriter(CharStreams.asWriter(logMessage)));
 
-      log0(priority, findCallingMethod(), logMessage);
+      log0(priority, findCallingMethod(), logMessage.toString());
     }
   }
 
