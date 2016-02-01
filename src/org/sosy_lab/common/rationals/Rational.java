@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.annotation.Nullable;
@@ -32,6 +33,8 @@ public final class Rational extends Number implements Comparable<Rational> {
   public static final Rational ZERO = new Rational(B_ZERO, B_ONE);
   public static final Rational ONE = new Rational(B_ONE, B_ONE);
   public static final Rational NEG_ONE = new Rational(B_M_ONE, B_ONE);
+
+  @Nullable private transient String stringCache = null;
 
   /**
    * Rationals are always stored in the normal form.
@@ -119,6 +122,17 @@ public final class Rational extends Number implements Comparable<Rational> {
       num = new BigInteger(s.substring(0, idx));
       den = new BigInteger(s.substring(idx + 1, s.length()));
       return of(num, den);
+    }
+  }
+
+  public static Rational ofBigDecimal(BigDecimal decimal) {
+    if (decimal.scale() <= 0) {
+      BigInteger num = decimal.toBigInteger();
+      return Rational.of(num, BigInteger.ONE);
+    } else {
+      BigInteger num = decimal.unscaledValue();
+      BigInteger denom = BigInteger.TEN.pow(decimal.scale());
+      return Rational.of(num, denom);
     }
   }
 
@@ -242,10 +256,14 @@ public final class Rational extends Number implements Comparable<Rational> {
    */
   @Override
   public String toString() {
-    if (den.equals(B_ONE)) {
-      return num.toString();
+    if (stringCache == null) {
+      if (den.equals(B_ONE)) {
+        stringCache = num.toString();
+      } else {
+        stringCache = num + "/" + den;
+      }
     }
-    return num + "/" + den;
+    return stringCache;
   }
 
   @Override
