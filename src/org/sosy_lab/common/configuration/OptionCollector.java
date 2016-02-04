@@ -48,6 +48,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -715,6 +717,15 @@ public class OptionCollector {
       }
       classes.add(foundClass);
     }
+    // sort to get deterministic order
+    Collections.sort(
+        classes,
+        new Comparator<Class<?>>() {
+          @Override
+          public int compare(Class<?> cls1, Class<?> cls2) {
+            return cls1.getName().compareTo(cls2.getName());
+          }
+        });
     return classes;
   }
 
