@@ -8,27 +8,22 @@
     </info>
 
     <configurations>
-        <!-- All dependencies that are only needed during build. -->
-        <conf name="build" />
+        <conf name="build" visibility="private" description="dependencies that are only needed during build"/>
 
         <!-- The normal dependencies. -->
-        <conf name="runtime" />
+        <conf name="runtime" description="runtime dependencies"/>
 
-        <!-- Dependencies needed for building or running tests. -->
-        <conf name="test" />
+        <conf name="test" visibility="private" description="for building or running tests"/>
 
-        <!-- Dependencies needed for running CheckStyle. -->
-        <conf name="checkstyle" />
+        <conf name="checkstyle" visibility="private" description="for running CheckStyle"/>
 
-        <!-- Dependencies needed for running FindBugs. -->
-        <conf name="findbugs" />
+        <conf name="findbugs" visibility="private" description="for running FindBugs"/>
 
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
-        <conf name="contrib" />
+        <conf name="contrib" description="additional files like JavaDocs or source code of dependencies that will help developers"/>
 
-        <!-- Configuration for publishing sources -->
-        <conf name="sources" />
+        <conf name="sources" description="sources of JavaSMT"/>
     </configurations>
 
     <publications defaultconf="runtime">
