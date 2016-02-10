@@ -54,6 +54,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** This class collects all {@link Option}s of a program. */
@@ -62,6 +63,11 @@ public class OptionCollector {
   private static final Pattern IGNORED_CLASSES =
       Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
   private static final int CHARS_PER_LINE = 75; // for description
+
+  private static final Pattern IMMUTABLE_SET_PATTERN =
+      Pattern.compile("ImmutableSet\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
+  private static final Pattern IMMUTABLE_LIST_PATTERN =
+      Pattern.compile("ImmutableList\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
 
   /** The main-method collects all classes of a program and
    * then it searches for all {@link Option}s.
@@ -515,18 +521,13 @@ public class OptionCollector {
                   + "s";
         }
 
-        if (defaultValue.startsWith("ImmutableSet.of(")) {
-          defaultValue =
-              "{"
-                  + defaultValue.substring("ImmutableSet.of(".length(), defaultValue.length() - 1)
-                  + "}";
+        Matcher match = IMMUTABLE_SET_PATTERN.matcher(defaultValue);
+        if (match.matches()) {
+          defaultValue = "{" + match.group(2) + "}";
         }
-
-        if (defaultValue.startsWith("ImmutableList.of(")) {
-          defaultValue =
-              "["
-                  + defaultValue.substring("ImmutableList.of(".length(), defaultValue.length() - 1)
-                  + "]";
+        match = IMMUTABLE_LIST_PATTERN.matcher(defaultValue);
+        if (match.matches()) {
+          defaultValue = "[" + match.group(2) + "]";
         }
       }
     } else {
