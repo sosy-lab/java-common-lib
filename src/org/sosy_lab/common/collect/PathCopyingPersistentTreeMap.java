@@ -445,6 +445,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @VisibleForTesting
+  @SuppressWarnings("CheckReturnValue")
   void checkAssertions() throws IllegalStateException {
     checkAssertions(root);
   }

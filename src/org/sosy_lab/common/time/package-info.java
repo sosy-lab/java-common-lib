@@ -22,6 +22,7 @@
  * and a data class {@link org.sosy_lab.common.time.TimeSpan} for storing
  * time spans together with the respective time unit.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

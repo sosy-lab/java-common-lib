@@ -61,6 +61,7 @@ public class ShutdownNotifierTest {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testNotRequestedReason() {
     thrown.expect(IllegalStateException.class);
     instance.getReason();

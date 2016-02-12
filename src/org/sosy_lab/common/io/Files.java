@@ -115,6 +115,7 @@ public final class Files {
     }
 
     @Override
+    @SuppressWarnings("CheckReturnValue")
     public void close() throws IOException {
       path.delete();
     }

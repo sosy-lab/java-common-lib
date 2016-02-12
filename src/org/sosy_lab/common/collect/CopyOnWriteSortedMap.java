@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ForwardingCollection;
 import com.google.common.collect.ForwardingSortedMap;
 import com.google.common.collect.ForwardingSortedSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -113,6 +114,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * modifying operations.
    */
   @Override
+  @CanIgnoreReturnValue
   public V put(K pKey, V pValue) {
     PersistentSortedMap<K, V> oldMap;
 
@@ -143,6 +145,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    * modifying operations.
    */
   @Override
+  @CanIgnoreReturnValue
   public @Nullable V remove(Object pKey) {
     PersistentSortedMap<K, V> oldMap;
     PersistentSortedMap<K, V> newMap;

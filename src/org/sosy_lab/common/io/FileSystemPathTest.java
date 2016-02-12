@@ -105,6 +105,7 @@ public class FileSystemPathTest {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void constructorWithNullPath() {
     FileSystemPath path = new FileSystemPath(null);
     path.toFile();

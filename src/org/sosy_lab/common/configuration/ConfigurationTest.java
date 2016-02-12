@@ -396,6 +396,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testFromCmdLineArgumentsFailFormat() throws Exception {
     thrown.expect(InvalidConfigurationException.class);
 
@@ -407,6 +408,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testFromCmdLineArgumentsFailFormat2() throws Exception {
     thrown.expect(InvalidConfigurationException.class);
 

@@ -26,6 +26,7 @@
  * can be used by registering the appropriate {@link org.sosy_lab.common.io.AbstractPathFactory}
  * with {@link org.sosy_lab.common.io.Paths#getFactory()}.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

@@ -23,6 +23,7 @@
  * but provides many additional features such as lazy log message creation,
  * and convenience methods for exceptions.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

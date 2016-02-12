@@ -91,6 +91,7 @@ public class Tickers {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
   private static final class CurrentThreadCputime extends TickerWithUnit {
     static final TickerWithUnit INSTANCE = new CurrentThreadCputime();
 
@@ -116,6 +117,7 @@ public class Tickers {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
   private static final class ProcessCputime extends TickerWithUnit {
     static final TickerWithUnit INSTANCE = new ProcessCputime();
 

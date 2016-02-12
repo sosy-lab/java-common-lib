@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("CheckReturnValue")
 public class TimeSpanTest {
 
   private static final long LARGE_VALUE = 1125899906842624L; //2^50

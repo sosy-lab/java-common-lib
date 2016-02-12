@@ -22,12 +22,14 @@ package org.sosy_lab.common.concurrency;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -43,6 +45,7 @@ import javax.annotation.Nullable;
  *
  * @see ThreadFactoryBuilder
  */
+@CanIgnoreReturnValue
 public class CatchSecurityViolationThreadFactoryBuilder {
   private @Nullable Boolean daemon;
   private @Nullable String nameFormat;
@@ -94,6 +97,7 @@ public class CatchSecurityViolationThreadFactoryBuilder {
   /**
    * @see ThreadFactoryBuilder#build()
    */
+  @CheckReturnValue
   public ThreadFactory build() {
     return build(this);
   }

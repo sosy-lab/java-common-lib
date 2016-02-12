@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("CheckReturnValue")
 public class ParserTest {
 
   private static final String TEST_FILE_SUFFIX = ".properties";

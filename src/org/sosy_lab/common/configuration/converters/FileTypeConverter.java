@@ -274,6 +274,7 @@ public class FileTypeConverter implements TypeConverter {
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile) */
+  @SuppressWarnings("CheckReturnValue")
   private Object handleFileOption(
       final String optionName,
       Path file,
