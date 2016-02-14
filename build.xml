@@ -37,7 +37,8 @@
 
     <target name="build" depends="-warn-factorypath, build-project, collect-options" description="Build"/>
 
-    <target name="dist" depends="jar, sources" description="Make a distributable release"/>
+    <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
+
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
