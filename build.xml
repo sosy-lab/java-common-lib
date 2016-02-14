@@ -10,6 +10,13 @@
     <property name="ivy.configurations" value="build, runtime, test, checkstyle, findbugs"/>
     <property name="package" value="common"/>
 
+    <!-- Maven Central metadata -->
+    <property name="ivy.pom.description" value="Library of common components for SoSy-Lab Projects"/>
+    <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-common-lib"/>
+    <property name="ivy.pom.name" value="java-common-lib"/>
+    <property name="ivy.pom.groupId" value="org.sosy-lab"/>
+    <property name="ivy.pom.artifactId" value="common"/>
+
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
@@ -20,6 +27,7 @@
     <import file="build/build-checkstyle.xml"/>
     <import file="build/build-findbugs.xml"/>
     <import file="build/build-publish.xml"/>
+    <import file="build/build-maven-publish.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
