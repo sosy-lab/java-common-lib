@@ -22,7 +22,7 @@
     </target>
 
     <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
-    <target name="stage" depends="dist, jar, sources" description="deploy release version to Maven staging repository">
+    <target name="stage" depends="dist, gen-pom, jar, sources" description="deploy release version to Maven staging repository">
 
         <!-- Sign and deploy the main artifact. -->
         <artifact:mvn>
