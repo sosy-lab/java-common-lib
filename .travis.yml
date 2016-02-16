@@ -16,6 +16,8 @@ deploy:
   skip_cleanup: true
   provider: script
   script: build/deploy-gh-pages.sh
+  on:
+    jdk: openjdk7
 notifications:
   email:
     - common-java-dev@groups.google.com

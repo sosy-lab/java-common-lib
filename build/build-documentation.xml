@@ -28,6 +28,9 @@
     </target>
 
     <target name="javadoc">
+        <condition property="javadoc.doclint" value="-Xdoclint:all,-missing" else="">
+            <not><equals arg1="${ant.java.version}" arg2="1.7"/></not>
+        </condition>
         <javadoc
             destdir="${documentation.javadoc.dir}"
             classpathref="classpath"
@@ -44,6 +47,7 @@
             <link href="http://docs.oracle.com/javase/7/docs/api/"/>
             <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
+            <arg line="${javadoc.doclint}"/>
         </javadoc>
     </target>
 </project>
