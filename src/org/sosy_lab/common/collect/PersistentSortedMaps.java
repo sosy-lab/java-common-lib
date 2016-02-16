@@ -57,7 +57,7 @@ public class PersistentSortedMaps {
      * which means that the corresponding map contains {@code null} as value
      * for this key.
      * The handler may return {@code null}, and in this case the resulting map
-     * will contain a mapping (key -> null).
+     * will contain a mapping {@code key -> null}.
      * @param key The key.
      * @param value1 The value from the first map.
      * @param value2 The value from the second map.

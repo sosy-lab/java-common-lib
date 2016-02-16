@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
 /**
  * This class is based on code from the library JSON.simple in version 1.1
  * (https://code.google.com/p/json-simple/)
- * by Fang Yidong <fangyidong@yahoo.com.cn>.
+ * by Fang Yidong {@code fangyidong@yahoo.com.cn}.
  * The license is the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0.txt).
  *
  * Significant performance improvements were made compared to the library.

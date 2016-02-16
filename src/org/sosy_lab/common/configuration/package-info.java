@@ -34,8 +34,8 @@
  * <p><strong>Annotating classes with options</strong></p>
  * <p>The example below demonstrates defining options for a class:
  *
- * <code>
  * <pre>
+ * <code>
  * {@literal @}Options(prefix="grep")
  * public class Grep {
  *   {@literal @}Option(description="Ignore case of the query", secure=true)
@@ -52,8 +52,8 @@
  *   public boolean search(String needle) {
  *      // ... search for a needle in a haystack.
  *   }
- * </pre>
  * </code>
+ * </pre>
  *
  * <p>Note the following features:
  * <ul>

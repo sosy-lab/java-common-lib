@@ -406,12 +406,12 @@ public final class Configuration {
    * The class of the object has to have a {@link Options} annotation, and each
    * field to set / method to call has to have a {@link Option} annotation.
    *
-   * Supported types for configuration options:
+   * <p>Supported types for configuration options:
    * - all primitive types and their wrapper types
    * - all enum types
    * - {@link String} and arrays of it
    * - {@link File} (the field {@link FileOption#value()} is required in this case!)
-   * - {@link Class <Something>}
+   * - {@code Class<Something>}
    * - {@link java.nio.charset.Charset}
    * - {@link java.util.logging.Level}
    * - {@link java.util.regex.Pattern}
@@ -420,7 +420,7 @@ public final class Configuration {
    *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}
    *   of the above types
    *
-   * For the collection types an immutable instance will be created and injected.
+   * <p>For the collection types an immutable instance will be created and injected.
    * Their type parameter has to be one of the other supported types.
    * For collection types and arrays the values of the configuration option are
    * assumed to be comma separated.

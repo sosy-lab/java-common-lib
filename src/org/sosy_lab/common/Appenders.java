@@ -214,7 +214,7 @@ public class Appenders {
    * and truncating it at the end (though no guarantees are made).
    *
    * @param a The {@link Appender} to convert into a string.
-   * @param truncateAt The maximum size of the returned string (>= 0).
+   * @param truncateAt The maximum size of the returned string {@code (>= 0)}
    * @return a string representation of the passed object,
    * with a maximum size of <code>truncateAt</code>
    */

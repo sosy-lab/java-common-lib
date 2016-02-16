@@ -100,13 +100,15 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
 
   /**
    * Reverses the effect of {@link ExtendedRational#toString}.
-   * Supports 4 different formats, to be consistent with the {@link Double} class.
+   * Supports 4 different formats, to be consistent with the {@link Double} class:
    *
-   * a) Infinity -> 1/0
-   * b) -Infinity -> -1/0
-   * c) NaN -> 0/0
-   * d) a/b -> ExtendedRational(a, b)
-   * e) a -> a/1
+   * <ul>
+   * <li>{@code "Infinity"}
+   * <li>{@code "-Infinity"}
+   * <li>{@code "NaN"}
+   * <li>{@code a/b} for some integers {@code a} and {@code b}
+   * <li>{@code a} for some integer {@code a}
+   * </ul>
    *
    * @param s Input string,
    * @throws NumberFormatException {@code s} is not a valid representation

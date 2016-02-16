@@ -345,14 +345,19 @@ public final class Classes {
   }
 
   /**
-   * From a type "X<Foo>", extract the "Foo".
+   * From a type {@code X<Foo>}, extract the {@code Foo}.
    * This is the value of {@link ParameterizedType#getActualTypeArguments()}.
-   * This method also supports "X<? extends Foo>", "X<Foo<?>>" etc.
+   * This method also supports {@code X<? extends Foo>}, {@code X<Foo<?>>} etc.
    *
-   * Example results:
+   * <p>Example results:
+   *
+   * <pre>
+   * {@code
    * X<Foo>          : Foo
    * X<? extends Foo>: Foo
    * X<Foo<Bar>>     : Foo<Bar>
+   * }
+   * </pre>
    *
    * @param type The type (needs to be parameterized with exactly one parameter)
    * @return A Type object.
