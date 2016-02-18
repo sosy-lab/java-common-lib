@@ -15,3 +15,59 @@ A collection of utilities for Java.
 
 
 [Javadoc documentation](https://sosy-lab.github.io/java-common-lib/) for entire project.
+
+## Installation
+
+# Using ANT and Ivy
+
+If we use ANT with Ivy in your build process, you can download latest version of
+SoSy-Lab Common from our repositories directly.
+The updates to the Ivy repository are very frequent, and the latest version can
+be easily found.
+
+The dependency is:
+
+```xml
+<dependency org="org.sosy_lab" name="common" rev="0.2" conf="core->runtime; contrib->sources"/>
+```
+
+And the Ivy repository URL is:
+
+```xml
+http://www.sosy-lab.org/ivy
+```
+
+# Using Maven Central
+
+The Common library is also published to Maven Central, however the volume of
+updates is less frequent.
+If you use Maven, the dependency is:
+
+```xml
+<dependency>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>common</artifactId>
+  <version>0.2</version>
+</dependency>
+```
+
+Or for Gradle:
+
+```
+dependencies {
+  compile 'org.sosy-lab:common:0.2'
+}
+```
+
+# Manually
+
+The latest JAR can be downloaded directly from the Ivy repository, served at
+
+```
+http://www.sosy-lab.org/ivy/org.sosy_lab/common/
+```
+
+This option is least recommended, as the required dependencies (namely,
+Guava and AutoValue) would need to be downloaded manually.
+Download the `.ivy` file corresponding to the obtained `jar` to see
+the dependencies and their location in the repository.
