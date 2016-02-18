@@ -18,7 +18,7 @@ A collection of utilities for Java.
 
 ## Installation
 
-# Using ANT and Ivy
+### Using ANT and Ivy
 
 If we use ANT with Ivy in your build process, you can download latest version of
 SoSy-Lab Common from our repositories directly.
@@ -37,7 +37,7 @@ And the Ivy repository URL is:
 http://www.sosy-lab.org/ivy
 ```
 
-# Using Maven Central
+### From Maven Central
 
 The Common library is also published to Maven Central, however the volume of
 updates is less frequent.
@@ -59,7 +59,7 @@ dependencies {
 }
 ```
 
-# Manually
+### Manually
 
 The latest JAR can be downloaded directly from the Ivy repository, served at
 
