@@ -159,7 +159,6 @@ public class NativeLibraries {
           getPathToJar()
               .getParent()
               .getParent()
-              .getParent()
               .resolve(Paths.get("native", arch + "-" + os));
     }
     return nativePath;
@@ -176,7 +175,7 @@ public class NativeLibraries {
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }
-    return Paths.get(pathToJar);
+    return Paths.get(pathToJar).getParent();
 
   }
 
