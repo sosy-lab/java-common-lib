@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
  * <p>The Rational object is immutable.
  * All arithmetic operations return new instances.
  *
- * <p>For performance and convenience, there is always only a single {@Code Rational}
+ * <p>For performance and convenience, there is always only a single {@code Rational}
  * instance representing numbers 0, 1 and -1.
  * These numbers can be compared using {@code ==} operator.
  */
