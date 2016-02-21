@@ -154,16 +154,9 @@ public class NativeLibraries {
     if (nativePath == null) {
       String arch = Architecture.guessVmArchitecture().name().toLowerCase();
       String os = OS.guessOperatingSystem().name().toLowerCase();
-      URI pathToJar;
-      try {
-        pathToJar =
-            NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-      } catch (URISyntaxException e) {
-        throw new AssertionError(e);
-      }
 
       nativePath =
-          Paths.get(pathToJar)
+          getPathToJar()
               .getParent()
               .getParent()
               .getParent()
@@ -173,22 +166,50 @@ public class NativeLibraries {
   }
 
   /**
+   * @return Path to <b>this</b> JAR, holding SoSy Lab-Common library.
+   */
+  private static Path getPathToJar() {
+    URI pathToJar;
+    try {
+      pathToJar =
+          NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+    } catch (URISyntaxException e) {
+      throw new AssertionError(e);
+    }
+    return Paths.get(pathToJar);
+
+  }
+
+  /**
    * Load a native library.
    * This is similar to {@link System#loadLibrary(String)},
    * but additionally tries more directories for the search path of the library.
+   *
+   * <p>We first try to load the library via the normal VM way.
+   * This way one can use the java.library.path property to point the VM
+   * to another file.
+   * Only if this fails (which is expected if the user did not specify the library path)
+   * we try to load the file from the architecture-specific directory under "lib/native/",
+   * <b>assuming</b> that the JAR representing this library is in {@code lib} that the JAR
+   * representing this library is in {@code lib}.
+   *
+   * Finally, if that fails as well, we search in the same directory this {@code JAR} is.
    */
   public static void loadLibrary(String name) {
-    // We first try to load the library via the normal VM way.
-    // This way one can use the java.library.path property to point the VM
-    // to another file.
-    // Only if this fails (which is expected if the user did not specify the library path)
-    // we try to load the file from the architecture-specific directory under "lib/native/".
     try {
       System.loadLibrary(name);
     } catch (UnsatisfiedLinkError firstEx) {
+      String libName = System.mapLibraryName(name);
       try {
-        Path file = getNativeLibraryPath().resolve(System.mapLibraryName(name)).toAbsolutePath();
-        System.load(file.toString());
+        Path file = getNativeLibraryPath().resolve(libName).toAbsolutePath();
+        try {
+          System.load(file.toString());
+        } catch (UnsatisfiedLinkError secondEx) {
+
+          // Last try, search for the file next to the JAR.
+          Path secondPath = getPathToJar().resolve(libName).toAbsolutePath();
+          System.load(secondPath.toString());
+        }
       } catch (Throwable t) {
         t.addSuppressed(firstEx);
         throw t;
