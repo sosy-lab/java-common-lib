@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +15,23 @@ public class RationalTest {
   public void testInstantiationLongs() {
     Rational x = Rational.ofLongs(108, 96);
     assertThat(x.toString()).isEqualTo("9/8");
+  }
+
+  @Test
+  public void testInstantiationBigDecimal() {
+    BigDecimal a = BigDecimal.valueOf(1, 3);
+    assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of(
+        "1/1000"
+    ));
+    a = BigDecimal.valueOf(1, -4);
+    assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of("10000"));
+  }
+
+  @Test
+  public void testGetters() {
+    Rational a = Rational.of("6/8");
+    assertThat(a.getNum()).isEqualTo(BigInteger.valueOf(3));
+    assertThat(a.getDen()).isEqualTo(BigInteger.valueOf(4));
   }
 
   @Test

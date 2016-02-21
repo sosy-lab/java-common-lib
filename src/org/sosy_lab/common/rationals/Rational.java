@@ -16,9 +16,9 @@ import javax.annotation.Nullable;
  * <p>The Rational object is immutable.
  * All arithmetic operations return new instances.
  *
- * <p>For performance and convenience, there is always only a single instance
- * representing 0, 1 or -1.
- * Thus these numbers can be compared using {@code ==} operator.
+ * <p>For performance and convenience, there is always only a single {@Code Rational}
+ * instance representing numbers 0, 1 and -1.
+ * These numbers can be compared using {@code ==} operator.
  */
 @SuppressWarnings("NumberEquality")
 public final class Rational extends Number implements Comparable<Rational> {
@@ -125,6 +125,18 @@ public final class Rational extends Number implements Comparable<Rational> {
     }
   }
 
+  /**
+   * Syntax sugar helper for creating Rationals.
+   *
+   * @see #ofString(String)
+   */
+  public static Rational of(String s) throws NumberFormatException {
+    return ofString(s);
+  }
+
+  /**
+   * Convert a given BigDecimal to Rational.
+   */
   public static Rational ofBigDecimal(BigDecimal decimal) {
     if (decimal.scale() <= 0) {
       BigInteger num = decimal.toBigInteger();
