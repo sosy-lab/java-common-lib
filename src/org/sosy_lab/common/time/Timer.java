@@ -23,8 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import com.google.common.base.Preconditions;
-
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 import java.util.concurrent.TimeUnit;
@@ -259,11 +257,9 @@ public final class Timer {
   /**
    * Syntax sugar method: pretty-format the timer output into a string in seconds.
    */
-  public String prettyFormat(String timerName) {
-    Preconditions.checkNotNull(timerName);
+  public String prettyFormat() {
     TimeUnit t = TimeUnit.SECONDS;
-    return String.format("Time spent in %s: %s (Max: %s), (Avg: %s), (#intervals = %s)%n",
-        timerName,
+    return String.format("%s (Max: %s), (Avg: %s), (#intervals = %s)",
         getSumTime().formatAs(t),
         getMaxTime().formatAs(t),
         getAvgTime().formatAs(t), getNumberOfIntervals());
