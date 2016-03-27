@@ -25,6 +25,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nullable;
 
 /**
@@ -250,5 +252,18 @@ public final class Timer {
   @Override
   public String toString() {
     return getSumTime().formatAs(SECONDS);
+  }
+
+  /**
+   * Syntax sugar method: pretty-format the timer output into a string in seconds.
+   */
+  public String prettyFormat(String timerName) {
+    TimeUnit t = TimeUnit.SECONDS;
+    return String.format("Time spent in %s: %s (Max: %s), (Avg: %s), (#intervals = %s)%n",
+        timerName,
+        getSumTime().formatAs(t),
+        getMaxTime().formatAs(t),
+        getAvgTime().formatAs(t), getNumberOfIntervals());
+
   }
 }
