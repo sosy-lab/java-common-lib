@@ -15,6 +15,8 @@
 
         <conf name="test" visibility="private" description="for building or running tests"/>
 
+        <conf name="format-source" visibility="private" description="for running google-java-format"/>
+
         <conf name="checkstyle" visibility="private" description="for running CheckStyle"/>
 
         <conf name="findbugs" visibility="private" description="for running FindBugs"/>
@@ -82,7 +84,7 @@
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.google-java-format" name="google-java-format" rev="0.1-SNAPSHOT-104-g79b7f0f" conf="build->runtime"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.0" conf="format-source->default"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.17.0" conf="checkstyle->default"/>
