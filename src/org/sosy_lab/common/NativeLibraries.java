@@ -156,10 +156,7 @@ public class NativeLibraries {
       String os = OS.guessOperatingSystem().name().toLowerCase();
 
       nativePath =
-          getPathToJar()
-              .getParent()
-              .getParent()
-              .resolve(Paths.get("native", arch + "-" + os));
+          getPathToJar().getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
     }
     return nativePath;
   }
@@ -170,13 +167,11 @@ public class NativeLibraries {
   private static Path getPathToJar() {
     URI pathToJar;
     try {
-      pathToJar =
-          NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+      pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }
     return Paths.get(pathToJar).getParent();
-
   }
 
   /**

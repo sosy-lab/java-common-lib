@@ -259,9 +259,11 @@ public final class Timer {
    */
   public String prettyFormat() {
     TimeUnit t = TimeUnit.SECONDS;
-    return String.format("%s (Max: %s), (Avg: %s), (#intervals = %s)",
+    return String.format(
+        "%s (Max: %s), (Avg: %s), (#intervals = %s)",
         getSumTime().formatAs(t),
         getMaxTime().formatAs(t),
-        getAvgTime().formatAs(t), getNumberOfIntervals());
+        getAvgTime().formatAs(t),
+        getNumberOfIntervals());
   }
 }

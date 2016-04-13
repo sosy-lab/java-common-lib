@@ -203,10 +203,10 @@ public class ProcessExecutor<E extends Exception> {
               @Override
               public Void call() throws E, IOException {
                 try (BufferedReader reader =
-                        new BufferedReader(
-                            // platform charset is what processes usually use for communication
-                            new InputStreamReader(
-                                process.getInputStream(), Charset.defaultCharset()))) {
+                    new BufferedReader(
+                        // platform charset is what processes usually use for communication
+                        new InputStreamReader(
+                            process.getInputStream(), Charset.defaultCharset()))) {
                   String line;
                   while ((line = reader.readLine()) != null) {
                     handleOutput(line);
@@ -233,10 +233,10 @@ public class ProcessExecutor<E extends Exception> {
               @Override
               public Void call() throws E, IOException {
                 try (BufferedReader reader =
-                        new BufferedReader(
-                            // platform charset is what processes usually use for communication
-                            new InputStreamReader(
-                                process.getErrorStream(), Charset.defaultCharset()))) {
+                    new BufferedReader(
+                        // platform charset is what processes usually use for communication
+                        new InputStreamReader(
+                            process.getErrorStream(), Charset.defaultCharset()))) {
                   String line;
                   while ((line = reader.readLine()) != null) {
                     handleErrorOutput(line);

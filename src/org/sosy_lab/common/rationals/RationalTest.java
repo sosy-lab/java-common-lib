@@ -20,9 +20,7 @@ public class RationalTest {
   @Test
   public void testInstantiationBigDecimal() {
     BigDecimal a = BigDecimal.valueOf(1, 3);
-    assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of(
-        "1/1000"
-    ));
+    assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of("1/1000"));
     a = BigDecimal.valueOf(1, -4);
     assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of("10000"));
   }
