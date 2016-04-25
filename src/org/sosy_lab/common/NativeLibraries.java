@@ -164,7 +164,7 @@ public class NativeLibraries {
   /**
    * @return Path to <b>this</b> JAR, holding SoSy Lab-Common library.
    */
-  private static Path getPathToJar() {
+  public static Path getPathToJar() {
     URI pathToJar;
     try {
       pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
