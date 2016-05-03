@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -89,8 +88,8 @@ public final class JSON {
     } else if (value instanceof Map<?, ?>) {
       writeJSONString((Map<?, ?>) value, out);
 
-    } else if (value instanceof List<?>) {
-      writeJSONString((List<?>) value, out);
+    } else if (value instanceof Iterable<?>) {
+      writeJSONString((Iterable<?>) value, out);
 
     } else {
       throw new NotSerializableException(
@@ -99,9 +98,9 @@ public final class JSON {
   }
 
   /**
-   * Encode a list into JSON text and write it to out.
+   * Encode an list into JSON text and write it to out.
    */
-  private static void writeJSONString(List<?> list, Appendable out) throws IOException {
+  private static void writeJSONString(Iterable<?> list, Appendable out) throws IOException {
     boolean first = true;
 
     out.append('[');
