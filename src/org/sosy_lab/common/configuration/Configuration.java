@@ -671,11 +671,28 @@ public final class Configuration {
    */
   private static String getOptionName(
       final Options options, final Member member, final Option option, boolean isDeprecated) {
-    String name = option.name();
+    String name = "";
+    if (isDeprecated) {
+      name = option.deprecatedName();
+      if (name.isEmpty()) {
+        name = option.name();
+      }
+    } else {
+      name = option.name();
+    }
     if (name.isEmpty()) {
       name = member.getName();
     }
-    String optsPrefix = !isDeprecated ? options.prefix() : options.deprecatedPrefix();
+
+    String optsPrefix;
+    if (isDeprecated) {
+      optsPrefix = options.deprecatedPrefix();
+      if (optsPrefix.isEmpty()) {
+        optsPrefix = options.prefix();
+      }
+    } else {
+      optsPrefix = options.prefix();
+    }
     if (!optsPrefix.isEmpty()) {
       optsPrefix += ".";
     }

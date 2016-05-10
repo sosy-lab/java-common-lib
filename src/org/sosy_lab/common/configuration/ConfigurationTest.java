@@ -360,6 +360,59 @@ public class ConfigurationTest {
     assertThat(c.getDeprecatedProperties()).contains("prefix.test");
   }
 
+  @Options(prefix = "prefix", deprecatedPrefix = "deprecated")
+  private static class DeprecatedOptionNames {
+    @Option(secure = true, description = "test", name = "name", deprecatedName = "deprecated")
+    private String optionWithDeprecatedName = "default";
+
+    @Option(secure = true, description = "test", name = "name")
+    private String optionWithoutDeprecatedName = "default";
+  }
+
+  private DeprecatedOptionNames deprecatedInjectionResultOf(String option)
+      throws InvalidConfigurationException {
+    Configuration c = Configuration.builder().setOption(option, "value").build();
+    DeprecatedOptionNames opts = new DeprecatedOptionNames();
+    c.inject(opts);
+    return opts;
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName1() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("prefix.name").optionWithDeprecatedName)
+        .isEqualTo("value");
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName2() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("deprecated.name").optionWithDeprecatedName)
+        .isEqualTo("default");
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName3() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("prefix.deprecated").optionWithDeprecatedName)
+        .isEqualTo("default");
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName4() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("deprecated.deprecated").optionWithDeprecatedName)
+        .isEqualTo("value");
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName5() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("prefix.name").optionWithoutDeprecatedName)
+        .isEqualTo("value");
+  }
+
+  @Test
+  public void testOptionWithDeprecatedName6() throws InvalidConfigurationException {
+    assertThat(deprecatedInjectionResultOf("deprecated.name").optionWithoutDeprecatedName)
+        .isEqualTo("value");
+  }
+
   @Test
   public void testAsPropertiesString() throws Exception {
     Configuration c = Configuration.builder().setOption("prefix.test", "myDeprecatedValue").build();

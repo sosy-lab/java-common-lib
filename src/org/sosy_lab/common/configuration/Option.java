@@ -67,6 +67,16 @@ public @interface Option {
   String name() default "";
 
   /**
+   * When the prefix needs to be renamed, often it is desirable to maintain
+   * the backwards compatibility with the previous config.
+   * In that case, the previous name can be moved to the field
+   * {@code deprecatedName}.
+   * Both normal and deprecated name would work,
+   * with latter printing the deprecation warning.
+   */
+  String deprecatedName() default "";
+
+  /**
    * An optional flag that this configuration option is secure,
    * i.e., setting it to an arbitrary attacker-controlled value
    * may not allow any harm (like abitrary code execution).
