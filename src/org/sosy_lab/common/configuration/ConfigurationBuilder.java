@@ -23,10 +23,10 @@ import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.Path;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.annotation.CheckReturnValue;

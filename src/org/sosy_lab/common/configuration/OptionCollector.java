@@ -34,6 +34,10 @@ import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import org.sosy_lab.common.io.MoreFiles;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -195,6 +199,7 @@ public class OptionCollector {
 
   /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
+  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private static Path getSourcePath(Class<?> cls) throws URISyntaxException {
     // Get base folder for classes, go via URI to handle escaping
     Path basePath = Paths.get(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -458,7 +463,7 @@ public class OptionCollector {
     }
 
     try {
-      return Files.toString(path.toFile(), StandardCharsets.UTF_8);
+      return MoreFiles.toString(path, StandardCharsets.UTF_8);
     } catch (IOException e) {
       errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
       return "";

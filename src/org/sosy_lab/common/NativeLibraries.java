@@ -19,15 +19,17 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.StandardSystemProperty;
 
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
@@ -143,6 +145,7 @@ public class NativeLibraries {
 
   private static @Nullable Path nativePath = null;
 
+  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static Path getNativeLibraryPath() {
     // We expected the libraries to be in the directory lib/native/<arch>-<os>
     // relative to the parent of the code.
@@ -171,7 +174,7 @@ public class NativeLibraries {
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }
-    return Paths.get(pathToJar).getParent();
+    return checkNotNull(Paths.get(pathToJar).getParent());
   }
 
   /**

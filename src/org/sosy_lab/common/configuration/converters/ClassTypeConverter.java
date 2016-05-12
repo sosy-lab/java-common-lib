@@ -26,10 +26,10 @@ import com.google.common.reflect.TypeToken;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.util.Collections;
 
 public class ClassTypeConverter implements TypeConverter {

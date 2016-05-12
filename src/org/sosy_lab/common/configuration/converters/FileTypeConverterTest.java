@@ -138,7 +138,7 @@ public class FileTypeConverterTest {
     public void testCheckSafePath() throws InvalidConfigurationException {
       FileTypeConverter conv = createFileTypeConverter(defaultConfiguration());
 
-      org.sosy_lab.common.io.Path path = org.sosy_lab.common.io.Paths.get(testPath);
+      Path path = Paths.get(testPath);
 
       if (!isAllowed(false)) {
         thrown.expect(InvalidConfigurationException.class);
@@ -147,7 +147,7 @@ public class FileTypeConverterTest {
         thrown.expectMessage(testPath);
       }
 
-      assertThat(conv.checkSafePath(path, "dummy")).isEqualTo(path);
+      assertThat((Object) conv.checkSafePath(path, "dummy")).isEqualTo(path);
     }
 
     @Test

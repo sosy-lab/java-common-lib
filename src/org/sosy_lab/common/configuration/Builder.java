@@ -29,12 +29,13 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.CharSource;
 
 import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
+import org.sosy_lab.common.io.MoreFiles;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -163,7 +164,7 @@ public class Builder implements ConfigurationBuilder {
     checkNotNull(basePath);
     setupProperties();
 
-    final Parser parser = Parser.parse(source, basePath, sourceName);
+    final Parser parser = Parser.parse(source, Paths.get(basePath), sourceName);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -200,7 +201,7 @@ public class Builder implements ConfigurationBuilder {
    * @see org.sosy_lab.common.configuration.ConfigurationBuilder#loadFromFile(java.lang.String)
    */
   @Override
-  public ConfigurationBuilder loadFromFile(@Nullable String filename)
+  public ConfigurationBuilder loadFromFile(String filename)
       throws IOException, InvalidConfigurationException {
     return loadFromFile(Paths.get(filename));
   }
@@ -213,13 +214,11 @@ public class Builder implements ConfigurationBuilder {
       throws IOException, InvalidConfigurationException {
     checkNotNull(file);
 
-    if (!file.exists()) {
-      throw new IOException("The file does not exist.");
-    }
+    MoreFiles.checkReadableFile(file);
 
     setupProperties();
 
-    final Parser parser = Parser.parse(file, "");
+    final Parser parser = Parser.parse(file, Paths.get(""));
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 

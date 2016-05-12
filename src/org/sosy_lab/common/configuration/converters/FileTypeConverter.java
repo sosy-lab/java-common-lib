@@ -33,16 +33,17 @@ import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
-import org.sosy_lab.common.io.Paths;
 import org.sosy_lab.common.log.LogManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
@@ -67,7 +68,6 @@ public class FileTypeConverter implements TypeConverter {
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES =
       ImmutableSet.<Class<?>>of(
           File.class,
-          java.nio.file.Path.class,
           Path.class,
           PathTemplate.class,
           PathCounterTemplate.class);
@@ -78,7 +78,7 @@ public class FileTypeConverter implements TypeConverter {
   @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";
 
-  private final org.sosy_lab.common.io.Path outputPath;
+  private final Path outputPath;
 
   @Option(
     secure = true,
@@ -94,7 +94,7 @@ public class FileTypeConverter implements TypeConverter {
   )
   private String rootDirectory = ".";
 
-  private final org.sosy_lab.common.io.Path rootPath;
+  private final Path rootPath;
 
   // Allow only paths below the current directory,
   // i.e., no absolute paths and no "../"
@@ -143,10 +143,10 @@ public class FileTypeConverter implements TypeConverter {
       return pPath; // any path allowed
     }
 
-    String path = pPath.getPath();
+    String path = pPath.toString();
 
     if (pPath.isAbsolute()) {
-      if (pPath.getPath().startsWith(TEMP_DIR)) {
+      if (pPath.startsWith(TEMP_DIR)) {
         // Make it a a relative path
         path = path.substring(TEMP_DIR.length());
 
@@ -189,7 +189,7 @@ public class FileTypeConverter implements TypeConverter {
     throw new InvalidConfigurationException(
         String.format(
             "The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".",
-            from(ImmutableList.of(optionName, path)).append(args).toArray(Object.class)));
+            from(ImmutableList.<Object>of(optionName, path)).append(args).toArray(Object.class)));
   }
 
   public String getOutputDirectory() {
@@ -258,13 +258,11 @@ public class FileTypeConverter implements TypeConverter {
 
     Path defaultValue;
     if (type.equals(File.class)) {
-      defaultValue = Paths.get((File) pDefaultValue);
+      defaultValue = ((File) pDefaultValue).toPath();
     } else if (type.equals(PathTemplate.class)) {
       defaultValue = Paths.get(((PathTemplate) pDefaultValue).getTemplate());
     } else if (type.equals(PathCounterTemplate.class)) {
       defaultValue = Paths.get(((PathCounterTemplate) pDefaultValue).getTemplate());
-    } else if (type.equals(java.nio.file.Path.class)) {
-      defaultValue = Paths.get(((java.nio.file.Path) pDefaultValue).toFile());
     } else {
       defaultValue = (Path) pDefaultValue;
     }
@@ -302,14 +300,14 @@ public class FileTypeConverter implements TypeConverter {
 
     checkSafePath(file, optionName); // throws exception if unsafe
 
-    if (file.isDirectory()) {
+    if (Files.isDirectory(file)) {
       throw new InvalidConfigurationException(
           "Option " + optionName + " specifies a directory instead of a file: " + file);
     }
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
       try {
-        Files.checkReadableFile(file);
+        MoreFiles.checkReadableFile(file);
       } catch (FileNotFoundException e) {
         throw new InvalidConfigurationException(
             "Option " + optionName + " specifies an invalid input file: " + e.getMessage(), e);
@@ -322,8 +320,6 @@ public class FileTypeConverter implements TypeConverter {
       return PathTemplate.ofFormatString(file.toString());
     } else if (targetType.equals(PathCounterTemplate.class)) {
       return PathCounterTemplate.ofFormatString(file.toString());
-    } else if (targetType.equals(java.nio.file.Path.class)) {
-      return file.toFile().toPath();
     } else {
       assert targetType.equals(Path.class);
       return file;

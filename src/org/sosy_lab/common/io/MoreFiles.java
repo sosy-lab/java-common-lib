@@ -21,25 +21,62 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.StandardSystemProperty;
 import com.google.common.base.Strings;
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
+import com.google.common.io.CharSink;
+import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
 
 import org.sosy_lab.common.Appenders;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
 /**
  * Provides helper functions for file access.
  */
-public final class Files {
+public final class MoreFiles {
 
-  private Files() {
+  private MoreFiles() {
     /* utility class */
+  }
+
+  /**
+   * @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...)
+   */
+  public static ByteSink asByteSink(Path path, FileWriteMode... options) {
+    return com.google.common.io.Files.asByteSink(path.toFile(), options);
+  }
+
+  /**
+   * @see com.google.common.io.Files#asByteSource(java.io.File)
+   */
+  public static ByteSource asByteSource(Path path) {
+    return com.google.common.io.Files.asByteSource(path.toFile());
+  }
+
+  /**
+   * @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...)
+   */
+  public static CharSink asCharSink(Path path, Charset charset, FileWriteMode... options) {
+    return com.google.common.io.Files.asCharSink(path.toFile(), charset, options);
+  }
+
+  /**
+   * @see com.google.common.io.Files#asCharSource(java.io.File, Charset)
+   */
+  public static CharSource asCharSource(Path path, Charset charset) {
+    return com.google.common.io.Files.asCharSource(path.toFile(), charset);
   }
 
   /**
@@ -50,7 +87,7 @@ public final class Files {
    * @param  suffix     The suffix string to be used in generating the file's
    *                    name; may be <code>null</code>, in which case the
    *                    suffix <code>".tmp"</code> will be used
-   * @param content The content to write (may be null).
+   * @param content The content to write (may be null). Will be written with default charset.
    *
    * @throws  IllegalArgumentException
    *          If the <code>prefix</code> argument contains fewer than three
@@ -59,17 +96,47 @@ public final class Files {
    */
   public static Path createTempFile(
       String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
-    Path path = Paths.createTempPath(prefix, suffix);
-    path.deleteOnExit();
+    if (prefix.length() < 3) {
+      throw new IllegalArgumentException("The prefix must at least be three characters long.");
+    }
+
+    if (suffix == null) {
+      suffix = ".tmp";
+    }
+
+    File file;
+    try {
+      file = File.createTempFile(prefix, suffix);
+    } catch (IOException e) {
+      // The message of this exception is often quite unhelpful,
+      // improve it by adding the path were we attempted to write.
+      String tmpDir = StandardSystemProperty.JAVA_IO_TMPDIR.value();
+      if (e.getMessage() != null && e.getMessage().contains(tmpDir)) {
+        throw e;
+      }
+
+      String fileName = Paths.get(tmpDir, prefix + "*" + suffix).toString();
+      if (Strings.nullToEmpty(e.getMessage()).isEmpty()) {
+        throw new IOException(fileName, e);
+      } else {
+        throw new IOException(fileName + " (" + e.getMessage() + ")", e);
+      }
+    }
+
+    Path path = file.toPath();
+    file.deleteOnExit();
 
     if (!Strings.isNullOrEmpty(content)) {
       try {
-        writeFile(path, content);
+        writeFile(path, Charset.defaultCharset(), content);
       } catch (IOException e) {
         // creation was successful, but writing failed
         // -> delete file
-        delete(path, e);
-
+        try {
+          Files.delete(path);
+        } catch (IOException deleteException) {
+          e.addSuppressed(deleteException);
+        }
         throw e;
       }
     }
@@ -94,13 +161,13 @@ public final class Files {
    */
   public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix)
       throws IOException {
-    Path tempFile = Paths.createTempPath(prefix, suffix);
+    Path tempFile = createTempFile(prefix, suffix, null);
     return new DeleteOnCloseFile(tempFile);
   }
 
   /**
    * A simple wrapper around {@link Path} that calls
-   * {@link Path#delete()} from {@link AutoCloseable#close()}.
+   * {@link Files#deleteIfExists(Path)} from {@link AutoCloseable#close()}.
    */
   public static class DeleteOnCloseFile implements AutoCloseable {
 
@@ -115,45 +182,17 @@ public final class Files {
     }
 
     @Override
-    @SuppressWarnings("CheckReturnValue")
     public void close() throws IOException {
-      path.delete();
+      Files.deleteIfExists(path);
     }
   }
 
   /**
-   * Try to delete a file.
-   *
-   * If deleting fails, and an exception is given as second parameter,
-   * the exception from the deletion is added to the given exception,
-   * otherwise it is thrown.
-   *
-   * It is suggested to use this method as follows:
-   * <code>
-   * try {
-   *    // write to file "f"
-   * } catch (IOException e) {
-   *    Files.delete(f, e);
-   *    throw e;
-   * }
-   * </code>
-   *
-   * @param path The file to delete.
-   * @param pendingException An optional pending exception.
-   * @throws IOException If deletion fails and no pending exception was given.
+   * Read the full content of a file.
+   * @param file The file.
    */
-  public static void delete(Path path, @Nullable IOException pendingException) throws IOException {
-    boolean deletionSucceeded = path.delete();
-
-    if (!deletionSucceeded) {
-      IOException deleteException = new IOException("The file " + path + " could not be deleted.");
-
-      if (pendingException != null) {
-        pendingException.addSuppressed(deleteException);
-      } else {
-        throw deleteException;
-      }
-    }
+  public static String toString(Path file, Charset charset) throws IOException {
+    return asCharSource(file, charset).read();
   }
 
   /**
@@ -161,25 +200,11 @@ public final class Files {
    * @param file The file.
    * @param content The content which shall be written.
    */
-  public static void writeFile(Path file, Object content) throws IOException {
+  public static void writeFile(Path file, Charset charset, Object content) throws IOException {
     checkNotNull(content);
-    try (Writer w = openOutputFile(file)) {
+    try (Writer w = openOutputFile(file, charset)) {
       Appenders.appendTo(w, content);
     }
-  }
-
-  /**
-   * Open a buffered Writer to a file with the default charset.
-   * This method creates necessary parent directories beforehand.
-   *
-   * Note that using the default charset is often not a good idea,
-   * because it varies from platform to platform.
-   * Consider explicitly specifying a charset.
-   *
-   * TODO should we use UTF8 here instead?
-   */
-  public static Writer openOutputFile(Path file, FileWriteMode... options) throws IOException {
-    return openOutputFile(file, Charset.defaultCharset(), options);
   }
 
   /**
@@ -191,7 +216,7 @@ public final class Files {
     checkNotNull(charset);
     checkNotNull(options);
     createParentDirs(file);
-    return file.asCharSink(charset, options).openBufferedStream();
+    return asCharSink(file, charset, options).openBufferedStream();
   }
 
   /**
@@ -200,9 +225,9 @@ public final class Files {
    * @param file The file.
    * @param content The content which will be written to the end of the file.
    */
-  public static void appendToFile(Path file, Object content) throws IOException {
+  public static void appendToFile(Path file, Charset charset, Object content) throws IOException {
     checkNotNull(content);
-    try (Writer w = openOutputFile(file, FileWriteMode.APPEND)) {
+    try (Writer w = openOutputFile(file, charset, FileWriteMode.APPEND)) {
       Appenders.appendTo(w, content);
     }
   }
@@ -217,15 +242,15 @@ public final class Files {
   public static void checkReadableFile(Path path) throws FileNotFoundException {
     checkNotNull(path);
 
-    if (!path.exists()) {
+    if (!Files.exists(path)) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " does not exist!");
     }
 
-    if (!path.isFile()) {
+    if (!Files.isRegularFile(path)) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not a normal file!");
     }
 
-    if (!path.canRead()) {
+    if (!Files.isReadable(path)) {
       throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
     }
   }
@@ -234,13 +259,6 @@ public final class Files {
    * @see com.google.common.io.Files#createParentDirs(java.io.File)
    */
   public static void createParentDirs(Path path) throws IOException {
-    Path parent = path.getParent();
-    if (parent == null || parent.exists()) {
-      // the parent is the root directory and therefore exists or cannot be created.
-      return;
-    }
-    if (!parent.mkdirs()) {
-      throw new IOException("Unable to create parent directories of " + path);
-    }
+    com.google.common.io.Files.createParentDirs(path.toFile());
   }
 }

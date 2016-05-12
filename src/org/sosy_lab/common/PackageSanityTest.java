@@ -22,13 +22,12 @@ package org.sosy_lab.common;
 import com.google.common.base.Joiner;
 import com.google.common.testing.AbstractPackageSanityTests;
 
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 

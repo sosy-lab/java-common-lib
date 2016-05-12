@@ -22,18 +22,18 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
-import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
+import org.sosy_lab.common.io.MoreFiles;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -128,7 +128,7 @@ class Parser {
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(Path file, @Nullable String basePath)
+  static Parser parse(Path file, @Nullable Path basePath)
       throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
@@ -146,24 +146,24 @@ class Parser {
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private void parse0(Path file, @Nullable String basePath)
+  private void parse0(Path file, @Nullable Path basePath)
       throws IOException, InvalidConfigurationException {
 
-    if (!file.isAbsolute() && !Strings.isNullOrEmpty(basePath)) {
-      file = Paths.get(basePath, file.getPath());
+    if (basePath != null) {
+      file = basePath.resolve(file);
     }
 
-    Files.checkReadableFile(file);
+    MoreFiles.checkReadableFile(file);
 
-    String fileName = file.toAbsolutePath().getPath();
+    String fileName = file.toAbsolutePath().toString();
     if (includeStack.contains(fileName)) {
       throw new InvalidConfigurationFileException(
           "Circular inclusion of file " + file.toAbsolutePath());
     }
     includeStack.addLast(fileName);
 
-    try (BufferedReader r = file.asCharSource(StandardCharsets.UTF_8).openBufferedStream()) {
-      parse(r, file.getParent().getPath(), file.getPath());
+    try (BufferedReader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+      parse(r, file.getParent(), file.toString());
     }
     includeStack.removeLast();
   }
@@ -184,7 +184,7 @@ class Parser {
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(CharSource source, @Nullable String basePath, String sourceName)
+  static Parser parse(CharSource source, @Nullable Path basePath, String sourceName)
       throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
@@ -214,7 +214,7 @@ class Parser {
     value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
     justification = "performance irrelevant compared to I/O, String much more convenient"
   )
-  private void parse(BufferedReader r, @Nullable String basePath, String source)
+  private void parse(BufferedReader r, @Nullable Path basePath, String source)
       throws IOException, InvalidConfigurationException {
     checkNotNull(source);
 

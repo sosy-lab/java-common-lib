@@ -25,10 +25,10 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.OptionDetailAnnotation;
-import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 
 import javax.annotation.Nullable;
 

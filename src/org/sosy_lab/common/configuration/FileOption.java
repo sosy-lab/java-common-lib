@@ -40,7 +40,6 @@ import java.nio.file.Path;
   applicableTo = {
     File.class,
     Path.class,
-    org.sosy_lab.common.io.Path.class,
     PathTemplate.class,
     PathCounterTemplate.class
   }

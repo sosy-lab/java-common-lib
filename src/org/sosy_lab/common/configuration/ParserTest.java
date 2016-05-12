@@ -26,12 +26,15 @@ import com.google.common.io.CharSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
+import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.MoreFiles.DeleteOnCloseFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,11 +48,11 @@ public class ParserTest {
 
   public ParserTest() {}
 
-  private String basePath;
+  private Path basePath;
 
   @Before
   public void resetBasePath() {
-    basePath = "";
+    basePath = Paths.get("");
   }
 
   private Map<String, String> test(String content)
@@ -263,36 +266,37 @@ public class ParserTest {
 
   @Test
   public final void simpleInclude() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
-      testSingleOption(" #include  " + included.getAbsolutePath() + "\t", "foo.bar", "abc");
+      testSingleOption(" #include  " + included.toAbsolutePath() + "\t", "foo.bar", "abc");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test
   public final void includeWithSpecialCharsFilename() throws IOException {
     Path included =
-        Files.createTempFile("SoSy-Lab Common\tParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
+        MoreFiles.createTempFile(
+            "SoSy-Lab Common\tParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
-      testSingleOption(" #include " + included.getAbsolutePath() + "\t", "foo.bar", "abc");
+      testSingleOption(" #include " + included.toAbsolutePath() + "\t", "foo.bar", "abc");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test
   public final void includeDepthTwo() throws IOException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        Files.createTempFile(
-            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath());
+        MoreFiles.createTempFile(
+            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
     try {
-      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "abc");
+      testSingleOption("#include " + included2.toAbsolutePath(), "foo.bar", "abc");
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 
@@ -300,63 +304,65 @@ public class ParserTest {
 
   @Test
   public final void includeDepthN() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(included);
 
     for (int i = 0; i < MAX_INCLUDE_TEST_DEPTH; i++) {
       included =
-          Files.createTempFile(
-              TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.getAbsolutePath());
+          MoreFiles.createTempFile(
+              TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.toAbsolutePath());
       allFiles.add(included);
     }
 
     try {
-      testSingleOption("#include " + included.getAbsolutePath(), "foo.bar", "abc");
+      testSingleOption("#include " + included.toAbsolutePath(), "foo.bar", "abc");
     } finally {
       for (Path toDelete : allFiles) {
-        toDelete.delete();
+        Files.delete(toDelete);
       }
     }
   }
 
   @Test
   public final void includeTwice() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(
-          "#include " + included.getAbsolutePath() + "\n#include " + included.getAbsolutePath(),
+          "#include " + included.toAbsolutePath() + "\n#include " + included.toAbsolutePath(),
           "foo.bar",
           "abc");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveInclude() throws IOException, InvalidConfigurationException {
-    Path included = Paths.createTempPath(TEST_FILE_PREFIX, TEST_FILE_SUFFIX);
-    Files.writeFile(included, "#include " + included.getAbsolutePath());
-    try {
-      test("#include " + included.getAbsolutePath());
-    } finally {
-      included.delete();
+    try (DeleteOnCloseFile included =
+        MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX)) {
+      MoreFiles.writeFile(
+          included.toPath(),
+          Charset.defaultCharset(),
+          "#include " + included.toPath().toAbsolutePath());
+      test("#include " + included.toPath().toAbsolutePath());
     }
   }
 
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveIncludeDepthTwo() throws IOException, InvalidConfigurationException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
     Path included2 =
-        Files.createTempFile(
-            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getAbsolutePath());
-    Files.writeFile(included1, "#include " + included2.getAbsolutePath());
+        MoreFiles.createTempFile(
+            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
+    MoreFiles.writeFile(
+        included1, Charset.defaultCharset(), "#include " + included2.toAbsolutePath());
     try {
-      test("#include " + included1.getAbsolutePath());
+      test("#include " + included1.toAbsolutePath());
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 
@@ -364,7 +370,7 @@ public class ParserTest {
 
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveIncludeDepthN() throws IOException, InvalidConfigurationException {
-    Path firstIncluded = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
+    Path firstIncluded = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(firstIncluded);
@@ -372,113 +378,115 @@ public class ParserTest {
 
     for (int i = 0; i < MAX_RECURSIVE_INCLUDE_TEST_DEPTH; i++) {
       included =
-          Files.createTempFile(
-              TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.getAbsolutePath());
+          MoreFiles.createTempFile(
+              TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.toAbsolutePath());
       allFiles.add(included);
     }
 
-    Files.writeFile(firstIncluded, "#include " + included.getAbsolutePath());
+    MoreFiles.writeFile(
+        firstIncluded, Charset.defaultCharset(), "#include " + included.toAbsolutePath());
 
     try {
-      test("#include " + included.getAbsolutePath());
+      test("#include " + included.toAbsolutePath());
     } finally {
       for (Path toDelete : allFiles) {
-        toDelete.delete();
+        Files.delete(toDelete);
       }
     }
   }
 
   @Test
   public final void overwriteIncludedOptionBefore() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
-      testSingleOption("foo.bar=123 \n#include " + included.getAbsolutePath(), "foo.bar", "123");
+      testSingleOption("foo.bar=123 \n#include " + included.toAbsolutePath(), "foo.bar", "123");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test
   public final void overwriteIncludedOptionAfter() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(
-          "#include " + included.getAbsolutePath() + " \n foo.bar=123", "foo.bar", "123");
+          "#include " + included.toAbsolutePath() + " \n foo.bar=123", "foo.bar", "123");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test
   public final void overwriteIncludedDepthTwo1() throws IOException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        Files.createTempFile(
+        MoreFiles.createTempFile(
             TEST_FILE_PREFIX,
             TEST_FILE_SUFFIX,
-            "#include " + included1.getAbsolutePath() + "\n foo.bar=xyz");
+            "#include " + included1.toAbsolutePath() + "\n foo.bar=xyz");
     try {
-      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "xyz");
+      testSingleOption("#include " + included2.toAbsolutePath(), "foo.bar", "xyz");
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 
   @Test
   public final void overwriteIncludedDepthTwo2() throws IOException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        Files.createTempFile(
+        MoreFiles.createTempFile(
             TEST_FILE_PREFIX,
             TEST_FILE_SUFFIX,
-            "#include " + included1.getAbsolutePath() + "\n foo.bar=xyz");
+            "#include " + included1.toAbsolutePath() + "\n foo.bar=xyz");
     try {
-      testSingleOption("foo.bar=123 \n#include " + included2.getAbsolutePath(), "foo.bar", "123");
+      testSingleOption("foo.bar=123 \n#include " + included2.toAbsolutePath(), "foo.bar", "123");
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 
   @Test
   public final void contradictoryIncludes() throws IOException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
-    Path included2 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=xyz");
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included2 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=xyz");
     try {
       testSingleOption(
-          "#include " + included1.getAbsolutePath() + "\n#include " + included2.getAbsolutePath(),
+          "#include " + included1.toAbsolutePath() + "\n#include " + included2.toAbsolutePath(),
           "foo.bar",
           "xyz");
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 
   @Test
   public final void relativePath1() throws IOException {
-    Path included = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
-    basePath = included.getParent().getPath();
+    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    basePath = included.getParent();
 
     try {
-      testSingleOption("#include " + included.getName(), "foo.bar", "abc");
+      testSingleOption("#include " + included.getFileName(), "foo.bar", "abc");
     } finally {
-      included.delete();
+      Files.delete(included);
     }
   }
 
   @Test
   public final void relativePath2() throws IOException {
-    Path included1 = Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        Files.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getName());
+        MoreFiles.createTempFile(
+            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getFileName());
 
     try {
-      testSingleOption("#include " + included2.getAbsolutePath(), "foo.bar", "abc");
+      testSingleOption("#include " + included2.toAbsolutePath(), "foo.bar", "abc");
     } finally {
-      included1.delete();
-      included2.delete();
+      Files.delete(included1);
+      Files.delete(included2);
     }
   }
 }
