@@ -32,7 +32,6 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.concurrency.Concurrency;
 import org.sosy_lab.common.log.LogManager;
 
 import java.io.BufferedReader;

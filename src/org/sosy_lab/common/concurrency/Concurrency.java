@@ -20,9 +20,7 @@
 package org.sosy_lab.common.concurrency;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Helper methods for concurrency related things.
@@ -38,24 +36,11 @@ public class Concurrency {
    *
    * Interrupting the thread will have no effect, but this method
    * will set the thread's interrupted flag in this case.
+   * @deprecated use {@link org.sosy_lab.common.Concurrency#waitForTermination(ExecutorService)}
    */
+  @Deprecated
   public static void waitForTermination(ExecutorService executor) {
-    boolean interrupted = Thread.interrupted();
-
-    while (!executor.isTerminated()) {
-      try {
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      } catch (InterruptedException ignored) {
-        interrupted = true;
-      }
-    }
-
-    // now all tasks have terminated
-
-    // restore interrupted flag
-    if (interrupted) {
-      Thread.currentThread().interrupt();
-    }
+    org.sosy_lab.common.Concurrency.waitForTermination(executor);
   }
 
   /**
@@ -63,10 +48,11 @@ public class Concurrency {
    * available to the JVM.
    *
    * @return thread pool
+   * @deprecated use {@link org.sosy_lab.common.Concurrency#createThreadPool()}
    */
+  @Deprecated
   public static ExecutorService createThreadPool() {
-    final int processors = Runtime.getRuntime().availableProcessors();
-    return Executors.newFixedThreadPool(processors);
+    return org.sosy_lab.common.Concurrency.createThreadPool();
   }
 
   /**
@@ -76,9 +62,10 @@ public class Concurrency {
    * @param threadFactory
    *            The thread factory to be used.
    * @return thread pool
+   * @deprecated use {@link org.sosy_lab.common.Concurrency#createThreadPool(ThreadFactory)}
    */
+  @Deprecated
   public static ExecutorService createThreadPool(ThreadFactory threadFactory) {
-    final int processors = Runtime.getRuntime().availableProcessors();
-    return Executors.newFixedThreadPool(processors, threadFactory);
+    return org.sosy_lab.common.Concurrency.createThreadPool(threadFactory);
   }
 }
