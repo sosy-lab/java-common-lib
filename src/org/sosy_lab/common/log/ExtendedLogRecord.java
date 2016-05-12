@@ -21,6 +21,8 @@ package org.sosy_lab.common.log;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -45,5 +47,22 @@ public class ExtendedLogRecord extends LogRecord {
 
   public String getSourceComponentName() {
     return componentName;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("sequenceNumber", getSequenceNumber())
+        .add("millis", getMillis())
+        .add("loggerName", getLoggerName())
+        .add("componentName", componentName)
+        .add("sourceClassName", getSourceClassName())
+        .add("sourceMethodName", getSourceMethodName())
+        .add("threadID", getThreadID())
+        .add("level", getLevel())
+        .add("message", getMessage())
+        .add("parameters", getParameters())
+        .add("thrown", getThrown())
+        .toString();
   }
 }
