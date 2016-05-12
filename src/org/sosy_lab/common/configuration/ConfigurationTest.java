@@ -71,6 +71,7 @@ public class ConfigurationTest {
   }
 
   @Before
+  @SuppressWarnings("deprecation")
   public void setUp() {
     Configuration.setBuilderFactory(DefaultConfigurationBuilderFactory.INSTANCE);
   }
@@ -180,6 +181,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldReturnCustomFactory() throws Exception {
     ConfigurationBuilderFactory mockFactory = mock(ConfigurationBuilderFactory.class);
     Configuration.setBuilderFactory(mockFactory);
@@ -188,6 +190,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldReturnDefaultBuilder() throws Exception {
     ConfigurationBuilder builder = Configuration.builder();
 
@@ -195,6 +198,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldReturnCustomBuilder() throws Exception {
     ConfigurationBuilder mockBuilder = mock(ConfigurationBuilder.class);
     ConfigurationBuilderFactory stubFactory = mock(ConfigurationBuilderFactory.class);

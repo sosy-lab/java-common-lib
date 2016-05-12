@@ -98,6 +98,7 @@ public final class Configuration {
   private static ConfigurationBuilderFactory builderFactory =
       new ConfigurationBuilderFactory() {
         @Override
+        @SuppressWarnings("deprecation")
         public ConfigurationBuilder getBuilder() {
           return new Builder();
         }
@@ -118,6 +119,7 @@ public final class Configuration {
    *
    * @param factory The factory to use in the future for creating all builders.
    */
+  @Deprecated
   public static void setBuilderFactory(ConfigurationBuilderFactory factory) {
     builderFactory = checkNotNull(factory);
   }

@@ -26,6 +26,7 @@ public interface ConfigurationBuilderFactory {
     INSTANCE;
 
     @Override
+    @SuppressWarnings("deprecation")
     public ConfigurationBuilder getBuilder() {
       return new Builder();
     }

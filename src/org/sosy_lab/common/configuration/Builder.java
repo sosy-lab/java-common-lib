@@ -42,6 +42,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+@Deprecated
 public class Builder implements ConfigurationBuilder {
 
   private @Nullable Map<String, String> properties = null;
