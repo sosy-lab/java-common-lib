@@ -26,8 +26,6 @@ import com.google.common.testing.TestLogHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -35,20 +33,21 @@ import java.util.logging.LogRecord;
 
 public class BasicLogManagerTest {
 
-  private TestLogHandler consoleHandler;
-  private TestLogHandler fileHandler;
-  private BasicLogManager logger;
+  private TestLogHandler testHandler;
+  private LogManager logger;
 
   @Before
-  public void setUp() throws InvalidConfigurationException {
-    consoleHandler = new TestLogHandler();
-    fileHandler = new TestLogHandler();
-    logger = new BasicLogManager(Configuration.defaultConfiguration(), consoleHandler, fileHandler);
+  public void setUp() {
+    testHandler = new TestLogHandler();
+    testHandler.setLevel(Level.INFO);
+    logger = BasicLogManager.createWithHandler(testHandler);
   }
 
   @After
-  public void tearDown() {
-    logger.close();
+  public void tearDown() throws Exception {
+    if (logger instanceof AutoCloseable) {
+      ((AutoCloseable) logger).close();
+    }
   }
 
   private void checkExpectedLogRecordSource(TestLogHandler handler, String methodName) {
@@ -61,15 +60,13 @@ public class BasicLogManagerTest {
   @Test
   public void testLogRecordSource() {
     logger.log(Level.SEVERE, "test");
-    checkExpectedLogRecordSource(consoleHandler, "testLogRecordSource");
-    checkExpectedLogRecordSource(fileHandler, "testLogRecordSource");
+    checkExpectedLogRecordSource(testHandler, "testLogRecordSource");
   }
 
   @Test
   public void testLogRecordSourceWithHelperMethod() {
     logIndirectly();
-    checkExpectedLogRecordSource(consoleHandler, "testLogRecordSourceWithHelperMethod");
-    checkExpectedLogRecordSource(fileHandler, "testLogRecordSourceWithHelperMethod");
+    checkExpectedLogRecordSource(testHandler, "testLogRecordSourceWithHelperMethod");
   }
 
   private void logIndirectly() {
@@ -86,8 +83,7 @@ public class BasicLogManagerTest {
       logger.logUserException(Level.SEVERE, e, null);
     }
 
-    checkExpectedLogRecordSource(consoleHandler, "throwException");
-    checkExpectedLogRecordSource(fileHandler, "throwException");
+    checkExpectedLogRecordSource(testHandler, "throwException");
   }
 
   private void throwException() {

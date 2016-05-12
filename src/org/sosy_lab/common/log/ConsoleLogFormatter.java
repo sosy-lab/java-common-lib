@@ -21,7 +21,6 @@ package org.sosy_lab.common.log;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 
 import java.util.logging.Formatter;
@@ -34,23 +33,38 @@ import java.util.logging.LogRecord;
 @Options(prefix = "log")
 public class ConsoleLogFormatter extends Formatter {
 
-  @Option(secure = true, description = "use colors for log messages on console")
-  private boolean useColors = true;
+  private final boolean useColors;
 
+  @Deprecated
   public ConsoleLogFormatter(Configuration config) throws InvalidConfigurationException {
-    config.inject(this);
+    this(new LoggingOptions(config));
+  }
 
+  public ConsoleLogFormatter(LoggingOptions options) {
+    this(options.useColors());
+  }
+
+  private ConsoleLogFormatter(boolean pUseColors) {
     // Using colors is only good if stderr is connected to a terminal and not
     // redirected into a file.
     // AFAIK there is no way to determine this from Java, but at least there
     // is a way to determine whether stdout is connected to a terminal.
     // We assume that most users only redirect stderr if they also redirect
     // stdout, so this should be ok.
-    if (useColors) {
+    if (pUseColors) {
       if ((System.console() == null) || System.getProperty("os.name", "").startsWith("Windows")) {
-        useColors = false;
+        pUseColors = false;
       }
     }
+    useColors = pUseColors;
+  }
+
+  public static Formatter withoutColors() {
+    return new ConsoleLogFormatter(false);
+  }
+
+  public static Formatter withColorsIfPossible() {
+    return new ConsoleLogFormatter(true);
   }
 
   @Override

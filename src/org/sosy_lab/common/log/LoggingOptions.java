@@ -49,7 +49,7 @@ import java.util.logging.Level;
           + "\nCare must be taken with levels of FINER or lower, as output files may "
           + "become quite large and memory usage might become an issue."
 )
-final class LoggingOptions {
+public class LoggingOptions {
 
   @Option(
     secure = true,
@@ -87,31 +87,38 @@ final class LoggingOptions {
   @IntegerOption(min = 1)
   private int truncateSize = 10000;
 
-  LoggingOptions(Configuration config) throws InvalidConfigurationException {
+  @Option(secure = true, description = "use colors for log messages on console")
+  private boolean useColors = true;
+
+  public LoggingOptions(Configuration config) throws InvalidConfigurationException {
     config.inject(this);
   }
 
-  Level getFileLevel() {
+  public Level getFileLevel() {
     return fileLevel;
   }
 
-  Level getConsoleLevel() {
+  public Level getConsoleLevel() {
     return consoleLevel;
   }
 
-  List<Level> getFileExclude() {
+  public List<Level> getFileExclude() {
     return fileExclude;
   }
 
-  List<Level> getConsoleExclude() {
+  public List<Level> getConsoleExclude() {
     return consoleExclude;
   }
 
-  Path getOutputFile() {
+  public Path getOutputFile() {
     return outputFile;
   }
 
-  int getTruncateSize() {
+  public int getTruncateSize() {
     return truncateSize;
+  }
+
+  public boolean useColors() {
+    return useColors;
   }
 }

@@ -22,6 +22,7 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -60,9 +61,10 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
 
+  @Deprecated // will be made private
   protected final Logger logger;
   private final int truncateSize;
-  private final @Nullable LogManagerBean mxBean;
+  private @Nullable LogManagerBean mxBean = null;
   private final String componentName;
 
   public interface LogManagerMXBean {
@@ -103,7 +105,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   /**
    * @see #BasicLogManager(Configuration, Handler)
+   * @deprecated use {@link BasicLogManager#create(Configuration)}
    */
+  @Deprecated
   public BasicLogManager(Configuration config) throws InvalidConfigurationException {
     this(config, null, null);
   }
@@ -119,7 +123,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * instance will be used.
    *
    * @see #BasicLogManager(Configuration, Handler, Handler)
+   * @deprecated use {@link BasicLogManager#createWithHandler(Handler)}
    */
+  @Deprecated
   public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler)
       throws InvalidConfigurationException {
     this(config, consoleOutputHandler, null);
@@ -139,7 +145,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param consoleOutputHandler A handler. If null a {@link ConsoleHandler}
    * instance will be used.
    * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
+   * @deprecated use {@link BasicLogManager#createWithHandler(Handler)}
    */
+  @Deprecated
   public BasicLogManager(
       Configuration config,
       @Nullable Handler consoleOutputHandler,
@@ -210,8 +218,124 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
    */
   @ForOverride
+  @Deprecated
   protected void setupHandler(
       Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
+    setupHandler(logger, handler, formatter, level, excludeLevels);
+  }
+
+  /**
+   * Constructor which allows to customize where this logger delegates to.
+   *
+   * The feature of truncating long log messages is disabled.
+   *
+   * @param pLogger The Java logger where this logger delegates to.
+   */
+  public BasicLogManager(Logger pLogger) {
+    this(pLogger, 0);
+  }
+
+  /**
+   * Constructor which allows to customize where this logger delegates to.
+   *
+   * @param pLogger The Java logger where this logger delegates to.
+   * @param pTruncateSize A positive integer threshold for truncating long log messages,
+   *    or 0 to disable truncation.
+   */
+  public BasicLogManager(Logger pLogger, int pTruncateSize) {
+    logger = checkNotNull(pLogger);
+    componentName = "";
+    checkArgument(pTruncateSize >= 0);
+    truncateSize = pTruncateSize;
+  }
+
+  /**
+   * Create a {@link BasicLogManager} which delegates to a new logger
+   * with only the given {@link Handler}.
+   * @param handler The target handler.
+   */
+  public static LogManager createWithHandler(Handler handler) {
+    Logger logger = Logger.getAnonymousLogger();
+    logger.setLevel(handler.getLevel());
+    logger.setUseParentHandlers(false);
+    logger.addHandler(handler);
+    return new BasicLogManager(logger);
+  }
+
+  /**
+   * Create a {@link BasicLogManager} which logs to a file and the console
+   * according to user configuration.
+   *
+   * This also adds an MXBean that allows runtime control of some logging options.
+   *
+   */
+  public static LogManager create(Configuration config) throws InvalidConfigurationException {
+    return create(new LoggingOptions(config));
+  }
+
+  /**
+   * Create a {@link BasicLogManager} which logs to a file and the console
+   * according to specified options.
+   *
+   * This also adds an MXBean that allows runtime control of some logging options.
+   *
+   * Most users will want to use {@link #create(Configuration)} instead.
+   */
+  public static LogManager create(LoggingOptions options) {
+    Level fileLevel = options.getFileLevel();
+    Level consoleLevel = options.getConsoleLevel();
+
+    Logger logger = Logger.getAnonymousLogger();
+    logger.setLevel(BasicLogManager.getMinimumLevel(fileLevel, consoleLevel));
+    logger.setUseParentHandlers(false);
+
+    // create console logger
+    Handler consoleOutputHandler = new ConsoleHandler();
+    setupHandler(
+        logger,
+        consoleOutputHandler,
+        new ConsoleLogFormatter(options),
+        consoleLevel,
+        options.getConsoleExclude());
+
+    // create file logger
+    Path outputFile = options.getOutputFile();
+    if (!fileLevel.equals(Level.OFF) && outputFile != null) {
+      try {
+        Files.createParentDirs(outputFile);
+
+        Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
+        setupHandler(
+            logger, outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
+      } catch (IOException e) {
+        // redirect log messages to console
+        if (consoleLevel.intValue() > fileLevel.intValue()) {
+          consoleOutputHandler.setLevel(fileLevel);
+        }
+
+        logger.log(
+            Level.WARNING,
+            "Could not open log file (" + e.getMessage() + "), redirecting log output to console");
+      }
+    }
+
+    BasicLogManager logManager = new BasicLogManager(logger, options.getTruncateSize());
+
+    logManager.addMxBean(consoleOutputHandler, fileLevel);
+
+    return logManager;
+  }
+
+  /**
+   * Sets up the given handler.
+   *
+   * @param handler The handler to set up.
+   * @param formatter The formatter to use with the handler.
+   * @param level The level to use with the handler.
+   * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
+   */
+  private static void setupHandler(
+      Logger logger, Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
     if (excludeLevels.size() > 0) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
@@ -228,11 +352,16 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     logger.addHandler(handler);
   }
 
+  private void addMxBean(Handler pConsoleHandler, Level pFileLevel) {
+    checkState(mxBean == null);
+    mxBean = new LogManagerBean(pConsoleHandler, pFileLevel);
+    mxBean.register();
+  }
+
   private BasicLogManager(BasicLogManager originalLogger, String pComponentName) {
     logger = originalLogger.logger;
     truncateSize = originalLogger.truncateSize;
     componentName = pComponentName;
-    mxBean = null;
   }
 
   @Override
