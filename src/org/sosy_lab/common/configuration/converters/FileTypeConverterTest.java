@@ -42,11 +42,11 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterSafeModeTest;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterUnsafeModeTest;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RunWith(Suite.class)
 @SuiteClasses({FileTypeConverterSafeModeTest.class, FileTypeConverterUnsafeModeTest.class})
@@ -138,7 +138,7 @@ public class FileTypeConverterTest {
     public void testCheckSafePath() throws InvalidConfigurationException {
       FileTypeConverter conv = createFileTypeConverter(defaultConfiguration());
 
-      Path path = Paths.get(testPath);
+      org.sosy_lab.common.io.Path path = org.sosy_lab.common.io.Paths.get(testPath);
 
       if (!isAllowed(false)) {
         thrown.expect(InvalidConfigurationException.class);
@@ -163,7 +163,7 @@ public class FileTypeConverterTest {
 
       FileTypeConverter conv = createFileTypeConverter(config);
       assertThat(conv.getOutputDirectory())
-          .isEqualTo(Paths.get(testPath).resolve("output").getOriginalPath());
+          .isEqualTo(Paths.get(testPath).resolve("output").toString());
     }
 
     @Test
@@ -177,7 +177,7 @@ public class FileTypeConverterTest {
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
-      assertThat(conv.getOutputDirectory()).isEqualTo(Paths.get(".").resolve(testPath).getPath());
+      assertThat(conv.getOutputDirectory()).isEqualTo(Paths.get(".").resolve(testPath).toString());
     }
 
     @Test
@@ -197,7 +197,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get(testPath));
+      assertThat((Object) options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get(testPath));
+      assertThat((Object) options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get("config").resolve(testPath));
+      assertThat((Object) options.path).isEqualTo(Paths.get("config").resolve(testPath));
     }
   }
 }

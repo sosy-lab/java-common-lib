@@ -20,7 +20,6 @@
 package org.sosy_lab.common.configuration;
 
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
-import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 
@@ -30,6 +29,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.file.Path;
 
 /**
  * This is an annotation providing more features for options of types {@link File} and {@link Path}.
@@ -37,7 +37,13 @@ import java.lang.annotation.Target;
  * as a converter for {@link FileOption}.
  */
 @OptionDetailAnnotation(
-  applicableTo = {File.class, Path.class, PathTemplate.class, PathCounterTemplate.class}
+  applicableTo = {
+    File.class,
+    Path.class,
+    org.sosy_lab.common.io.Path.class,
+    PathTemplate.class,
+    PathCounterTemplate.class
+  }
 )
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

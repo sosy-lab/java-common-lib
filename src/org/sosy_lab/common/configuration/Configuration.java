@@ -412,7 +412,8 @@ public final class Configuration {
    * - all primitive types and their wrapper types
    * - all enum types
    * - {@link String} and arrays of it
-   * - {@link File} (the field {@link FileOption#value()} is required in this case!)
+   * - {@link File} and {@link Path}
+   *   (the field {@link FileOption#value()} is required in this case!)
    * - {@code Class<Something>}
    * - {@link java.nio.charset.Charset}
    * - {@link java.util.logging.Level}

@@ -66,7 +66,11 @@ public class FileTypeConverter implements TypeConverter {
 
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES =
       ImmutableSet.<Class<?>>of(
-          File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
+          File.class,
+          java.nio.file.Path.class,
+          Path.class,
+          PathTemplate.class,
+          PathCounterTemplate.class);
 
   private static final String TEMP_DIR =
       StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;
@@ -74,7 +78,7 @@ public class FileTypeConverter implements TypeConverter {
   @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";
 
-  private final Path outputPath;
+  private final org.sosy_lab.common.io.Path outputPath;
 
   @Option(
     secure = true,
@@ -90,7 +94,7 @@ public class FileTypeConverter implements TypeConverter {
   )
   private String rootDirectory = ".";
 
-  private final Path rootPath;
+  private final org.sosy_lab.common.io.Path rootPath;
 
   // Allow only paths below the current directory,
   // i.e., no absolute paths and no "../"
@@ -259,6 +263,8 @@ public class FileTypeConverter implements TypeConverter {
       defaultValue = Paths.get(((PathTemplate) pDefaultValue).getTemplate());
     } else if (type.equals(PathCounterTemplate.class)) {
       defaultValue = Paths.get(((PathCounterTemplate) pDefaultValue).getTemplate());
+    } else if (type.equals(java.nio.file.Path.class)) {
+      defaultValue = Paths.get(((java.nio.file.Path) pDefaultValue).toFile());
     } else {
       defaultValue = (Path) pDefaultValue;
     }
@@ -316,6 +322,8 @@ public class FileTypeConverter implements TypeConverter {
       return PathTemplate.ofFormatString(file.toString());
     } else if (targetType.equals(PathCounterTemplate.class)) {
       return PathCounterTemplate.ofFormatString(file.toString());
+    } else if (targetType.equals(java.nio.file.Path.class)) {
+      return file.toFile().toPath();
     } else {
       assert targetType.equals(Path.class);
       return file;
