@@ -32,6 +32,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.concurrent.ThreadFactory;
 
+@SuppressWarnings("deprecation")
 public class ThreadsTest {
 
   @Rule public MockitoRule mockito = MockitoJUnit.rule();

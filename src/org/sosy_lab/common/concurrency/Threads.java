@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("deprecation")
 public class Threads {
 
   private static @Nullable ThreadFactory factory;
@@ -40,6 +41,7 @@ public class Threads {
   /**
    * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
+  @Deprecated
   public static Thread newThread(Runnable r) {
     return newThread(r, null, null, null);
   }
@@ -47,6 +49,7 @@ public class Threads {
   /**
    * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
+  @Deprecated
   public static Thread newThread(Runnable r, String name) {
     return newThread(r, checkNotNull(name), null, null);
   }
@@ -54,6 +57,7 @@ public class Threads {
   /**
    * @see Threads#newThread(Runnable, String, Boolean, Integer)
    */
+  @Deprecated
   public static Thread newThread(Runnable r, String name, boolean daemon) {
     return newThread(r, checkNotNull(name), daemon, null);
   }
@@ -67,6 +71,7 @@ public class Threads {
    * @param priority The priority of the new thread.
    * @return A new Thread instance.
    */
+  @Deprecated
   public static Thread newThread(
       Runnable r, @Nullable String name, @Nullable Boolean daemon, @Nullable Integer priority) {
     checkNotNull(r);
@@ -91,7 +96,9 @@ public class Threads {
    * or it has been set to null the factory {@link Executors#defaultThreadFactory()} will be used.
    *
    * @return The thread factory.
+   * @deprecated use {@link Executors#defaultThreadFactory()}
    */
+  @Deprecated
   public static ThreadFactory threadFactory() {
     if (factory == null) {
       return Executors.defaultThreadFactory();
@@ -105,6 +112,7 @@ public class Threads {
    *
    * @param threadFactory The thread factory to be used.
    */
+  @Deprecated
   public static void setThreadFactory(@Nullable ThreadFactory threadFactory) {
     factory = threadFactory;
   }
@@ -114,7 +122,9 @@ public class Threads {
    * backing {@link ThreadFactory} set.
    * @see ThreadFactoryBuilder
    * @return A fresh {@link CatchSecurityViolationThreadFactoryBuilder} instance.
+   * @deprecated use {@link ThreadFactoryBuilder#ThreadFactoryBuilder()}
    */
+  @Deprecated
   public static CatchSecurityViolationThreadFactoryBuilder threadFactoryBuilder() {
     return new CatchSecurityViolationThreadFactoryBuilder().setThreadFactory(threadFactory());
   }

@@ -40,6 +40,7 @@ public class CatchSecurityViolationThreadFactoryBuilderTest {
 
   @Mock private Runnable mockRunnable;
 
+  @SuppressWarnings("deprecation")
   private CatchSecurityViolationThreadFactoryBuilder builder;
 
   @Before
