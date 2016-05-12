@@ -34,9 +34,6 @@ import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.Paths;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -46,6 +43,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -203,12 +202,12 @@ public class OptionCollector {
     // check the folders known as source, depending on the current folder
     // structure for the class files
 
-    if (basePath.getName().equals("bin")) {
+    if (basePath.endsWith("bin")) {
       // this could be a usual eclipse environment, therefore src is the appropriate
       // folder to search for sources
       basePath = basePath.getParent();
 
-    } else if (basePath.getPath().endsWith("/build/classes/main")) {
+    } else if (basePath.endsWith("build/classes/main")) {
       // this is a typical project layout for gradle, the sources should be in
       // src/main/java/
       basePath = basePath.getParent().getParent().getParent();
@@ -219,7 +218,7 @@ public class OptionCollector {
     List<Path> candidates = ImmutableList.of(Paths.get("src", "main", "java"), Paths.get("src"));
     for (Path candidate : candidates) {
       Path sourcePath = basePath.resolve(candidate);
-      if (sourcePath.isDirectory()) {
+      if (java.nio.file.Files.isDirectory(sourcePath)) {
         return sourcePath;
       }
     }
@@ -459,7 +458,7 @@ public class OptionCollector {
     }
 
     try {
-      return path.asCharSource(StandardCharsets.UTF_8).read();
+      return Files.toString(path.toFile(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
       return "";
