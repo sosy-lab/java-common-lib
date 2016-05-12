@@ -36,10 +36,10 @@ import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -183,7 +183,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         try {
           Files.createParentDirs(outputFile);
 
-          Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
+          Handler outfileHandler = new FileHandler(outputFile.toAbsolutePath().toString(), false);
           setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
         } catch (IOException e) {
           // redirect log messages to console
@@ -304,7 +304,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       try {
         Files.createParentDirs(outputFile);
 
-        Handler outfileHandler = new FileHandler(outputFile.getAbsolutePath(), false);
+        Handler outfileHandler = new FileHandler(outputFile.toAbsolutePath().toString(), false);
         setupHandler(
             logger, outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
       } catch (IOException e) {
