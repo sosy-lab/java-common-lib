@@ -17,12 +17,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.common;
+package org.sosy_lab.common.io;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.io.ByteStreams;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.annotation.Nullable;
@@ -32,14 +33,15 @@ import javax.annotation.Nullable;
  * other OutputStreams.
  *
  * Exceptions thrown by any of the streams will be relayed to the caller.
- * @deprecated use {@link org.sosy_lab.common.io.DuplicateOutputStream}
  */
-@Deprecated
-@SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public class DuplicateOutputStream extends org.sosy_lab.common.io.DuplicateOutputStream {
+public class DuplicateOutputStream extends OutputStream {
+
+  private final OutputStream stream1;
+  private final OutputStream stream2;
 
   public DuplicateOutputStream(OutputStream pStream1, OutputStream pStream2) {
-    super(pStream1, pStream2);
+    stream1 = checkNotNull(pStream1);
+    stream2 = checkNotNull(pStream2);
   }
 
   /**
@@ -62,6 +64,51 @@ public class DuplicateOutputStream extends org.sosy_lab.common.io.DuplicateOutpu
       } else {
         return new DuplicateOutputStream(stream1, stream2);
       }
+    }
+  }
+
+  @Override
+  public void write(int pB) throws IOException {
+    try {
+      stream1.write(pB);
+    } finally {
+      stream2.write(pB);
+    }
+  }
+
+  @Override
+  public void write(byte[] pB) throws IOException {
+    try {
+      stream1.write(pB);
+    } finally {
+      stream2.write(pB);
+    }
+  }
+
+  @Override
+  public void write(byte[] pB, int pOff, int pLen) throws IOException {
+    try {
+      stream1.write(pB, pOff, pLen);
+    } finally {
+      stream2.write(pB, pOff, pLen);
+    }
+  }
+
+  @Override
+  public void flush() throws IOException {
+    try {
+      stream1.flush();
+    } finally {
+      stream2.flush();
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    try {
+      stream1.close();
+    } finally {
+      stream2.close();
     }
   }
 }
