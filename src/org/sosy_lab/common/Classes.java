@@ -110,15 +110,11 @@ public final class Classes {
       Constructor<? extends T> ct = cls.getConstructor(argumentTypes);
       return ct.newInstance(argumentValues);
 
-    } catch (SecurityException e) {
+    } catch (SecurityException | InstantiationException | IllegalAccessException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
       throw new ClassInstantiationException(
           cls.getCanonicalName(), "Matching constructor not found!", e);
-    } catch (InstantiationException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e);
-    } catch (IllegalAccessException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e);
     }
   }
 

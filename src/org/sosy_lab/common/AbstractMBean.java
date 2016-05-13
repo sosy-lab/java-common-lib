@@ -96,13 +96,10 @@ public abstract class AbstractMBean {
         // now register our instance
         MBEAN_SERVER.registerMBean(this, oname);
 
-      } catch (JMException e) {
+      } catch (JMException | SecurityException e) {
         logger.logException(Level.WARNING, e, "Error during registration of management interface");
         oname = null;
 
-      } catch (SecurityException e) {
-        logger.logException(Level.WARNING, e, "Error during registration of management interface");
-        oname = null;
       }
     } else {
       logger.log(Level.WARNING, "Cannot register management interface");
@@ -117,10 +114,7 @@ public abstract class AbstractMBean {
     if (MBEAN_SERVER != null && oname != null) {
       try {
         MBEAN_SERVER.unregisterMBean(oname);
-      } catch (JMException e) {
-        logger.logException(
-            Level.WARNING, e, "Error during unregistration of management interface");
-      } catch (SecurityException e) {
+      } catch (JMException | SecurityException e) {
         logger.logException(
             Level.WARNING, e, "Error during unregistration of management interface");
       }
