@@ -147,7 +147,7 @@ public class FileTypeConverterTest {
         thrown.expectMessage(testPath);
       }
 
-      assertThat((Object) conv.checkSafePath(path, "dummy")).isEqualTo(path);
+      assertThat((Comparable<?>) conv.checkSafePath(path, "dummy")).isEqualTo(path);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat((Object) options.path).isEqualTo(Paths.get(testPath));
+      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat((Object) options.path).isEqualTo(Paths.get(testPath));
+      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat((Object) options.path).isEqualTo(Paths.get("config").resolve(testPath));
+      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get("config").resolve(testPath));
     }
   }
 }
