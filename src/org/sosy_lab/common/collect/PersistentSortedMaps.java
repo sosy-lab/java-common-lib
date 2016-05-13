@@ -47,6 +47,7 @@ public class PersistentSortedMaps {
    * A callback that is used when a key with two different values
    * is encountered during the merge of two maps.
    */
+  @FunctionalInterface
   public interface MergeConflictHandler<K, V> {
 
     /**
@@ -72,13 +73,10 @@ public class PersistentSortedMaps {
    * Use this in cases where you never expect differing values for one key.
    */
   public static <K, V> MergeConflictHandler<K, V> getExceptionMergeConflictHandler() {
-    return new MergeConflictHandler<K, V>() {
-      @Override
-      public V resolveConflict(K key, V value1, V value2) {
-        throw new IllegalArgumentException(
-            String.format(
-                "Conflicting value when merging maps for key %s: %s and %s", key, value1, value2));
-      }
+    return (key, value1, value2) -> {
+      throw new IllegalArgumentException(
+          String.format(
+              "Conflicting value when merging maps for key %s: %s and %s", key, value1, value2));
     };
   }
 
@@ -89,12 +87,7 @@ public class PersistentSortedMaps {
    */
   public static <K, V extends Comparable<? super V>>
       MergeConflictHandler<K, V> getMaximumMergeConflictHandler() {
-    return new MergeConflictHandler<K, V>() {
-      @Override
-      public V resolveConflict(K key, V value1, V value2) {
-        return Ordering.natural().max(value1, value2);
-      }
-    };
+    return (key, value1, value2) -> Ordering.natural().max(value1, value2);
   }
 
   /**
@@ -104,22 +97,12 @@ public class PersistentSortedMaps {
    */
   public static <K, V extends Comparable<? super V>>
       MergeConflictHandler<K, V> getMinimumMergeConflictHandler() {
-    return new MergeConflictHandler<K, V>() {
-      @Override
-      public V resolveConflict(K key, V value1, V value2) {
-        return Ordering.natural().min(value1, value2);
-      }
-    };
+    return (key, value1, value2) -> Ordering.natural().min(value1, value2);
   }
 
   private static <K, V> MergeConflictHandler<K, V> inverseMergeConflictHandler(
       final MergeConflictHandler<K, V> delegate) {
-    return new MergeConflictHandler<K, V>() {
-      @Override
-      public V resolveConflict(K pKey, V pValue1, V pValue2) {
-        return delegate.resolveConflict(pKey, pValue2, pValue1);
-      }
-    };
+    return (pKey, pValue1, pValue2) -> delegate.resolveConflict(pKey, pValue2, pValue1);
   }
 
   /**

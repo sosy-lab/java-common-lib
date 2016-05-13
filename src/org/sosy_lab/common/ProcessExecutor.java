@@ -43,7 +43,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -149,42 +148,38 @@ public class ProcessExecutor<E extends Exception> {
     final Process process = proc.start();
     processFuture =
         executor.submit(
-            new Callable<Integer>() {
-
+            () -> {
               // this callable guarantees that when it finishes,
               // the external process also has finished and it has been wait()ed for
               // (which is important for ulimit timing measurements on Linux)
 
-              @Override
-              public Integer call() throws E {
-                logger.log(Level.FINEST, "Waiting for", name);
+              logger.log(Level.FINEST, "Waiting for", name);
 
-                try {
-                  int exitCode = process.waitFor();
-                  logger.log(Level.FINEST, name, "has terminated normally");
+              try {
+                int exitCode1 = process.waitFor();
+                logger.log(Level.FINEST, name, "has terminated normally");
 
-                  handleExitCode(exitCode);
+                handleExitCode(exitCode1);
 
-                  return exitCode;
+                return exitCode1;
 
-                } catch (InterruptedException e) {
+              } catch (InterruptedException e) {
 
-                  process.destroy();
+                process.destroy();
 
-                  while (true) {
-                    try {
-                      int exitCode = process.waitFor();
-                      logger.log(Level.FINEST, name, "has terminated after it was cancelled");
+                while (true) {
+                  try {
+                    int exitCode2 = process.waitFor();
+                    logger.log(Level.FINEST, name, "has terminated after it was cancelled");
 
-                      // no call to handleExitCode() here, we do this only with normal termination
+                    // no call to handleExitCode() here, we do this only with normal termination
 
-                      // reset interrupted status
-                      Thread.currentThread().interrupt();
-                      return exitCode;
+                    // reset interrupted status
+                    Thread.currentThread().interrupt();
+                    return exitCode2;
 
-                    } catch (InterruptedException ignored) {
-                      // ignore, we will call interrupt()
-                    }
+                  } catch (InterruptedException ignored) {
+                    // ignore, we will call interrupt()
                   }
                 }
               }
@@ -197,62 +192,52 @@ public class ProcessExecutor<E extends Exception> {
     // exceptions thrown by the handling methods terminate the process immediately
     outFuture =
         executor.submit(
-            new Callable<Void>() {
-
-              @Override
-              public Void call() throws E, IOException {
-                try (BufferedReader reader =
-                    new BufferedReader(
-                        // platform charset is what processes usually use for communication
-                        new InputStreamReader(
-                            process.getInputStream(), Charset.defaultCharset()))) {
-                  String line;
-                  while ((line = reader.readLine()) != null) {
-                    handleOutput(line);
-                  }
-
-                } catch (IOException e) {
-                  if (processFuture.isCancelled()) {
-                    // IOExceptions after a killed process are no suprise
-                    // Log and ignore so they don't mask the real cause
-                    // why we killed the process.
-                    logger.logDebugException(e, "IOException after process was killed");
-                  } else {
-                    throw e;
-                  }
+            () -> {
+              try (BufferedReader reader =
+                  new BufferedReader(
+                      // platform charset is what processes usually use for communication
+                      new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                  handleOutput(line);
                 }
-                return null;
+
+              } catch (IOException e) {
+                if (processFuture.isCancelled()) {
+                  // IOExceptions after a killed process are no suprise
+                  // Log and ignore so they don't mask the real cause
+                  // why we killed the process.
+                  logger.logDebugException(e, "IOException after process was killed");
+                } else {
+                  throw e;
+                }
               }
+              return null;
             });
 
     errFuture =
         executor.submit(
-            new Callable<Void>() {
-
-              @Override
-              public Void call() throws E, IOException {
-                try (BufferedReader reader =
-                    new BufferedReader(
-                        // platform charset is what processes usually use for communication
-                        new InputStreamReader(
-                            process.getErrorStream(), Charset.defaultCharset()))) {
-                  String line;
-                  while ((line = reader.readLine()) != null) {
-                    handleErrorOutput(line);
-                  }
-
-                } catch (IOException e) {
-                  if (processFuture.isCancelled()) {
-                    // IOExceptions after a killed process are no suprise
-                    // Log and ignore so they don't mask the real cause
-                    // why we killed the process.
-                    logger.logDebugException(e, "IOException after process was killed");
-                  } else {
-                    throw e;
-                  }
+            () -> {
+              try (BufferedReader reader =
+                  new BufferedReader(
+                      // platform charset is what processes usually use for communication
+                      new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                  handleErrorOutput(line);
                 }
-                return null;
+
+              } catch (IOException e) {
+                if (processFuture.isCancelled()) {
+                  // IOExceptions after a killed process are no suprise
+                  // Log and ignore so they don't mask the real cause
+                  // why we killed the process.
+                  logger.logDebugException(e, "IOException after process was killed");
+                } else {
+                  throw e;
+                }
               }
+              return null;
             });
 
     FutureCallback<Object> cancelProcessOnFailure =

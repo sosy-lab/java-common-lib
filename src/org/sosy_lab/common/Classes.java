@@ -40,7 +40,6 @@ import java.lang.reflect.WildcardType;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -433,10 +432,5 @@ public final class Classes {
   }
 
   public static final Predicate<Class<?>> IS_GENERATED =
-      new Predicate<Class<?>>() {
-        @Override
-        public boolean apply(@Nonnull Class<?> pInput) {
-          return pInput.getSimpleName().startsWith("AutoValue_");
-        }
-      };
+      pInput -> pInput.getSimpleName().startsWith("AutoValue_");
 }

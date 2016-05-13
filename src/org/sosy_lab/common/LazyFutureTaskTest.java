@@ -22,11 +22,13 @@ package org.sosy_lab.common;
 import static com.google.common.truth.Truth.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
+import com.google.common.util.concurrent.Callables;
+import com.google.common.util.concurrent.Runnables;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -40,15 +42,7 @@ public class LazyFutureTaskTest {
   public void testRunnable() throws InterruptedException, ExecutionException {
     final AtomicBoolean test = new AtomicBoolean(false);
 
-    Future<Boolean> f =
-        new LazyFutureTask<>(
-            new Runnable() {
-              @Override
-              public void run() {
-                test.set(true);
-              }
-            },
-            true);
+    Future<Boolean> f = new LazyFutureTask<>(() -> test.set(true), true);
 
     assertThat(f.get()).isTrue();
     assertThat(test.get()).isTrue();
@@ -57,14 +51,7 @@ public class LazyFutureTaskTest {
   @Test
   public void testCallable() throws InterruptedException, ExecutionException {
 
-    Future<Boolean> f =
-        new LazyFutureTask<>(
-            new Callable<Boolean>() {
-              @Override
-              public Boolean call() throws Exception {
-                return true;
-              }
-            });
+    Future<Boolean> f = new LazyFutureTask<>(Callables.returning(true));
 
     assertThat(f.get()).isTrue();
   }
@@ -78,11 +65,8 @@ public class LazyFutureTaskTest {
 
     Future<Boolean> f =
         new LazyFutureTask<>(
-            new Callable<Boolean>() {
-              @Override
-              public Boolean call() throws Exception {
-                throw testException;
-              }
+            () -> {
+              throw testException;
             });
 
     f.get();
@@ -92,14 +76,7 @@ public class LazyFutureTaskTest {
   public void testNoExecution() {
     final AtomicBoolean test = new AtomicBoolean(true);
 
-    new LazyFutureTask<Void>(
-        new Runnable() {
-          @Override
-          public void run() {
-            test.set(false);
-          }
-        },
-        null);
+    new LazyFutureTask<Void>(() -> test.set(false), null);
 
     // no call to f.get()
     assertThat(test.get()).isTrue();
@@ -108,11 +85,8 @@ public class LazyFutureTaskTest {
   @Test
   public void testExceptionNoExecution() {
     new LazyFutureTask<>(
-        new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            throw new NullPointerException();
-          }
+        () -> {
+          throw new NullPointerException();
         });
 
     // no call to f.get()
@@ -122,13 +96,7 @@ public class LazyFutureTaskTest {
   public void testCancel() throws InterruptedException, ExecutionException {
     thrown.expect(CancellationException.class);
 
-    Future<Void> f =
-        new LazyFutureTask<>(
-            new Runnable() {
-              @Override
-              public void run() {}
-            },
-            null);
+    Future<Void> f = new LazyFutureTask<>(Runnables.doNothing(), null);
 
     f.cancel(false);
     f.get();

@@ -49,7 +49,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -573,66 +572,58 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   // Code for formatting as string
 
   private static final Function<TimeSpan, String> FORMAT_SIMPLE =
-      new Function<TimeSpan, String>() {
-        @Override
-        public String apply(@Nonnull TimeSpan pInput) {
-          return pInput.span + TIME_UNITS.get(pInput.unit);
-        }
-      };
+      pInput -> pInput.span + TIME_UNITS.get(pInput.unit);
 
   @VisibleForTesting
   static final Function<TimeSpan, String> FORMAT_HUMAN_READABLE_LARGE =
-      new Function<TimeSpan, String>() {
-        @Override
-        public String apply(@Nonnull TimeSpan pInput) {
-          final TimeUnit unit = pInput.getUnit();
-          final StringBuilder result = new StringBuilder();
-          boolean started = false;
+      pInput -> {
+        final TimeUnit unit = pInput.getUnit();
+        final StringBuilder result = new StringBuilder();
+        boolean started = false;
 
-          long years = pInput.getChecked(DAYS) / 365;
-          if (years > 0) {
-            started = true;
-            result.append(years).append("a ");
-          }
-
-          long days = pInput.getChecked(DAYS) - years * 365;
-          if (started || days > 0) {
-            started = true;
-            result.append(days).append("d ");
-          }
-          if (unit.equals(DAYS)) {
-            return result.toString().trim();
-          }
-
-          long hours = pInput.getChecked(HOURS) - years * 365 * 24 - days * 24;
-          if (started || hours > 0) {
-            started = true;
-            result.append(String.format("%02dh ", hours));
-          }
-          if (unit.equals(HOURS)) {
-            return result.toString().trim();
-          }
-
-          long minutes =
-              pInput.getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
-          if (started || minutes > 0) {
-            result.append(String.format("%02dmin ", minutes));
-          }
-          if (unit.equals(MINUTES)) {
-            started = true;
-            return result.toString().trim();
-          }
-
-          long seconds =
-              pInput.getChecked(SECONDS)
-                  - years * 365 * 24 * 60 * 60
-                  - days * 24 * 60 * 60
-                  - hours * 60 * 60
-                  - minutes * 60;
-          result.append(String.format("%02ds", seconds));
-
-          return result.toString();
+        long years = pInput.getChecked(DAYS) / 365;
+        if (years > 0) {
+          started = true;
+          result.append(years).append("a ");
         }
+
+        long days = pInput.getChecked(DAYS) - years * 365;
+        if (started || days > 0) {
+          started = true;
+          result.append(days).append("d ");
+        }
+        if (unit.equals(DAYS)) {
+          return result.toString().trim();
+        }
+
+        long hours = pInput.getChecked(HOURS) - years * 365 * 24 - days * 24;
+        if (started || hours > 0) {
+          started = true;
+          result.append(String.format("%02dh ", hours));
+        }
+        if (unit.equals(HOURS)) {
+          return result.toString().trim();
+        }
+
+        long minutes =
+            pInput.getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
+        if (started || minutes > 0) {
+          result.append(String.format("%02dmin ", minutes));
+        }
+        if (unit.equals(MINUTES)) {
+          started = true;
+          return result.toString().trim();
+        }
+
+        long seconds =
+            pInput.getChecked(SECONDS)
+                - years * 365 * 24 * 60 * 60
+                - days * 24 * 60 * 60
+                - hours * 60 * 60
+                - minutes * 60;
+        result.append(String.format("%02ds", seconds));
+
+        return result.toString();
       };
 
   private static final String DEFAULT_FORMAT_PROPERTY_NAME =

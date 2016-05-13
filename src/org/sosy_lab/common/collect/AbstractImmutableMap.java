@@ -19,25 +19,13 @@
  */
 package org.sosy_lab.common.collect;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
-
-  static <V> Function<Entry<?, V>, V> getValueFunction() {
-    return new Function<Map.Entry<?, V>, V>() {
-      @Override
-      public V apply(@Nonnull Map.Entry<?, V> input) {
-        return input.getValue();
-      }
-    };
-  }
 
   @Deprecated
   @Override
@@ -75,7 +63,7 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   @Override
   public Collection<V> values() {
-    return Collections2.transform(entrySet(), AbstractImmutableMap.<V>getValueFunction());
+    return Collections2.transform(entrySet(), Entry::getValue);
   }
 
   @Override

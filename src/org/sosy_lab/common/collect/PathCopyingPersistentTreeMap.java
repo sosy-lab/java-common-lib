@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
@@ -48,7 +47,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -179,15 +177,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         return 0;
       }
       return countNodes(n.left) + 1 + countNodes(n.right);
-    }
-
-    static <K> Function<Entry<K, ?>, K> getKeyFunction() {
-      return new Function<Map.Entry<K, ?>, K>() {
-        @Override
-        public K apply(@Nonnull Map.Entry<K, ?> input) {
-          return input.getKey();
-        }
-      };
     }
   }
 
@@ -951,7 +940,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public Comparator<? super Entry<K, V>> comparator() {
-      return Ordering.natural().onResultOf(Node.<K>getKeyFunction());
+      return Ordering.natural().onResultOf(Entry::getKey);
     }
 
     @Override
@@ -1346,7 +1335,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Override
       public Comparator<? super Entry<K, V>> comparator() {
-        return Ordering.natural().onResultOf(Node.<K>getKeyFunction());
+        return Ordering.natural().onResultOf(Entry::getKey);
       }
 
       @Override

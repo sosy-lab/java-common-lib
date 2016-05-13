@@ -59,13 +59,7 @@ public final class ShutdownManager {
 
   // Do not remove this field, otherwise the listener will be garbage collected
   // and we could miss notifications.
-  private final ShutdownRequestListener ourListener =
-      new ShutdownRequestListener() {
-        @Override
-        public void shutdownRequested(String reason) {
-          ShutdownManager.this.requestShutdown(reason);
-        }
-      };
+  private final ShutdownRequestListener ourListener = ShutdownManager.this::requestShutdown;
 
   private final ShutdownNotifier notifier = new ShutdownNotifier();
 

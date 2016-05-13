@@ -271,14 +271,10 @@ public final class ShutdownNotifier {
    */
   public static ShutdownRequestListener interruptCurrentThreadOnShutdown() {
     final Thread currentThread = Thread.currentThread();
-    return new ShutdownRequestListener() {
-      @Override
-      public void shutdownRequested(String pReason) {
-        currentThread.interrupt();
-      }
-    };
+    return pReason -> currentThread.interrupt();
   }
 
+  @FunctionalInterface
   public interface ShutdownRequestListener {
 
     /**

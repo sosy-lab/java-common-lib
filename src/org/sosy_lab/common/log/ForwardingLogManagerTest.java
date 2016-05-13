@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.common.log;
 
-import com.google.common.base.Function;
 import com.google.common.testing.ForwardingWrapperTester;
 
 import org.junit.Test;
@@ -31,10 +30,8 @@ public class ForwardingLogManagerTest {
     new ForwardingWrapperTester()
         .testForwarding(
             LogManager.class,
-            new Function<LogManager, LogManager>() {
-              @Override
-              public LogManager apply(final LogManager pInput) {
-                return new ForwardingLogManager() {
+            pInput ->
+                new ForwardingLogManager() {
 
                   @Override
                   protected LogManager delegate() {
@@ -52,8 +49,6 @@ public class ForwardingLogManagerTest {
                   public String toString() {
                     return pInput.toString();
                   }
-                };
-              }
-            });
+                });
   }
 }

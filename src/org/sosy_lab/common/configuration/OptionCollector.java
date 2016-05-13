@@ -25,7 +25,6 @@ import static com.google.common.collect.FluentIterable.from;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -112,14 +111,7 @@ public class OptionCollector {
   // The map where we will collect all options.
   // TreeMap for alphabetical order of keys
   private final Multimap<String, AnnotationInfo> options =
-      Multimaps.newMultimap(
-          new TreeMap<String, Collection<AnnotationInfo>>(),
-          new Supplier<Collection<AnnotationInfo>>() {
-            @Override
-            public Collection<AnnotationInfo> get() {
-              return new ArrayList<>();
-            }
-          });
+      Multimaps.newMultimap(new TreeMap<String, Collection<AnnotationInfo>>(), ArrayList::new);
 
   private OptionCollector(boolean pVerbose, boolean pIncludeLibraryOptions) {
     verbose = pVerbose;
@@ -723,14 +715,7 @@ public class OptionCollector {
       classes.add(foundClass);
     }
     // sort to get deterministic order
-    Collections.sort(
-        classes,
-        new Comparator<Class<?>>() {
-          @Override
-          public int compare(Class<?> cls1, Class<?> cls2) {
-            return cls1.getName().compareTo(cls2.getName());
-          }
-        });
+    Collections.sort(classes, Comparator.comparing(Class::getName));
     return classes;
   }
 
