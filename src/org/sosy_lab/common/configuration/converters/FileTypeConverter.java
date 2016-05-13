@@ -67,10 +67,7 @@ public class FileTypeConverter implements TypeConverter {
 
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES =
       ImmutableSet.<Class<?>>of(
-          File.class,
-          Path.class,
-          PathTemplate.class,
-          PathCounterTemplate.class);
+          File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
   private static final String TEMP_DIR =
       StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;

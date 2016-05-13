@@ -37,12 +37,7 @@ import java.nio.file.Path;
  * as a converter for {@link FileOption}.
  */
 @OptionDetailAnnotation(
-  applicableTo = {
-    File.class,
-    Path.class,
-    PathTemplate.class,
-    PathCounterTemplate.class
-  }
+  applicableTo = {File.class, Path.class, PathTemplate.class, PathCounterTemplate.class}
 )
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
