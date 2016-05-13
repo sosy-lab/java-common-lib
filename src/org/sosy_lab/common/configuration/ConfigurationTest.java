@@ -56,7 +56,7 @@ public class ConfigurationTest {
   private enum TestEnum {
     E1,
     E2,
-    E3;
+    E3
   }
 
   @Options
