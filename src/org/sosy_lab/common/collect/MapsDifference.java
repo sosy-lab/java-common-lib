@@ -22,9 +22,9 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Optional;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Utilities for handling differences between maps.
@@ -134,13 +134,11 @@ public class MapsDifference {
     Entry() {}
 
     public static <K, V> Entry<K, V> forLeftValueOnly(K pKey, V pLeftValue) {
-      return new AutoValue_MapsDifference_Entry<>(
-          pKey, Optional.of(pLeftValue), Optional.<V>absent());
+      return new AutoValue_MapsDifference_Entry<>(pKey, Optional.of(pLeftValue), Optional.empty());
     }
 
     public static <K, V> Entry<K, V> forRightValueOnly(K pKey, V pRightValue) {
-      return new AutoValue_MapsDifference_Entry<>(
-          pKey, Optional.<V>absent(), Optional.of(pRightValue));
+      return new AutoValue_MapsDifference_Entry<>(pKey, Optional.empty(), Optional.of(pRightValue));
     }
 
     public static <K, V> Entry<K, V> forDifferingValues(K pKey, V pLeftValue, V pRightValue) {

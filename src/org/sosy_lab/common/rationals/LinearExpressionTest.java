@@ -2,10 +2,11 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.base.Optional;
 import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class LinearExpressionTest {
 
@@ -99,7 +100,7 @@ public class LinearExpressionTest {
     LinearExpression<String> den =
         LinearExpression.monomial("x", Rational.ofString("1"))
             .add(LinearExpression.monomial("y", Rational.ofString("2")));
-    assertThat(num.divide(den)).isEqualTo(Optional.absent());
+    assertThat(num.divide(den)).isEqualTo(Optional.empty());
   }
 
   @Test

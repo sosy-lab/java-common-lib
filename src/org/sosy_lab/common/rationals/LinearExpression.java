@@ -2,13 +2,13 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -140,7 +140,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
    */
   public Optional<Rational> divide(LinearExpression<T> other) {
     if (other.size() != data.size()) {
-      return Optional.absent();
+      return Optional.empty();
     }
     Rational multiplier = null;
     for (T key : data.keySet()) {
@@ -148,7 +148,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
       if (multiplier == null) {
         multiplier = div;
       } else if (!multiplier.equals(div)) {
-        return Optional.absent();
+        return Optional.empty();
       }
     }
     assert multiplier != null;
