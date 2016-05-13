@@ -13,7 +13,7 @@
 	<classpathentry kind="lib" path="lib/java/build/auto-service.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-value.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path=".apt-generated">
 		<attributes>
 			<attribute name="optional" value="true"/>
