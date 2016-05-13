@@ -73,6 +73,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
+  @SuppressWarnings("unused")
   public void testNoExecution() {
     final AtomicBoolean test = new AtomicBoolean(true);
 
@@ -83,6 +84,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
+  @SuppressWarnings("unused")
   public void testExceptionNoExecution() {
     new LazyFutureTask<>(
         () -> {
