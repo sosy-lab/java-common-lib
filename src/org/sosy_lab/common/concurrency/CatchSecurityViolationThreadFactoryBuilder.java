@@ -112,29 +112,26 @@ public class CatchSecurityViolationThreadFactoryBuilder {
         (builder.backingFactory != null)
             ? builder.backingFactory
             : Executors.defaultThreadFactory();
-    return new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable r) {
-        Thread thread = factory.newThread(r);
-        try {
-          if (daemon != null) {
-            thread.setDaemon(daemon);
-          }
-          if (nameFormat != null) {
-            thread.setName(String.format(nameFormat, count.getAndIncrement()));
-          }
-          if (priority != null) {
-            thread.setPriority(priority);
-          }
-          if (handler != null) {
-            thread.setUncaughtExceptionHandler(handler);
-          }
-        } catch (SecurityException e) {
-          // silently ignore
+    return r -> {
+      Thread thread = factory.newThread(r);
+      try {
+        if (daemon != null) {
+          thread.setDaemon(daemon);
         }
-
-        return thread;
+        if (nameFormat != null) {
+          thread.setName(String.format(nameFormat, count.getAndIncrement()));
+        }
+        if (priority != null) {
+          thread.setPriority(priority);
+        }
+        if (handler != null) {
+          thread.setUncaughtExceptionHandler(handler);
+        }
+      } catch (SecurityException e) {
+        // silently ignore
       }
+
+      return thread;
     };
   }
 }

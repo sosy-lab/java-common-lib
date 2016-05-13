@@ -95,14 +95,8 @@ public final class Configuration {
    */
   static final String NO_NAMED_SOURCE = "manually set";
 
-  private static ConfigurationBuilderFactory builderFactory =
-      new ConfigurationBuilderFactory() {
-        @Override
-        @SuppressWarnings("deprecation")
-        public ConfigurationBuilder getBuilder() {
-          return new Builder();
-        }
-      };
+  @SuppressWarnings("deprecation")
+  private static ConfigurationBuilderFactory builderFactory = Builder::new;
 
   private static boolean secureMode = false;
 
@@ -149,12 +143,12 @@ public final class Configuration {
    */
   public static Configuration defaultConfiguration() {
     return new Configuration(
-        ImmutableMap.<String, String>of(),
-        ImmutableMap.<String, Path>of(),
+        ImmutableMap.of(),
+        ImmutableMap.of(),
         "",
         ImmutableMap.copyOf(DEFAULT_CONVERTERS),
-        new HashSet<String>(0),
-        new HashSet<String>(0),
+        new HashSet<>(0),
+        new HashSet<>(0),
         null);
   }
 

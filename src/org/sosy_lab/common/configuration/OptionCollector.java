@@ -111,7 +111,7 @@ public class OptionCollector {
   // The map where we will collect all options.
   // TreeMap for alphabetical order of keys
   private final Multimap<String, AnnotationInfo> options =
-      Multimaps.newMultimap(new TreeMap<String, Collection<AnnotationInfo>>(), ArrayList::new);
+      Multimaps.newMultimap(new TreeMap<>(), ArrayList::new);
 
   private OptionCollector(boolean pVerbose, boolean pIncludeLibraryOptions) {
     verbose = pVerbose;
@@ -137,11 +137,8 @@ public class OptionCollector {
       return;
     }
 
-    for (Class<?> c : getClasses(classPath)) {
-      if (c.isAnnotationPresent(Options.class)) {
-        collectOptions(c);
-      }
-    }
+    getClasses(classPath).stream().filter(c -> c.isAnnotationPresent(Options.class))
+        .forEach(this::collectOptions);
 
     if (includeLibraryOptions) {
       for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
@@ -159,9 +156,7 @@ public class OptionCollector {
 
     System.setOut(originalStdOut);
 
-    for (String error : errorMessages) {
-      System.err.println(error);
-    }
+    errorMessages.forEach(System.err::println);
 
     // Dump all options, avoiding repeated information.
     String lastDescription = "";
