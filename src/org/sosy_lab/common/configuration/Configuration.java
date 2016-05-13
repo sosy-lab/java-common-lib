@@ -1155,8 +1155,7 @@ public final class Configuration {
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();
-    for (int i = 0; i < args.length; i++) {
-      String arg = args[i];
+    for (final String arg : args) {
       if (!arg.startsWith("--")) {
         throw new InvalidConfigurationException(
             "Invalid command-line argument '" + arg + "', --option=value syntax expected.");
