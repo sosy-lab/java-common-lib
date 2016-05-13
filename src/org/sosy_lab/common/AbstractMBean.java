@@ -99,7 +99,6 @@ public abstract class AbstractMBean {
       } catch (JMException | SecurityException e) {
         logger.logException(Level.WARNING, e, "Error during registration of management interface");
         oname = null;
-
       }
     } else {
       logger.log(Level.WARNING, "Cannot register management interface");

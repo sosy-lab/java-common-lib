@@ -137,7 +137,9 @@ public class OptionCollector {
       return;
     }
 
-    getClasses(classPath).stream().filter(c -> c.isAnnotationPresent(Options.class))
+    getClasses(classPath)
+        .stream()
+        .filter(c -> c.isAnnotationPresent(Options.class))
         .forEach(this::collectOptions);
 
     if (includeLibraryOptions) {
