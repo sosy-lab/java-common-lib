@@ -76,6 +76,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -384,18 +385,12 @@ public final class Configuration {
   }
 
   public String asPropertiesString() {
-    String[] lines = new String[properties.size()];
-    int i = 0;
-    for (Map.Entry<String, String> entry : properties.entrySet()) {
-      lines[i++] = entry.getKey() + " = " + entry.getValue();
-    }
-    Arrays.sort(lines, String.CASE_INSENSITIVE_ORDER);
-    StringBuilder sb = new StringBuilder();
-    for (String line : lines) {
-      sb.append(line);
-      sb.append('\n');
-    }
-    return sb.toString();
+    return properties
+        .entrySet()
+        .stream()
+        .map((entry) -> entry.getKey() + " = " + entry.getValue() + "\n")
+        .sorted(String.CASE_INSENSITIVE_ORDER)
+        .collect(Collectors.joining());
   }
 
   /**
