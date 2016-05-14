@@ -93,13 +93,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     @Override
     public void setConsoleLevel(String pNewLevel) throws IllegalArgumentException {
       Level newLevel = Level.parse(pNewLevel.toUpperCase());
-
-      try {
-        consoleHandler.setLevel(newLevel);
-        logger.setLevel(getMinimumLevel(fileLevel, newLevel));
-      } catch (SecurityException e) {
-        // on Google App Engine calling setLevel() is forbidden.
-      }
+      consoleHandler.setLevel(newLevel);
+      logger.setLevel(getMinimumLevel(fileLevel, newLevel));
     }
   }
 

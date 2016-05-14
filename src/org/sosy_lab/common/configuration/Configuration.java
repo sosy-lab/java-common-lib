@@ -55,6 +55,7 @@ import org.sosy_lab.common.log.TestLogManager;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -473,20 +474,11 @@ public final class Configuration {
             + "If you used inject(Object), try inject(Object, Class) instead.",
         cls.getName());
 
-    /*
-     * Get all injectable members and override their final & private modifiers.
-     * Do not use Field.setAccessible(Object[], boolean) to do so as it will not work
-     * on the Google App Engine!
-     */
     final Field[] fields = cls.getDeclaredFields();
-    for (Field field : fields) {
-      field.setAccessible(true);
-    }
+    AccessibleObject.setAccessible(fields, true);
 
     final Method[] methods = cls.getDeclaredMethods();
-    for (Method method : methods) {
-      method.setAccessible(true);
-    }
+    AccessibleObject.setAccessible(methods, true);
 
     try {
       for (final Field field : fields) {
