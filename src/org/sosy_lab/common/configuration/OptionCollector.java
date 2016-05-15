@@ -50,7 +50,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -58,6 +57,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
@@ -137,10 +137,9 @@ public class OptionCollector {
       return;
     }
 
-    getClasses(classPath)
-        .stream()
-        .filter(c -> c.isAnnotationPresent(Options.class))
-        .forEach(this::collectOptions);
+    getClassesWithOptions(classPath)
+        .sorted(Comparator.comparing(Class::getName)) // sort to get deterministic order
+        .forEachOrdered(this::collectOptions);
 
     if (includeLibraryOptions) {
       for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
@@ -671,49 +670,38 @@ public class OptionCollector {
   }
 
   /**
-   * Collects classes accessible from the context class loader.
-   * Ignores classes that are packaged inside JARs, certain blacklisted classes,
-   * and interfaces.
-   * @return list of classes
+   * Collects classes with options from the given {@link ClassPath}.
+   * Ignores classes that do not have file:// URLs (e.g., packaged inside JARs)
+   * certain blacklisted classes, and interfaces, classes without options.
+   * @return stream of classes with options
    */
-  private List<Class<?>> getClasses(ClassPath classPath) {
+  private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
+    return classPath
+        .getAllClasses()
+        .stream()
+        .filter(clsInfo -> clsInfo.url().getProtocol().equals("file"))
+        .filter(clsInfo -> !IGNORED_CLASSES.matcher(clsInfo.getName()).matches())
+        .flatMap(this::tryLoadClass)
+        .filter(cls -> !Modifier.isInterface(cls.getModifiers())) // ignore interfaces
+        .filter(cls -> cls.isAnnotationPresent(Options.class));
+  }
 
-    final List<Class<?>> classes = new ArrayList<>();
-
-    for (ClassInfo cls : classPath.getAllClasses()) {
-      // Ignore classes in JAR files etc, we want only classes of this project.
-      if (!cls.url().getProtocol().equals("file")) {
-        continue;
-      }
-      if (IGNORED_CLASSES.matcher(cls.getName()).matches()) {
-        continue;
-      }
-      final Class<?> foundClass;
-
-      try {
-        foundClass = cls.load();
-      } catch (LinkageError e) {
-        // Because ClassInfo.load() does not link or initialize the class
-        // like Class.forName() does, most common problems with class loading
-        // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
-        // Currently no case is know why a LinkageError would occur..
-        errorMessages.add(
-            String.format(
-                "INFO: Could not load '%s' for getting Option annotations: %s: %s",
-                cls.getResourceName(),
-                e.getClass().getName(),
-                e.getMessage()));
-        continue;
-      }
-
-      if (Modifier.isInterface(foundClass.getModifiers())) {
-        continue; // ignore interfaces
-      }
-      classes.add(foundClass);
+  private Stream<Class<?>> tryLoadClass(ClassInfo cls) {
+    try {
+      return Stream.of(cls.load());
+    } catch (LinkageError e) {
+      // Because ClassInfo.load() does not link or initialize the class
+      // like Class.forName() does, most common problems with class loading
+      // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
+      // Currently no case is known why a LinkageError would occur..
+      errorMessages.add(
+          String.format(
+              "INFO: Could not load '%s' for getting Option annotations: %s: %s",
+              cls.getResourceName(),
+              e.getClass().getName(),
+              e.getMessage()));
+      return Stream.empty();
     }
-    // sort to get deterministic order
-    Collections.sort(classes, Comparator.comparing(Class::getName));
-    return classes;
   }
 
   private static abstract class AnnotationInfo {
