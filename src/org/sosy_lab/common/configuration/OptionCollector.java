@@ -28,7 +28,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -37,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.sosy_lab.common.io.MoreFiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ import java.util.stream.Stream;
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
 
+  private static final String OPTIONS_FILE = "ConfigurationOptions.txt";
   private static final Pattern IGNORED_CLASSES =
       Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
   private static final int CHARS_PER_LINE = 75; // for description
@@ -137,17 +139,7 @@ public class OptionCollector {
         .forEachOrdered(this::collectOptions);
 
     if (includeLibraryOptions) {
-      for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
-        String resourceName = resourceInfo.getResourceName();
-        if (Files.getFileExtension(resourceName).equals("txt")
-            && Files.getNameWithoutExtension(resourceName).equals("ConfigurationOptions")) {
-          try {
-            Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
-          } catch (IOException e) {
-            errorMessages.add("Could not find the required resource " + resourceInfo.url());
-          }
-        }
-      }
+      copyOptionFilesToOutput(classPath, out);
     }
 
     errorMessages.forEach(System.err::println);
@@ -173,6 +165,21 @@ public class OptionCollector {
         if (!lastInfo.equals(infoText)) {
           out.append(infoText);
           lastInfo = infoText;
+        }
+      }
+    }
+  }
+
+  /**
+   * Copy files with options documentation found on the class path to the output.
+   */
+  private void copyOptionFilesToOutput(ClassPath classPath, final PrintStream out) {
+    for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
+      if (new File(resourceInfo.getResourceName()).getName().equals(OPTIONS_FILE)) {
+        try {
+          Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
+        } catch (IOException e) {
+          errorMessages.add("Could not find the required resource " + resourceInfo.url());
         }
       }
     }
@@ -204,7 +211,7 @@ public class OptionCollector {
     List<Path> candidates = ImmutableList.of(Paths.get("src", "main", "java"), Paths.get("src"));
     for (Path candidate : candidates) {
       Path sourcePath = basePath.resolve(candidate);
-      if (java.nio.file.Files.isDirectory(sourcePath)) {
+      if (Files.isDirectory(sourcePath)) {
         return sourcePath;
       }
     }
