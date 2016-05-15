@@ -26,8 +26,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -41,6 +40,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
@@ -54,10 +54,14 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** This class collects all {@link Option}s of a program. */
@@ -128,11 +132,6 @@ public class OptionCollector {
   private final boolean verbose;
   private final boolean includeLibraryOptions;
 
-  // The map where we will collect all options.
-  // TreeMap for alphabetical order of keys
-  private final Multimap<String, AnnotationInfo> options =
-      Multimaps.newMultimap(new TreeMap<>(), ArrayList::new);
-
   private OptionCollector(boolean pVerbose, boolean pIncludeLibraryOptions) {
     verbose = pVerbose;
     includeLibraryOptions = pIncludeLibraryOptions;
@@ -151,17 +150,22 @@ public class OptionCollector {
       return;
     }
 
-    getClassesWithOptions(classPath)
-        .sorted(Comparator.comparing(Class::getName)) // sort to get deterministic order
-        .forEachOrdered(this::collectOptions);
-
     if (includeLibraryOptions) {
       copyOptionFilesToOutput(classPath, out);
     }
 
-    // Dump all options
+    // We want a deterministic ordering for cases where the same option is declared multiple times.
+    Comparator<AnnotationInfo> annotationComparator =
+        Comparator.comparing(a -> a.owningClass().getName());
+
     OptionPlainTextWriter outputWriter = new OptionPlainTextWriter(verbose, out);
-    options.asMap().values().forEach(outputWriter::writeOption);
+
+    // Collect and dump all options
+    getClassesWithOptions(classPath)
+        .flatMap(this::collectOptions)
+        .collect(groupingBySorted(AnnotationInfo::name, Ordering.natural(), annotationComparator))
+        .values()
+        .forEach(outputWriter::writeOption);
   }
 
   /**
@@ -219,19 +223,20 @@ public class OptionCollector {
    *
    * @param c class where to take the Option from
    */
-  private void collectOptions(final Class<?> c) {
+  private Stream<AnnotationInfo> collectOptions(final Class<?> c) {
+    Stream.Builder<AnnotationInfo> result = Stream.builder();
     String classSource = getSourceCode(c);
 
     final Options classOption = c.getAnnotation(Options.class);
     verifyNotNull(classOption, "Class without @Options annotation");
-    options.put(classOption.prefix(), OptionsInfo.create(c));
+    result.accept(OptionsInfo.create(c, classOption.prefix()));
 
     for (final Field field : c.getDeclaredFields()) {
       if (field.isAnnotationPresent(Option.class)) {
         Option option = field.getAnnotation(Option.class);
         final String optionName = Configuration.getOptionName(classOption, field, option);
         final String defaultValue = getDefaultValue(field, classSource);
-        options.put(optionName, OptionInfo.createForField(field, optionName, defaultValue));
+        result.accept(OptionInfo.createForField(field, optionName, defaultValue));
       }
     }
 
@@ -239,9 +244,10 @@ public class OptionCollector {
       if (method.isAnnotationPresent(Option.class)) {
         Option option = method.getAnnotation(Option.class);
         final String optionName = Configuration.getOptionName(classOption, method, option);
-        options.put(optionName, OptionInfo.createForMethod(method, optionName));
+        result.accept(OptionInfo.createForMethod(method, optionName));
       }
     }
+    return result.build();
   }
 
   /** This function returns the content of a sourcefile as String.
@@ -325,7 +331,7 @@ public class OptionCollector {
       typeString = typeString.replaceAll("^[^<]*\\.", "");
 
       // remove package-definition in middle:
-      // List<package.name.X> --> List<X>
+      // List<package.name.X> --> Li)st<X>
       // (without special case "? extends X", that is handled below)
       typeString = typeString.replaceAll("<[^\\?][^<]*\\.", "<");
 
@@ -457,12 +463,37 @@ public class OptionCollector {
     return s;
   }
 
+  /**
+   * Return a collector that groups values by keys into a map,
+   * and sorts both keys and the values per key.
+   */
+  private static <T, K> Collector<T, ?, SortedMap<K, List<T>>> groupingBySorted(
+      Function<? super T, ? extends K> classifier,
+      Comparator<? super K> keyComparator,
+      Comparator<? super T> valueComparator) {
+    Function<List<T>, List<T>> listSortFinisher =
+        list -> {
+          list.sort(valueComparator);
+          return list;
+        };
+    Collector<T, ?, List<T>> toSortedList =
+        Collectors.collectingAndThen(Collectors.toCollection(ArrayList::new), listSortFinisher);
+    return Collectors.groupingBy(classifier, () -> new TreeMap<>(keyComparator), toSortedList);
+  }
+
   static abstract class AnnotationInfo {
 
     /**
      * The annotated element or class.
      */
     abstract AnnotatedElement element();
+
+    /**
+     * The name for this annotation.
+     */
+    abstract String name();
+
+    abstract Class<?> owningClass();
   }
 
   @AutoValue
@@ -477,24 +508,29 @@ public class OptionCollector {
       return new AutoValue_OptionCollector_OptionInfo(method, name, method.getReturnType(), "");
     }
 
-    @Override
-    abstract AnnotatedElement element();
-
-    abstract String name();
-
     abstract Class<?> type();
 
     abstract String defaultValue();
+
+    @Override
+    final Class<?> owningClass() {
+      return ((Member) element()).getDeclaringClass();
+    }
   }
 
   @AutoValue
   static abstract class OptionsInfo extends AnnotationInfo {
 
-    static OptionsInfo create(Class<?> c) {
-      return new AutoValue_OptionCollector_OptionsInfo(c);
+    static OptionsInfo create(Class<?> c, String prefix) {
+      return new AutoValue_OptionCollector_OptionsInfo(prefix, c);
     }
 
     @Override
     abstract Class<?> element();
+
+    @Override
+    final Class<?> owningClass() {
+      return element();
+    }
   }
 }
