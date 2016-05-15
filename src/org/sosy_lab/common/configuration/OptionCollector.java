@@ -123,11 +123,6 @@ public class OptionCollector {
    * and returns a formatted String.
    */
   private void collectOptions(final PrintStream out) {
-    // redirect stdout to stderr so that error messages that are printed
-    // when classes are loaded appear in stderr
-    PrintStream originalStdOut = System.out;
-    System.setOut(System.err);
-
     ClassPath classPath;
     try {
       classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
@@ -154,8 +149,6 @@ public class OptionCollector {
         }
       }
     }
-
-    System.setOut(originalStdOut);
 
     errorMessages.forEach(System.err::println);
 
