@@ -103,7 +103,12 @@ public class OptionCollector {
    */
   public static void collectOptions(
       final boolean verbose, final boolean includeLibraryOptions, final PrintStream out) {
-    new OptionCollector(verbose, includeLibraryOptions).collectOptions(out);
+    OptionCollector optionCollector = new OptionCollector(verbose, includeLibraryOptions);
+    try {
+      optionCollector.collectOptions(out);
+    } finally {
+      optionCollector.errorMessages.forEach(System.err::println);
+    }
   }
 
   private final Set<String> errorMessages = new LinkedHashSet<>();
@@ -141,8 +146,6 @@ public class OptionCollector {
     if (includeLibraryOptions) {
       copyOptionFilesToOutput(classPath, out);
     }
-
-    errorMessages.forEach(System.err::println);
 
     // Dump all options, avoiding repeated information.
     String lastDescription = "";
