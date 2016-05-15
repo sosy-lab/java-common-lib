@@ -19,12 +19,9 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verifyNotNull;
-import static com.google.common.collect.FluentIterable.from;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -41,7 +38,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
@@ -50,7 +46,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -66,7 +61,6 @@ public class OptionCollector {
   private static final String OPTIONS_FILE = "ConfigurationOptions.txt";
   private static final Pattern IGNORED_CLASSES =
       Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
-  private static final int CHARS_PER_LINE = 75; // for description
 
   private static final Pattern IMMUTABLE_SET_PATTERN =
       Pattern.compile("ImmutableSet\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
@@ -126,8 +120,7 @@ public class OptionCollector {
   }
 
   /**
-   * This function collects options from all classes
-   * and returns a formatted String.
+   * This function collects options from all classes and writes them to the output.
    */
   private void collectOptions(final PrintStream out) {
     ClassPath classPath;
@@ -147,30 +140,9 @@ public class OptionCollector {
       copyOptionFilesToOutput(classPath, out);
     }
 
-    // Dump all options, avoiding repeated information.
-    String lastDescription = "";
-    String lastInfo = "";
-    for (Collection<AnnotationInfo> allInstances : options.asMap().values()) {
-      boolean first = true;
-      for (AnnotationInfo annotation : allInstances) {
-        String description = getOptionDescription(annotation.element());
-        if (!description.isEmpty() && !lastDescription.equals(description)) {
-          if (first) {
-            out.append("\n");
-            first = false;
-          }
-          out.append(description);
-          lastDescription = description;
-        }
-      }
-      for (OptionInfo option : from(allInstances).filter(OptionInfo.class)) {
-        String infoText = getOptionInfo(option);
-        if (!lastInfo.equals(infoText)) {
-          out.append(infoText);
-          lastInfo = infoText;
-        }
-      }
-    }
+    // Dump all options
+    OptionPlainTextWriter outputWriter = new OptionPlainTextWriter(verbose, out);
+    options.asMap().values().forEach(outputWriter::writeOption);
   }
 
   /**
@@ -185,6 +157,101 @@ public class OptionCollector {
           errorMessages.add("Could not find the required resource " + resourceInfo.url());
         }
       }
+    }
+  }
+
+  /**
+   * Collects classes with options from the given {@link ClassPath}.
+   * Ignores classes that do not have file:// URLs (e.g., packaged inside JARs)
+   * certain blacklisted classes, and interfaces, classes without options.
+   * @return stream of classes with options
+   */
+  private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
+    return classPath
+        .getAllClasses()
+        .stream()
+        .filter(clsInfo -> clsInfo.url().getProtocol().equals("file"))
+        .filter(clsInfo -> !IGNORED_CLASSES.matcher(clsInfo.getName()).matches())
+        .flatMap(this::tryLoadClass)
+        .filter(cls -> !Modifier.isInterface(cls.getModifiers())) // ignore interfaces
+        .filter(cls -> cls.isAnnotationPresent(Options.class));
+  }
+
+
+  private Stream<Class<?>> tryLoadClass(ClassInfo cls) {
+    try {
+      return Stream.of(cls.load());
+    } catch (LinkageError e) {
+      // Because ClassInfo.load() does not link or initialize the class
+      // like Class.forName() does, most common problems with class loading
+      // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
+      // Currently no case is known why a LinkageError would occur..
+      errorMessages.add(
+          String.format(
+              "INFO: Could not load '%s' for getting Option annotations: %s: %s",
+              cls.getResourceName(),
+              e.getClass().getName(),
+              e.getMessage()));
+      return Stream.empty();
+    }
+  }
+
+  /** This method collects every {@link Option} of a class.
+   *
+   * @param c class where to take the Option from
+   */
+  private void collectOptions(final Class<?> c) {
+    String classSource = getSourceCode(c);
+
+    final Options classOption = c.getAnnotation(Options.class);
+    verifyNotNull(classOption, "Class without @Options annotation");
+    options.put(classOption.prefix(), OptionsInfo.create(c));
+
+    for (final Field field : c.getDeclaredFields()) {
+      if (field.isAnnotationPresent(Option.class)) {
+        Option option = field.getAnnotation(Option.class);
+        final String optionName = Configuration.getOptionName(classOption, field, option);
+        final String defaultValue = getDefaultValue(field, classSource);
+        options.put(optionName, OptionInfo.createForField(field, optionName, defaultValue));
+      }
+    }
+
+    for (final Method method : c.getDeclaredMethods()) {
+      if (method.isAnnotationPresent(Option.class)) {
+        Option option = method.getAnnotation(Option.class);
+        final String optionName = Configuration.getOptionName(classOption, method, option);
+        options.put(optionName, OptionInfo.createForMethod(method, optionName));
+      }
+    }
+  }
+
+  /** This function returns the content of a sourcefile as String.
+   *
+   * @param cls the class whose sourcefile should be retrieved
+   */
+  private String getSourceCode(final Class<?> cls) {
+    // get name of sourcefile
+    String filename = cls.getName().replace(".", "/");
+
+    // encapsulated classes have a "$" in filename
+    if (filename.contains("$")) {
+      filename = filename.substring(0, filename.indexOf("$"));
+    }
+
+    // get name of source file
+    Path path;
+    try {
+      path = getSourcePath(cls).resolve(filename + ".java");
+    } catch (URISyntaxException e) {
+      errorMessages.add("INFO: Could not access source file for class " + cls.getName() + ": " + e);
+      return "";
+    }
+
+    try {
+      return MoreFiles.toString(path, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
+      return "";
     }
   }
 
@@ -219,150 +286,6 @@ public class OptionCollector {
       }
     }
     return basePath;
-  }
-
-  /** This method collects every {@link Option} of a class.
-   *
-   * @param c class where to take the Option from
-   */
-  private void collectOptions(final Class<?> c) {
-    String classSource = getContentOfFile(c);
-
-    final Options classOption = c.getAnnotation(Options.class);
-    verifyNotNull(classOption, "Class without @Options annotation");
-    options.put(classOption.prefix(), OptionsInfo.create(c));
-
-    for (final Field field : c.getDeclaredFields()) {
-      if (field.isAnnotationPresent(Option.class)) {
-        Option option = field.getAnnotation(Option.class);
-        final String optionName = Configuration.getOptionName(classOption, field, option);
-        final String defaultValue = getDefaultValue(field, classSource);
-        options.put(optionName, OptionInfo.createForField(field, optionName, defaultValue));
-      }
-    }
-
-    for (final Method method : c.getDeclaredMethods()) {
-      if (method.isAnnotationPresent(Option.class)) {
-        Option option = method.getAnnotation(Option.class);
-        final String optionName = Configuration.getOptionName(classOption, method, option);
-        options.put(optionName, OptionInfo.createForMethod(method, optionName));
-      }
-    }
-  }
-
-  /** This function returns the formatted description of an {@link Option}.
-   *
-   * @param element field with the option */
-  static String getOptionDescription(final AnnotatedElement element) {
-    String text;
-    if (element.isAnnotationPresent(Option.class)) {
-      text = element.getAnnotation(Option.class).description();
-    } else if (element.isAnnotationPresent(Options.class)) {
-      text = element.getAnnotation(Options.class).description();
-    } else {
-      throw new AssertionError();
-    }
-
-    if (element.isAnnotationPresent(Deprecated.class)) {
-      text = "DEPRECATED: " + text;
-    }
-
-    return formatText(text);
-  }
-
-  /** This function returns the formatted information about an {@link Option}. */
-  private String getOptionInfo(OptionInfo info) {
-    final StringBuilder optionInfo = new StringBuilder();
-    optionInfo.append(info.name());
-
-    if (verbose) {
-      if (info.element() instanceof Field) {
-        optionInfo.append("\n  field:    " + ((Field) info.element()).getName() + "\n");
-      } else if (info.element() instanceof Method) {
-        optionInfo.append("\n  method:   " + ((Method) info.element()).getName() + "\n");
-      }
-
-      Class<?> cls = ((Member) info.element()).getDeclaringClass();
-      optionInfo.append("  class:    " + cls.toString().substring(6) + "\n");
-      optionInfo.append("  type:     " + info.type().getSimpleName() + "\n");
-      optionInfo.append("  default value: ");
-      if (!info.defaultValue().isEmpty()) {
-        optionInfo.append(info.defaultValue());
-      } else {
-        optionInfo.append("not available");
-      }
-
-    } else {
-      if (!info.defaultValue().isEmpty()) {
-        optionInfo.append(" = " + info.defaultValue());
-      } else {
-        optionInfo.append(" = no default value");
-      }
-    }
-    optionInfo.append("\n");
-    optionInfo.append(getAllowedValues(info.element(), info.type(), verbose));
-
-    return optionInfo.toString();
-  }
-
-  /** This function formats text and splits lines, if they are too long.
-   * This functions adds "#" before each line.*/
-  private static String formatText(final String text) {
-    return formatText(text, "# ", true);
-  }
-
-  /** This function formats text and splits lines, if they are too long. */
-  private static String formatText(
-      final String text, final String lineStart, final boolean useLineStartInFirstLine) {
-    checkNotNull(lineStart);
-    if (text.isEmpty()) {
-      return text;
-    }
-
-    // split description into lines
-    final String[] lines = text.split("\n");
-
-    // split lines into more lines, if they are too long
-    final List<String> splittedLines = new ArrayList<>();
-    for (final String fullLine : lines) {
-      String remainingLine = fullLine;
-      while (remainingLine.length() > CHARS_PER_LINE) {
-
-        int spaceIndex = remainingLine.lastIndexOf(" ", CHARS_PER_LINE);
-        if (spaceIndex == -1) {
-          spaceIndex = remainingLine.indexOf(" ");
-        }
-        if (spaceIndex == -1) {
-          spaceIndex = remainingLine.length() - 1;
-        }
-
-        final String start = remainingLine.substring(0, spaceIndex);
-        if (!start.isEmpty()) {
-          splittedLines.add(start);
-        }
-        remainingLine = remainingLine.substring(spaceIndex + 1);
-      }
-      splittedLines.add(remainingLine);
-    }
-
-    // remove last element, if empty (useful if previous line is too long)
-    if (splittedLines.get(splittedLines.size() - 1).isEmpty()) {
-      splittedLines.remove(splittedLines.size() - 1);
-    }
-
-    // add "# " before each line
-    StringBuilder formattedLines = new StringBuilder();
-    if (!useLineStartInFirstLine && splittedLines.size() > 0) {
-      formattedLines.append(splittedLines.remove(0));
-      formattedLines.append('\n');
-    }
-    for (String line : splittedLines) {
-      formattedLines.append(lineStart);
-      formattedLines.append(line);
-      formattedLines.append('\n');
-    }
-
-    return formattedLines.toString();
   }
 
   /** This function searches for the default field value of an {@link Option}
@@ -428,37 +351,6 @@ public class OptionCollector {
       defaultValue = "";
     }
     return defaultValue;
-  }
-
-  /** This function returns the content of a sourcefile as String.
-   *
-   * @param cls the class whose sourcefile should be retrieved
-   */
-  private String getContentOfFile(final Class<?> cls) {
-
-    // get name of sourcefile
-    String filename = cls.getName().replace(".", "/");
-
-    // encapsulated classes have a "$" in filename
-    if (filename.contains("$")) {
-      filename = filename.substring(0, filename.indexOf("$"));
-    }
-
-    // get name of source file
-    Path path;
-    try {
-      path = getSourcePath(cls).resolve(filename + ".java");
-    } catch (URISyntaxException e) {
-      errorMessages.add("INFO: Could not access source file for class " + cls.getName() + ": " + e);
-      return "";
-    }
-
-    try {
-      return MoreFiles.toString(path, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
-      return "";
-    }
   }
 
   /** This function searches for fieldstring in content and
@@ -550,164 +442,7 @@ public class OptionCollector {
     return s;
   }
 
-  /** This function returns the allowed values or interval for a field.
-   *
-   * @param field field with the {@link Option}-annotation
-   * @param verbose short or long output? */
-  private static String getAllowedValues(
-      final AnnotatedElement field, final Class<?> type, final boolean verbose) {
-    String allowedValues = "";
-
-    // if the type is enum,
-    // the allowed values can be extracted the enum-class
-    if (type.isEnum()) {
-      final Object[] enums = type.getEnumConstants();
-      final String[] enumTitles = new String[enums.length];
-      for (int i = 0; i < enums.length; i++) {
-        enumTitles[i] = ((Enum<?>) enums[i]).name();
-      }
-      allowedValues =
-          "  enum:     "
-              + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
-    }
-
-    allowedValues += getOptionValues(field, verbose);
-    allowedValues += getClassOptionValues(field, verbose);
-    allowedValues += getFileOptionValues(field, verbose);
-    allowedValues += getIntegerOptionValues(field, verbose);
-    allowedValues += getTimeSpanOptionValues(field, verbose);
-
-    return allowedValues;
-  }
-
-  /** This method returns text representing the values,
-   * that are defined in the {@link Option}-annotation. */
-  private static String getOptionValues(AnnotatedElement field, boolean verbose) {
-    final Option option = field.getAnnotation(Option.class);
-    assert option != null;
-    String str = "";
-    if (option.values().length != 0) {
-      str += "  allowed values: " + java.util.Arrays.toString(option.values()) + "\n";
-    }
-
-    if (verbose && !option.regexp().isEmpty()) {
-      str += "  regexp:   " + option.regexp() + "\n";
-    }
-
-    if (verbose && option.toUppercase()) {
-      str += "  uppercase: true\n";
-    }
-    return str;
-  }
-
-  /** This method returns text representing the values,
-   * that are defined in the {@link ClassOption}-annotation. */
-  private static String getClassOptionValues(AnnotatedElement field, boolean verbose) {
-    final ClassOption classOption = field.getAnnotation(ClassOption.class);
-    String str = "";
-    if (classOption != null) {
-      if (verbose && classOption.packagePrefix().length != 0) {
-        str += "  packagePrefix: " + Joiner.on(", ").join(classOption.packagePrefix()) + "\n";
-      }
-    }
-    return str;
-  }
-
-  /** This method returns text representing the values,
-   * that are defined in the {@link FileOption}-annotation. */
-  private static String getFileOptionValues(AnnotatedElement field, boolean verbose) {
-    final FileOption fileOption = field.getAnnotation(FileOption.class);
-    String str = "";
-    if (fileOption != null) {
-      if (verbose) {
-        str += "  type of file: " + fileOption.value() + "\n";
-      }
-    }
-    return str;
-  }
-
-  /** This method returns text representing the values,
-   * that are defined in the {@link IntegerOption}-annotation. */
-  private static String getIntegerOptionValues(AnnotatedElement field, boolean verbose) {
-    final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
-    String str = "";
-    if (intOption != null) {
-      if (verbose) {
-        if (intOption.min() == Long.MIN_VALUE) {
-          str += "  min:      Long.MIN_VALUE\n";
-        } else {
-          str += "  min:      " + intOption.min() + "\n";
-        }
-        if (intOption.max() == Long.MAX_VALUE) {
-          str += "  max:      Long.MAX_VALUE\n";
-        } else {
-          str += "  max:      " + intOption.max() + "\n";
-        }
-      }
-    }
-    return str;
-  }
-
-  /** This method returns text representing the values,
-   * that are defined in the {@link TimeSpanOption}-annotation. */
-  private static String getTimeSpanOptionValues(AnnotatedElement field, boolean verbose) {
-    final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
-    String str = "";
-    if (timeSpanOption != null) {
-      if (verbose) {
-        str += "  code unit:     " + timeSpanOption.codeUnit() + "\n";
-        str += "  default unit:  " + timeSpanOption.defaultUserUnit() + "\n";
-        if (timeSpanOption.min() == Long.MIN_VALUE) {
-          str += "  time min:      Long.MIN_VALUE\n";
-        } else {
-          str += "  time min:      " + timeSpanOption.min() + "\n";
-        }
-        if (timeSpanOption.max() == Long.MAX_VALUE) {
-          str += "  time max:      Long.MAX_VALUE\n";
-        } else {
-          str += "  time max:      " + timeSpanOption.max() + "\n";
-        }
-      }
-    }
-    return str;
-  }
-
-  /**
-   * Collects classes with options from the given {@link ClassPath}.
-   * Ignores classes that do not have file:// URLs (e.g., packaged inside JARs)
-   * certain blacklisted classes, and interfaces, classes without options.
-   * @return stream of classes with options
-   */
-  private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
-    return classPath
-        .getAllClasses()
-        .stream()
-        .filter(clsInfo -> clsInfo.url().getProtocol().equals("file"))
-        .filter(clsInfo -> !IGNORED_CLASSES.matcher(clsInfo.getName()).matches())
-        .flatMap(this::tryLoadClass)
-        .filter(cls -> !Modifier.isInterface(cls.getModifiers())) // ignore interfaces
-        .filter(cls -> cls.isAnnotationPresent(Options.class));
-  }
-
-  private Stream<Class<?>> tryLoadClass(ClassInfo cls) {
-    try {
-      return Stream.of(cls.load());
-    } catch (LinkageError e) {
-      // Because ClassInfo.load() does not link or initialize the class
-      // like Class.forName() does, most common problems with class loading
-      // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
-      // Currently no case is known why a LinkageError would occur..
-      errorMessages.add(
-          String.format(
-              "INFO: Could not load '%s' for getting Option annotations: %s: %s",
-              cls.getResourceName(),
-              e.getClass().getName(),
-              e.getMessage()));
-      return Stream.empty();
-    }
-  }
-
-  private static abstract class AnnotationInfo {
+  static abstract class AnnotationInfo {
 
     /**
      * The annotated element or class.

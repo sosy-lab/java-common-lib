@@ -883,7 +883,7 @@ public final class Configuration {
       @Nullable final Object defaultValue) {
 
     final StringBuilder optionInfo = new StringBuilder();
-    optionInfo.append(OptionCollector.getOptionDescription(element));
+    optionInfo.append(OptionPlainTextWriter.getOptionDescription(element));
     optionInfo.append(name).append("\n");
 
     if (defaultValue != null) {
