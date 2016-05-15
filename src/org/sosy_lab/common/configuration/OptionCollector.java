@@ -22,6 +22,9 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -45,12 +48,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -106,6 +111,20 @@ public class OptionCollector {
   }
 
   private final Set<String> errorMessages = new LinkedHashSet<>();
+
+  private final LoadingCache<CodeSource, Path> codeSourceToSourcePath =
+      CacheBuilder.newBuilder()
+          // Most projects have only one source folder and thus we expect only one entry here.
+          .initialCapacity(1)
+          .concurrencyLevel(1)
+          .build(
+              new CacheLoader<CodeSource, Path>() {
+                @Override
+                public Path load(CodeSource codeSource) throws URISyntaxException {
+                  return getSourcePath(codeSource);
+                }
+              });
+
   private final boolean verbose;
   private final boolean includeLibraryOptions;
 
@@ -231,26 +250,22 @@ public class OptionCollector {
    */
   private String getSourceCode(final Class<?> cls) {
     // get name of sourcefile
-    String filename = cls.getName().replace(".", "/");
+    String filename = cls.getName().replace('.', File.separatorChar);
 
     // encapsulated classes have a "$" in filename
     if (filename.contains("$")) {
       filename = filename.substring(0, filename.indexOf("$"));
     }
-
-    // get name of source file
-    Path path;
-    try {
-      path = getSourcePath(cls).resolve(filename + ".java");
-    } catch (URISyntaxException e) {
-      errorMessages.add("INFO: Could not access source file for class " + cls.getName() + ": " + e);
-      return "";
-    }
+    filename += ".java";
 
     try {
-      return MoreFiles.toString(path, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      errorMessages.add("INFO: Could not read sourcefiles for getting the default values.");
+      Path path = codeSourceToSourcePath.get(cls.getProtectionDomain().getCodeSource());
+      return MoreFiles.toString(path.resolve(filename), StandardCharsets.UTF_8);
+    } catch (ExecutionException | IOException e) {
+      // Do not print exception message to avoid having a different error message for each file.
+      errorMessages.add(
+          "INFO: Could not find source files for classes in "
+              + cls.getProtectionDomain().getCodeSource().getLocation());
       return "";
     }
   }
@@ -258,9 +273,9 @@ public class OptionCollector {
   /** This method tries to get Source-Path. This path is used
    * to get default values for options without instantiating the classes. */
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  private static Path getSourcePath(Class<?> cls) throws URISyntaxException {
+  private static Path getSourcePath(CodeSource codeSource) throws URISyntaxException {
     // Get base folder for classes, go via URI to handle escaping
-    Path basePath = Paths.get(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
+    Path basePath = Paths.get(codeSource.getLocation().toURI());
 
     // check the folders known as source, depending on the current folder
     // structure for the class files
