@@ -50,6 +50,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -114,7 +115,7 @@ public class OptionCollector {
     }
   }
 
-  private final Set<String> errorMessages = new LinkedHashSet<>();
+  private final Set<String> errorMessages = Collections.synchronizedSet(new LinkedHashSet<>());
 
   private final LoadingCache<CodeSource, Path> codeSourceToSourcePath =
       CacheBuilder.newBuilder()
@@ -192,7 +193,7 @@ public class OptionCollector {
   private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
     return classPath
         .getAllClasses()
-        .stream()
+        .parallelStream()
         .filter(clsInfo -> clsInfo.url().getProtocol().equals("file"))
         .filter(clsInfo -> !IGNORED_CLASSES.matcher(clsInfo.getName()).matches())
         .flatMap(this::tryLoadClass)
