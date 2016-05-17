@@ -49,8 +49,6 @@ import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.NullLogManager;
-import org.sosy_lab.common.log.TestLogManager;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -278,7 +276,7 @@ public final class Configuration {
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
 
-  private LogManager logger = NullLogManager.getInstance();
+  private LogManager logger = LogManager.createNullLogManager();
 
   LogManager getLogger() {
     return logger;
@@ -310,11 +308,11 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
-    logger = firstNonNull(pLogger, NullLogManager.getInstance());
+    logger = firstNonNull(pLogger, LogManager.createNullLogManager());
   }
 
   public void enableLogging(LogManager pLogger) {
-    checkState(logger.equals(NullLogManager.getInstance()), "Logging already enabled.");
+    checkState(logger.equals(LogManager.createNullLogManager()), "Logging already enabled.");
     logger = checkNotNull(pLogger);
   }
 
@@ -981,7 +979,7 @@ public final class Configuration {
         type,
         secondaryOption,
         sources.get(optionName),
-        MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
+        MoreObjects.firstNonNull(logger, LogManager.createNullLogManager()));
   }
 
   /**

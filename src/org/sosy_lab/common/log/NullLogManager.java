@@ -26,10 +26,12 @@ import java.util.logging.Level;
  *
  * Note: Do not use this implementation for unit tests,
  * use {@link TestLogManager} instead.
+ *
+ * @deprecated Use {@link LogManager#createNullLogManager()} instead.
+ *    This class will be made package-private.
  */
+@Deprecated
 public enum NullLogManager implements LogManager {
-  @Deprecated
-  // Use getInstance() instead, enum is just an implementation detail.
   INSTANCE;
 
   public static LogManager getInstance() {

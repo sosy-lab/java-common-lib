@@ -126,5 +126,31 @@ public interface LogManager {
    */
   void logException(Level priority, Throwable e, @Nullable String additionalMessage);
 
+  /**
+   * Flush all handlers of this logger.
+   */
   void flush();
+
+  /**
+   * Return a LogManager that does not log anything.
+   *
+   * Note: Do not use this implementation for unit tests,
+   * use {@link #createTestLogManager()} instead.
+   */
+  @SuppressWarnings("deprecation")
+  static LogManager createNullLogManager() {
+    return NullLogManager.INSTANCE;
+  }
+
+  /**
+   * Return a LogManager implementation intended for testing
+   * when nothing should actually be logged.
+   *
+   * Compared to {@link #createTestLogManager()}, it does check all the parameters for validity,
+   * i.e. non-nullness and correct string format.
+   */
+  @SuppressWarnings("deprecation")
+  static LogManager createTestLogManager() {
+    return TestLogManager.INSTANCE;
+  }
 }

@@ -29,6 +29,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
+@SuppressWarnings("deprecation")
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
