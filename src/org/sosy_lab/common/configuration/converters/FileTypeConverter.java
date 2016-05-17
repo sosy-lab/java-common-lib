@@ -97,12 +97,7 @@ public class FileTypeConverter implements TypeConverter {
   // i.e., no absolute paths and no "../"
   private final boolean safePathsOnly;
 
-  @Deprecated
-  public FileTypeConverter(Configuration config) throws InvalidConfigurationException {
-    this(config, false);
-  }
-
-  protected FileTypeConverter(Configuration config, boolean pSafePathsOnly)
+  private FileTypeConverter(Configuration config, boolean pSafePathsOnly)
       throws InvalidConfigurationException {
     safePathsOnly = pSafePathsOnly; // set before calls to checkSafePath
     config.inject(this, FileTypeConverter.class);
