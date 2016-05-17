@@ -23,6 +23,7 @@ import com.google.common.base.Predicates;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -38,6 +39,11 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(Formatter.class, new SimpleFormatter());
 
     setDefault(Configuration.class, Configuration.defaultConfiguration());
+    try {
+      setDefault(LoggingOptions.class, new LoggingOptions(Configuration.defaultConfiguration()));
+    } catch (InvalidConfigurationException e) {
+      throw new AssertionError(e);
+    }
 
     // NullLogManager does not do any checkNotNull checks on purpose
     ignoreClasses(Predicates.<Class<?>>equalTo(NullLogManager.class));
