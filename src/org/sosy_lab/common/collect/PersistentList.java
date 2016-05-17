@@ -74,6 +74,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -81,6 +82,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -88,6 +90,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -95,6 +98,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -102,6 +106,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -109,6 +114,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -116,6 +122,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -123,6 +130,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -130,6 +138,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -137,6 +146,7 @@ public interface PersistentList<T> extends List<T> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
