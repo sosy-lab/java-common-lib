@@ -28,7 +28,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
-import com.google.errorprone.annotations.ForOverride;
 
 import org.sosy_lab.common.AbstractMBean;
 import org.sosy_lab.common.Appender;
@@ -61,8 +60,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
 
-  @Deprecated // will be made private
-  protected final Logger logger;
+  private final Logger logger;
   private final int truncateSize;
   private @Nullable LogManagerBean mxBean = null;
   private final String componentName;
@@ -96,127 +94,6 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       consoleHandler.setLevel(newLevel);
       logger.setLevel(getMinimumLevel(fileLevel, newLevel));
     }
-  }
-
-  /**
-   * @see #BasicLogManager(Configuration, Handler)
-   * @deprecated use {@link BasicLogManager#create(Configuration)}
-   */
-  @Deprecated
-  public BasicLogManager(Configuration config) throws InvalidConfigurationException {
-    this(config, null, null);
-  }
-
-  /**
-   * Constructor which allows to customize where the console output of the
-   * LogManager is written to. Suggestions for the consoleOutputHandler are
-   * StringHandler or OutputStreamHandler.
-   *
-   * The level, filter and formatter of that handler are set by this class.
-   *
-   * @param consoleOutputHandler A handler. If null a {@link ConsoleHandler}
-   * instance will be used.
-   *
-   * @see #BasicLogManager(Configuration, Handler, Handler)
-   * @deprecated use {@link BasicLogManager#createWithHandler(Handler)}
-   */
-  @Deprecated
-  public BasicLogManager(Configuration config, @Nullable Handler consoleOutputHandler)
-      throws InvalidConfigurationException {
-    this(config, consoleOutputHandler, null);
-  }
-
-  /**
-   * Constructor which allows to customize where the console output of the
-   * LogManager is written to and also allows to customize where the file output
-   * of the LogManager is written to.
-   *
-   * If fileOutputHandler is set to null a handler of type {@link FileHandler}
-   * will be used. If the instantiation of this handler fails log messages will be automatically
-   * redirected to the consoleOutputHandler.
-   *
-   * The level, filter and formatter of the handlers are set by this class.
-   *
-   * @param consoleOutputHandler A handler. If null a {@link ConsoleHandler}
-   * instance will be used.
-   * @param fileOutputHandler A handler, if null a {@link FileHandler} instance will be used
-   * @deprecated use {@link BasicLogManager#createWithHandler(Handler)}
-   */
-  @Deprecated
-  public BasicLogManager(
-      Configuration config,
-      @Nullable Handler consoleOutputHandler,
-      @Nullable Handler fileOutputHandler)
-      throws InvalidConfigurationException {
-    LoggingOptions options = new LoggingOptions(config);
-    Level fileLevel = options.getFileLevel();
-    Level consoleLevel = options.getConsoleLevel();
-    truncateSize = options.getTruncateSize();
-
-    componentName = "";
-
-    logger = Logger.getAnonymousLogger();
-    logger.setLevel(getMinimumLevel(fileLevel, consoleLevel));
-    logger.setUseParentHandlers(false);
-
-    // create console logger
-    if (!consoleLevel.equals(Level.OFF)) {
-      if (consoleOutputHandler == null) {
-        consoleOutputHandler = new ConsoleHandler();
-      }
-      setupHandler(
-          consoleOutputHandler,
-          new ConsoleLogFormatter(config),
-          consoleLevel,
-          options.getConsoleExclude());
-    }
-
-    // create file logger
-    if (fileOutputHandler == null) {
-      Path outputFile = options.getOutputFile();
-      if (!fileLevel.equals(Level.OFF) && outputFile != null) {
-        try {
-          MoreFiles.createParentDirs(outputFile);
-
-          Handler outfileHandler = new FileHandler(outputFile.toAbsolutePath().toString(), false);
-          setupHandler(outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
-        } catch (IOException e) {
-          // redirect log messages to console
-          if (consoleLevel.intValue() > fileLevel.intValue()) {
-            logger.getHandlers()[0].setLevel(fileLevel);
-          }
-
-          logger.log(
-              Level.WARNING,
-              "Could not open log file " + e.getMessage() + ", redirecting log output to console");
-        }
-      }
-    } else {
-      setupHandler(fileOutputHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
-    }
-
-    // setup MXBean at the end (this might already log something!)
-    if (consoleOutputHandler != null) {
-      mxBean = new LogManagerBean(consoleOutputHandler, fileLevel);
-      mxBean.register();
-    } else {
-      mxBean = null;
-    }
-  }
-
-  /**
-   * Sets up the given handler.
-   *
-   * @param handler The handler to set up.
-   * @param formatter The formatter to use with the handler.
-   * @param level The level to use with the handler.
-   * @param excludeLevels Levels to exclude from the handler via a {@link LogLevelFilter}
-   */
-  @ForOverride
-  @Deprecated
-  protected void setupHandler(
-      Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
-    setupHandler(logger, handler, formatter, level, excludeLevels);
   }
 
   /**
