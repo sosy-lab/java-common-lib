@@ -26,16 +26,13 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.sosy_lab.common.configuration.ConfigurationBuilderFactory.DefaultConfigurationBuilderFactory;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
 
@@ -68,12 +65,6 @@ public class ConfigurationTest {
 
   private Configuration enumTestConfiguration() throws InvalidConfigurationException {
     return Configuration.builder().setOption("values", "E3, E2").build();
-  }
-
-  @Before
-  @SuppressWarnings("deprecation")
-  public void setUp() {
-    Configuration.setBuilderFactory(DefaultConfigurationBuilderFactory.INSTANCE);
   }
 
   @Test
@@ -178,35 +169,6 @@ public class ConfigurationTest {
   @Test
   public void testPatternDefault() throws InvalidConfigurationException {
     testDefault(TestPatternOptions.class);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldReturnCustomFactory() throws Exception {
-    ConfigurationBuilderFactory mockFactory = mock(ConfigurationBuilderFactory.class);
-    Configuration.setBuilderFactory(mockFactory);
-
-    assertThat(Configuration.getBuilderFactory()).isSameAs(mockFactory);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldReturnDefaultBuilder() throws Exception {
-    ConfigurationBuilder builder = Configuration.builder();
-
-    assertThat(builder).isInstanceOf(Builder.class);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldReturnCustomBuilder() throws Exception {
-    ConfigurationBuilder mockBuilder = mock(ConfigurationBuilder.class);
-    ConfigurationBuilderFactory stubFactory = mock(ConfigurationBuilderFactory.class);
-    when(stubFactory.getBuilder()).thenReturn(mockBuilder);
-
-    Configuration.setBuilderFactory(stubFactory);
-
-    assertThat(Configuration.builder()).isSameAs(mockBuilder);
   }
 
   /**

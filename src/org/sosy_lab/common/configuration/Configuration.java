@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
@@ -97,38 +96,13 @@ public final class Configuration {
    */
   static final String NO_NAMED_SOURCE = "manually set";
 
-  @SuppressWarnings("deprecation")
-  private static ConfigurationBuilderFactory builderFactory = Builder::new;
-
   private static boolean secureMode = false;
 
   /**
    * Create a new Builder instance.
    */
   public static ConfigurationBuilder builder() {
-    return getBuilderFactory().getBuilder();
-  }
-
-  /**
-   * Sets the factory that will be used to create a {@link ConfigurationBuilder}
-   * instance.
-   *
-   * @param factory The factory to use in the future for creating all builders.
-   */
-  @Deprecated
-  public static void setBuilderFactory(ConfigurationBuilderFactory factory) {
-    builderFactory = checkNotNull(factory);
-  }
-
-  /**
-   * Returns the factory that is used to create {@link ConfigurationBuilder}
-   * instances.
-   *
-   * @return The factory.
-   */
-  @VisibleForTesting
-  static ConfigurationBuilderFactory getBuilderFactory() {
-    return builderFactory;
+    return new ConfigurationBuilder();
   }
 
   /**
@@ -230,7 +204,7 @@ public final class Configuration {
   /**
    * Get the map of registered default {@link TypeConverter}s.
    * These type converters are used whenever a new Configuration instance is
-   * created, except when the {@link Builder#copyFrom(Configuration)} method is
+   * created, except when the {@link ConfigurationBuilder#copyFrom(Configuration)} method is
    * used.
    *
    * The returned map is mutable and changes have immediate effect on this class!
@@ -239,7 +213,7 @@ public final class Configuration {
    * Thus, it should be used only with caution, for example to add default type
    * converters in a large project at startup.
    * It is discouraged to change this map, if the same effect can easily be
-   * achieved using {@link Builder#addConverter(Class, TypeConverter)}.
+   * achieved using {@link ConfigurationBuilder#addConverter(Class, TypeConverter)}.
    *
    * @return A reference to the map of type converters used by this class.
    */
