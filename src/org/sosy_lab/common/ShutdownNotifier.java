@@ -105,21 +105,6 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Create an instance that will never return true for {@link #shouldShutdown()}
-   * and will never notify its listeners.
-   *
-   * Use {@link #createDummy()} instead for creating dummy instances for tests,
-   * and {@link ShutdownManager#create()} for creating real instances.
-   *
-   * @deprecated since the split into {@link ShutdownManager} and ShutdownNotifier,
-   *     kept for backwards compatibility
-   */
-  @Deprecated
-  public static ShutdownNotifier create() {
-    return createDummy();
-  }
-
-  /**
    * Request a shutdown of all components that check this instance,
    * by letting {@link #shouldShutdown()} return true in the future,
    * and by notifying all registered listeners.
