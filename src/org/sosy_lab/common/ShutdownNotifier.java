@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
 /**
@@ -91,7 +92,16 @@ public final class ShutdownNotifier {
   @GuardedBy("listeners")
   private boolean listenersNotified = false;
 
-  ShutdownNotifier() {}
+  // Do not remove this field, otherwise in a cascade of ShutdownManagers some intermediate
+  // ShutdownManagers could potentially be garbage collected
+  // and we would miss shutdown notifications
+  // (in such a cascade we need references from child ShutdownManagers to parent ShutdownManagers,
+  // and this field is part of this).
+  private final @Nullable ShutdownManager manager;
+
+  ShutdownNotifier(@Nullable ShutdownManager pManager) {
+    manager = pManager;
+  }
 
   /**
    * Create an instance that will never return true for {@link #shouldShutdown()}
@@ -101,7 +111,7 @@ public final class ShutdownNotifier {
    * To create a real usable ShutdownNotifier, use {@link ShutdownManager#create()}.
    */
   public static ShutdownNotifier createDummy() {
-    return new ShutdownNotifier();
+    return new ShutdownNotifier(null);
   }
 
   /**
