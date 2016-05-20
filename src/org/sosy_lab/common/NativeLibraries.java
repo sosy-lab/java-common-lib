@@ -22,16 +22,18 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.google.common.base.Optional;
 import com.google.common.base.StandardSystemProperty;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Helper class for loading native libraries.
@@ -146,7 +148,7 @@ public class NativeLibraries {
   private static @Nullable Path nativePath = null;
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  public static Path getNativeLibraryPath() {
+  private static Path getNativeLibraryPath() {
     // We expected the libraries to be in the directory lib/native/<arch>-<os>
     // relative to the parent of the code.
     // When the code resides in a JAR file, the JAR file needs to be in the same
@@ -167,7 +169,7 @@ public class NativeLibraries {
   /**
    * @return Path to <b>this</b> JAR, holding SoSy Lab-Common library.
    */
-  public static Path getPathToJar() {
+  private static Path getPathToJar() {
     URI pathToJar;
     try {
       pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
@@ -176,6 +178,7 @@ public class NativeLibraries {
     }
     return checkNotNull(Paths.get(pathToJar).getParent());
   }
+
 
   /**
    * Load a native library.
@@ -193,24 +196,32 @@ public class NativeLibraries {
    * Finally, if that fails as well, we search in the same directory this {@code JAR} is.
    */
   public static void loadLibrary(String name) {
-    try {
-      System.loadLibrary(name);
-    } catch (UnsatisfiedLinkError firstEx) {
-      String libName = System.mapLibraryName(name);
-      try {
-        Path file = getNativeLibraryPath().resolve(libName).toAbsolutePath();
-        try {
-          System.load(file.toString());
-        } catch (UnsatisfiedLinkError secondEx) {
-
-          // Last try, search for the file next to the JAR.
-          Path secondPath = getPathToJar().resolve(libName).toAbsolutePath();
-          System.load(secondPath.toString());
-        }
-      } catch (Throwable t) {
-        t.addSuppressed(firstEx);
-        throw t;
-      }
+    Optional<Path> path = findPathForLibrary(name);
+    if (path.isPresent()) {
+      System.load(path.get().toAbsolutePath().toString());
     }
+    System.loadLibrary(name);
+  }
+
+  /**
+   * Find a path for library.
+   *
+   * <p>We first try an architecture-dependent folder under "lib/native",
+   * <b>assuming</b> that the JAR representing this library is in the folder "lib",
+   * and if that fails, we try the same folder this JAR is in.
+   *
+   * @return Found path or {@code Optional.absent()}
+   */
+  public static Optional<Path> findPathForLibrary(String libraryName) {
+    String osLibName = System.mapLibraryName(libraryName);
+    Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
+    if (Files.exists(p)) {
+      return Optional.of(p);
+    }
+    p = getPathToJar().resolve(osLibName).toAbsolutePath();
+    if (Files.exists(p)) {
+      return Optional.of(p);
+    }
+    return Optional.absent();
   }
 }
