@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -54,7 +55,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
@@ -173,13 +173,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
           // but I do not know how to detect them.
           continue;
         }
-        boolean foundConfigurationParameter = false;
-        for (VariableElement parameter : constructor.getParameters()) {
-          if (parameter.asType().toString().equals(Configuration.class.getName())) {
-            foundConfigurationParameter = true;
-            break;
-          }
-        }
+
+        boolean foundConfigurationParameter =
+            constructor
+                .getParameters()
+                .stream()
+                .anyMatch(
+                    (param) -> param.asType().toString().equals(Configuration.class.getName()));
         if (!foundConfigurationParameter && warningsEnabled(constructor)) {
           message(
               WARNING,
@@ -276,7 +276,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     }
 
     if (option.description().isEmpty() && warningsEnabled(elem)) {
-      AnnotationMirror optionAnnotation = findAnnotationMirror(Option.class, elem);
+      AnnotationMirror optionAnnotation = findAnnotationMirror(Option.class, elem).get();
       AnnotationValue value = findAnnotationValue(Option.class, "description", optionAnnotation);
       message(
           WARNING,
@@ -302,9 +302,9 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       final Element annotation = am.getAnnotationType().asElement();
 
       // The @OptionDetailAnnotation at the declaration of @SomeTypeOption
-      final AnnotationMirror optionDetailAnnotation =
+      final Optional<? extends AnnotationMirror> optionDetailAnnotation =
           findAnnotationMirror(OptionDetailAnnotation.class, annotation);
-      if (optionDetailAnnotation == null) {
+      if (!optionDetailAnnotation.isPresent()) {
         continue; // not an option-detail annotation
       }
 
@@ -364,7 +364,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // where each AnnotationValue has a TypeMirror/DeclaredType instance as value,
       // because applicableTo is defined as array of Class instances.
       AnnotationValue acceptedClasses =
-          findAnnotationValue(OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation);
+          findAnnotationValue(
+              OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation.get());
 
       boolean foundMatchingType = false;
       final Set<String> acceptedTypeNames = new HashSet<>();
@@ -469,12 +470,10 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    */
   private boolean hasChildWithAnnotation(
       final Element element, final Class<? extends Annotation> annotation) {
-    for (Element child : element.getEnclosedElements()) {
-      if (child.getAnnotation(annotation) != null) {
-        return true;
-      }
-    }
-    return false;
+    return element
+        .getEnclosedElements()
+        .stream()
+        .anyMatch((child) -> child.getAnnotation(annotation) != null);
   }
 
   /**
@@ -484,17 +483,15 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * @param annotation The annotation to look for.
    * @param elem The element that should have the annotation.
    * @return The corresponding {@link AnnotationMirror},
-   * or <code>null</code> if this element is not annotated with this annotation.
+   * or <code>Optional.empty()</code> if this element is not annotated with this annotation.
    */
-  private @Nullable AnnotationMirror findAnnotationMirror(
+  private Optional<? extends AnnotationMirror> findAnnotationMirror(
       final Class<? extends Annotation> annotation, final Element elem) {
     final String annotationName = annotation.getName();
-    for (AnnotationMirror am : elem.getAnnotationMirrors()) {
-      if (am.getAnnotationType().toString().equals(annotationName)) {
-        return am;
-      }
-    }
-    return null;
+    return elem.getAnnotationMirrors()
+        .stream()
+        .filter((am) -> am.getAnnotationType().toString().equals(annotationName))
+        .findFirst();
   }
 
   /**
@@ -607,7 +604,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   private void message(
       Diagnostic.Kind level, Element elem, Class<? extends Annotation> annotation, String message) {
-    message(level, elem, findAnnotationMirror(annotation, elem), message);
+    message(level, elem, findAnnotationMirror(annotation, elem).orElse(null), message);
   }
 
   private void message(

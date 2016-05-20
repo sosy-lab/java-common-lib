@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
 /**
@@ -91,7 +92,16 @@ public final class ShutdownNotifier {
   @GuardedBy("listeners")
   private boolean listenersNotified = false;
 
-  ShutdownNotifier() {}
+  // Do not remove this field, otherwise in a cascade of ShutdownManagers some intermediate
+  // ShutdownManagers could potentially be garbage collected
+  // and we would miss shutdown notifications
+  // (in such a cascade we need references from child ShutdownManagers to parent ShutdownManagers,
+  // and this field is part of this).
+  private final @Nullable ShutdownManager manager;
+
+  ShutdownNotifier(@Nullable ShutdownManager pManager) {
+    manager = pManager;
+  }
 
   /**
    * Create an instance that will never return true for {@link #shouldShutdown()}
@@ -101,22 +111,7 @@ public final class ShutdownNotifier {
    * To create a real usable ShutdownNotifier, use {@link ShutdownManager#create()}.
    */
   public static ShutdownNotifier createDummy() {
-    return new ShutdownNotifier();
-  }
-
-  /**
-   * Create an instance that will never return true for {@link #shouldShutdown()}
-   * and will never notify its listeners.
-   *
-   * Use {@link #createDummy()} instead for creating dummy instances for tests,
-   * and {@link ShutdownManager#create()} for creating real instances.
-   *
-   * @deprecated since the split into {@link ShutdownManager} and ShutdownNotifier,
-   *     kept for backwards compatibility
-   */
-  @Deprecated
-  public static ShutdownNotifier create() {
-    return createDummy();
+    return new ShutdownNotifier(null);
   }
 
   /**

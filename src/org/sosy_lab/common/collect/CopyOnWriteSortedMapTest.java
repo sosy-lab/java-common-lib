@@ -35,6 +35,7 @@ import junit.framework.TestSuite;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.stream.Stream;
 
 public class CopyOnWriteSortedMapTest {
 
@@ -45,9 +46,7 @@ public class CopyOnWriteSortedMapTest {
         protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
           CopyOnWriteSortedMap<String, String> result =
               CopyOnWriteSortedMap.copyOf(PathCopyingPersistentTreeMap.<String, String>of());
-          for (Entry<String, String> entry : pEntries) {
-            result.put(entry.getKey(), entry.getValue());
-          }
+          Stream.of(pEntries).forEach((entry) -> result.put(entry.getKey(), entry.getValue()));
           return result;
         }
       };

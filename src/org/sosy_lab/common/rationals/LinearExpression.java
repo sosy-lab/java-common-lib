@@ -78,9 +78,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
       return empty();
     }
     Map<T, Rational> newData = new HashMap<>(data.size());
-    for (Entry<T, Rational> e : data.entrySet()) {
-      newData.put(e.getKey(), e.getValue().times(constant));
-    }
+    data.forEach((key, value) -> newData.put(key, value.times(constant)));
     return new LinearExpression<>(newData);
   }
   /**
@@ -114,12 +112,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
    * @return Whether all coefficients are integral.
    */
   public boolean isIntegral() {
-    for (Rational coeff : data.values()) {
-      if (!coeff.isIntegral()) {
-        return false;
-      }
-    }
-    return true;
+    return data.values().stream().allMatch(Rational::isIntegral);
   }
 
   /**
@@ -155,13 +148,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   @Override
   public String toString() {
     StringBuilder b = new StringBuilder();
-    for (Entry<T, Rational> monomial : this) {
-      Rational coeff = monomial.getValue();
-      T var = monomial.getKey();
-      String varSerialized = var.toString();
-
-      writeMonomial(varSerialized, coeff, b);
-    }
+    data.forEach((var, coeff) -> writeMonomial(var.toString(), coeff, b));
     return b.toString();
   }
 

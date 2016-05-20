@@ -33,10 +33,12 @@ import javax.annotation.Nullable;
  *
  * However, it does check all the parameters for validity,
  * i.e. non-nullness and correct string format.
+ *
+ * @deprecated Use {@link LogManager#createTestLogManager()} instead.
+ *    This class will be made package-private.
  */
+@Deprecated
 public enum TestLogManager implements LogManager {
-  @Deprecated
-  // Use getInstance() instead, enum is just an implementation detail.
   INSTANCE;
 
   public static LogManager getInstance() {

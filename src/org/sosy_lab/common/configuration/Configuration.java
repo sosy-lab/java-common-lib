@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
@@ -50,11 +49,10 @@ import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
 import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.NullLogManager;
-import org.sosy_lab.common.log.TestLogManager;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -75,6 +73,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -95,44 +94,13 @@ public final class Configuration {
    */
   static final String NO_NAMED_SOURCE = "manually set";
 
-  private static ConfigurationBuilderFactory builderFactory =
-      new ConfigurationBuilderFactory() {
-        @Override
-        @SuppressWarnings("deprecation")
-        public ConfigurationBuilder getBuilder() {
-          return new Builder();
-        }
-      };
-
   private static boolean secureMode = false;
 
   /**
    * Create a new Builder instance.
    */
   public static ConfigurationBuilder builder() {
-    return getBuilderFactory().getBuilder();
-  }
-
-  /**
-   * Sets the factory that will be used to create a {@link ConfigurationBuilder}
-   * instance.
-   *
-   * @param factory The factory to use in the future for creating all builders.
-   */
-  @Deprecated
-  public static void setBuilderFactory(ConfigurationBuilderFactory factory) {
-    builderFactory = checkNotNull(factory);
-  }
-
-  /**
-   * Returns the factory that is used to create {@link ConfigurationBuilder}
-   * instances.
-   *
-   * @return The factory.
-   */
-  @VisibleForTesting
-  static ConfigurationBuilderFactory getBuilderFactory() {
-    return builderFactory;
+    return new ConfigurationBuilder();
   }
 
   /**
@@ -149,12 +117,12 @@ public final class Configuration {
    */
   public static Configuration defaultConfiguration() {
     return new Configuration(
-        ImmutableMap.<String, String>of(),
-        ImmutableMap.<String, Path>of(),
+        ImmutableMap.of(),
+        ImmutableMap.of(),
         "",
         ImmutableMap.copyOf(DEFAULT_CONVERTERS),
-        new HashSet<String>(0),
-        new HashSet<String>(0),
+        new HashSet<>(0),
+        new HashSet<>(0),
         null);
   }
 
@@ -234,7 +202,7 @@ public final class Configuration {
   /**
    * Get the map of registered default {@link TypeConverter}s.
    * These type converters are used whenever a new Configuration instance is
-   * created, except when the {@link Builder#copyFrom(Configuration)} method is
+   * created, except when the {@link ConfigurationBuilder#copyFrom(Configuration)} method is
    * used.
    *
    * The returned map is mutable and changes have immediate effect on this class!
@@ -243,7 +211,7 @@ public final class Configuration {
    * Thus, it should be used only with caution, for example to add default type
    * converters in a large project at startup.
    * It is discouraged to change this map, if the same effect can easily be
-   * achieved using {@link Builder#addConverter(Class, TypeConverter)}.
+   * achieved using {@link ConfigurationBuilder#addConverter(Class, TypeConverter)}.
    *
    * @return A reference to the map of type converters used by this class.
    */
@@ -308,7 +276,7 @@ public final class Configuration {
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
 
-  private LogManager logger = NullLogManager.getInstance();
+  private LogManager logger = LogManager.createNullLogManager();
 
   LogManager getLogger() {
     return logger;
@@ -340,11 +308,11 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
-    logger = firstNonNull(pLogger, NullLogManager.getInstance());
+    logger = firstNonNull(pLogger, LogManager.createNullLogManager());
   }
 
   public void enableLogging(LogManager pLogger) {
-    checkState(logger.equals(NullLogManager.getInstance()), "Logging already enabled.");
+    checkState(logger.equals(LogManager.createNullLogManager()), "Logging already enabled.");
     logger = checkNotNull(pLogger);
   }
 
@@ -389,18 +357,12 @@ public final class Configuration {
   }
 
   public String asPropertiesString() {
-    String[] lines = new String[properties.size()];
-    int i = 0;
-    for (Map.Entry<String, String> entry : properties.entrySet()) {
-      lines[i++] = entry.getKey() + " = " + entry.getValue();
-    }
-    Arrays.sort(lines, String.CASE_INSENSITIVE_ORDER);
-    StringBuilder sb = new StringBuilder();
-    for (String line : lines) {
-      sb.append(line);
-      sb.append('\n');
-    }
-    return sb.toString();
+    return properties
+        .entrySet()
+        .stream()
+        .map((entry) -> entry.getKey() + " = " + entry.getValue() + "\n")
+        .sorted(String.CASE_INSENSITIVE_ORDER)
+        .collect(Collectors.joining());
   }
 
   /**
@@ -479,20 +441,11 @@ public final class Configuration {
             + "If you used inject(Object), try inject(Object, Class) instead.",
         cls.getName());
 
-    /*
-     * Get all injectable members and override their final & private modifiers.
-     * Do not use Field.setAccessible(Object[], boolean) to do so as it will not work
-     * on the Google App Engine!
-     */
     final Field[] fields = cls.getDeclaredFields();
-    for (Field field : fields) {
-      field.setAccessible(true);
-    }
+    AccessibleObject.setAccessible(fields, true);
 
     final Method[] methods = cls.getDeclaredMethods();
-    for (Method method : methods) {
-      method.setAccessible(true);
-    }
+    AccessibleObject.setAccessible(methods, true);
 
     try {
       for (final Field field : fields) {
@@ -902,7 +855,7 @@ public final class Configuration {
       @Nullable final Object defaultValue) {
 
     final StringBuilder optionInfo = new StringBuilder();
-    optionInfo.append(OptionCollector.getOptionDescription(element));
+    optionInfo.append(OptionPlainTextWriter.getOptionDescription(element));
     optionInfo.append(name).append("\n");
 
     if (defaultValue != null) {
@@ -1026,7 +979,7 @@ public final class Configuration {
         type,
         secondaryOption,
         sources.get(optionName),
-        MoreObjects.firstNonNull(logger, TestLogManager.getInstance()));
+        MoreObjects.firstNonNull(logger, LogManager.createNullLogManager()));
   }
 
   /**

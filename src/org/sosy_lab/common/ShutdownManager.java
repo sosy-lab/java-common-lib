@@ -21,6 +21,8 @@ package org.sosy_lab.common;
 
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 
+import javax.annotation.Nullable;
+
 /**
  * Together with {@link ShutdownNotifier}, this class implements a service
  * for distributing shutdown requests throughout an application's component,
@@ -61,9 +63,18 @@ public final class ShutdownManager {
   // and we could miss notifications.
   private final ShutdownRequestListener ourListener = ShutdownManager.this::requestShutdown;
 
-  private final ShutdownNotifier notifier = new ShutdownNotifier();
+  private final ShutdownNotifier notifier = new ShutdownNotifier(this);
 
-  private ShutdownManager() {}
+  // Do not remove this field, otherwise in a cascade of ShutdownManagers some intermediate
+  // ShutdownManagers could potentially be garbage collected
+  // and we would miss shutdown notifications
+  // (in such a cascade we need references from child ShutdownManagers to parent ShutdownManagers,
+  // and this field is part of this).
+  private final @Nullable ShutdownNotifier parent;
+
+  private ShutdownManager(@Nullable ShutdownNotifier pParent) {
+    parent = pParent;
+  }
 
   /**
    * Create a fresh new instance of this class.
@@ -71,7 +82,7 @@ public final class ShutdownManager {
    * and shutdown has not been requested yet.
    */
   public static ShutdownManager create() {
-    return new ShutdownManager();
+    return new ShutdownManager(null);
   }
 
   /**
@@ -86,7 +97,7 @@ public final class ShutdownManager {
    * @param parent A non-null ShutdownNotifier instance.
    */
   public static ShutdownManager createWithParent(final ShutdownNotifier parent) {
-    final ShutdownManager child = create();
+    final ShutdownManager child = new ShutdownManager(parent);
     parent.registerAndCheckImmediately(child.ourListener);
     return child;
   }

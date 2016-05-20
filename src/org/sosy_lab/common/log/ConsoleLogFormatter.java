@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.common.log;
 
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Options;
-
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -30,15 +26,9 @@ import java.util.logging.LogRecord;
 /**
  * Class to handle formatting for console output.
  */
-@Options(prefix = "log")
 public class ConsoleLogFormatter extends Formatter {
 
   private final boolean useColors;
-
-  @Deprecated
-  public ConsoleLogFormatter(Configuration config) throws InvalidConfigurationException {
-    this(new LoggingOptions(config));
-  }
 
   public ConsoleLogFormatter(LoggingOptions options) {
     this(options.useColors());

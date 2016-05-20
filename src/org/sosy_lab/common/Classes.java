@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -110,15 +111,11 @@ public final class Classes {
       Constructor<? extends T> ct = cls.getConstructor(argumentTypes);
       return ct.newInstance(argumentValues);
 
-    } catch (SecurityException e) {
+    } catch (SecurityException | InstantiationException | IllegalAccessException e) {
       throw new ClassInstantiationException(cls.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
       throw new ClassInstantiationException(
           cls.getCanonicalName(), "Matching constructor not found!", e);
-    } catch (InstantiationException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e);
-    } catch (IllegalAccessException e) {
-      throw new ClassInstantiationException(cls.getCanonicalName(), e);
     }
   }
 
@@ -169,12 +166,7 @@ public final class Classes {
     checkNotNull(exceptionType);
     if (argumentTypes == null) {
       // fill argumenTypes array
-      argumentTypes = new Class<?>[argumentValues.length];
-      int i = 0;
-      for (Object obj : argumentValues) {
-        argumentTypes[i++] = obj.getClass();
-      }
-
+      argumentTypes = Stream.of(argumentValues).map(Object::getClass).toArray(Class[]::new);
     } else {
       checkArgument(argumentTypes.length == argumentValues.length);
     }

@@ -176,9 +176,7 @@ public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
    */
   @Override
   public void putAll(Map<? extends K, ? extends V> pMap) {
-    for (Map.Entry<? extends K, ? extends V> entry : pMap.entrySet()) {
-      put(entry.getKey(), entry.getValue());
-    }
+    pMap.forEach((key, value) -> put(key, value));
   }
 
   /**

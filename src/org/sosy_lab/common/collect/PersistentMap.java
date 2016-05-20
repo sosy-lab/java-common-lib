@@ -61,6 +61,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -68,6 +69,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -75,6 +77,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated
@@ -82,6 +85,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /**
    * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
    */
   @Override
   @Deprecated

@@ -28,7 +28,7 @@ be easily found.
 The dependency is:
 
 ```xml
-<dependency org="org.sosy_lab" name="common" rev="0.2" conf="core->runtime; contrib->sources"/>
+<dependency org="org.sosy_lab" name="common" rev="0.3000" conf="core->runtime; contrib->sources"/>
 ```
 
 And the Ivy repository URL is:
@@ -47,7 +47,7 @@ If you use Maven, the dependency is:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>common</artifactId>
-  <version>0.2</version>
+  <version>0.3000</version>
 </dependency>
 ```
 
@@ -55,7 +55,7 @@ Or for Gradle:
 
 ```
 dependencies {
-  compile 'org.sosy-lab:common:0.2'
+  compile 'org.sosy-lab:common:0.3000'
 }
 ```
 

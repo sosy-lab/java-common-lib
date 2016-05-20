@@ -21,8 +21,6 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Iterators;
-
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -48,7 +46,7 @@ class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
 
   @Override
   public Iterator<K> iterator() {
-    return Iterators.transform(map.entrySet().iterator(), Map.Entry::getKey);
+    return map.entrySet().stream().map(Map.Entry::getKey).iterator();
   }
 
   @Override

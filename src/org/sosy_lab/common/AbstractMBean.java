@@ -52,13 +52,6 @@ public abstract class AbstractMBean {
     } catch (SecurityException e) {
       // ignore exception because we cannot handle it here
       return null;
-    } catch (NoClassDefFoundError e) {
-      /*
-       * Google App Engine does not allow to use classes from the package java.lang.management.
-       * Therefore it throws a NoClassDefFoundError if this is attempted regardless. To prevent
-       * CPAChecker from crashing in this case we catch the error and log the event.
-       */
-      return null;
     }
   }
 
@@ -96,11 +89,7 @@ public abstract class AbstractMBean {
         // now register our instance
         MBEAN_SERVER.registerMBean(this, oname);
 
-      } catch (JMException e) {
-        logger.logException(Level.WARNING, e, "Error during registration of management interface");
-        oname = null;
-
-      } catch (SecurityException e) {
+      } catch (JMException | SecurityException e) {
         logger.logException(Level.WARNING, e, "Error during registration of management interface");
         oname = null;
       }
@@ -117,10 +106,7 @@ public abstract class AbstractMBean {
     if (MBEAN_SERVER != null && oname != null) {
       try {
         MBEAN_SERVER.unregisterMBean(oname);
-      } catch (JMException e) {
-        logger.logException(
-            Level.WARNING, e, "Error during unregistration of management interface");
-      } catch (SecurityException e) {
+      } catch (JMException | SecurityException e) {
         logger.logException(
             Level.WARNING, e, "Error during unregistration of management interface");
       }
