@@ -199,8 +199,9 @@ public class NativeLibraries {
     Optional<Path> path = findPathForLibrary(name);
     if (path.isPresent()) {
       System.load(path.get().toAbsolutePath().toString());
+    } else {
+      System.loadLibrary(name);
     }
-    System.loadLibrary(name);
   }
 
   /**
