@@ -81,6 +81,8 @@
             <emptyLine />
             <package name="EDU" withSubpackages="true" static="false" />
             <emptyLine />
+            <package name="edu" withSubpackages="true" static="false" />
+            <emptyLine />
             <package name="eg" withSubpackages="true" static="false" />
             <emptyLine />
             <package name="eu" withSubpackages="true" static="false" />
