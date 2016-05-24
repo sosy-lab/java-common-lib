@@ -25,6 +25,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import com.google.common.base.Optional;
 import com.google.common.base.StandardSystemProperty;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -32,8 +34,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Helper class for loading native libraries.
@@ -193,7 +193,7 @@ public class NativeLibraries {
    * <b>assuming</b> that the JAR representing this library is in {@code lib} that the JAR
    * representing this library is in {@code lib}.
    *
-   * Finally, if that fails as well, we search in the same directory this {@code JAR} is.
+   * <p>Finally, if that fails as well, we search in the same directory this {@code JAR} is.
    */
   public static void loadLibrary(String name) {
     Optional<Path> path = findPathForLibrary(name);
