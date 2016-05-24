@@ -148,7 +148,7 @@ public class NativeLibraries {
   private static @Nullable Path nativePath = null;
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  private static Path getNativeLibraryPath() {
+  public static Path getNativeLibraryPath() {
     // We expected the libraries to be in the directory lib/native/<arch>-<os>
     // relative to the parent of the code.
     // When the code resides in a JAR file, the JAR file needs to be in the same
