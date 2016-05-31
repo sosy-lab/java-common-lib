@@ -25,8 +25,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.FluentIterable.from;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset.Entry;
@@ -300,7 +302,7 @@ public final class Classes {
   public static @Nullable String verifyDeclaredExceptions(
       Executable executable, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(
-        Arrays.asList(executable.getExceptionTypes()), allowedExceptionTypes);
+        Arrays.asList(executable.getExceptionTypes()), Arrays.asList(allowedExceptionTypes));
   }
 
   /**
@@ -317,33 +319,20 @@ public final class Classes {
       Invokable<?, ?> invokable, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(
         from(invokable.getExceptionTypes()).transform(TypeToken::getRawType),
-        allowedExceptionTypes);
+        Arrays.asList(allowedExceptionTypes));
   }
 
-  private static @Nullable String verifyDeclaredExceptions(
-      Iterable<Class<?>> declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
-    checkNotNull(allowedExceptionTypes);
+  @VisibleForTesting
+  static @Nullable String verifyDeclaredExceptions(
+      Iterable<Class<?>> declaredExceptionTypes, Iterable<Class<?>> pAllowedExceptionTypes) {
+    // RuntimeException and Error are always allowed
+    FluentIterable<Class<?>> allowedExceptionTypes =
+        from(pAllowedExceptionTypes).append(RuntimeException.class, Error.class);
+
     for (Class<?> declaredException : declaredExceptionTypes) {
-
-      if (Exception.class.isAssignableFrom(declaredException)) {
-        // it's an exception, not an error
-
-        if (Runtime.class.isAssignableFrom(declaredException)) {
-          // it's a runtime exception
-          continue;
-        }
-
-        boolean ok = false;
-        for (Class<?> allowedExceptionType : allowedExceptionTypes) {
-          if (allowedExceptionType.isAssignableFrom(declaredException)) {
-            ok = true;
-            break;
-          }
-        }
-
-        if (!ok) {
-          return declaredException.getSimpleName();
-        }
+      if (!allowedExceptionTypes.anyMatch(
+          allowedExceptionType -> allowedExceptionType.isAssignableFrom(declaredException))) {
+        return declaredException.getSimpleName();
       }
     }
     return null;
