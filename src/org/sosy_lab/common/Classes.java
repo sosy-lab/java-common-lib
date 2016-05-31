@@ -66,6 +66,7 @@ public final class Classes {
   /**
    * Exception thrown by {@link Classes#createInstance(Class, Class[], Object[], Class)}.
    */
+  @Deprecated
   public static class ClassInstantiationException extends Exception {
 
     private static final long serialVersionUID = 7862065219560550275L;
@@ -113,6 +114,7 @@ public final class Classes {
    * (like class cannot be found or has no constructor).
    * @throws InvocationTargetException If the constructor throws an exception.
    */
+  @Deprecated
   public static <T> T createInstance(
       Class<? extends T> cls,
       @Nullable Class<?>[] argumentTypes,
@@ -146,6 +148,7 @@ public final class Classes {
    * @param argumentValues Array with the values
    * that will be passed to the constructor.
    */
+  @Deprecated
   public static <T> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
@@ -169,6 +172,7 @@ public final class Classes {
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
+  @Deprecated
   public static <T, X extends Exception> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
