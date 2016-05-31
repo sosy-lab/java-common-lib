@@ -29,6 +29,7 @@ import static javax.tools.Diagnostic.Kind.WARNING;
 import com.google.auto.service.AutoService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -363,14 +364,16 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // acceptedClasses is a List<AnnotationValue>
       // where each AnnotationValue has a TypeMirror/DeclaredType instance as value,
       // because applicableTo is defined as array of Class instances.
-      AnnotationValue acceptedClasses =
-          findAnnotationValue(
-              OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation.get());
+      Iterable<?> acceptedClasses =
+          (Iterable<?>)
+              findAnnotationValue(
+                      OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation.get())
+                  .getValue();
 
       boolean foundMatchingType = false;
       final Set<String> acceptedTypeNames = new HashSet<>();
 
-      for (Object listEntry : (Iterable<?>) acceptedClasses.getValue()) {
+      for (Object listEntry : acceptedClasses) {
         DeclaredType acceptedType = (DeclaredType) ((AnnotationValue) listEntry).getValue();
         acceptedTypeNames.add(acceptedType.toString());
 
@@ -381,7 +384,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         }
       }
 
-      if (!foundMatchingType) {
+      if (!Iterables.isEmpty(acceptedClasses) && !foundMatchingType) {
         String msgPrefix;
         if (isArray) {
           msgPrefix = "Array option with incompatible element type";

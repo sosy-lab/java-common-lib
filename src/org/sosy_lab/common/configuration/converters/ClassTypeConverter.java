@@ -24,6 +24,7 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.Classes.UnsuitedClassException;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
@@ -57,9 +58,6 @@ public class ClassTypeConverter implements TypeConverter {
           from(packagePrefixes).append(((ClassOption) secondaryOption).packagePrefix());
     }
 
-    // get value of type parameter
-    final TypeToken<?> targetType = Classes.getSingleTypeArgument(type);
-
     // get class object
     Class<?> cls = null;
     for (String prefix : packagePrefixes) {
@@ -74,20 +72,40 @@ public class ClassTypeConverter implements TypeConverter {
           "Class " + value + " specified in option " + optionName + " not found");
     }
 
-    // check type
-    if (!targetType.isSupertypeOf(cls)) {
-      throw new InvalidConfigurationException(
-          "Class "
-              + value
-              + " specified in option "
-              + optionName
-              + " is not an instance of "
-              + targetType);
+    Object result;
+    if (type.getRawType().equals(Class.class)) {
+      // get value of type parameter
+      final TypeToken<?> targetType = Classes.getSingleTypeArgument(type);
+
+      // check type
+      if (!targetType.isSupertypeOf(cls)) {
+        throw new InvalidConfigurationException(
+            String.format(
+                "Class %s specified in option %s is not an instance of %s",
+                value,
+                optionName,
+                targetType));
+      }
+
+      result = cls;
+      Classes.produceClassLoadingWarning(logger, cls, targetType.getRawType());
+
+    } else {
+      // This should be a factory interface for which we create a proxy implementation.
+      try {
+        result = Classes.createFactory(type, cls);
+      } catch (UnsuitedClassException e) {
+        throw new InvalidConfigurationException(
+            String.format(
+                "Class %s specified in option %s is invalid (%s)",
+                value,
+                optionName,
+                e.getMessage()));
+      }
+      Classes.produceClassLoadingWarning(logger, cls, type.getRawType());
     }
 
-    Classes.produceClassLoadingWarning(logger, cls, targetType.getRawType());
-
-    return cls;
+    return result;
   }
 
   @Override

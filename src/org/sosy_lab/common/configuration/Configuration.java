@@ -195,6 +195,7 @@ public final class Configuration {
 
   static {
     DEFAULT_CONVERTERS.put(Class.class, new ClassTypeConverter());
+    DEFAULT_CONVERTERS.put(ClassOption.class, new ClassTypeConverter());
     DEFAULT_CONVERTERS.put(IntegerOption.class, new IntegerTypeConverter());
     DEFAULT_CONVERTERS.put(TimeSpanOption.class, new TimeSpanTypeConverter());
   }
@@ -380,6 +381,7 @@ public final class Configuration {
    * - {@link java.nio.charset.Charset}
    * - {@link java.util.logging.Level}
    * - {@link java.util.regex.Pattern}
+   * - arbitrary factory interfaces as supported by {@link Classes#createFactory(TypeToken, Class)}
    * - arrays of the above types
    * - collection types {@link Iterable}, {@link Collection}, {@link List},
    *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}
@@ -841,7 +843,7 @@ public final class Configuration {
         Arrays.asList(
             annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
 
-    if (!applicableTypes.contains(optionType.getRawType())) {
+    if (!applicableTypes.isEmpty() && !applicableTypes.contains(optionType.getRawType())) {
       throw new UnsupportedOperationException(
           String.format(
               "Annotation %s is not applicable for options of type %s.", annotation, optionType));
