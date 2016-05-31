@@ -22,9 +22,17 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset.Entry;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.Parameter;
+import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 
 import org.sosy_lab.common.annotations.Unmaintained;
@@ -32,13 +40,18 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -270,33 +283,35 @@ public final class Classes {
   }
 
   /**
-   * Verify that a constructor declares no other checked exceptions except a
+   * Verify that a constructor or method declares no other checked exceptions except a
    * given type.
    *
    * Returns the name of any violating exception, or null if there is none.
    *
-   * @param constructor The constructor to check.
+   * @param executable The executable to check.
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
   public static @Nullable String verifyDeclaredExceptions(
-      Constructor<?> constructor, Class<?>... allowedExceptionTypes) {
-    return verifyDeclaredExceptions(constructor.getExceptionTypes(), allowedExceptionTypes);
+      Executable executable, Class<?>... allowedExceptionTypes) {
+    return verifyDeclaredExceptions(executable.getExceptionTypes(), allowedExceptionTypes);
   }
 
   /**
-   * Verify that a method declares no other checked exceptions except a
+   * Verify that a constructor or method declares no other checked exceptions except a
    * given type.
    *
    * Returns the name of any violating exception, or null if there is none.
    *
-   * @param method The method to check.
+   * @param invokable The invokable to check.
    * @param allowedExceptionTypes The type of exception that is allowed.
    * @return Null or the name of a declared exception.
    */
   public static @Nullable String verifyDeclaredExceptions(
-      Method method, Class<?>... allowedExceptionTypes) {
-    return verifyDeclaredExceptions(method.getExceptionTypes(), allowedExceptionTypes);
+      Invokable<?, ?> invokable, Class<?>... allowedExceptionTypes) {
+    return verifyDeclaredExceptions(
+        invokable.getExceptionTypes().stream().map(TypeToken::getRawType).toArray(Class[]::new),
+        allowedExceptionTypes);
   }
 
   private static @Nullable String verifyDeclaredExceptions(
@@ -425,4 +440,224 @@ public final class Classes {
 
   public static final Predicate<Class<?>> IS_GENERATED =
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
+
+
+  /**
+   * Create a factory at runtime that implements the interface {@code factoryType}
+   * and delegates to either a constructor or a static factory method of {@code cls}.
+   *
+   * The factory interface needs to have exactly one method.
+   * The target class needs to have either a single public static method name {@code create},
+   * or a single public constructor.
+   * The declared exceptions of the static method/constructor
+   * need to be a subset of those of the method of the factory interface,
+   * and the same holds for the parameters.
+   * Parameters that are declared {@link Nullable} may be missing in the factory interface.
+   *
+   * @param factoryType The factory interface
+   * @param cls The class which should be instantiated by the returned factory
+   * @return An implementation of {@code factoryType} that instantiates {@code cls}
+   * @throws UnsuitedClassException If the static method/constructor of {@code cls}
+   *    does not fulfill the restrictions of the factory interface
+   */
+  public static <I> I createFactory(final Class<I> factoryType, final Class<?> cls)
+      throws UnsuitedClassException {
+    return createFactory(TypeToken.of(factoryType), cls);
+  }
+
+  /**
+   * Create a factory at runtime that implements the interface {@code factoryType}
+   * and delegates to either a constructor or a static factory method of {@code cls}.
+   *
+   * The factory interface needs to have exactly one method.
+   * The target class needs to have either a single public static method name {@code create},
+   * or a single public constructor.
+   * The declared exceptions of the static method/constructor
+   * need to be a subset of those of the method of the factory interface,
+   * and the same holds for the parameters.
+   * Parameters that are declared {@link Nullable} may be missing in the factory interface.
+   *
+   * @param factoryType A type token that represents the factory interface
+   * @param cls The class which should be instantiated by the returned factory
+   * @return An implementation of {@code factoryType} that instantiates {@code cls}
+   * @throws UnsuitedClassException If the static method/constructor of {@code cls}
+   *    does not fulfill the restrictions of the factory interface
+   */
+  public static <I> I createFactory(final TypeToken<I> factoryType, final Class<?> cls)
+      throws UnsuitedClassException {
+    final Class<? super I> factoryInterface = factoryType.getRawType();
+    checkNotNull(cls);
+    checkArgument(factoryInterface.isInterface());
+    checkArgument(
+        factoryInterface.getMethods().length == 1,
+        "Factory interface %s does not declare exactly one method",
+        factoryType);
+
+    // Get the method we should implement and the relevant information from it.
+    final Method interfaceMethod = factoryInterface.getMethods()[0];
+    final TypeToken<?> returnType = factoryType.resolveType(interfaceMethod.getGenericReturnType());
+    final List<Class<?>> allowedExceptions =
+        resolve(factoryType, interfaceMethod.getGenericExceptionTypes())
+            .map(TypeToken::getRawType)
+            .collect(Collectors.toList());
+    final List<TypeToken<?>> formalParamTypes =
+        resolve(factoryType, interfaceMethod.getGenericParameterTypes())
+            .collect(Collectors.toList());
+    for (Entry<TypeToken<?>> entry : ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
+      verify(
+          entry.getCount() == 1,
+          "Method %s of factory interface %s declares parameter of type %s multiple times",
+          interfaceMethod.getName(),
+          factoryType,
+          entry.getElement());
+    }
+
+    // Get the method we should call and check whether it matches.
+    if (!Modifier.isPublic(cls.getModifiers())) {
+      throw new UnsuitedClassException("class is not public");
+    }
+    final Invokable<?, ?> target = getInstantiationMethodForClass(cls);
+    if (!returnType.isSupertypeOf(target.getReturnType())) {
+      throw new UnsuitedClassException("'%s' does not produce instances of %s", target, returnType);
+    }
+    String exception =
+        Classes.verifyDeclaredExceptions(
+            target, allowedExceptions.toArray(new Class<?>[allowedExceptions.size()]));
+    if (exception != null) {
+      throw new UnsuitedClassException(
+          "'%s' declares illegal checked exception %s", target, exception);
+    }
+    final List<TypeToken<?>> targetParamTypes =
+        Lists.transform(target.getParameters(), Parameter::getType);
+
+    // For each parameter of the constructor, this array contains the position of the value
+    // in the parameters of the interface method.
+    final int[] parameterMapping = new int[targetParamTypes.size()];
+    for (int i = 0; i < targetParamTypes.size(); i++) {
+      int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
+      if (sourceIndex == -1) {
+        if (target.getParameters().get(i).isAnnotationPresent(Nullable.class)) {
+          sourceIndex = -1; // marker for passing value null
+        } else {
+          throw new UnsuitedClassException(
+              "'%s' requires parameter of type %s which is not present in factory interface",
+              target,
+              targetParamTypes.get(i));
+        }
+      }
+      parameterMapping[i] = sourceIndex;
+    }
+
+    @SuppressWarnings("unchecked")
+    final I factory =
+        (I)
+            Reflection.newProxy(
+                factoryInterface,
+                new FactoryInvocationHandler(
+                    factoryType, interfaceMethod, target, parameterMapping));
+    return factory;
+  }
+
+  private static Stream<TypeToken<?>> resolve(TypeToken<?> context, Type[] types) {
+    return Arrays.stream(types).<TypeToken<?>>map(type -> context.resolveType(type));
+  }
+
+  /**
+   * Search for a method that we should use to instantiate the class.
+   * First, it looks for a public static method named "create",
+   * second, for a public constructor.
+   * @throws UnsuitedClassException if no matching method can be found
+   */
+  private static Invokable<?, ?> getInstantiationMethodForClass(Class<?> cls)
+      throws UnsuitedClassException {
+    List<Invokable<?, ?>> factoryMethods =
+        Arrays.stream(cls.getDeclaredMethods())
+            .filter(m -> m.getName().equals("create"))
+            .map(Invokable::from)
+            .filter(m -> m.isStatic())
+            .filter(m -> m.isPublic())
+            .filter(m -> !m.isSynthetic())
+            .collect(Collectors.toList());
+    switch (factoryMethods.size()) {
+      case 0:
+        if (Modifier.isAbstract(cls.getModifiers())) {
+          throw new UnsuitedClassException("class is abstract");
+        }
+        Constructor<?>[] constructors = cls.getConstructors();
+        if (constructors.length != 1) {
+          throw new UnsuitedClassException(
+              "class does not have a static method \"create\" nor exactly one public constructor");
+        }
+        return Invokable.from(constructors[0]);
+
+      case 1:
+        return factoryMethods.get(0);
+
+      default:
+        throw new UnsuitedClassException("class has more than one static methods named \"create\"");
+    }
+  }
+
+  private static final class FactoryInvocationHandler extends AbstractInvocationHandler {
+
+    private final TypeToken<?> factoryType;
+    private final Method interfaceMethod;
+
+    private final Invokable<?, ?> target;
+    private final List<Parameter> targetParameters;
+    private final int[] parameterMapping;
+
+    FactoryInvocationHandler(
+        TypeToken<?> pFactoryType,
+        Method pInterfaceMethod,
+        Invokable<?, ?> pTarget,
+        int[] pParameterMapping) {
+      factoryType = pFactoryType;
+      interfaceMethod = pInterfaceMethod;
+      target = pTarget;
+      targetParameters = pTarget.getParameters();
+      parameterMapping = pParameterMapping;
+    }
+
+    @Override
+    protected Object handleInvocation(Object pProxy, Method pMethod, Object[] pActualArgs)
+        throws Throwable {
+      verify(pMethod.equals(interfaceMethod));
+
+      Object[] targetArgs = new Object[parameterMapping.length];
+      for (int i = 0; i < parameterMapping.length; i++) {
+        Object value = parameterMapping[i] == -1 ? null : pActualArgs[parameterMapping[i]];
+        if (value == null && !targetParameters.get(i).isAnnotationPresent(Nullable.class)) {
+          throw new NullPointerException(
+              "Value null for parameter " + targetParameters.get(i) + " in " + factoryType);
+        }
+        targetArgs[i] = value;
+
+      }
+
+      try {
+        return target.invoke(null, targetArgs);
+      } catch (InvocationTargetException e) {
+        throw e.getCause();
+      }
+    }
+
+    @Override
+    public String toString() {
+      return factoryType + " implementation for '" + target + "'";
+    }
+  }
+
+  /**
+   * Exception thrown when {@link Classes#createFactory(TypeToken, Class)}
+   * is called with a class that does not satisfy the requirements of the factory interface.
+   */
+  public static final class UnsuitedClassException extends Exception {
+
+    private static final long serialVersionUID = 5091662820905162461L;
+
+    UnsuitedClassException(String msg, Object... args) {
+      super(String.format(msg, args));
+    }
+  }
 }
