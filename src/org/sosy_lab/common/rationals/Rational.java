@@ -110,6 +110,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    * @param s Input string
    * @throws NumberFormatException iff {@code s} is not a valid representation
    * of Rational.
+   * @throws IllegalArgumentException If the resulting rational is undefined (e.g. 0/0 or 1/0).
    */
   public static Rational ofString(String s) throws NumberFormatException {
     int idx = s.indexOf('/');
