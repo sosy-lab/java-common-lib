@@ -441,7 +441,7 @@ public class ConfigurationTest {
 
   @Options
   private static class OptionsWithRational {
-    @Option(secure = true, description = "")
+    @Option(secure = true, description = "description")
     Rational x = Rational.ONE;
   }
 
