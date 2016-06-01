@@ -82,6 +82,23 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /**
+   * Wrapper around the constructor, returns cached constants if possible.
+   * Assumes that <code>num</code> and <code>den</code> are in the normal form.
+   */
+  private static Rational ofNormalForm(BigInteger num, BigInteger den) {
+    if (num.equals(B_ZERO)) {
+      return ZERO;
+    } else if (den.equals(B_ONE)) {
+      if (num.equals(B_ONE)) {
+        return ONE;
+      } else if (num.equals(B_M_ONE)) {
+        return NEG_ONE;
+      }
+    }
+    return new Rational(num, den);
+  }
+
+  /**
    * Create a new rational from two longs.
    */
   public static Rational ofLongs(long numerator, long denominator) {
@@ -158,22 +175,6 @@ public final class Rational extends Number implements Comparable<Rational> {
     }
   }
 
-  /**
-   * Wrapper around the constructor, returns cached constants if possible.
-   * Assumes that <code>num</code> and <code>den</code> are in the normal form.
-   */
-  private static Rational ofNormalForm(BigInteger num, BigInteger den) {
-    if (num.equals(B_ZERO)) {
-      return ZERO;
-    } else if (den.equals(B_ONE)) {
-      if (num.equals(B_ONE)) {
-        return ONE;
-      } else if (num.equals(B_M_ONE)) {
-        return NEG_ONE;
-      }
-    }
-    return new Rational(num, den);
-  }
 
   /**
    * Multiply by {@code b}, return a new instance.
@@ -239,7 +240,7 @@ public final class Rational extends Number implements Comparable<Rational> {
       throw new IllegalArgumentException(
           "Division by zero not supported, use ExtendedRational if you need it");
     }
-    return ofNormalForm(den, num);
+    return of(den, num);
   }
 
   /**

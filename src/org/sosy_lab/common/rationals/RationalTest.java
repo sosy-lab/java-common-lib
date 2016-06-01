@@ -73,6 +73,16 @@ public class RationalTest {
   }
 
   @Test
+  public void testMultiplication3() {
+    // Test that signs are correct.
+    Rational two = Rational.of(2);
+    Rational negTwo = Rational.of(-2);
+    assertThat(negTwo.times(negTwo)).isEqualTo(Rational.of(4));
+    assertThat(two.times(negTwo)).isEqualTo(Rational.of(-4));
+    assertThat(negTwo.times(two)).isEqualTo(Rational.of(-4));
+  }
+
+  @Test
   public void testDivision() {
     Rational a = Rational.ofString("2/4");
     Rational b = Rational.ofString("1/4");
@@ -130,5 +140,24 @@ public class RationalTest {
     Rational a = Rational.ofString("-2");
     Rational b = Rational.ofString("1");
     assertThat(a.plus(b)).isSameAs(Rational.NEG_ONE);
+  }
+
+  @Test
+  public void testReciprocal() {
+    Rational a = Rational.of("1/2");
+    assertThat(a.reciprocal()).isEqualTo(Rational.of(2));
+  }
+
+  @Test
+  public void testReciprocalNegative() {
+    Rational a = Rational.of("-1");
+    assertThat(a.reciprocal()).isEqualTo(a);
+  }
+
+  @Test
+  public void testNegate() {
+    assertThat(Rational.of(10).negate()).isEqualTo(Rational.of(-10));
+    assertThat(Rational.ZERO.negate()).isEqualTo(Rational.ZERO);
+    assertThat(Rational.of(-10).negate()).isEqualTo(Rational.of(10));
   }
 }
