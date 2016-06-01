@@ -27,19 +27,38 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     this.data = ImmutableMap.copyOf(data);
   }
 
+  /**
+   * Creates an empty linear expression.
+   */
   public static <T> LinearExpression<T> empty() {
-    return new LinearExpression<>(ImmutableMap.<T, Rational>of());
+    return new LinearExpression<>(ImmutableMap.of());
   }
 
+  /**
+   * Return a monomial with a variable {@code var} and a coefficient {@code coeff}.
+   *
+   * @deprecated Use {@link #monomial} instead.
+   */
+  @Deprecated
   public static <T> LinearExpression<T> pair(T var, Rational coeff) {
+    return monomial(var, coeff);
+  }
+
+  /**
+   * Return a monomial with a variable {@code var} and a coefficient {@code coeff}.
+   */
+  public static <T> LinearExpression<T> monomial(T var, Rational coeff) {
     if (coeff.equals(Rational.ZERO)) {
       return empty();
     }
     return new LinearExpression<>(ImmutableMap.of(var, coeff));
   }
 
+  /**
+   * Create a monomial consisting of variable {@code var} with a coefficient of one.
+   */
   public static <T> LinearExpression<T> ofVariable(T var) {
-    return LinearExpression.pair(var, Rational.ONE);
+    return LinearExpression.monomial(var, Rational.ONE);
   }
 
   /**
