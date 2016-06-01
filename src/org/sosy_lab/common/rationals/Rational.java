@@ -136,6 +136,15 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /**
+   * Syntax sugar.
+   *
+   * @see #ofLong(long)
+   */
+  public static Rational of(long l) throws NumberFormatException {
+    return ofLong(l);
+  }
+
+  /**
    * Convert a given BigDecimal to Rational.
    */
   public static Rational ofBigDecimal(BigDecimal decimal) {
