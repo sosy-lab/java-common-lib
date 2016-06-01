@@ -25,6 +25,7 @@ import com.google.common.reflect.TypeToken;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -102,6 +103,14 @@ public enum BaseTypeConverter implements TypeConverter {
                 optionName,
                 e.getMessage()),
             e);
+      }
+    } else if (type.equals(Rational.class)) {
+      try {
+        return Rational.of(valueStr);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidConfigurationException(
+            String.format("Illegal rational %s in option  %s (%s).",
+                valueStr, optionName, e.getMessage()), e);
       }
 
     } else {

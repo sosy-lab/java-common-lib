@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -437,4 +438,19 @@ public class ConfigurationTest {
           "-option1", "value1",
         });
   }
+
+  @Options
+  private static class OptionsWithRational {
+    @Option(secure=true, description="")
+    Rational x = Rational.ONE;
+  }
+
+  @Test
+  public void testRationalInput() throws Exception {
+    Configuration c = Configuration.builder().setOption("x", "2/3").build();
+    OptionsWithRational opts = new OptionsWithRational();
+    c.inject(opts);
+    assertThat(opts.x).isEqualTo(Rational.of("2/3"));
+  }
+
 }
