@@ -221,9 +221,9 @@ public final class MoreFiles {
     checkNotNull(charset);
     createParentDirs(file);
     try (OutputStream outputStream = Files.newOutputStream(file);
-         OutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
-         Writer outputStreamWriter = new OutputStreamWriter(gzipOutputStream, charset);
-         Writer w = new BufferedWriter(outputStreamWriter)) {
+        OutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
+        Writer outputStreamWriter = new OutputStreamWriter(gzipOutputStream, charset);
+        Writer w = new BufferedWriter(outputStreamWriter)) {
       Appenders.appendTo(w, content);
     }
   }

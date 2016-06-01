@@ -445,7 +445,6 @@ public final class Classes {
   public static final Predicate<Class<?>> IS_GENERATED =
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
 
-
   /**
    * Create a factory at runtime that implements the interface {@code factoryType}
    * and delegates to either a constructor or a static factory method of {@code cls}.
@@ -636,7 +635,6 @@ public final class Classes {
               "Value null for parameter " + targetParameters.get(i) + " in " + factoryType);
         }
         targetArgs[i] = value;
-
       }
 
       try {
