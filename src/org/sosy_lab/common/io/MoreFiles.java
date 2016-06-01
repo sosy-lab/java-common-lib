@@ -31,14 +31,18 @@ import com.google.common.io.FileWriteMode;
 
 import org.sosy_lab.common.Appenders;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.Nullable;
 
@@ -203,6 +207,23 @@ public final class MoreFiles {
   public static void writeFile(Path file, Charset charset, Object content) throws IOException {
     checkNotNull(content);
     try (Writer w = openOutputFile(file, charset)) {
+      Appenders.appendTo(w, content);
+    }
+  }
+
+  /**
+   * Writes content to a file compressed in GZIP format.
+   * @param file The file.
+   * @param content The content which shall be written.
+   */
+  public static void writeGZIPFile(Path file, Charset charset, Object content) throws IOException {
+    checkNotNull(content);
+    checkNotNull(charset);
+    createParentDirs(file);
+    try (OutputStream outputStream = Files.newOutputStream(file);
+         OutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
+         Writer outputStreamWriter = new OutputStreamWriter(gzipOutputStream, charset);
+         Writer w = new BufferedWriter(outputStreamWriter)) {
       Appenders.appendTo(w, content);
     }
   }
