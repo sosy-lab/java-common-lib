@@ -201,7 +201,6 @@ public class OptionCollector {
         .filter(cls -> cls.isAnnotationPresent(Options.class));
   }
 
-
   private Stream<Class<?>> tryLoadClass(ClassInfo cls) {
     try {
       return Stream.of(cls.load());

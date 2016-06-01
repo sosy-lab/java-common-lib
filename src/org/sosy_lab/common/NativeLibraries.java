@@ -179,7 +179,6 @@ public class NativeLibraries {
     return checkNotNull(Paths.get(pathToJar).getParent());
   }
 
-
   /**
    * Load a native library.
    * This is similar to {@link System#loadLibrary(String)},

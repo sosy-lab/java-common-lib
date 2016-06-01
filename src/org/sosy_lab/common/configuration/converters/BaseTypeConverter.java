@@ -109,8 +109,9 @@ public enum BaseTypeConverter implements TypeConverter {
         return Rational.of(valueStr);
       } catch (IllegalArgumentException e) {
         throw new InvalidConfigurationException(
-            String.format("Illegal rational %s in option  %s (%s).",
-                valueStr, optionName, e.getMessage()), e);
+            String.format(
+                "Illegal rational %s in option  %s (%s).", valueStr, optionName, e.getMessage()),
+            e);
       }
 
     } else {
