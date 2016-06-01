@@ -52,6 +52,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   private Rational(BigInteger numerator, BigInteger denominator) {
     num = numerator;
     den = denominator;
+    assert den.signum() == 1;
   }
 
   /** Factory functions **/
