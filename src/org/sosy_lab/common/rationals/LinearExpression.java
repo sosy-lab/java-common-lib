@@ -161,6 +161,13 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   /**
+   * @return The underlying stored map.
+   */
+  public ImmutableMap<T, Rational> getMap() {
+    return data;
+  }
+
+  /**
    * @return Pretty-printing for linear expressions.
    * E. g. <i>-x + 2y + z</i>
    */
