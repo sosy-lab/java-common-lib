@@ -282,10 +282,7 @@ public class FileTypeConverter implements TypeConverter {
     if (typeInfo == FileOption.Type.OUTPUT_FILE) {
       file = outputPath.resolve(file);
     } else if (source != null) {
-      Path baseDir = source.getParent();
-      if (baseDir != null) {
-        file = baseDir.resolve(file);
-      }
+      file = source.resolveSibling(file);
     } else {
       file = rootPath.resolve(file);
     }
