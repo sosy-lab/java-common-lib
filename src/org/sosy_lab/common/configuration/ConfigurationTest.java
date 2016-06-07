@@ -262,6 +262,7 @@ public class ConfigurationTest {
     assertThat(opts.test).isEqualTo("myValue");
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testCopyWithNewPrefix() throws Exception {
     Configuration c = Configuration.builder().setOption("new-prefix.hello", "world").build();
@@ -292,6 +293,7 @@ public class ConfigurationTest {
     assertThat(converters).containsKey(IntegerOption.class);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testHasProperty() throws Exception {
     Configuration c = Configuration.builder().setOption("blah", "blah2").build();
@@ -403,6 +405,7 @@ public class ConfigurationTest {
     assertThat(opts2.test).isEqualTo("newValue");
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testFromCmdLineArgumentsSimple() throws Exception {
     Configuration config =

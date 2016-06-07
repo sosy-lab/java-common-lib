@@ -321,10 +321,11 @@ public final class Configuration {
    * Get the value of an option.
    * USE OF THIS METHOD IS NOT RECOMMENDED!
    *
-   * If possible, use {@link Option} and {@link #inject(Object)}.
+   * Use configuration injection with {@link Option} and {@link #inject(Object)} instead.
    * This provides type safety, documentation, logging etc.
    */
   @Nullable
+  @Deprecated
   public String getProperty(String key) {
     checkNotNull(key);
     String result = properties.get(prefix + key);
@@ -341,9 +342,10 @@ public final class Configuration {
    * Check whether an option has a specified value.
    * USE OF THIS METHOD IS NOT RECOMMENDED!
    *
-   * If possible, use {@link Option} and {@link #inject(Object)}.
+   * Use configuration injection with {@link Option} and {@link #inject(Object)} instead.
    * This provides type safety, documentation, logging, default values, etc.
    */
+  @Deprecated
   public boolean hasProperty(String key) {
     checkNotNull(key);
     return properties.containsKey(prefix + key) || properties.containsKey(key);
