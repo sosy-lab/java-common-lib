@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nullable;
 
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
@@ -122,17 +121,14 @@ class Parser {
    * Parse a configuration file with the format as defined above.
    *
    * @param file The file to parse.
-   * @param basePath If filename is relative, use this as parent path
-   * (if null or empty, the current working directory is used).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(Path file, @Nullable Path basePath)
-      throws IOException, InvalidConfigurationException {
+  static Parser parse(Path file) throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
-    parser.parse0(file, basePath);
+    parser.parse0(file);
     verify(parser.includeStack.isEmpty());
     return parser;
   }
@@ -141,18 +137,10 @@ class Parser {
    * Parse a configuration file with the format as defined above.
    *
    * @param file The file to parse.
-   * @param basePath If filename is relative, use this as parent path
-   * (if null or empty, the current working directory is used).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
-  private void parse0(Path file, @Nullable Path basePath)
-      throws IOException, InvalidConfigurationException {
-
-    if (basePath != null) {
-      file = basePath.resolve(file);
-    }
-
+  private void parse0(Path file) throws IOException, InvalidConfigurationException {
     MoreFiles.checkReadableFile(file);
 
     String fileName = file.toAbsolutePath().toString();
@@ -163,7 +151,7 @@ class Parser {
     includeStack.addLast(fileName);
 
     try (BufferedReader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-      parse(r, file.getParent(), file.toString());
+      parse(r, file, file.toString());
     }
     includeStack.removeLast();
   }
@@ -176,15 +164,14 @@ class Parser {
    * if they are included.
    *
    * @param source The source to read the file from.
-   * @param basePath If filename is relative, use this as parent path
-   * (if null or empty, the current working directory is used).
+   * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
    * @param sourceName A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(CharSource source, @Nullable Path basePath, String sourceName)
+  static Parser parse(CharSource source, Path basePath, String sourceName)
       throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
@@ -203,8 +190,7 @@ class Parser {
    * if they are included.
    *
    * @param r The reader to read the file from.
-   * @param basePath If filename is relative, use this as parent path
-   * (if null or empty, the current working directory is used).
+   * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
    * @param source A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
    * @throws IOException If an I/O error occurs.
@@ -214,8 +200,9 @@ class Parser {
     value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
     justification = "performance irrelevant compared to I/O, String much more convenient"
   )
-  private void parse(BufferedReader r, @Nullable Path basePath, String source)
+  private void parse(BufferedReader r, Path basePath, String source)
       throws IOException, InvalidConfigurationException {
+    checkNotNull(basePath);
     checkNotNull(source);
 
     String line;
@@ -261,7 +248,7 @@ class Parser {
         }
 
         // parse included file (content will be in fields of this class)
-        parse0(Paths.get(line), basePath);
+        parse0(basePath.resolveSibling(Paths.get(line)));
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {

@@ -212,7 +212,9 @@ public final class ConfigurationBuilder {
     checkNotNull(basePath);
     setupProperties();
 
-    final Parser parser = Parser.parse(source, Paths.get(basePath), sourceName);
+    // Need to append something to base path because resolveSibling() is used.
+    Path base = Paths.get(basePath).resolve("dummy");
+    final Parser parser = Parser.parse(source, base, sourceName);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -244,7 +246,7 @@ public final class ConfigurationBuilder {
 
     setupProperties();
 
-    final Parser parser = Parser.parse(file, Paths.get(""));
+    final Parser parser = Parser.parse(file);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 

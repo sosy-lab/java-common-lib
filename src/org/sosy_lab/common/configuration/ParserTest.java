@@ -466,7 +466,7 @@ public class ParserTest {
   @Test
   public final void relativePath1() throws IOException {
     Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
-    basePath = included.getParent();
+    basePath = included;
 
     try {
       testSingleOption("#include " + included.getFileName(), "foo.bar", "abc");
