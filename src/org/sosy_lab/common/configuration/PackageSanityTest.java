@@ -26,6 +26,7 @@ import org.sosy_lab.common.Classes;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
@@ -36,5 +37,6 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(Path.class, Paths.get("test"));
     setDefault(Configuration.class, Configuration.defaultConfiguration());
     setDefault(CharSource.class, CharSource.wrap("test"));
+    setDefault(Optional.class, Optional.empty());
   }
 }
