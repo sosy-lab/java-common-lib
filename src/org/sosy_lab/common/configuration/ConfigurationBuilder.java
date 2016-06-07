@@ -296,12 +296,9 @@ public final class ConfigurationBuilder {
    *
    * This method resets the builder instance, so that after this method has
    * returned it is exactly in the same state as directly after instantiation.
-   *
-   * @throws InvalidConfigurationException if the settings contained invalid values
-   * for the configuration options of the Configuration class
    */
   @CheckReturnValue
-  public Configuration build() throws InvalidConfigurationException {
+  public Configuration build() {
     ImmutableMap<String, String> newProperties;
     if (properties == null) {
       // we can re-use the old properties instance because it is immutable
@@ -368,8 +365,8 @@ public final class ConfigurationBuilder {
             newConverters,
             newUnusedProperties,
             newDeprecatedProperties,
+            oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
             oldConfig != null ? oldConfig.getLogger() : null);
-    newConfig.inject(newConfig);
 
     // reset builder instance so that it may be re-used
     properties = null;

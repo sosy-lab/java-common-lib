@@ -51,6 +51,7 @@ import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -81,7 +82,6 @@ import javax.annotation.Nullable;
  * Immutable wrapper around a map with properties, providing
  * useful access helper methods.
  */
-@Options
 public final class Configuration {
 
   /**
@@ -123,6 +123,7 @@ public final class Configuration {
         ImmutableMap.copyOf(DEFAULT_CONVERTERS),
         new HashSet<>(0),
         new HashSet<>(0),
+        null,
         null);
   }
 
@@ -130,25 +131,17 @@ public final class Configuration {
    * Creates a copy of a configuration with just the prefix set to a new value.
    */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
-    Configuration newConfig =
-        new Configuration(
-            oldConfig.properties,
-            oldConfig.sources,
-            newPrefix,
-            oldConfig.converters,
-            oldConfig.unusedProperties,
-            oldConfig.deprecatedProperties,
-            oldConfig.logger);
+    return new Configuration(
+        oldConfig.properties,
+        oldConfig.sources,
+        newPrefix,
+        oldConfig.converters,
+        oldConfig.unusedProperties,
+        oldConfig.deprecatedProperties,
+        oldConfig.printUsedOptions,
+        oldConfig.logger);
 
-    // instead of calling inject() set options manually
-    // this avoids the "throws InvalidConfigurationException" in the signature
-    newConfig.exportUsedOptions = oldConfig.exportUsedOptions;
-
-    return newConfig;
   }
-
-  @Option(name = "log.usedOptions.export", description = "all used options are printed")
-  private boolean exportUsedOptions = false;
 
   /** Splitter to create string arrays. */
   private static final Splitter ARRAY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -277,6 +270,12 @@ public final class Configuration {
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
 
+  private @Nullable PrintStream printUsedOptions;
+
+  PrintStream getUsedOptionsPrintStream() {
+    return printUsedOptions;
+  }
+
   private LogManager logger = LogManager.createNullLogManager();
 
   LogManager getLogger() {
@@ -288,7 +287,7 @@ public final class Configuration {
    * to avoid the exception in the signature,
    * the caller needs to make sure to set the values or inject them.
    */
-  @SuppressWarnings("options")
+  @SuppressWarnings("checkstyle:parameternumber")
   Configuration(
       ImmutableMap<String, String> pProperties,
       ImmutableMap<String, Path> pSources,
@@ -296,6 +295,7 @@ public final class Configuration {
       ImmutableMap<Class<?>, TypeConverter> pConverters,
       Set<String> pUnusedProperties,
       Set<String> pDeprecatedProperties,
+      @Nullable PrintStream pPrintUsedOptions,
       @Nullable LogManager pLogger) {
 
     checkNotNull(pProperties);
@@ -309,12 +309,23 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
+    printUsedOptions = pPrintUsedOptions;
     logger = firstNonNull(pLogger, LogManager.createNullLogManager());
   }
 
   public void enableLogging(LogManager pLogger) {
     checkState(logger.equals(LogManager.createNullLogManager()), "Logging already enabled.");
     logger = checkNotNull(pLogger);
+  }
+
+  /**
+   * Let this instance write human-readable information about every option that is used
+   * to the given stream.
+   */
+  public void dumpUsedOptionsTo(PrintStream out) {
+    checkNotNull(out);
+    checkState(printUsedOptions == null);
+    printUsedOptions = out;
   }
 
   /**
@@ -743,7 +754,7 @@ public final class Configuration {
       value = convertDefaultValue(optionName, defaultValue, type, secondaryOption);
     }
 
-    if (exportUsedOptions) {
+    if (printUsedOptions != null) {
       printOptionInfos(member, optionName, valueStr, defaultValue);
     }
     return value;
@@ -878,7 +889,7 @@ public final class Configuration {
       optionInfo.append("--> used value:     ").append(valueStr).append("\n");
     }
 
-    System.out.println(optionInfo.toString());
+    printUsedOptions.println(optionInfo.toString());
   }
 
   /**
