@@ -170,6 +170,29 @@ public final class ConfigurationBuilder {
   }
 
   /**
+   * Copy one single option from another Configuration instance,
+   * overwriting the value in this builder, if it is already set.
+   * If the given Configuration instance does not have a value for this option,
+   * nothing is changed.
+   *
+   * It is better to use this method instead of
+   * <code>setOption(option, oldConfig.getProperty(option))</code>,
+   * because it retains the mapping to the source of this value,
+   * which allows better error messages and resolving relative file paths.
+   *
+   * @param sourceConfig A configuration instance.
+   * @param option The name of a configuration option.
+   */
+  public ConfigurationBuilder copyOptionFromIfPresent(Configuration sourceConfig, String option) {
+    checkNotNull(option);
+    if (sourceConfig.properties.containsKey(option)) {
+      copyOptionFrom(sourceConfig, option);
+    }
+
+    return this;
+  }
+
+  /**
    * Load options from a {@link CharSource} with a "key = value" format.
    *
    * A stream from this source is opened and closed by this method.
