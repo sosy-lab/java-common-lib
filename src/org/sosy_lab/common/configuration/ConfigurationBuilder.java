@@ -25,12 +25,15 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharSource;
+import com.google.common.io.Resources;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.MoreFiles;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -250,6 +253,34 @@ public final class ConfigurationBuilder {
     final Parser parser = Parser.parse(file);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
+
+    return this;
+  }
+
+  /**
+   * Load options from a class-loader resource with a "key = value" format.
+   *
+   * There must not be any #include directives in the resource.
+   *
+   * @param contextClass The class to use for looking up the resource.
+   * @param resourceName The name of the resource relative to {@code contextClass}.
+   * @throws IllegalArgumentException If the resource cannot be found or read,
+   * or contains invalid syntax or #include directives.
+   */
+  public ConfigurationBuilder loadFromResource(Class<?> contextClass, String resourceName) {
+    URL url = Resources.getResource(contextClass, resourceName);
+    CharSource source = Resources.asCharSource(url, StandardCharsets.UTF_8);
+
+    setupProperties();
+
+    try {
+      final Parser parser = Parser.parse(source, Optional.empty(), url.toString());
+      properties.putAll(parser.getOptions());
+      sources.putAll(parser.getSources());
+    } catch (InvalidConfigurationException | IOException e) {
+      throw new IllegalArgumentException(
+          "Error in resource " + resourceName + " relative to " + contextClass.getName(), e);
+    }
 
     return this;
   }
