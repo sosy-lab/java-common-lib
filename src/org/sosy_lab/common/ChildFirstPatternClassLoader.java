@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -41,7 +42,19 @@ import java.util.regex.Pattern;
  */
 public class ChildFirstPatternClassLoader extends URLClassLoader {
 
-  private final Pattern classPattern;
+  private final Predicate<String> loadInChild;
+
+  /**
+   * Create a new class loader.
+   * @param pLoadInChild The predicate telling which classes should never be loaded by the parent.
+   * @param pUrls The sources where this class loader should load classes from.
+   * @param pParent The parent class loader.
+   */
+  public ChildFirstPatternClassLoader(
+      Predicate<String> pLoadInChild, URL[] pUrls, ClassLoader pParent) {
+    super(pUrls, checkNotNull(pParent));
+    loadInChild = checkNotNull(pLoadInChild);
+  }
 
   /**
    * Create a new class loader.
@@ -51,12 +64,13 @@ public class ChildFirstPatternClassLoader extends URLClassLoader {
    */
   public ChildFirstPatternClassLoader(Pattern pClassPattern, URL[] pUrls, ClassLoader pParent) {
     super(pUrls, checkNotNull(pParent));
-    classPattern = checkNotNull(pClassPattern);
+    checkNotNull(pClassPattern);
+    loadInChild = s -> pClassPattern.matcher(s).matches();
   }
 
   @Override
   protected Class<?> loadClass(String name, boolean pResolve) throws ClassNotFoundException {
-    if (!classPattern.matcher(name).matches()) {
+    if (!loadInChild.test(name)) {
       return super.loadClass(name, pResolve);
     }
 
