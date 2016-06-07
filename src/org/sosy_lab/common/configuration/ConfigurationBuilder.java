@@ -93,6 +93,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Add all options from a map.
    */
@@ -107,6 +108,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Set the optional prefix for new configuration.
    */
@@ -117,6 +119,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Copy everything from an existing Configuration instance. This also means
    * that the new configuration object created by this builder will share the
@@ -137,6 +140,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Copy one single option from another Configuration instance,
    * overwriting the value in this builder, if it is already set.
@@ -223,6 +227,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Add a type converter for options with a certain type.
    * This will enable the Configuration instance to parse strings into values
@@ -259,6 +264,7 @@ public final class ConfigurationBuilder {
 
     return this;
   }
+
   /**
    * Create a Configuration instance with the settings specified by method
    * calls on this builder instance.

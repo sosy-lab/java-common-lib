@@ -176,7 +176,6 @@ public final class Rational extends Number implements Comparable<Rational> {
     }
   }
 
-
   /**
    * Multiply by {@code b}, return a new instance.
    **/
