@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
@@ -39,6 +40,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
@@ -151,7 +153,7 @@ class Parser {
     includeStack.addLast(fileName);
 
     try (BufferedReader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-      parse(r, file, file.toString());
+      parse(r, Optional.of(file), file.toString());
     }
     includeStack.removeLast();
   }
@@ -165,13 +167,14 @@ class Parser {
    *
    * @param source The source to read the file from.
    * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
+   * Source must not contain #include if absent.
    * @param sourceName A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(CharSource source, Path basePath, String sourceName)
+  static Parser parse(CharSource source, Optional<Path> basePath, String sourceName)
       throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
@@ -191,6 +194,7 @@ class Parser {
    *
    * @param r The reader to read the file from.
    * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
+   * Source must not contain #include if absent.
    * @param source A string to use as source of the file in error messages
    * (this should usually be a filename or something similar).
    * @throws IOException If an I/O error occurs.
@@ -200,7 +204,7 @@ class Parser {
     value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
     justification = "performance irrelevant compared to I/O, String much more convenient"
   )
-  private void parse(BufferedReader r, Path basePath, String source)
+  private void parse(BufferedReader r, Optional<Path> basePath, String source)
       throws IOException, InvalidConfigurationException {
     checkNotNull(basePath);
     checkNotNull(source);
@@ -247,8 +251,13 @@ class Parser {
               "Include without filename", lineno, source, fullLine);
         }
 
+        checkArgument(
+            basePath.isPresent(),
+            "File %s contains #include directive, but base path not given.",
+            source);
+
         // parse included file (content will be in fields of this class)
-        parse0(basePath.resolveSibling(Paths.get(line)));
+        parse0(basePath.get().resolveSibling(Paths.get(line)));
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {

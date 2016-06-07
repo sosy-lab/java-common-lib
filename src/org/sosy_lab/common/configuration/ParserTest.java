@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("CheckReturnValue")
 public class ParserTest {
@@ -57,7 +58,8 @@ public class ParserTest {
 
   private Map<String, String> test(String content)
       throws IOException, InvalidConfigurationException {
-    return Parser.parse(CharSource.wrap(content), basePath, "test").getOptions();
+    return Parser.parse(CharSource.wrap(content), Optional.ofNullable(basePath), "test")
+        .getOptions();
   }
 
   private void testEmpty(String content) {
@@ -97,6 +99,12 @@ public class ParserTest {
   public final void simpleOptions() {
     testSingleOption("foo.bar=ab cde ef", "foo.bar", "ab cde ef");
     testSingleOption(" foo.bar \t= 123 4 5 6 ", "foo.bar", "123 4 5 6");
+  }
+
+  @Test
+  public final void simpleOptionsWithoutBasePath() {
+    basePath = null;
+    testSingleOption("foo=bar", "foo", "bar");
   }
 
   @Test
@@ -272,6 +280,11 @@ public class ParserTest {
     } finally {
       Files.delete(included);
     }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public final void includeWithoutBasePath() throws IOException, InvalidConfigurationException {
+    Parser.parse(CharSource.wrap("#include test.properties"), Optional.empty(), "test");
   }
 
   @Test

@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.CheckReturnValue;
@@ -214,7 +215,7 @@ public final class ConfigurationBuilder {
 
     // Need to append something to base path because resolveSibling() is used.
     Path base = Paths.get(basePath).resolve("dummy");
-    final Parser parser = Parser.parse(source, base, sourceName);
+    final Parser parser = Parser.parse(source, Optional.of(base), sourceName);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
