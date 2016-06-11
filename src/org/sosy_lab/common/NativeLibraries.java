@@ -22,7 +22,6 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import com.google.common.base.Optional;
 import com.google.common.base.StandardSystemProperty;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,6 +31,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -222,6 +222,6 @@ public class NativeLibraries {
     if (Files.exists(p)) {
       return Optional.of(p);
     }
-    return Optional.absent();
+    return Optional.empty();
   }
 }
