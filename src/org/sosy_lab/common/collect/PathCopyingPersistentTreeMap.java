@@ -735,6 +735,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
+  public V getOrDefault(Object pKey, V pDefaultValue) {
+    Node<K, V> node = findNode(pKey, root);
+    return node == null ? pDefaultValue : node.getValue();
+  }
+
+  @Override
   public boolean isEmpty() {
     return root == null;
   }
