@@ -24,6 +24,8 @@ import com.google.common.collect.Collections2;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
@@ -41,6 +43,12 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   @Deprecated
   @Override
+  public final V putIfAbsent(K pKey, V pValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
   public final void putAll(Map<? extends K, ? extends V> pM) {
     throw new UnsupportedOperationException();
   }
@@ -48,6 +56,56 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   @Deprecated
   @Override
   public final V remove(Object pKey) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final boolean replace(K pKey, V pOldValue, V pNewValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final boolean remove(Object pKey, Object pValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final V compute(K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final V computeIfAbsent(K pKey, Function<? super K, ? extends V> pMappingFunction) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final V computeIfPresent(
+      K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final V merge(
+      K pKey, V pValue, BiFunction<? super V, ? super V, ? extends V> pRemappingFunction) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final V replace(K pKey, V pValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final void replaceAll(BiFunction<? super K, ? super V, ? extends V> pFunction) {
     throw new UnsupportedOperationException();
   }
 

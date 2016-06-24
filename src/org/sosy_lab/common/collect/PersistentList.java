@@ -20,7 +20,9 @@
 package org.sosy_lab.common.collect;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import javax.annotation.CheckReturnValue;
 
@@ -142,6 +144,14 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  void replaceAll(UnaryOperator<T> pOperator);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
   boolean retainAll(Collection<?> pC) throws UnsupportedOperationException;
 
   /**
@@ -151,4 +161,12 @@ public interface PersistentList<T> extends List<T> {
   @Override
   @Deprecated
   T set(int pIndex, T pElement) throws UnsupportedOperationException;
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  void sort(Comparator<? super T> pC);
 }

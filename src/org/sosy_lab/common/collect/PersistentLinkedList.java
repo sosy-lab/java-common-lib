@@ -29,11 +29,13 @@ import com.google.common.collect.UnmodifiableListIterator;
 
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -58,7 +60,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
-public class PersistentLinkedList<T> extends AbstractSequentialList<T>
+public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {
 
   private final @Nullable T head; // only null for the empty list
@@ -299,5 +301,17 @@ public class PersistentLinkedList<T> extends AbstractSequentialList<T>
     public T previous() {
       throw new UnsupportedOperationException();
     }
+  }
+
+  @Deprecated
+  @Override
+  public void replaceAll(UnaryOperator<T> pOperator) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public void sort(Comparator<? super T> pC) {
+    throw new UnsupportedOperationException();
   }
 }

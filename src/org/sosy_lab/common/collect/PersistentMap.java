@@ -20,6 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import javax.annotation.CheckReturnValue;
 
@@ -71,6 +73,14 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    * @throws UnsupportedOperationException Always.
    * @deprecated Unsupported operation.
    */
+  @Deprecated
+  @Override
+  V putIfAbsent(K pKey, V pValue);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
   @Override
   @Deprecated
   void putAll(Map<? extends K, ? extends V> pM) throws UnsupportedOperationException;
@@ -89,5 +99,69 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  boolean remove(Object pKey, Object pValue);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
   void clear() throws UnsupportedOperationException;
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  V compute(K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  V computeIfAbsent(K pKey, Function<? super K, ? extends V> pMappingFunction);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  V computeIfPresent(K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  V replace(K pKey, V pValue);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  boolean replace(K pKey, V pOldValue, V pNewValue);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  void replaceAll(BiFunction<? super K, ? super V, ? extends V> pFunction);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Override
+  @Deprecated
+  V merge(K pKey, V pValue, BiFunction<? super V, ? super V, ? extends V> pRemappingFunction);
 }
