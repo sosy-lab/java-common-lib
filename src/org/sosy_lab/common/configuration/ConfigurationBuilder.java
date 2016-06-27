@@ -32,8 +32,10 @@ import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.MoreFiles;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -273,8 +275,18 @@ public final class ConfigurationBuilder {
 
     setupProperties();
 
+    // Get the path to the source, used for error messages and resolving relative path names.
+    String sourceString;
     try {
-      final Parser parser = Parser.parse(source, Optional.empty(), url.toString());
+      sourceString = Paths.get(url.toURI()).toString();
+    } catch (URISyntaxException | FileSystemNotFoundException | IllegalArgumentException e) {
+      // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
+      // This will not allow resolving relative path names, but everything else works.
+      sourceString = url.toString();
+    }
+
+    try {
+      final Parser parser = Parser.parse(source, Optional.empty(), sourceString);
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {
