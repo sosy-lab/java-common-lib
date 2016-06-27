@@ -276,17 +276,20 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     // Get the path to the source, used for error messages and resolving relative path names.
+    Path sourcePath;
     String sourceString;
     try {
-      sourceString = Paths.get(url.toURI()).toString();
+      sourcePath = Paths.get(url.toURI());
+      sourceString = sourcePath.toString();
     } catch (URISyntaxException | FileSystemNotFoundException | IllegalArgumentException e) {
       // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
       // This will not allow resolving relative path names, but everything else works.
+      sourcePath = null;
       sourceString = url.toString();
     }
 
     try {
-      final Parser parser = Parser.parse(source, Optional.empty(), sourceString);
+      final Parser parser = Parser.parse(source, Optional.ofNullable(sourcePath), sourceString);
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {
