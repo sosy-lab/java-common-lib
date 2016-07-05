@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Verify.verify;
+import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
@@ -298,7 +299,8 @@ public final class Classes {
    */
   public static @Nullable String verifyDeclaredExceptions(
       Executable executable, Class<?>... allowedExceptionTypes) {
-    return verifyDeclaredExceptions(executable.getExceptionTypes(), allowedExceptionTypes);
+    return verifyDeclaredExceptions(
+        Arrays.asList(executable.getExceptionTypes()), allowedExceptionTypes);
   }
 
   /**
@@ -314,12 +316,12 @@ public final class Classes {
   public static @Nullable String verifyDeclaredExceptions(
       Invokable<?, ?> invokable, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(
-        invokable.getExceptionTypes().stream().map(TypeToken::getRawType).toArray(Class[]::new),
+        from(invokable.getExceptionTypes()).transform(TypeToken::getRawType),
         allowedExceptionTypes);
   }
 
   private static @Nullable String verifyDeclaredExceptions(
-      Class<?>[] declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
+      Iterable<Class<?>> declaredExceptionTypes, Class<?>[] allowedExceptionTypes) {
     checkNotNull(allowedExceptionTypes);
     for (Class<?> declaredException : declaredExceptionTypes) {
 
@@ -499,10 +501,10 @@ public final class Classes {
     // Get the method we should implement and the relevant information from it.
     final Method interfaceMethod = factoryInterface.getMethods()[0];
     final TypeToken<?> returnType = factoryType.resolveType(interfaceMethod.getGenericReturnType());
-    final List<Class<?>> allowedExceptions =
+    final Class<?>[] allowedExceptions =
         resolve(factoryType, interfaceMethod.getGenericExceptionTypes())
             .map(TypeToken::getRawType)
-            .collect(Collectors.toList());
+            .toArray(Class[]::new);
     final List<TypeToken<?>> formalParamTypes =
         resolve(factoryType, interfaceMethod.getGenericParameterTypes())
             .collect(Collectors.toList());
@@ -523,9 +525,7 @@ public final class Classes {
     if (!returnType.isSupertypeOf(target.getReturnType())) {
       throw new UnsuitedClassException("'%s' does not produce instances of %s", target, returnType);
     }
-    String exception =
-        Classes.verifyDeclaredExceptions(
-            target, allowedExceptions.toArray(new Class<?>[allowedExceptions.size()]));
+    String exception = Classes.verifyDeclaredExceptions(target, allowedExceptions);
     if (exception != null) {
       throw new UnsuitedClassException(
           "'%s' declares illegal checked exception %s", target, exception);
