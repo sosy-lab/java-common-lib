@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.common.log;
 
+import org.sosy_lab.common.MoreStrings;
+
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -56,6 +59,7 @@ public interface LogManager {
    * The message is constructed lazily by concatenating the parts with " ".
    * The caller should not use string concatenation to create the message
    * in order to increase performance if the message is never logged.
+   * To make individual arguments lazy, use {@link MoreStrings#lazyString(Supplier)}.
    *
    * @param priority the log level for the message
    * @param args the parts of the message
@@ -65,7 +69,17 @@ public interface LogManager {
 
   /**
    * Logs any message occurring during program execution.
+   * The message is constructed lazily by asking the provided supplier if necessary.
+   *
+   * @param priority the log level for the message
+   * @param msgSupplier a supplier for a non-null log message
+   */
+  void log(Level priority, Supplier<String> msgSupplier);
+
+  /**
+   * Logs any message occurring during program execution.
    * The message is constructed lazily from <code>String.format(format, args)</code>.
+   * To make individual arguments lazy, use {@link MoreStrings#lazyString(Supplier)}.
    *
    * @param priority the log level for the message
    * @param format The format string.

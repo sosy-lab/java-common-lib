@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -67,6 +68,12 @@ public enum TestLogManager implements LogManager {
     checkArgument(pArgs.length != 0);
     // Convert arguments array to string to check that no toString() method throws an exception.
     checkArgument(!Arrays.deepToString(pArgs).isEmpty());
+  }
+
+  @Override
+  public void log(Level pPriority, Supplier<String> pMsgSupplier) {
+    checkNotNull(pPriority);
+    checkNotNull(pMsgSupplier.get());
   }
 
   @Override

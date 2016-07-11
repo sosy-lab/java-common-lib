@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -273,6 +274,15 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     if (wouldBeLogged(priority)) {
 
       log0(priority, findCallingMethod(), buildMessageText(args));
+    }
+  }
+
+  @Override
+  public void log(Level priority, Supplier<String> msgSupplier) {
+    checkNotNull(msgSupplier);
+
+    if (wouldBeLogged(priority)) {
+      log0(priority, findCallingMethod(), msgSupplier.get());
     }
   }
 

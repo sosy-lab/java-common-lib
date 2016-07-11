@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 /**
@@ -78,6 +79,30 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
       if (seenMessages.add(ImmutableList.copyOf(pArgs))) {
         // log only if not already seen
         log(pPriority, pArgs);
+      }
+    }
+  }
+
+  /**
+   * Logging method similar to {@link #log(Level, Supplier)},
+   * however, subsequent calls to this method with the same arguments
+   * will be silently ignored.
+   * Direct calls to {@link #log(Level, Supplier)} are not affected.
+   *
+   * Make sure to call this method only with immutable parameters,
+   * such as Strings!
+   * If objects are changed after being passed to this method,
+   * detecting duplicate log messages may not work,
+   * or too many log messages may be ignored.
+   */
+  public void logOnce(Level pPriority, Supplier<String> pMsgSupplier) {
+    checkNotNull(pMsgSupplier);
+    if (wouldBeLogged(pPriority)) {
+
+      String msg = pMsgSupplier.get();
+      if (seenMessages.add(ImmutableList.of(msg))) {
+        // log only if not already seen
+        log(pPriority, msg);
       }
     }
   }

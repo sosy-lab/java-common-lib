@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -48,6 +49,17 @@ public class BasicLogManagerTest {
     if (logger instanceof AutoCloseable) {
       ((AutoCloseable) logger).close();
     }
+  }
+
+  public void testSupplierIsLazy() {
+    AtomicBoolean called = new AtomicBoolean();
+    logger.log(
+        Level.FINE,
+        () -> {
+          called.set(true);
+          return "";
+        });
+    assertThat(called.get()).isFalse();
   }
 
   private void checkExpectedLogRecordSource(TestLogHandler handler, String methodName) {

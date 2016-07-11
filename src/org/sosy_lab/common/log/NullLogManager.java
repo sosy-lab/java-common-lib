@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 /**
@@ -50,6 +51,9 @@ public enum NullLogManager implements LogManager {
 
   @Override
   public void log(Level pPriority, Object... pArgs) {}
+
+  @Override
+  public void log(Level pPriority, Supplier<String> pMsgSupplier) {}
 
   @Override
   public void logf(Level pPriority, String pFormat, Object... pArgs) {}

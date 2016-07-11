@@ -21,6 +21,8 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.function.Supplier;
+
 import javax.annotation.CheckReturnValue;
 
 /**
@@ -45,6 +47,27 @@ public final class MoreStrings {
     }
     s = s.substring(0, prefixLength);
     return s.equalsIgnoreCase(prefix);
+  }
+
+  /**
+   * Return an {@link Object} instance whose {@link Object#toString()} method
+   * lazily delegates to the given supplier.
+   * This can be used for logging to make a single logging argument lazy, e.g.
+   * <code>
+   * logger.log(Level.FINE, "Some message with %s and %s args", lazyString(() -> "lazy"), "eager");
+   * </code>
+   * @param stringSupplier A non-null supplier that returns a non-null string.
+   * @return A object that should only be used for {@link Object#toString()}.
+   */
+  @CheckReturnValue
+  public static Object lazyString(Supplier<String> stringSupplier) {
+    checkNotNull(stringSupplier);
+    return new Object() {
+      @Override
+      public String toString() {
+        return checkNotNull(stringSupplier.get());
+      }
+    };
   }
 
   /**

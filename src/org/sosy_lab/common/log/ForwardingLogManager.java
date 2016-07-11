@@ -21,6 +21,7 @@ package org.sosy_lab.common.log;
 
 import com.google.errorprone.annotations.ForOverride;
 
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -38,6 +39,11 @@ public abstract class ForwardingLogManager implements LogManager {
   @Override
   public void log(Level pPriority, Object... pArgs) {
     delegate().log(pPriority, pArgs);
+  }
+
+  @Override
+  public void log(Level pPriority, Supplier<String> pMsgSupplier) {
+    delegate().log(pPriority, pMsgSupplier);
   }
 
   @Override
