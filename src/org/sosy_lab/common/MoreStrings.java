@@ -53,9 +53,9 @@ public final class MoreStrings {
    * Return an {@link Object} instance whose {@link Object#toString()} method
    * lazily delegates to the given supplier.
    * This can be used for logging to make a single logging argument lazy, e.g.
-   * <code>
+   * {@code
    * logger.log(Level.FINE, "Some message with %s and %s args", lazyString(() -> "lazy"), "eager");
-   * </code>
+   * }
    * @param stringSupplier A non-null supplier that returns a non-null string.
    * @return A object that should only be used for {@link Object#toString()}.
    */
