@@ -221,6 +221,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   @Override
+  @SuppressWarnings("ReferenceEquality") // singleton instance
   public boolean isEmpty() {
     return this == EMPTY;
   }

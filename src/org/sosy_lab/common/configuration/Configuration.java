@@ -140,7 +140,6 @@ public final class Configuration {
         oldConfig.deprecatedProperties,
         oldConfig.printUsedOptions,
         oldConfig.logger);
-
   }
 
   /** Splitter to create string arrays. */
@@ -1046,7 +1045,7 @@ public final class Configuration {
 
     checkApplicability(secondaryOption, innerType);
 
-    if (type == innerType) {
+    if (type.equals(innerType)) {
       // If its not a collection, we try to pass the default value to the
       // type converter if there is any.
       // TODO: Also pass default values inside a collection.

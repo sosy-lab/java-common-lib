@@ -48,7 +48,7 @@ public class ClassesFactoryTest {
     public SimpleTestClass2() {}
   }
 
-  public abstract class AbstractTestClass {
+  public static abstract class AbstractTestClass {
     public AbstractTestClass() {}
   }
 

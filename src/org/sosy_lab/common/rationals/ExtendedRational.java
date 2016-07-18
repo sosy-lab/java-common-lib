@@ -167,6 +167,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     return toString().hashCode();
   }
 
+  @SuppressWarnings("ReferenceEquality") // multiton pattern
   public ExtendedRational times(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
@@ -185,10 +186,11 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     }
   }
 
+  @SuppressWarnings("ReferenceEquality") // multiton pattern
   public ExtendedRational plus(ExtendedRational b) {
     if (this == NaN || b == NaN) {
       return NaN;
-    } else if (this == NEG_INFTY && b == INFTY || this == INFTY && b == NEG_INFTY) {
+    } else if ((this == NEG_INFTY && b == INFTY) || (this == INFTY && b == NEG_INFTY)) {
       return NaN;
     } else if (this == INFTY || b == INFTY) {
       return INFTY;
@@ -209,6 +211,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     return a.times(b.reciprocal());
   }
 
+  @SuppressWarnings("ReferenceEquality") // multiton pattern
   public ExtendedRational reciprocal() {
     if (this == NaN) {
       return NaN;
@@ -219,6 +222,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     return new ExtendedRational(rational.reciprocal());
   }
 
+  @SuppressWarnings("ReferenceEquality") // multiton pattern
   public ExtendedRational negate() {
     if (this == NaN) {
       return NaN;

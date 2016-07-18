@@ -156,6 +156,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
     }
 
+    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
     Node<K, V> withLeftChild(Node<K, V> newLeft) {
       if (newLeft == left) {
         return this;
@@ -164,6 +165,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
     }
 
+    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
     Node<K, V> withRightChild(Node<K, V> newRight) {
       if (newRight == right) {
         return this;
@@ -446,6 +448,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param newRoot A node or null (meaning the empty tree).
    * @return A map instance with the given tree.
    */
+  @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
   private PersistentSortedMap<K, V> mapFromTree(Node<K, V> newRoot) {
     if (newRoot == root) {
       return this;
@@ -811,6 +814,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
+    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
     public boolean containsAll(Collection<?> pC) {
       if (pC instanceof EntrySet<?, ?>) {
         // We can rely on sorted-set semantics here and optimize.
@@ -921,6 +925,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
+    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
     public boolean equals(Object pO) {
       if (pO instanceof EntrySet<?, ?>) {
         EntrySet<?, ?> other = (EntrySet<?, ?>) pO;

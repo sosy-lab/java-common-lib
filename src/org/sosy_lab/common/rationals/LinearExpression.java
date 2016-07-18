@@ -181,6 +181,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   /**
    * Pretty-print monomial to the given {@link StringBuilder}.
    */
+  @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public static void writeMonomial(String varSerialized, Rational coeff, StringBuilder b) {
     checkNotNull(varSerialized);
     if (b.length() != 0 && coeff.signum() >= 0) {

@@ -179,6 +179,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   /**
    * Multiply by {@code b}, return a new instance.
    **/
+  @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public Rational times(Rational b) {
     checkNotNull(b);
     Rational a = this;
@@ -201,6 +202,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   /**
    * Return a new instance equal to the sum of {@code this} and {@code b}.
    */
+  @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public Rational plus(Rational b) {
     checkNotNull(b);
     Rational a = this;
