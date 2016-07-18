@@ -20,6 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
@@ -30,7 +32,7 @@ import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.testing.EqualsTester;
 
-import junit.framework.TestCase;
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 
 import org.junit.After;
@@ -44,7 +46,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class PathCopyingPersistentTreeMapTest extends TestCase {
+public class PathCopyingPersistentTreeMapTest {
 
   private static final TestStringSortedMapGenerator mapGenerator =
       new TestStringSortedMapGenerator() {
@@ -61,7 +63,7 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
-    suite.addTestSuite(PathCopyingPersistentTreeMapTest.class);
+    suite.addTest(new JUnit4TestAdapter(PathCopyingPersistentTreeMapTest.class));
 
     suite.addTest(
         SortedMapTestSuiteBuilder.using(mapGenerator)
@@ -78,13 +80,11 @@ public class PathCopyingPersistentTreeMapTest extends TestCase {
 
   private PersistentSortedMap<String, String> map;
 
-  @Override
   @Before
   public void setUp() {
     map = PathCopyingPersistentTreeMap.of();
   }
 
-  @Override
   @After
   public void tearDown() {
     map = null;

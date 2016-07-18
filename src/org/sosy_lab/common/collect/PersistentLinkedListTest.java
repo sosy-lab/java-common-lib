@@ -29,7 +29,7 @@ import com.google.common.collect.testing.testers.ListLastIndexOfTester;
 import com.google.common.collect.testing.testers.ListListIteratorTester;
 import com.google.common.collect.testing.testers.ListSubListTester;
 
-import junit.framework.TestCase;
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-public class PersistentLinkedListTest extends TestCase {
+public class PersistentLinkedListTest {
 
   private static final TestStringListGenerator listGenerator =
       new TestStringListGenerator() {
@@ -50,7 +50,7 @@ public class PersistentLinkedListTest extends TestCase {
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
-    suite.addTestSuite(PersistentLinkedListTest.class);
+    suite.addTest(new JUnit4TestAdapter(PersistentLinkedListTest.class));
 
     suite.addTest(
         ListTestSuiteBuilder.using(listGenerator)

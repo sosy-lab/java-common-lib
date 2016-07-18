@@ -31,8 +31,6 @@ import com.google.common.collect.testing.testers.MapPutTester;
 import com.google.common.collect.testing.testers.MapRemoveTester;
 import com.google.common.collect.testing.testers.SortedMapNavigationTester;
 
-import junit.framework.TestSuite;
-
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.stream.Stream;
@@ -52,34 +50,28 @@ public class CopyOnWriteSortedMapTest {
       };
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
-    TestSuite suite = new TestSuite();
-    suite.addTestSuite(PathCopyingPersistentTreeMapTest.class);
+    return SortedMapTestSuiteBuilder.using(mapGenerator)
+        .named("CopyOnWriteSortedMap")
+        .withFeatures(
+            MapFeature.ALLOWS_NULL_VALUES,
+            // MapFeature.GENERAL_PURPOSE Not possible because collection views are unmodifiable
+            CollectionFeature.KNOWN_ORDER,
+            CollectionSize.ANY)
 
-    suite.addTest(
-        SortedMapTestSuiteBuilder.using(mapGenerator)
-            .named("CopyOnWriteSortedMap")
-            .withFeatures(
-                MapFeature.ALLOWS_NULL_VALUES,
-                // MapFeature.GENERAL_PURPOSE Not possible because collection views are unmodifiable
-                CollectionFeature.KNOWN_ORDER,
-                CollectionSize.ANY)
+        // We throw ClassCastException as allowed by the JavaDoc of SortedMap
+        .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
 
-            // We throw ClassCastException as allowed by the JavaDoc of SortedMap
-            .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
+        // Map is actually mutable, can't select the appropriate tests (see above)
+        .suppressing(MapPutTester.class.getMethod("testPut_unsupportedNotPresent"))
+        .suppressing(MapPutTester.class.getMethod("testPut_unsupportedPresentDifferentValue"))
+        .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedSomePresent"))
+        .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedNonePresent"))
+        .suppressing(MapRemoveTester.class.getMethod("testRemove_unsupported"))
+        .suppressing(MapClearTester.class.getMethod("testClear_unsupported"))
 
-            // Map is actually mutable, can't select the appropriate tests (see above)
-            .suppressing(MapPutTester.class.getMethod("testPut_unsupportedNotPresent"))
-            .suppressing(MapPutTester.class.getMethod("testPut_unsupportedPresentDifferentValue"))
-            .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedSomePresent"))
-            .suppressing(MapPutAllTester.class.getMethod("testPutAll_unsupportedNonePresent"))
-            .suppressing(MapRemoveTester.class.getMethod("testRemove_unsupported"))
-            .suppressing(MapClearTester.class.getMethod("testClear_unsupported"))
-
-            // subMap is created lazily
-            // TODO change this and enable test
-            .suppressing(SortedMapNavigationTester.class.getMethod("testSubMapIllegal"))
-            .createTestSuite());
-
-    return suite;
+        // subMap is created lazily
+        // TODO change this and enable test
+        .suppressing(SortedMapNavigationTester.class.getMethod("testSubMapIllegal"))
+        .createTestSuite();
   }
 }
