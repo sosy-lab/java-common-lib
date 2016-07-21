@@ -118,8 +118,16 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   public BasicLogManager(Logger pLogger, int pTruncateSize) {
     logger = checkNotNull(pLogger);
     componentName = "";
-    checkArgument(pTruncateSize >= 0);
-    truncateSize = pTruncateSize;
+    if (pTruncateSize >= TRUNCATE_REMAINING_SIZE) {
+      truncateSize = pTruncateSize;
+    } else if (pTruncateSize > 0) {
+      // truncate to something smaller than TRUNCATE_REMAINING_SIZE would have no effect
+      truncateSize = TRUNCATE_REMAINING_SIZE;
+    } else if (pTruncateSize == 0) {
+      truncateSize = 0;
+    } else {
+      throw new IllegalArgumentException("Negative truncateSize not allowed.");
+    }
   }
 
   /**
