@@ -21,18 +21,27 @@ package org.sosy_lab.common.log;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.base.Strings;
 import com.google.common.testing.TestLogHandler;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.Appenders.AbstractAppender;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class BasicLogManagerTest {
+
+  private final static String LONG_STRING = Strings.repeat("1234567890", 20);
+  private final static String LONG_STRING_TRUNCATED =
+      String.format(
+          "| %s... <REMAINING ARGUMENT OMITTED BECAUSE 10 CHARACTERS LONG> |",
+          Strings.repeat("1234567890", 10));
 
   private TestLogHandler testHandler;
   private LogManager logger;
@@ -41,7 +50,7 @@ public class BasicLogManagerTest {
   public void setUp() {
     testHandler = new TestLogHandler();
     testHandler.setLevel(Level.INFO);
-    logger = BasicLogManager.createWithHandler(testHandler);
+    logger = BasicLogManager.createWithHandler(testHandler, 150);
   }
 
   @After
@@ -100,5 +109,38 @@ public class BasicLogManagerTest {
 
   private void throwException() {
     throw new RuntimeException();
+  }
+
+  private void checkExpectedTruncatedMessage() {
+    List<LogRecord> records = testHandler.getStoredLogRecords();
+    assertThat(records).hasSize(1);
+    assertThat(records.get(0).getMessage().equals(LONG_STRING_TRUNCATED));
+  }
+
+  @Test
+  public void testLogTruncate() {
+    logger.log(Level.SEVERE, LONG_STRING);
+    checkExpectedTruncatedMessage();
+  }
+
+  @Test
+  public void testLogAppenderTruncate() {
+    logger.log(
+        Level.SEVERE,
+        "|",
+        new AbstractAppender() {
+          @Override
+          public void appendTo(Appendable pAppendable) throws IOException {
+            pAppendable.append(LONG_STRING);
+          }
+        },
+        "|");
+    checkExpectedTruncatedMessage();
+  }
+
+  @Test
+  public void testLogfTruncate() {
+    logger.logf(Level.SEVERE, "| %s |", LONG_STRING);
+    checkExpectedTruncatedMessage();
   }
 }

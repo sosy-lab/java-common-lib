@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -186,11 +187,16 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param handler The target handler.
    */
   public static LogManager createWithHandler(Handler handler) {
+    return createWithHandler(handler, 0);
+  }
+
+  @VisibleForTesting
+  static LogManager createWithHandler(Handler handler, int truncateSize) {
     Logger logger = Logger.getAnonymousLogger();
     logger.setLevel(handler.getLevel());
     logger.setUseParentHandlers(false);
     logger.addHandler(handler);
-    return new BasicLogManager(logger);
+    return new BasicLogManager(logger, truncateSize);
   }
 
   /**
