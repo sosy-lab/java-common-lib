@@ -97,6 +97,56 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     }
   }
 
+  private static class LimitingStringBufferAppendable implements Appendable {
+
+    private final int truncateSize;
+
+    private final StringBuilder sb = new StringBuilder();
+
+    LimitingStringBufferAppendable(int pTruncateSize) {
+      truncateSize = pTruncateSize;
+    }
+
+    @Override
+    public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
+      int length = pEnd - pStart;
+      if (length - truncateSize > 0) {
+        sb.append(pCsq, pStart, pStart + TRUNCATE_REMAINING_SIZE);
+        appendTruncationMessage(sb, Integer.toString(length));
+      } else {
+        sb.append(pCsq, pStart, pEnd);
+      }
+      return this;
+    }
+
+    @Override
+    public Appendable append(char pC) throws IOException {
+      sb.append(pC);
+      return this;
+    }
+
+    @Override
+    public Appendable append(CharSequence pCsq) throws IOException {
+      int length = pCsq.length();
+      if (length > truncateSize) {
+        sb.append(pCsq, 0, TRUNCATE_REMAINING_SIZE);
+        appendTruncationMessage(sb, Integer.toString(length));
+      } else {
+        sb.append(pCsq);
+      }
+      return this;
+    }
+
+    @Override
+    public String toString() {
+      return sb.toString();
+    }
+  }
+
+  private static void appendTruncationMessage(StringBuilder sb, String len) {
+    sb.append("... <REMAINING ARGUMENT OMITTED BECAUSE ").append(len).append(" CHARACTERS LONG>");
+  }
+
   /**
    * Constructor which allows to customize where this logger delegates to.
    *
@@ -307,7 +357,10 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     checkNotNull(format);
     checkNotNull(args);
     if (wouldBeLogged(priority)) {
-      log0(priority, findCallingMethod(), String.format(format, args));
+      @SuppressWarnings("resource") // Nothing to close for StringBuilder
+      java.util.Formatter formatter = new java.util.Formatter(
+          truncateSize > 0 ? new LimitingStringBufferAppendable(truncateSize) : new StringBuffer());
+      log0(priority, findCallingMethod(), formatter.format(format, args).toString());
     }
   }
 
@@ -370,11 +423,10 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
         String length = (o instanceof Appender) ? ">= " + truncateSize : arg.length() + "";
-        argsStr[i] =
-            arg.substring(0, TRUNCATE_REMAINING_SIZE)
-                + "... <REMAINING ARGUMENT OMITTED BECAUSE "
-                + length
-                + " CHARACTERS LONG>";
+        StringBuilder sb = new StringBuilder(TRUNCATE_REMAINING_SIZE + 70);
+        sb.append(arg.substring(0, TRUNCATE_REMAINING_SIZE));
+        appendTruncationMessage(sb, length);
+        argsStr[i] = sb.toString();
       } else {
         argsStr[i] = arg;
       }
