@@ -37,11 +37,8 @@ import java.util.logging.LogRecord;
 
 public class BasicLogManagerTest {
 
+  private static final int TRUNCATE_SIZE = 150;
   private final static String LONG_STRING = Strings.repeat("1234567890", 20);
-  private final static String LONG_STRING_TRUNCATED =
-      String.format(
-          "| %s... <REMAINING ARGUMENT OMITTED BECAUSE 10 CHARACTERS LONG> |",
-          Strings.repeat("1234567890", 10));
 
   private TestLogHandler testHandler;
   private LogManager logger;
@@ -50,7 +47,7 @@ public class BasicLogManagerTest {
   public void setUp() {
     testHandler = new TestLogHandler();
     testHandler.setLevel(Level.INFO);
-    logger = BasicLogManager.createWithHandler(testHandler, 150);
+    logger = BasicLogManager.createWithHandler(testHandler, TRUNCATE_SIZE);
   }
 
   @After
@@ -111,16 +108,30 @@ public class BasicLogManagerTest {
     throw new RuntimeException();
   }
 
-  private void checkExpectedTruncatedMessage() {
+  private void checkExpectedTruncatedMessage(boolean knownSize) {
     List<LogRecord> records = testHandler.getStoredLogRecords();
     assertThat(records).hasSize(1);
-    assertThat(records.get(0).getMessage().equals(LONG_STRING_TRUNCATED));
+    if (knownSize) {
+      assertThat(records.get(0).getMessage())
+          .isEqualTo(
+              String.format(
+                  "| %s... <REMAINING ARGUMENT OMITTED BECAUSE %d CHARACTERS LONG> |",
+                  LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
+                  LONG_STRING.length()));
+    } else {
+      assertThat(records.get(0).getMessage())
+          .isEqualTo(
+              String.format(
+                  "| %s... <REMAINING ARGUMENT OMITTED BECAUSE >= %d CHARACTERS LONG> |",
+                  LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
+                  TRUNCATE_SIZE));
+    }
   }
 
   @Test
   public void testLogTruncate() {
-    logger.log(Level.SEVERE, LONG_STRING);
-    checkExpectedTruncatedMessage();
+    logger.log(Level.SEVERE, "|", LONG_STRING, "|");
+    checkExpectedTruncatedMessage(true);
   }
 
   @Test
@@ -135,12 +146,12 @@ public class BasicLogManagerTest {
           }
         },
         "|");
-    checkExpectedTruncatedMessage();
+    checkExpectedTruncatedMessage(false);
   }
 
   @Test
   public void testLogfTruncate() {
     logger.logf(Level.SEVERE, "| %s |", LONG_STRING);
-    checkExpectedTruncatedMessage();
+    checkExpectedTruncatedMessage(true);
   }
 }

@@ -57,7 +57,7 @@ import javax.annotation.Nullable;
 public class BasicLogManager implements LogManager, AutoCloseable {
 
   // Number of characters taken from the start of the original output strings when truncating
-  private static final int TRUNCATE_REMAINING_SIZE = 100;
+  @VisibleForTesting static final int TRUNCATE_REMAINING_SIZE = 100;
 
   private static final Level EXCEPTION_DEBUG_LEVEL = Level.ALL;
   private static final Joiner MESSAGE_FORMAT = Joiner.on(' ').useForNull("null");
