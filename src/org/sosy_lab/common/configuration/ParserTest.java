@@ -47,8 +47,6 @@ public class ParserTest {
   private static final String TEST_FILE_SUFFIX = ".properties";
   private static final String TEST_FILE_PREFIX = "SoSy-Lab_Common_ParserTest";
 
-  public ParserTest() {}
-
   private Path basePath;
 
   @Before

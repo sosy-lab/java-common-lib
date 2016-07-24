@@ -365,8 +365,11 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     checkNotNull(args);
     if (wouldBeLogged(priority)) {
       @SuppressWarnings("resource") // Nothing to close for StringBuilder
-      java.util.Formatter formatter = new java.util.Formatter(
-          truncateSize > 0 ? new LimitingStringBufferAppendable(truncateSize) : new StringBuffer());
+      java.util.Formatter formatter =
+          new java.util.Formatter(
+              truncateSize > 0
+                  ? new LimitingStringBufferAppendable(truncateSize)
+                  : new StringBuffer());
       log0(priority, findCallingMethod(), formatter.format(format, args).toString());
     }
   }
