@@ -275,7 +275,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static void setupHandler(
       Logger logger, Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
     //build up list of Levels to exclude from logging
-    if (excludeLevels.size() > 0) {
+    if (!excludeLevels.isEmpty()) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
     } else {
       handler.setFilter(null);

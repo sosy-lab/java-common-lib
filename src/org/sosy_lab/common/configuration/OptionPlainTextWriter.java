@@ -191,7 +191,7 @@ class OptionPlainTextWriter {
 
     // add "# " before each line
     StringBuilder formattedLines = new StringBuilder();
-    if (!useLineStartInFirstLine && splittedLines.size() > 0) {
+    if (!useLineStartInFirstLine && !splittedLines.isEmpty()) {
       formattedLines.append(splittedLines.remove(0));
       formattedLines.append('\n');
     }
