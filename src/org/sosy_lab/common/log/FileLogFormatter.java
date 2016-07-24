@@ -22,6 +22,7 @@ package org.sosy_lab.common.log;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -30,7 +31,8 @@ import java.util.logging.LogRecord;
  */
 public class FileLogFormatter extends Formatter {
 
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+  private final SimpleDateFormat dateFormat =
+      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
 
   @Override
   public String format(LogRecord lr) {
