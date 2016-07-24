@@ -461,11 +461,11 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   @Override
   public void logUserException(Level priority, Throwable e, @Nullable String additionalMessage) {
     if (wouldBeLogged(priority)) {
-      String logMessage = "";
+      StringBuilder logMessage = new StringBuilder();
       if (priority.equals(Level.SEVERE)) {
-        logMessage = "Error: ";
+        logMessage.append("Error: ");
       } else if (priority.equals(Level.WARNING)) {
-        logMessage = "Warning: ";
+        logMessage.append("Warning: ");
       }
 
       String exceptionMessage = Strings.nullToEmpty(e.getMessage());
@@ -473,25 +473,28 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       if (Strings.isNullOrEmpty(additionalMessage)) {
 
         if (!exceptionMessage.isEmpty()) {
-          logMessage += exceptionMessage;
+          logMessage.append(exceptionMessage);
         } else {
           // No message at all, this shoudn't happen as its not nice for the user
           // Create a default message
-          logMessage += e.getClass().getSimpleName() + " in " + e.getStackTrace()[0];
+          logMessage
+              .append(e.getClass().getSimpleName())
+              .append(" in ")
+              .append(e.getStackTrace()[0]);
         }
 
       } else {
-        logMessage += additionalMessage;
+        logMessage.append(additionalMessage);
 
         if (!exceptionMessage.isEmpty()) {
           if ((e instanceof IOException)
-              && logMessage.endsWith("file")
+              && additionalMessage.endsWith("file")
               && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
             // nicer error message, so that we have something like
             // "could not write to file /FOO.txt (Permission denied)"
-            logMessage += " " + exceptionMessage;
+            logMessage.append(" ").append(exceptionMessage);
           } else {
-            logMessage += " (" + exceptionMessage + ")";
+            logMessage.append(" (").append(exceptionMessage).append(")");
           }
         }
       }
@@ -512,7 +515,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         }
       }
 
-      log0(priority, frame, logMessage);
+      log0(priority, frame, logMessage.toString());
     }
 
     logDebugException(e, additionalMessage);
