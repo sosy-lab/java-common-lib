@@ -869,8 +869,10 @@ public final class Configuration {
       @Nullable final Object defaultValue) {
 
     final StringBuilder optionInfo = new StringBuilder();
-    optionInfo.append(OptionPlainTextWriter.getOptionDescription(element));
-    optionInfo.append(name).append('\n');
+    optionInfo
+        .append(OptionPlainTextWriter.getOptionDescription(element))
+        .append(name)
+        .append('\n');
 
     if (defaultValue != null) {
       String defaultStr;
