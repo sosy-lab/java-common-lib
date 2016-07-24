@@ -300,8 +300,8 @@ public class PathCopyingPersistentTreeMapTest {
 
     // Insert nodes
     for (int i = 0; i < iterations; i++) {
-      String key = rnd.nextInt() + "";
-      String value = rnd.nextInt() + "";
+      String key = Integer.toString(rnd.nextInt());
+      String value = Integer.toString(rnd.nextInt());
 
       put(key, value);
       comparison.put(key, value);
@@ -311,10 +311,10 @@ public class PathCopyingPersistentTreeMapTest {
 
     // random put/remove operations
     for (int i = 0; i < iterations; i++) {
-      String key = rnd.nextInt() + "";
+      String key = Integer.toString(rnd.nextInt());
 
       if (rnd.nextBoolean()) {
-        String value = rnd.nextInt() + "";
+        String value = Integer.toString(rnd.nextInt());
         put(key, value);
         comparison.put(key, value);
       } else {

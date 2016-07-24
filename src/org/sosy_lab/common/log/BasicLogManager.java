@@ -428,7 +428,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       }
       arg = firstNonNull(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
-        String length = (o instanceof Appender) ? ">= " + truncateSize : arg.length() + "";
+        String length =
+            (o instanceof Appender) ? ">= " + truncateSize : Integer.toString(arg.length());
         StringBuilder sb = new StringBuilder(TRUNCATE_REMAINING_SIZE + 70);
         sb.append(arg.substring(0, TRUNCATE_REMAINING_SIZE));
         appendTruncationMessage(sb, length);
