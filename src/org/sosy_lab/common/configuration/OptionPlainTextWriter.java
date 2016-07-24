@@ -67,7 +67,7 @@ class OptionPlainTextWriter {
       String description = getOptionDescription(annotation.element());
       if (!description.isEmpty() && !lastDescription.equals(description)) {
         if (first) {
-          out.append("\n");
+          out.append('\n');
           first = false;
         }
         out.append(description);
@@ -132,7 +132,7 @@ class OptionPlainTextWriter {
         optionInfo.append(" = no default value");
       }
     }
-    optionInfo.append("\n");
+    optionInfo.append('\n');
     appendAllowedValues(info.element(), info.type(), optionInfo);
 
     return optionInfo.toString();
@@ -229,11 +229,11 @@ class OptionPlainTextWriter {
     final Option option = field.getAnnotation(Option.class);
     assert option != null;
     if (option.values().length != 0) {
-      str.append("  allowed values: ").append(Arrays.toString(option.values())).append("\n");
+      str.append("  allowed values: ").append(Arrays.toString(option.values())).append('\n');
     }
 
     if (verbose && !option.regexp().isEmpty()) {
-      str.append("  regexp:   ").append(option.regexp()).append("\n");
+      str.append("  regexp:   ").append(option.regexp()).append('\n');
     }
 
     if (verbose && option.toUppercase()) {
@@ -249,7 +249,7 @@ class OptionPlainTextWriter {
       if (verbose && classOption.packagePrefix().length != 0) {
         str.append("  packagePrefix: ");
         Joiner.on(", ").appendTo(str, classOption.packagePrefix());
-        str.append("\n");
+        str.append('\n');
       }
     }
   }
@@ -260,7 +260,7 @@ class OptionPlainTextWriter {
     final FileOption fileOption = field.getAnnotation(FileOption.class);
     if (fileOption != null) {
       if (verbose) {
-        str.append("  type of file: ").append(fileOption.value()).append("\n");
+        str.append("  type of file: ").append(fileOption.value()).append('\n');
       }
     }
   }
@@ -274,12 +274,12 @@ class OptionPlainTextWriter {
         if (intOption.min() == Long.MIN_VALUE) {
           str.append("  min:      Long.MIN_VALUE\n");
         } else {
-          str.append("  min:      ").append(intOption.min()).append("\n");
+          str.append("  min:      ").append(intOption.min()).append('\n');
         }
         if (intOption.max() == Long.MAX_VALUE) {
           str.append("  max:      Long.MAX_VALUE\n");
         } else {
-          str.append("  max:      ").append(intOption.max()).append("\n");
+          str.append("  max:      ").append(intOption.max()).append('\n');
         }
       }
     }
@@ -291,17 +291,17 @@ class OptionPlainTextWriter {
     final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
     if (timeSpanOption != null) {
       if (verbose) {
-        str.append("  code unit:     ").append(timeSpanOption.codeUnit()).append("\n");
-        str.append("  default unit:  ").append(timeSpanOption.defaultUserUnit()).append("\n");
+        str.append("  code unit:     ").append(timeSpanOption.codeUnit()).append('\n');
+        str.append("  default unit:  ").append(timeSpanOption.defaultUserUnit()).append('\n');
         if (timeSpanOption.min() == Long.MIN_VALUE) {
           str.append("  time min:      Long.MIN_VALUE\n");
         } else {
-          str.append("  time min:      ").append(timeSpanOption.min()).append("\n");
+          str.append("  time min:      ").append(timeSpanOption.min()).append('\n');
         }
         if (timeSpanOption.max() == Long.MAX_VALUE) {
           str.append("  time max:      Long.MAX_VALUE\n");
         } else {
-          str.append("  time max:      ").append(timeSpanOption.max()).append("\n");
+          str.append("  time max:      ").append(timeSpanOption.max()).append('\n');
         }
       }
     }

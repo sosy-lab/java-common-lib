@@ -74,15 +74,15 @@ public class ConsoleLogFormatter extends Formatter {
       String component = ((ExtendedLogRecord) lr).getSourceComponentName();
       if (!component.isEmpty()) {
         sb.append(component);
-        sb.append(":");
+        sb.append(':');
       }
     }
     sb.append(LogUtils.extractSimpleClassName(lr));
-    sb.append(".");
+    sb.append('.');
     sb.append(lr.getSourceMethodName());
     sb.append(", ");
     sb.append(lr.getLevel().toString());
-    sb.append(")");
+    sb.append(')');
     if (useColors) {
       sb.append("\033[m");
     }

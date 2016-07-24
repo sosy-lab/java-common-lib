@@ -870,7 +870,7 @@ public final class Configuration {
 
     final StringBuilder optionInfo = new StringBuilder();
     optionInfo.append(OptionPlainTextWriter.getOptionDescription(element));
-    optionInfo.append(name).append("\n");
+    optionInfo.append(name).append('\n');
 
     if (defaultValue != null) {
       String defaultStr;
@@ -881,11 +881,11 @@ public final class Configuration {
         defaultStr = defaultValue.toString();
       }
 
-      optionInfo.append("    default value:  ").append(defaultStr).append("\n");
+      optionInfo.append("    default value:  ").append(defaultStr).append('\n');
     }
 
     if (valueStr != null) {
-      optionInfo.append("--> used value:     ").append(valueStr).append("\n");
+      optionInfo.append("--> used value:     ").append(valueStr).append('\n');
     }
 
     printUsedOptions.println(optionInfo.toString());

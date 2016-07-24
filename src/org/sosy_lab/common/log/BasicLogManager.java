@@ -492,9 +492,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
               && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
             // nicer error message, so that we have something like
             // "could not write to file /FOO.txt (Permission denied)"
-            logMessage.append(" ").append(exceptionMessage);
+            logMessage.append(' ').append(exceptionMessage);
           } else {
-            logMessage.append(" (").append(exceptionMessage).append(")");
+            logMessage.append(" (").append(exceptionMessage).append(')');
           }
         }
       }
@@ -567,7 +567,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       StringBuilder logMessage = new StringBuilder();
 
       if (!Strings.isNullOrEmpty(additionalMessage)) {
-        logMessage.append(additionalMessage).append("\n");
+        logMessage.append(additionalMessage).append('\n');
       }
 
       logMessage
