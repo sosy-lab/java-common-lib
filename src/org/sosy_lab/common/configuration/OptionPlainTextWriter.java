@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -132,7 +133,7 @@ class OptionPlainTextWriter {
       }
     }
     optionInfo.append("\n");
-    optionInfo.append(getAllowedValues(info.element(), info.type()));
+    appendAllowedValues(info.element(), info.type(), optionInfo);
 
     return optionInfo.toString();
   }
@@ -201,9 +202,8 @@ class OptionPlainTextWriter {
    *
    * @param field field with the {@link Option}-annotation
    */
-  private String getAllowedValues(final AnnotatedElement field, final Class<?> type) {
-    String allowedValues = "";
-
+  private void appendAllowedValues(
+      final AnnotatedElement field, final Class<?> type, final StringBuilder str) {
     // if the type is enum,
     // the allowed values can be extracted the enum-class
     if (type.isEnum()) {
@@ -212,109 +212,98 @@ class OptionPlainTextWriter {
       for (int i = 0; i < enums.length; i++) {
         enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
-      allowedValues =
-          "  enum:     "
-              + formatText(java.util.Arrays.toString(enumTitles), "             ", false);
+      str.append("  enum:     ")
+          .append(formatText(java.util.Arrays.toString(enumTitles), "             ", false));
     }
 
-    allowedValues += getOptionValues(field);
-    allowedValues += getClassOptionValues(field);
-    allowedValues += getFileOptionValues(field);
-    allowedValues += getIntegerOptionValues(field);
-    allowedValues += getTimeSpanOptionValues(field);
-
-    return allowedValues;
+    appendOptionValues(field, str);
+    appendClassOptionValues(field, str);
+    appendFileOptionValues(field, str);
+    appendIntegerOptionValues(field, str);
+    appendTimeSpanOptionValues(field, str);
   }
 
   /** This method returns text representing the values,
    * that are defined in the {@link Option}-annotation. */
-  private String getOptionValues(AnnotatedElement field) {
+  private void appendOptionValues(AnnotatedElement field, StringBuilder str) {
     final Option option = field.getAnnotation(Option.class);
     assert option != null;
-    String str = "";
     if (option.values().length != 0) {
-      str += "  allowed values: " + java.util.Arrays.toString(option.values()) + "\n";
+      str.append("  allowed values: ").append(Arrays.toString(option.values())).append("\n");
     }
 
     if (verbose && !option.regexp().isEmpty()) {
-      str += "  regexp:   " + option.regexp() + "\n";
+      str.append("  regexp:   ").append(option.regexp()).append("\n");
     }
 
     if (verbose && option.toUppercase()) {
-      str += "  uppercase: true\n";
+      str.append("  uppercase: true\n");
     }
-    return str;
   }
 
   /** This method returns text representing the values,
    * that are defined in the {@link ClassOption}-annotation. */
-  private String getClassOptionValues(AnnotatedElement field) {
+  private void appendClassOptionValues(AnnotatedElement field, StringBuilder str) {
     final ClassOption classOption = field.getAnnotation(ClassOption.class);
-    String str = "";
     if (classOption != null) {
       if (verbose && classOption.packagePrefix().length != 0) {
-        str += "  packagePrefix: " + Joiner.on(", ").join(classOption.packagePrefix()) + "\n";
+        str.append("  packagePrefix: ");
+        Joiner.on(", ").appendTo(str, classOption.packagePrefix());
+        str.append("\n");
       }
     }
-    return str;
   }
 
   /** This method returns text representing the values,
    * that are defined in the {@link FileOption}-annotation. */
-  private String getFileOptionValues(AnnotatedElement field) {
+  private void appendFileOptionValues(AnnotatedElement field, StringBuilder str) {
     final FileOption fileOption = field.getAnnotation(FileOption.class);
-    String str = "";
     if (fileOption != null) {
       if (verbose) {
-        str += "  type of file: " + fileOption.value() + "\n";
+        str.append("  type of file: ").append(fileOption.value()).append("\n");
       }
     }
-    return str;
   }
 
   /** This method returns text representing the values,
    * that are defined in the {@link IntegerOption}-annotation. */
-  private String getIntegerOptionValues(AnnotatedElement field) {
+  private void appendIntegerOptionValues(AnnotatedElement field, StringBuilder str) {
     final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
-    String str = "";
     if (intOption != null) {
       if (verbose) {
         if (intOption.min() == Long.MIN_VALUE) {
-          str += "  min:      Long.MIN_VALUE\n";
+          str.append("  min:      Long.MIN_VALUE\n");
         } else {
-          str += "  min:      " + intOption.min() + "\n";
+          str.append("  min:      ").append(intOption.min()).append("\n");
         }
         if (intOption.max() == Long.MAX_VALUE) {
-          str += "  max:      Long.MAX_VALUE\n";
+          str.append("  max:      Long.MAX_VALUE\n");
         } else {
-          str += "  max:      " + intOption.max() + "\n";
+          str.append("  max:      ").append(intOption.max()).append("\n");
         }
       }
     }
-    return str;
   }
 
   /** This method returns text representing the values,
    * that are defined in the {@link TimeSpanOption}-annotation. */
-  private String getTimeSpanOptionValues(AnnotatedElement field) {
+  private void appendTimeSpanOptionValues(AnnotatedElement field, StringBuilder str) {
     final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
-    String str = "";
     if (timeSpanOption != null) {
       if (verbose) {
-        str += "  code unit:     " + timeSpanOption.codeUnit() + "\n";
-        str += "  default unit:  " + timeSpanOption.defaultUserUnit() + "\n";
+        str.append("  code unit:     ").append(timeSpanOption.codeUnit()).append("\n");
+        str.append("  default unit:  ").append(timeSpanOption.defaultUserUnit()).append("\n");
         if (timeSpanOption.min() == Long.MIN_VALUE) {
-          str += "  time min:      Long.MIN_VALUE\n";
+          str.append("  time min:      Long.MIN_VALUE\n");
         } else {
-          str += "  time min:      " + timeSpanOption.min() + "\n";
+          str.append("  time min:      ").append(timeSpanOption.min()).append("\n");
         }
         if (timeSpanOption.max() == Long.MAX_VALUE) {
-          str += "  time max:      Long.MAX_VALUE\n";
+          str.append("  time max:      Long.MAX_VALUE\n");
         } else {
-          str += "  time max:      " + timeSpanOption.max() + "\n";
+          str.append("  time max:      ").append(timeSpanOption.max()).append("\n");
         }
       }
     }
-    return str;
   }
 }
