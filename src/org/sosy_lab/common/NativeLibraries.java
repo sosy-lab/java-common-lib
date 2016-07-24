@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 /**
  * Helper class for loading native libraries.
  */
-public class NativeLibraries {
+public final class NativeLibraries {
 
   private NativeLibraries() {}
 

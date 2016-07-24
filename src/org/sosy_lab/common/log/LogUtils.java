@@ -21,7 +21,7 @@ package org.sosy_lab.common.log;
 
 import java.util.logging.LogRecord;
 
-class LogUtils {
+final class LogUtils {
 
   private LogUtils() {}
 

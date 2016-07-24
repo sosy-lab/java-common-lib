@@ -32,7 +32,7 @@ import java.util.SortedSet;
 /**
  * Utility class similar to {@link Collections} and {@link Collections2}.
  */
-public class Collections3 {
+public final class Collections3 {
 
   private Collections3() {}
 

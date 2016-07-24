@@ -63,7 +63,7 @@ import javax.annotation.Nullable;
  * In order to configure these features, the normal configuration options are used.
  */
 @Options
-public class FileTypeConverter implements TypeConverter {
+public final class FileTypeConverter implements TypeConverter {
 
   private static final ImmutableSet<Class<?>> SUPPORTED_TYPES =
       ImmutableSet.<Class<?>>of(

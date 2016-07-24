@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 /**
  * Utilities for {@link Optional}.
  */
-public class Optionals {
+public final class Optionals {
 
   private Optionals() {}
 

@@ -66,7 +66,7 @@ import javax.annotation.Nullable;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
-public class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
+public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
 
   private final AtomicReference<PersistentSortedMap<K, V>> map;
 
