@@ -481,7 +481,7 @@ public class OptionCollector {
     return Collectors.groupingBy(classifier, () -> new TreeMap<>(keyComparator), toSortedList);
   }
 
-  static abstract class AnnotationInfo {
+  abstract static class AnnotationInfo {
 
     /**
      * The annotated element or class.
@@ -497,7 +497,7 @@ public class OptionCollector {
   }
 
   @AutoValue
-  static abstract class OptionInfo extends AnnotationInfo {
+  abstract static class OptionInfo extends AnnotationInfo {
 
     static OptionInfo createForField(Field field, String name, String defaultValue) {
       return new AutoValue_OptionCollector_OptionInfo(field, name, field.getType(), defaultValue);
@@ -519,7 +519,7 @@ public class OptionCollector {
   }
 
   @AutoValue
-  static abstract class OptionsInfo extends AnnotationInfo {
+  abstract static class OptionsInfo extends AnnotationInfo {
 
     static OptionsInfo create(Class<?> c, String prefix) {
       return new AutoValue_OptionCollector_OptionsInfo(prefix, c);

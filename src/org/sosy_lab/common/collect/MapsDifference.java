@@ -97,7 +97,7 @@ public class MapsDifference {
   /**
    * Default implementation of {@link Visitor} with empty methods.
    */
-  public static abstract class DefaultVisitor<K, V> implements Visitor<K, V> {
+  public abstract static class DefaultVisitor<K, V> implements Visitor<K, V> {
 
     @Override
     public void leftValueOnly(K pKey, V pLeftValue) {}
@@ -129,7 +129,7 @@ public class MapsDifference {
    * @param <V> The type of the values.
    */
   @AutoValue
-  public static abstract class Entry<K, V> {
+  public abstract static class Entry<K, V> {
 
     Entry() {}
 

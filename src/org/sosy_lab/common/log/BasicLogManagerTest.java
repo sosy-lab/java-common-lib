@@ -38,7 +38,7 @@ import java.util.logging.LogRecord;
 public class BasicLogManagerTest {
 
   private static final int TRUNCATE_SIZE = 150;
-  private final static String LONG_STRING = Strings.repeat("1234567890", 20);
+  private static final String LONG_STRING = Strings.repeat("1234567890", 20);
 
   private TestLogHandler testHandler;
   private LogManager logger;
