@@ -74,6 +74,25 @@ public class Appenders {
   }
 
   /**
+   * Let an {@link Appender} dump itself into a {@link StringBuilder}.
+   * This method is similar to passing the {@link StringBuilder} to
+   * the {@link Appender#appendTo(Appendable)} method, just without the checked
+   * exception.
+   * @param sb The StringBuilder that will receive the content.
+   * @param a The Appender to dump into the StringBuilder.
+   * @return The passed StringBuilder to allow for method chaining.
+   */
+  public static StringBuilder appendTo(StringBuilder sb, Appender a) {
+    checkNotNull(sb);
+    try {
+      a.appendTo(sb);
+    } catch (IOException e) {
+      throw new AssertionError("StringBuilder threw IOException", e);
+    }
+    return sb;
+  }
+
+  /**
    * Return an {@link Appender} that writes an {@link Iterable} into the output
    * using a given {@link Joiner}.
    * @param joiner The joiner that will be used to create a string representation of the iterable.
@@ -133,25 +152,6 @@ public class Appenders {
         appendable.append(Objects.toString(o));
       }
     };
-  }
-
-  /**
-   * Let an {@link Appender} dump itself into a {@link StringBuilder}.
-   * This method is similar to passing the {@link StringBuilder} to
-   * the {@link Appender#appendTo(Appendable)} method, just without the checked
-   * exception.
-   * @param sb The StringBuilder that will receive the content.
-   * @param a The Appender to dump into the StringBuilder.
-   * @return The passed StringBuilder to allow for method chaining.
-   */
-  public static StringBuilder appendTo(StringBuilder sb, Appender a) {
-    checkNotNull(sb);
-    try {
-      a.appendTo(sb);
-    } catch (IOException e) {
-      throw new AssertionError("StringBuilder threw IOException", e);
-    }
-    return sb;
   }
 
   /**

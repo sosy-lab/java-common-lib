@@ -412,29 +412,6 @@ public final class Configuration {
   }
 
   /**
-   * Call {@link #inject(Object, Class)} for this object with its actual class
-   * and all super class that have an {@link Options} annotation.
-   *
-   * @param obj The object in which the configuration options should be injected.
-   * @throws InvalidConfigurationException If the user specified configuration is wrong.
-   */
-  public void recursiveInject(Object obj) throws InvalidConfigurationException {
-    Class<?> cls = obj.getClass();
-    checkArgument(
-        cls.isAnnotationPresent(Options.class),
-        "Class %s must have @Options annotation.",
-        cls.getName());
-
-    do {
-      if (cls.isAnnotationPresent(Options.class)) {
-        inject(obj, cls);
-      }
-
-      cls = cls.getSuperclass();
-    } while (cls != null);
-  }
-
-  /**
    * @see #inject(Object)
    *
    * Use this method if the calling class is likely to be sub-classed, so that
@@ -480,6 +457,29 @@ public final class Configuration {
       // setAccessible() succeeded but member is still not accessible (should not happen)
       throw new AssertionError(e);
     }
+  }
+
+  /**
+   * Call {@link #inject(Object, Class)} for this object with its actual class
+   * and all super class that have an {@link Options} annotation.
+   *
+   * @param obj The object in which the configuration options should be injected.
+   * @throws InvalidConfigurationException If the user specified configuration is wrong.
+   */
+  public void recursiveInject(Object obj) throws InvalidConfigurationException {
+    Class<?> cls = obj.getClass();
+    checkArgument(
+        cls.isAnnotationPresent(Options.class),
+        "Class %s must have @Options annotation.",
+        cls.getName());
+
+    do {
+      if (cls.isAnnotationPresent(Options.class)) {
+        inject(obj, cls);
+      }
+
+      cls = cls.getSuperclass();
+    } while (cls != null);
   }
 
   /** This method sets a new value to a field with an {@link Options}-annotation.

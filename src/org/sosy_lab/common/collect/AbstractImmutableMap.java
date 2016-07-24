@@ -61,13 +61,19 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   @Deprecated
   @Override
-  public final boolean replace(K pKey, V pOldValue, V pNewValue) {
+  public final boolean remove(Object pKey, Object pValue) {
     throw new UnsupportedOperationException();
   }
 
   @Deprecated
   @Override
-  public final boolean remove(Object pKey, Object pValue) {
+  public final V replace(K pKey, V pValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public final boolean replace(K pKey, V pOldValue, V pNewValue) {
     throw new UnsupportedOperationException();
   }
 
@@ -94,12 +100,6 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   @Override
   public final V merge(
       K pKey, V pValue, BiFunction<? super V, ? super V, ? extends V> pRemappingFunction) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  @Override
-  public final V replace(K pKey, V pValue) {
     throw new UnsupportedOperationException();
   }
 
