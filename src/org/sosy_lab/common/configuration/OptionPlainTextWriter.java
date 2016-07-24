@@ -161,9 +161,9 @@ class OptionPlainTextWriter {
       String remainingLine = fullLine;
       while (remainingLine.length() > CHARS_PER_LINE) {
 
-        int spaceIndex = remainingLine.lastIndexOf(" ", CHARS_PER_LINE);
+        int spaceIndex = remainingLine.lastIndexOf(' ', CHARS_PER_LINE);
         if (spaceIndex == -1) {
-          spaceIndex = remainingLine.indexOf(" ");
+          spaceIndex = remainingLine.indexOf(' ');
         }
         if (spaceIndex == -1) {
           spaceIndex = remainingLine.length() - 1;

@@ -260,7 +260,7 @@ public class OptionCollector {
 
     // encapsulated classes have a "$" in filename
     if (filename.contains("$")) {
-      filename = filename.substring(0, filename.indexOf("$"));
+      filename = filename.substring(0, filename.indexOf('$'));
     }
     filename += ".java";
 
@@ -351,12 +351,12 @@ public class OptionCollector {
     if (field.getType().isEnum()) {
       if (defaultValue.isEmpty()) {
         String type = field.getType().toString();
-        type = type.substring(type.lastIndexOf(".") + 1).replace("$", ".");
+        type = type.substring(type.lastIndexOf('.') + 1).replace("$", ".");
         defaultValue =
             getDefaultValueFromContent(classSource, getFieldMatchingPattern(field, type));
       }
       if (defaultValue.contains(".")) {
-        defaultValue = defaultValue.substring(defaultValue.lastIndexOf(".") + 1);
+        defaultValue = defaultValue.substring(defaultValue.lastIndexOf('.') + 1);
       }
     }
 
@@ -388,7 +388,7 @@ public class OptionCollector {
     String[] splitted = content.split(fieldPattern);
     if (splitted.length > 1) { // first part is before fieldString, second part is after it
       final String rest = splitted[1];
-      defaultValue = rest.substring(0, rest.indexOf(";")).trim();
+      defaultValue = rest.substring(0, rest.indexOf(';')).trim();
 
       // remove unnecessary parts of field
       if (defaultValue.startsWith("=")) {
