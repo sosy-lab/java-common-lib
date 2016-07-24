@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common;
 
+import com.google.common.base.Ascii;
 import com.google.common.base.Strings;
 
 import org.sosy_lab.common.io.MoreFiles;
@@ -175,7 +176,7 @@ public final class JSON {
           if ((ch >= '\u0000' && ch <= '\u001F')
               || (ch >= '\u007F' && ch <= '\u009F')
               || (ch >= '\u2000' && ch <= '\u20FF')) {
-            String ss = Integer.toHexString(ch).toUpperCase();
+            String ss = Ascii.toUpperCase(Integer.toHexString(ch));
             out.append("\\u");
             out.append(Strings.padStart(ss, 4, '0'));
           } else {

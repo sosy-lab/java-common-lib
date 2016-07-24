@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -92,7 +93,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
     @Override
     public void setConsoleLevel(String pNewLevel) throws IllegalArgumentException {
-      Level newLevel = Level.parse(pNewLevel.toUpperCase());
+      Level newLevel = Level.parse(pNewLevel.toUpperCase(Locale.US));
       consoleHandler.setLevel(newLevel);
       logger.setLevel(getMinimumLevel(fileLevel, newLevel));
     }

@@ -30,6 +30,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Ascii;
 import com.google.common.base.Function;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -632,7 +633,8 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   private static final Function<TimeSpan, String> DEFAULT_FORMAT;
 
   static {
-    String format = System.getProperty(DEFAULT_FORMAT_PROPERTY_NAME, "SIMPLE").toUpperCase().trim();
+    String format =
+        Ascii.toUpperCase(System.getProperty(DEFAULT_FORMAT_PROPERTY_NAME, "SIMPLE").trim());
     switch (format) {
       case "HUMAN_READABLE_LARGE":
         DEFAULT_FORMAT = FORMAT_HUMAN_READABLE_LARGE;

@@ -22,6 +22,8 @@ package org.sosy_lab.common.time;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Ascii;
+
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 import java.util.concurrent.TimeUnit;
@@ -48,7 +50,8 @@ public final class Timer {
 
   static {
     String clockToUse =
-        System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").toUpperCase().trim();
+        Ascii.toUpperCase(
+            System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").trim());
     switch (clockToUse) {
       case "WALLTIME_MILLIS":
         DEFAULT_CLOCK = Tickers.getWalltimeMillis();

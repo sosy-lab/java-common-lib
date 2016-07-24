@@ -69,6 +69,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -793,7 +794,7 @@ public final class Configuration {
     }
 
     if (alwaysUppercase || option.toUppercase()) {
-      valueStr = valueStr.toUpperCase();
+      valueStr = valueStr.toUpperCase(Locale.getDefault());
     }
 
     // check if it is included in the allowed values list

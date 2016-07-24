@@ -22,6 +22,7 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,7 +63,7 @@ public class NativeLibraries {
                 + "(OS, architecture, JVM).");
       }
 
-      prop = prop.toLowerCase().replace(" ", "");
+      prop = Ascii.toLowerCase(prop.replace(" ", ""));
 
       if (prop.startsWith("linux")) {
         currentOS = LINUX;
@@ -117,7 +118,7 @@ public class NativeLibraries {
 
         prop = StandardSystemProperty.JAVA_VM_NAME.value();
         if (!isNullOrEmpty(prop)) {
-          prop = prop.toLowerCase();
+          prop = Ascii.toLowerCase(prop);
 
           if (prop.contains("32-bit") || prop.contains("32bit") || prop.contains("i386")) {
 
@@ -157,8 +158,8 @@ public class NativeLibraries {
     // sub-directory of the one with the "lib" directory (e.g., in a "bin" directory).
 
     if (nativePath == null) {
-      String arch = Architecture.guessVmArchitecture().name().toLowerCase();
-      String os = OS.guessOperatingSystem().name().toLowerCase();
+      String arch = Ascii.toLowerCase(Architecture.guessVmArchitecture().name());
+      String os = Ascii.toLowerCase(OS.guessOperatingSystem().name());
 
       nativePath =
           getPathToJar().getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
