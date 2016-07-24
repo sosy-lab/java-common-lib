@@ -34,15 +34,12 @@ import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 @SuppressWarnings("CheckReturnValue")
 public class TimeSpanTest {
 
   private static final long LARGE_VALUE = 1125899906842624L; //2^50
   private static final TimeSpan LARGE_AS_HOURS = TimeSpan.of(LARGE_VALUE * 24, HOURS);
-  private static final TimeSpan LARGE_AS_MINUTES =
-      TimeSpan.of(LARGE_VALUE * 24 * 60, TimeUnit.MINUTES);
+  private static final TimeSpan LARGE_AS_MINUTES = TimeSpan.of(LARGE_VALUE * 24 * 60, MINUTES);
   private static final TimeSpan LARGE = TimeSpan.of(LARGE_VALUE, DAYS); // 2^50 days
 
   private static final long VERY_LARGE_VALUE = 4611686018427387905L; //2^62 + 1
@@ -209,7 +206,7 @@ public class TimeSpanTest {
 
   @Test(expected = ArithmeticException.class)
   public void testGetCheckedOverflow() {
-    LARGE.getChecked(TimeUnit.SECONDS);
+    LARGE.getChecked(SECONDS);
   }
 
   @Test
@@ -234,7 +231,7 @@ public class TimeSpanTest {
 
   @Test(expected = ArithmeticException.class)
   public void testToGetCheckedOverflow() {
-    LARGE.toChecked(TimeUnit.SECONDS);
+    LARGE.toChecked(SECONDS);
   }
 
   @Test
@@ -290,7 +287,7 @@ public class TimeSpanTest {
   @Test
   public void testSumNoOverflow() {
     TimeSpan input = TimeSpan.of(VERY_LARGE_VALUE, HOURS);
-    TimeSpan result = TimeSpan.sum(input, input);
+    TimeSpan result = sum(input, input);
     assertThat(result.getUnit()).isEqualTo(DAYS);
     assertThat(result).isEqualTo(TimeSpan.of(2 * (VERY_LARGE_VALUE / 24), DAYS));
   }
@@ -298,7 +295,7 @@ public class TimeSpanTest {
   @Test(expected = ArithmeticException.class)
   public void testSumOverflow() {
     TimeSpan input = TimeSpan.of(VERY_LARGE_VALUE, DAYS);
-    TimeSpan.sum(input, input);
+    sum(input, input);
   }
 
   @Test

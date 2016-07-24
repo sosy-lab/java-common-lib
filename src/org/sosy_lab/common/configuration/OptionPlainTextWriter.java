@@ -213,7 +213,7 @@ class OptionPlainTextWriter {
         enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
       str.append("  enum:     ")
-          .append(formatText(java.util.Arrays.toString(enumTitles), "             ", false));
+          .append(formatText(Arrays.toString(enumTitles), "             ", false));
     }
 
     appendOptionValues(field, str);

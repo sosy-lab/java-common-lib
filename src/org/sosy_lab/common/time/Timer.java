@@ -21,7 +21,6 @@ package org.sosy_lab.common.time;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
@@ -251,7 +250,7 @@ public final class Timer {
    */
   @Override
   public String toString() {
-    return getSumTime().formatAs(SECONDS);
+    return getSumTime().formatAs(TimeUnit.SECONDS);
   }
 
   /**

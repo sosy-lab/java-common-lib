@@ -427,7 +427,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     // Need to use a fixed unit here to be consistent with equals:
     // 60s and 1min need to have the same hashCode.
     // Saturation is ok, all really large values just have the same hash code.
-    return Longs.hashCode(getSaturated(TimeUnit.NANOSECONDS));
+    return Longs.hashCode(getSaturated(NANOSECONDS));
   }
 
   @Override

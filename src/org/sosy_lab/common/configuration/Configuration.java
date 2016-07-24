@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -799,7 +798,7 @@ public final class Configuration {
 
     // check if it is included in the allowed values list
     final String[] allowedValues = option.values();
-    if (allowedValues.length > 0 && !java.util.Arrays.asList(allowedValues).contains(valueStr)) {
+    if (allowedValues.length > 0 && !Arrays.asList(allowedValues).contains(valueStr)) {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)",
@@ -995,7 +994,7 @@ public final class Configuration {
         type,
         secondaryOption,
         sources.get(optionName),
-        MoreObjects.firstNonNull(logger, LogManager.createNullLogManager()));
+        firstNonNull(logger, LogManager.createNullLogManager()));
   }
 
   /**
