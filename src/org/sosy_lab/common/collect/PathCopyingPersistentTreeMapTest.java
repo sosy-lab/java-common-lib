@@ -339,8 +339,8 @@ public class PathCopyingPersistentTreeMapTest {
   }
 
   private void checkPartialMaps(SortedMap<String, String> comparison, Random rnd) {
-    String key1 = rnd.nextInt() + "";
-    String key2 = rnd.nextInt() + "";
+    String key1 = Integer.toString(rnd.nextInt());
+    String key2 = Integer.toString(rnd.nextInt());
 
     checkEqualTo(comparison.tailMap(key1), map.tailMap(key1));
     checkEqualTo(comparison.tailMap(key2), map.tailMap(key2));

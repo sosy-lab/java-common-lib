@@ -105,20 +105,26 @@ class OptionPlainTextWriter {
 
   /** This function returns the formatted information about an {@link Option}. */
   private String getOptionInfo(OptionInfo info) {
-    final StringBuilder optionInfo = new StringBuilder();
+    final StringBuilder optionInfo = new StringBuilder(200);
     optionInfo.append(info.name());
 
     if (verbose) {
       if (info.element() instanceof Field) {
-        optionInfo.append("\n  field:    " + ((Field) info.element()).getName() + "\n");
+        optionInfo.append("\n  field:    ").append(((Field) info.element()).getName()).append('\n');
       } else if (info.element() instanceof Method) {
-        optionInfo.append("\n  method:   " + ((Method) info.element()).getName() + "\n");
+        optionInfo
+            .append("\n  method:   ")
+            .append(((Method) info.element()).getName())
+            .append('\n');
       }
 
       Class<?> cls = ((Member) info.element()).getDeclaringClass();
-      optionInfo.append("  class:    " + cls.toString().substring(6) + "\n");
-      optionInfo.append("  type:     " + info.type().getSimpleName() + "\n");
-      optionInfo.append("  default value: ");
+      optionInfo
+          .append("  class:    ")
+          .append(cls.toString().substring(6))
+          .append("\n  type:     ")
+          .append(info.type().getSimpleName())
+          .append("\n  default value: ");
       if (!info.defaultValue().isEmpty()) {
         optionInfo.append(info.defaultValue());
       } else {
@@ -127,7 +133,7 @@ class OptionPlainTextWriter {
 
     } else {
       if (!info.defaultValue().isEmpty()) {
-        optionInfo.append(" = " + info.defaultValue());
+        optionInfo.append(" = ").append(info.defaultValue());
       } else {
         optionInfo.append(" = no default value");
       }
@@ -291,8 +297,11 @@ class OptionPlainTextWriter {
     final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
     if (timeSpanOption != null) {
       if (verbose) {
-        str.append("  code unit:     ").append(timeSpanOption.codeUnit()).append('\n');
-        str.append("  default unit:  ").append(timeSpanOption.defaultUserUnit()).append('\n');
+        str.append("  code unit:     ")
+            .append(timeSpanOption.codeUnit())
+            .append("\n  default unit:  ")
+            .append(timeSpanOption.defaultUserUnit())
+            .append('\n');
         if (timeSpanOption.min() == Long.MIN_VALUE) {
           str.append("  time min:      Long.MIN_VALUE\n");
         } else {

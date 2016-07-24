@@ -59,7 +59,7 @@ public class ConsoleLogFormatter extends Formatter {
 
   @Override
   public String format(LogRecord lr) {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(200);
 
     if (useColors) {
       if (lr.getLevel().equals(Level.WARNING)) {
@@ -68,8 +68,7 @@ public class ConsoleLogFormatter extends Formatter {
         sb.append("\033[31;1m"); // bold red color
       }
     }
-    sb.append(lr.getMessage());
-    sb.append(" (");
+    sb.append(lr.getMessage()).append(" (");
     if (lr instanceof ExtendedLogRecord) {
       String component = ((ExtendedLogRecord) lr).getSourceComponentName();
       if (!component.isEmpty()) {
