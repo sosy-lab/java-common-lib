@@ -317,11 +317,6 @@ public class OptionCollector {
    *
    * @param field where to get the default value */
   private static String getDefaultValue(final Field field, final String classSource) {
-
-    // get declaration of field from file
-    // example fieldString: 'private boolean shouldCheck'
-    String fieldString = Modifier.toString(field.getModifiers());
-
     // genericType: "boolean" or "java.util.List<java.util.logging.Level>"
     String typeString = field.getGenericType().toString();
     if (typeString.matches(".*<.*>")) {
@@ -347,10 +342,8 @@ public class OptionCollector {
     // remove prefix of inner classes
     typeString = typeString.replaceAll("[^<>, ]*\\$([^<>, $]*)", "$1");
 
-    fieldString += "\\s+" + typeString;
-    fieldString += "\\s+" + field.getName();
-
-    String defaultValue = getDefaultValueFromContent(classSource, fieldString);
+    String defaultValue =
+        getDefaultValueFromContent(classSource, getFieldMatchingPattern(field, typeString));
 
     // enums can be written with the whole classname, example:
     // 'Waitlist.TraversalMethod traversalMethod = ...;'
@@ -359,9 +352,8 @@ public class OptionCollector {
       if (defaultValue.isEmpty()) {
         String type = field.getType().toString();
         type = type.substring(type.lastIndexOf(".") + 1).replace("$", ".");
-        fieldString =
-            Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+" + field.getName();
-        defaultValue = getDefaultValueFromContent(classSource, fieldString);
+        defaultValue =
+            getDefaultValueFromContent(classSource, getFieldMatchingPattern(field, type));
       }
       if (defaultValue.contains(".")) {
         defaultValue = defaultValue.substring(defaultValue.lastIndexOf(".") + 1);
@@ -372,6 +364,14 @@ public class OptionCollector {
       defaultValue = "";
     }
     return defaultValue;
+  }
+
+  /**
+   * Get pattern for matching a field declaration in a source file.
+   * Example: 'private boolean shouldCheck'
+   */
+  private static String getFieldMatchingPattern(final Field field, String type) {
+    return Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+" + field.getName();
   }
 
   /** This function searches for fieldstring in content and
