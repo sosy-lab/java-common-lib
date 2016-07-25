@@ -24,7 +24,7 @@ deploy:
     script: build/deploy-coverage.sh
 notifications:
   email:
-    - common-java-dev@groups.google.com
+    - common-java-dev@googlegroups.com
 cache:
   directories:
   - $HOME/.ivy2
