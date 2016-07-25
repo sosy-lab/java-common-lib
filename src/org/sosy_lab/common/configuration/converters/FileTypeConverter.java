@@ -216,6 +216,7 @@ public final class FileTypeConverter implements TypeConverter {
 
     Class<?> type = pType.getRawType();
     checkApplicability(type, secondaryOption, optionName);
+    assert secondaryOption != null : "checkApplicability should ensure this";
 
     return handleFileOption(
         optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), type, pSource);
@@ -228,6 +229,7 @@ public final class FileTypeConverter implements TypeConverter {
 
     final Class<?> type = pType.getRawType();
     checkApplicability(type, secondaryOption, optionName);
+    assert secondaryOption != null : "checkApplicability should ensure this";
 
     FileOption.Type typeInfo = ((FileOption) secondaryOption).value();
 
