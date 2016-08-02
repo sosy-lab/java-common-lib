@@ -53,7 +53,7 @@ public final class Collections3 {
    * {@link Stream} or {@link FluentIterable}.
    */
   public static <T1, T2> ImmutableList<T2> transformedImmutableListCopy(
-      Collection<T1> input, Function<T1, T2> transformer) {
+      Collection<T1> input, Function<? super T1, T2> transformer) {
     return ImmutableList.copyOf(Collections2.transform(input, transformer));
   }
 
@@ -63,7 +63,7 @@ public final class Collections3 {
    * {@link Collections2#transform(Collection, Function)}.
    */
   public static <T1, T2> ImmutableSet<T2> transformedImmutableSetCopy(
-      Collection<T1> input, Function<T1, T2> transformer) {
+      Collection<T1> input, Function<? super T1, T2> transformer) {
     return ImmutableSet.copyOf(Collections2.transform(input, transformer));
   }
 
