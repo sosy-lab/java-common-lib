@@ -22,12 +22,20 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.stream.Stream;
 
 /**
  * Utility class similar to {@link Collections} and {@link Collections2}.
@@ -35,6 +43,29 @@ import java.util.SortedSet;
 public final class Collections3 {
 
   private Collections3() {}
+
+  /**
+   * Apply a function to all elements in a collection and return an {@link ImmutableList}
+   * with the results. This is an eager version of {@link Lists#transform(List, Function)}
+   * and {@link Collections2#transform(Collection, Function)}.
+   *
+   * This function is more efficient than code doing the same using
+   * {@link Stream} or {@link FluentIterable}.
+   */
+  public static <T1, T2> ImmutableList<T2> transformedImmutableListCopy(
+      Collection<T1> input, Function<T1, T2> transformer) {
+    return ImmutableList.copyOf(Collections2.transform(input, transformer));
+  }
+
+  /**
+   * Apply a function to all elements in a collection and return an {@link ImmutableSet}
+   * with the results. This is an eager version of
+   * {@link Collections2#transform(Collection, Function)}.
+   */
+  public static <T1, T2> ImmutableSet<T2> transformedImmutableSetCopy(
+      Collection<T1> input, Function<T1, T2> transformer) {
+    return ImmutableSet.copyOf(Collections2.transform(input, transformer));
+  }
 
   /**
    * Given a {@link SortedMap} with {@link String}s as key,
