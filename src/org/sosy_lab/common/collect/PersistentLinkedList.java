@@ -30,12 +30,20 @@ import com.google.common.collect.UnmodifiableListIterator;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -301,6 +309,55 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     @Override
     public T previous() {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in
+   * {@link Stream#collect(Collector)}.
+   * The returned collector does not support parallel streams.
+   */
+  public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
+    return new Collector<T, PersistentLinkedListBuilder<T>, PersistentLinkedList<T>>() {
+
+      @Override
+      public Supplier<PersistentLinkedListBuilder<T>> supplier() {
+        return PersistentLinkedListBuilder::new;
+      }
+
+      @Override
+      public BiConsumer<PersistentLinkedListBuilder<T>, T> accumulator() {
+        return PersistentLinkedListBuilder::add;
+      }
+
+      @Override
+      public BinaryOperator<PersistentLinkedListBuilder<T>> combiner() {
+        return (a, b) -> {
+          throw new UnsupportedOperationException("Should be used sequentially");
+        };
+      }
+
+      @Override
+      public Function<PersistentLinkedListBuilder<T>, PersistentLinkedList<T>> finisher() {
+        return PersistentLinkedListBuilder::build;
+      }
+
+      @Override
+      public Set<Characteristics> characteristics() {
+        return EnumSet.noneOf(Characteristics.class);
+      }
+    };
+  }
+
+  private static class PersistentLinkedListBuilder<T> {
+    private PersistentLinkedList<T> list = PersistentLinkedList.of();
+
+    void add(final T e) {
+      list = list.with(e);
+    }
+
+    PersistentLinkedList<T> build() {
+      return list;
     }
   }
 
