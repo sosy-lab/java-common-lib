@@ -1,16 +1,17 @@
 language: java
-# Only for newer ant, containers on Travis only have ant 1.8.2 which fails
-sudo: required
-dist: trusty
 jdk:
   - oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 env:
   global:
     - GH_REF: github.com/dbeyer/common-java.git
   matrix:
     - NAME='Build and run tests'
 install:
-  - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
+  - ant resolve-dependencies
 script:
   - ant unit-tests-coverage
 matrix:
