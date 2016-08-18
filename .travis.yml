@@ -7,7 +7,7 @@ addons:
       - oracle-java8-installer
 env:
   global:
-    - GH_REF: github.com/dbeyer/common-java.git
+    - GH_REF: github.com/sosy-lab/common-java.git
   matrix:
     - NAME='Build and run tests'
 install:
