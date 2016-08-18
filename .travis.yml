@@ -49,6 +49,8 @@ deploy:
 notifications:
   email:
     - common-java-dev@googlegroups.com
+git:
+  depth: 1
 cache:
   directories:
   - $HOME/.ivy2
