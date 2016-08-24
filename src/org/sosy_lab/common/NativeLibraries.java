@@ -38,6 +38,25 @@ import javax.annotation.Nullable;
 
 /**
  * Helper class for loading native libraries.
+ *
+ * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary}
+ * with the library name.
+ * The following paths are tried in order:
+ *
+ * <ul>
+ *  <li>Standard VM path (as set by the property {@code java.library.path})</li>
+ *  <li>{@code native} folder, which is assumed to be two levels above the directory containing the JAR.
+ *  One of the following directories is searched within the {@code native} folder:
+ *  <ul>
+ *      <li>x86_64-linux</li>
+ *      <li>x86-linux</li>
+ *      <li>x86-windows</li>
+ *      <li>x86_64-windows</li>
+ *      <li>x86-macosx</li>
+ *      <li>x86_64-macosx</li>
+ *  </ul>
+ *  <li>Same directory as the JAR file holding {@code NativeLibraries.class}.</li>
+ * </ul>
  */
 public final class NativeLibraries {
 
