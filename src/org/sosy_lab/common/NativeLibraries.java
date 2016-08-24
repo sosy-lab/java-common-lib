@@ -45,7 +45,8 @@ import javax.annotation.Nullable;
  *
  * <ul>
  *  <li>Standard VM path (as set by the property {@code java.library.path})</li>
- *  <li>{@code native} folder, which is assumed to be two levels above the directory containing the JAR.
+ *  <li>{@code native} folder, which is assumed to be two levels above the
+ *  directory containing the JAR.
  *  One of the following directories is searched within the {@code native} folder:
  *  <ul>
  *      <li>x86_64-linux</li>
