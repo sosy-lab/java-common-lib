@@ -21,6 +21,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.errorprone.annotations.Immutable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -40,6 +41,7 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
   @Override
   SortedSet<Map.Entry<K, V>> entrySet();
 
+  @Immutable(containerOf = {"K", "V"})
   class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> {
 

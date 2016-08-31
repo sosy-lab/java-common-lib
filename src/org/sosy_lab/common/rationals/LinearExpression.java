@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 @javax.annotation.concurrent.Immutable // does not guarantee deep immutability
 public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   private final ImmutableMap<T, Rational> data;
-  private @LazyInit int hashCache = 0;
+  private transient @LazyInit int hashCache = 0;
 
   private LinearExpression(Map<T, Rational> data) {
     this.data = ImmutableMap.copyOf(data);

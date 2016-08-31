@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.Immutable;
+
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -29,6 +31,7 @@ import javax.annotation.CheckReturnValue;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
+@Immutable(containerOf = {"K", "V"})
 public interface PersistentSortedMap<K, V>
     extends PersistentMap<K, V>, SortedMap<K, V>, OurSortedMap<K, V> {
 

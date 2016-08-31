@@ -28,6 +28,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
+import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -84,7 +86,7 @@ import javax.annotation.Nullable;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
-@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
+@Immutable(containerOf = {"K", "V"})
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
@@ -95,7 +97,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     value = "EQ_DOESNT_OVERRIDE_EQUALS",
     justification = "Inherits equals() according to specification."
   )
-  @javax.annotation.concurrent.Immutable // does not guarantee deep immutability
+  @Immutable(containerOf = {"K", "V"})
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
 
     // Constants for isRed field
@@ -213,7 +215,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   private final @Nullable Node<K, V> root;
 
-  private transient @Nullable EntrySet<K, V> entrySet;
+  private transient @LazyInit @Nullable EntrySet<K, V> entrySet;
 
   private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
@@ -786,13 +788,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
+  @Immutable(containerOf = {"K", "V"})
   private static final class EntrySet<K extends Comparable<? super K>, V>
       extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
 
     private final @Nullable Node<K, V> root;
 
     // Cache size
-    private transient int size = -1;
+    private transient @LazyInit int size = -1;
 
     private EntrySet(Node<K, V> pRoot) {
       root = pRoot;
@@ -1108,6 +1111,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
+  @Immutable(containerOf = {"K", "V"})
   private static class PartialSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V> {
 
@@ -1191,7 +1195,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K fromKey; // inclusive
     private final @Nullable K toKey; // exclusive
 
-    private transient @Nullable SortedSet<Map.Entry<K, V>> entrySet;
+    private transient @LazyInit @Nullable SortedSet<Map.Entry<K, V>> entrySet;
 
     private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
       root = pRoot;

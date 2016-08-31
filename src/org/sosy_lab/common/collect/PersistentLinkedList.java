@@ -65,7 +65,7 @@ import javax.annotation.Nullable;
  * create two new maps, each reflecting exactly the operation executed by the current thread,
  * and not reflecting the operation executed by the other thread.
  */
-@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
+@javax.annotation.concurrent.Immutable
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
 public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {

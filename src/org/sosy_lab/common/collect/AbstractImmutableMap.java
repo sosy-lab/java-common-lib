@@ -21,12 +21,14 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
+import com.google.errorprone.annotations.Immutable;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+@Immutable(containerOf = {"K", "V"})
 abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   @Deprecated
