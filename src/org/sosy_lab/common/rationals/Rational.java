@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
  * These numbers can be compared using {@code ==} operator.
  */
 @SuppressWarnings("NumberEquality")
+@javax.annotation.concurrent.Immutable
 public final class Rational extends Number implements Comparable<Rational> {
 
   private static final long serialVersionUID = 1657347377738275521L;

@@ -212,6 +212,7 @@ public class ConfigurationTest {
    * Deprecated options are acceptable, but throw warnings.
    */
   @Test
+  @SuppressWarnings("FormatStringAnnotation")
   public void testDeprecatedOptionsWarning() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
@@ -229,6 +230,7 @@ public class ConfigurationTest {
    * is used and the warning is logged.
    */
   @Test
+  @SuppressWarnings("FormatStringAnnotation")
   public void testDuplicateOptions() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);
@@ -245,6 +247,7 @@ public class ConfigurationTest {
   }
 
   @Test
+  @SuppressWarnings("FormatStringAnnotation")
   public void testDuplicateOptionsSameValue() throws Exception {
     @SuppressWarnings("resource")
     LogManager mockLogger = mock(LogManager.class);

@@ -22,6 +22,7 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.FormatMethod;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -119,6 +120,7 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
    * detecting duplicate log messages may not work,
    * or too many log messages may be ignored.
    */
+  @FormatMethod
   public void logfOnce(Level pPriority, String pFormat, Object... pArgs) {
     checkNotNull(pFormat);
     checkNotNull(pArgs);

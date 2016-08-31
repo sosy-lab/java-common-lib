@@ -46,7 +46,6 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A single-linked-list implementation of {@link PersistentList}.
@@ -66,7 +65,7 @@ import javax.annotation.concurrent.Immutable;
  * create two new maps, each reflecting exactly the operation executed by the current thread,
  * and not reflecting the operation executed by the other thread.
  */
-@Immutable
+@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
 public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {

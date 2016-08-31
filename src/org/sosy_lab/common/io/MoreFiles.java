@@ -173,6 +173,7 @@ public final class MoreFiles {
    * A simple wrapper around {@link Path} that calls
    * {@link Files#deleteIfExists(Path)} from {@link AutoCloseable#close()}.
    */
+  @javax.annotation.concurrent.Immutable
   public static class DeleteOnCloseFile implements AutoCloseable {
 
     private final Path path;

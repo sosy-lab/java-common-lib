@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
  *
  * Represented as wrapper around {@link Rational} class.
  */
+@javax.annotation.concurrent.Immutable
 public final class ExtendedRational implements Comparable<ExtendedRational> {
   @SuppressWarnings("hiding")
   public enum NumberType {

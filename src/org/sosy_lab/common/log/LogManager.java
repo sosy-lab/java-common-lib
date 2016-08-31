@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.errorprone.annotations.FormatMethod;
+
 import org.sosy_lab.common.MoreStrings;
 
 import java.util.function.Supplier;
@@ -85,6 +87,7 @@ public interface LogManager {
    * @param format The format string.
    * @param args The arguments for the format string.
    */
+  @FormatMethod
   void logf(Level priority, String format, Object... args);
 
   /**

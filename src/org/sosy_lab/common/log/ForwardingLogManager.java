@@ -47,6 +47,7 @@ public abstract class ForwardingLogManager implements LogManager {
   }
 
   @Override
+  @SuppressWarnings("FormatStringAnnotation")
   public void logf(Level pPriority, String pFormat, Object... pArgs) {
     delegate().logf(pPriority, pFormat, pArgs);
   }

@@ -22,6 +22,7 @@ package org.sosy_lab.common.io;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.MoreObjects;
+import com.google.errorprone.annotations.Immutable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +33,7 @@ import java.util.IllegalFormatException;
  * A template for paths, from which a real path can be constructed
  * by passing some values to fill in the blanks.
  */
+@Immutable
 public final class PathTemplate {
 
   private final String template;

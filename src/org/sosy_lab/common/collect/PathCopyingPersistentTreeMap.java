@@ -84,6 +84,7 @@ import javax.annotation.Nullable;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
+@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
@@ -94,6 +95,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     value = "EQ_DOESNT_OVERRIDE_EQUALS",
     justification = "Inherits equals() according to specification."
   )
+  @javax.annotation.concurrent.Immutable // does not guarantee deep immutability
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
 
     // Constants for isRed field

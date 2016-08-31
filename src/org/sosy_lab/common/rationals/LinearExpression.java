@@ -3,6 +3,7 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,9 +20,10 @@ import javax.annotation.Nullable;
  *
  * Every constant stored has to have a non-zero value.
  */
+@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
 public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   private final ImmutableMap<T, Rational> data;
-  private int hashCache = 0;
+  private @LazyInit int hashCache = 0;
 
   private LinearExpression(Map<T, Rational> data) {
     this.data = ImmutableMap.copyOf(data);
