@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 
 import javax.annotation.Nullable;
@@ -97,7 +99,7 @@ public final class ShutdownManager {
    * @param parent A non-null ShutdownNotifier instance.
    */
   public static ShutdownManager createWithParent(final ShutdownNotifier parent) {
-    final ShutdownManager child = new ShutdownManager(parent);
+    final ShutdownManager child = new ShutdownManager(checkNotNull(parent));
     parent.registerAndCheckImmediately(child.ourListener);
     return child;
   }
