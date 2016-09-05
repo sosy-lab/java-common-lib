@@ -26,10 +26,11 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.reflect.AbstractInvocationHandler;
@@ -37,7 +38,11 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
 import org.sosy_lab.common.annotations.Unmaintained;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
@@ -50,13 +55,18 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -433,8 +443,114 @@ public final class Classes {
     }
   }
 
-  public static final Predicate<Class<?>> IS_GENERATED =
+  public static final com.google.common.base.Predicate<Class<?>> IS_GENERATED =
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
+
+  /**
+   * A builder for class loaders with more features than {@link URLClassLoader}.
+   */
+  @CanIgnoreReturnValue
+  public abstract static class ClassLoaderBuilder {
+    ClassLoaderBuilder() {}
+
+    /**
+     * Set parent of new class loader.
+     * If not set the default delegation parent class loader will be used
+     * (like {@link URLClassLoader#URLClassLoader(URL[])}.
+     */
+    public abstract ClassLoaderBuilder setParent(ClassLoader parent);
+
+    /**
+     * Set sources for classes of new class loader just like for {@link URLClassLoader}
+     * (this or {@link #setUrls(URL...)} are required).
+     */
+    public abstract ClassLoaderBuilder setUrls(Iterable<URL> urls);
+
+    /**
+     * Set sources for classes of new class loader just like for {@link URLClassLoader}
+     * (this or {@link #setUrls(Iterable)} are required).
+     */
+    public ClassLoaderBuilder setUrls(URL... urls) {
+      return setUrls(ImmutableList.copyOf(urls));
+    }
+
+    /**
+     * Set a predicate that specifies which classes are forced to be loaded by the new class loader
+     * and not its parent, even if the latter could load them.
+     *
+     * The predicate should match the fully-qualified class name.
+     * The default is to not match any classes.
+     *
+     * Normally class loaders follow the parent-first strategy, so they never load
+     * classes which their parent could also load. The new class loader follows the
+     * child-first strategy for a specific set of classes (as specified by this predicate)
+     * and the parent-first strategy for the rest.
+     *
+     * This feature can be used if you want to load a component with its own
+     * class loader (so that it can be garbage collected independently, for example),
+     * but the parent class loader also sees the classes.
+     */
+    public abstract ClassLoaderBuilder setDirectLoadClasses(Predicate<String> classes);
+
+    /**
+     * @see #setDirectLoadClasses(Predicate)
+     */
+    public ClassLoaderBuilder setDirectLoadClasses(Pattern classes) {
+      return setDirectLoadClasses(matching(classes));
+    }
+
+    /**
+     * Set a predicate that specifies for which native libraries
+     * we should use a custom lookup for the binary as documented in {@link NativeLibraries}.
+     *
+     * The predicate should match the library name as given to {@link System#loadLibrary(String)}.
+     * The default is to not match any libraries.
+     *
+     * Note that this is only effective if the new class loader is actually the one that is asked
+     * to load the new library. Because Java's class loaders follow the parent-first strategy,
+     * it is easy to end up with a parent class loader loading the library,
+     * if the parent can see the class(es) that do the loading.
+     * In this case, use {@link #setDirectLoadClasses(Predicate)} to ensure the new class loader
+     * loads all relevant classes itself.
+     */
+    public abstract ClassLoaderBuilder setCustomLookupNativeLibraries(Predicate<String> libraries);
+
+    /**
+     * @see #setCustomLookupNativeLibraries(Predicate)
+     */
+    public ClassLoaderBuilder setCustomLookupNativeLibraries(Pattern nativeLibraries) {
+      return setCustomLookupNativeLibraries(matching(nativeLibraries));
+    }
+
+    /**
+     * @see #setCustomLookupNativeLibraries(Predicate)
+     */
+    public ClassLoaderBuilder setCustomLookupNativeLibraries(String... nativeLibraries) {
+      return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
+    }
+
+    private static Predicate<String> matching(Pattern pattern) {
+      return s -> pattern.matcher(s).matches();
+    }
+
+    abstract ExtendedURLClassLoaderConfiguration autoBuild();
+
+    @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
+    @CheckReturnValue
+    public URLClassLoader build() {
+      return new ExtendedURLClassLoader(autoBuild());
+    }
+  }
+
+  /**
+   * Create a class loader that is based on an {@link URLClassLoader} but implements some additional
+   * features. This method returns a builder that can be used to configure the new class loader.
+   */
+  public static ClassLoaderBuilder makeExtendedURLClassLoader() {
+    return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder()
+        .setDirectLoadClasses(c -> false)
+        .setCustomLookupNativeLibraries(l -> false);
+  }
 
   /**
    * Create a factory at runtime that implements the interface {@code factoryType}

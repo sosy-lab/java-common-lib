@@ -39,7 +39,11 @@ import java.util.regex.Pattern;
  * This class loader can be used if you want to load a component with its own
  * class loader (so that it can be garbage collected independently, for example),
  * but the parent class loader also sees the classes.
+ *
+ * @deprecated replaced with {@link Classes#makeExtendedURLClassLoader()}
+ *     and {@link Classes.ClassLoaderBuilder#setDirectLoadClasses(Predicate)}.
  */
+@Deprecated
 public class ChildFirstPatternClassLoader extends URLClassLoader {
 
   private final Predicate<String> loadInChild;

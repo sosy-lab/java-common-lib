@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -60,12 +61,16 @@ import javax.annotation.Nullable;
  * </ul>
  *
  * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary}
- * with the library name.
+ * with the library name,
+ * or use {@link Classes#makeExtendedURLClassLoader()}
+ * and {@link Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(Predicate)}
+ * if third-party code loads the library.
  */
 public final class NativeLibraries {
 
   private NativeLibraries() {}
 
+  @Deprecated // will become private
   public enum OS {
     LINUX,
     MACOSX,
@@ -106,6 +111,7 @@ public final class NativeLibraries {
     }
   }
 
+  @Deprecated // will become private
   public enum Architecture {
     X86,
     X86_64;
@@ -210,6 +216,11 @@ public final class NativeLibraries {
    * If the library cannot be found there, it falls back to {@link System#loadLibrary(String)},
    * which looks in the directories specified in the {@literal java.library.path} system property.
    *
+   * If you cannot replace the call to {@link System#loadLibrary(String)}, you can use
+   * a class loader created with {@link Classes#makeExtendedURLClassLoader()}
+   * and {@link Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(Predicate)} to let
+   * {@link System#loadLibrary(String)} use the same lookup mechanism as this method.
+   *
    * @param name A library name as for {@link System#loadLibrary(String)}.
    */
   public static void loadLibrary(String name) {
@@ -228,6 +239,7 @@ public final class NativeLibraries {
    * @param libraryName A library name as for {@link System#loadLibrary(String)}.
    * @return Found path or {@code Optional.absent()}
    */
+  @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
     String osLibName = System.mapLibraryName(libraryName);
     Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
