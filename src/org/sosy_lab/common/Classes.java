@@ -475,6 +475,14 @@ public final class Classes {
     }
 
     /**
+     * Set an {@link URLClassLoader} as parent and its URLs from {@link URLClassLoader#getURLs()}
+     * as sources for new class loader.
+     */
+    public ClassLoaderBuilder setParentAndUrls(URLClassLoader parent) {
+      return setParent(parent).setUrls(parent.getURLs());
+    }
+
+    /**
      * Set a predicate that specifies which classes are forced to be loaded by the new class loader
      * and not its parent, even if the latter could load them.
      *
