@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -218,8 +219,16 @@ public final class FileTypeConverter implements TypeConverter {
     checkApplicability(type, secondaryOption, optionName);
     assert secondaryOption != null : "checkApplicability should ensure this";
 
+    Path path;
+    try {
+      path = Paths.get(pValue);
+    } catch (InvalidPathException e) {
+      throw new InvalidConfigurationException(
+          String.format("Invalid file name in option %s: %s", optionName, e.getMessage()), e);
+    }
+
     return handleFileOption(
-        optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), type, pSource);
+        optionName, path, ((FileOption) secondaryOption).value(), type, pSource);
   }
 
   @Override
