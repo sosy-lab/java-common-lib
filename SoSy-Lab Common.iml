@@ -5,6 +5,7 @@
     <libelement value="file://lib/java/runtime/guava.jar" />
     <libelement value="file://lib/java/test/guava-testlib.jar" />
     <libelement value="file://lib/java/test/truth.jar" />
+    <libelement value="file://lib/java/test/truth-java8-extension.jar" />
     <libelement value="file://lib/java/test/junit.jar" />
     <libelement value="file://lib/java/test/hamcrest-core.jar" />
     <libelement value="file://lib/java/test/mockito-core.jar" />
@@ -63,6 +64,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$MODULE_DIR$/lib/java-contrib/truth-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truth-java8-extension.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/truth-java8-extension.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/truth-java8-extension-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
