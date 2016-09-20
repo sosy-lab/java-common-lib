@@ -20,6 +20,7 @@
 package org.sosy_lab.common.log;
 
 import com.google.errorprone.annotations.ForOverride;
+import com.google.errorprone.annotations.FormatMethod;
 
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ public abstract class ForwardingLogManager implements LogManager {
   }
 
   @Override
-  @SuppressWarnings("FormatStringAnnotation")
+  @FormatMethod
   public void logf(Level pPriority, String pFormat, Object... pArgs) {
     delegate().logf(pPriority, pFormat, pArgs);
   }
