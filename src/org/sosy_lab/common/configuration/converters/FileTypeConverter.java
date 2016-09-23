@@ -254,7 +254,7 @@ public final class FileTypeConverter implements TypeConverter {
       return null;
     }
 
-    if (disableOutput && typeInfo == FileOption.Type.OUTPUT_FILE) {
+    if (disableOutput && isOutputOption(typeInfo)) {
       // disable output by setting the option to null
       return null;
     }
@@ -290,7 +290,7 @@ public final class FileTypeConverter implements TypeConverter {
       final Path source)
       throws InvalidConfigurationException {
 
-    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
+    if (isOutputOption(typeInfo)) {
       file = outputPath.resolve(file);
     } else if (source != null) {
       file = source.resolveSibling(file);
@@ -300,9 +300,16 @@ public final class FileTypeConverter implements TypeConverter {
 
     checkSafePath(file, optionName); // throws exception if unsafe
 
-    if (Files.isDirectory(file)) {
-      throw new InvalidConfigurationException(
-          "Option " + optionName + " specifies a directory instead of a file: " + file);
+    if (typeInfo == FileOption.Type.OUTPUT_DIRECTORY) {
+      if (Files.isRegularFile(file)) {
+        throw new InvalidConfigurationException(
+            "Option " + optionName + " specifies a file instead of a directory: " + file);
+      }
+    } else {
+      if (Files.isDirectory(file)) {
+        throw new InvalidConfigurationException(
+            "Option " + optionName + " specifies a directory instead of a file: " + file);
+      }
     }
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
@@ -324,5 +331,9 @@ public final class FileTypeConverter implements TypeConverter {
       assert targetType.equals(Path.class);
       return file;
     }
+  }
+
+  private boolean isOutputOption(FileOption.Type typeInfo) {
+    return typeInfo == FileOption.Type.OUTPUT_FILE || typeInfo == FileOption.Type.OUTPUT_DIRECTORY;
   }
 }

@@ -67,5 +67,11 @@ public @interface FileOption {
      * I doesn't matter whether this file already exists, but it may not be a directory.
      */
     OUTPUT_FILE,
+
+    /**
+     * The directory specified with this option will be created by the tool.
+     * I doesn't matter whether this directory already exists, but it may not be a file.
+     */
+    OUTPUT_DIRECTORY,
   }
 }
