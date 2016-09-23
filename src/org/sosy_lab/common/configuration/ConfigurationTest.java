@@ -33,6 +33,8 @@ import com.google.common.collect.Sets;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sosy_lab.common.configuration.FileOption.Type;
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
@@ -41,7 +43,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -457,5 +462,69 @@ public class ConfigurationTest {
     OptionsWithRational opts = new OptionsWithRational();
     c.inject(opts);
     assertThat(opts.x).isEqualTo(Rational.of("2/3"));
+  }
+
+  @Options
+  private static class AnnotatedOptions {
+    @Option(secure = true, description = "test")
+    AnnotatedValue<String> string;
+
+    @Option(secure = true, description = "test")
+    AnnotatedValue<Integer> integer;
+
+    @Option(secure = true, description = "test")
+    List<AnnotatedValue<Integer>> integerList;
+
+    @Option(secure = true, description = "test")
+    @FileOption(Type.OPTIONAL_INPUT_FILE)
+    AnnotatedValue<Path> path;
+  }
+
+  @Test
+  public void testAnnotatedOptions_noAnnotation() throws InvalidConfigurationException {
+    FileTypeConverter fileConverter =
+        FileTypeConverter.createWithSafePathsOnly(Configuration.defaultConfiguration());
+    Configuration c =
+        Configuration.builder()
+            .setOption("string", "test")
+            .setOption("integer", "1")
+            .setOption("integerList", "1, 2, 3")
+            .setOption("path", "test.txt")
+            .addConverter(FileOption.class, fileConverter)
+            .build();
+    AnnotatedOptions opts = new AnnotatedOptions();
+    c.inject(opts);
+    assertThat(opts.string).isEqualTo(AnnotatedValue.create("test"));
+    assertThat(opts.integer).isEqualTo(AnnotatedValue.create(1));
+    assertThat(opts.integerList)
+        .containsExactly(
+            AnnotatedValue.create(1), AnnotatedValue.create(2), AnnotatedValue.create(3))
+        .inOrder();
+    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Paths.get("test.txt")));
+  }
+
+  @Test
+  public void testAnnotatedOptions_annotation() throws InvalidConfigurationException {
+    FileTypeConverter fileConverter =
+        FileTypeConverter.createWithSafePathsOnly(Configuration.defaultConfiguration());
+    Configuration c =
+        Configuration.builder()
+            .setOption("string", "test::a1")
+            .setOption("integer", "1::a2")
+            .setOption("integerList", "1::a1, 2, 3::a3")
+            .setOption("path", "test.txt::a")
+            .addConverter(FileOption.class, fileConverter)
+            .build();
+    AnnotatedOptions opts = new AnnotatedOptions();
+    c.inject(opts);
+    assertThat(opts.string).isEqualTo(AnnotatedValue.create("test", "a1"));
+    assertThat(opts.integer).isEqualTo(AnnotatedValue.create(1, "a2"));
+    assertThat(opts.integerList)
+        .containsExactly(
+            AnnotatedValue.create(1, "a1"),
+            AnnotatedValue.create(2),
+            AnnotatedValue.create(3, "a3"))
+        .inOrder();
+    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Paths.get("test.txt"), "a"));
   }
 }

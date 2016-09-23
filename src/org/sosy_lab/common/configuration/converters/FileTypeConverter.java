@@ -148,8 +148,7 @@ public final class FileTypeConverter implements TypeConverter {
       }
     }
 
-    // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
-    if (path.replaceAll("::", "").contains(File.pathSeparator)) {
+    if (path.contains(File.pathSeparator)) {
       throw forbidden(
           "because it contains the character '%s'", optionName, pPath, File.pathSeparator);
     }

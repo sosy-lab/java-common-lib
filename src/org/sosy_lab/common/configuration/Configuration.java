@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
@@ -68,9 +69,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
@@ -144,6 +147,10 @@ public final class Configuration {
 
   /** Splitter to create string arrays. */
   private static final Splitter ARRAY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+
+  /** Splitter that separates the option value and the annotation. */
+  private static final Splitter ANNOTATION_VALUE_SPLITTER =
+      Splitter.on("::").limit(2).trimResults();
 
   /** Map that stores which implementation we use for the collection classes. */
   static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
@@ -395,6 +402,8 @@ public final class Configuration {
    * - {@link java.util.regex.Pattern}
    * - arbitrary factory interfaces as supported by {@link Classes#createFactory(TypeToken, Class)}
    * - arrays of the above types
+   * - {@link AnnotatedValue} with types of the above as value type
+   *   (users can specify an annotation string after a "::" separator)
    * - collection types {@link Iterable}, {@link Collection}, {@link List},
    *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}
    *   of the above types
@@ -845,7 +854,7 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(@Nullable Annotation annotation, final TypeToken<?> optionType)
+  private void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType)
       throws UnsupportedOperationException {
     if (annotation == null) {
       return;
@@ -854,6 +863,10 @@ public final class Configuration {
     List<Class<?>> applicableTypes =
         Arrays.asList(
             annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
+
+    if (optionType.getRawType() == AnnotatedValue.class) {
+      optionType = Classes.getSingleTypeArgument(optionType);
+    }
 
     if (!applicableTypes.isEmpty() && !applicableTypes.contains(optionType.getRawType())) {
       throw new UnsupportedOperationException(
@@ -981,21 +994,37 @@ public final class Configuration {
    */
   private @Nullable Object convertSingleValue(
       final String optionName,
-      final String valueStr,
-      final TypeToken<?> type,
+      String valueStr,
+      TypeToken<?> type,
       @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
+
+    final boolean isAnnotated = type.getRawType() == AnnotatedValue.class;
+    String annotation = null;
+    if (isAnnotated) {
+      type = Classes.getSingleTypeArgument(type);
+      Iterator<String> parts = ANNOTATION_VALUE_SPLITTER.split(valueStr).iterator();
+      valueStr = parts.next();
+      annotation = Iterators.getNext(parts, null);
+    }
 
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
-    return converter.convert(
-        optionName,
-        valueStr,
-        type,
-        secondaryOption,
-        sources.get(optionName),
-        firstNonNull(logger, LogManager.createNullLogManager()));
+    Object result =
+        converter.convert(
+            optionName,
+            valueStr,
+            type,
+            secondaryOption,
+            sources.get(optionName),
+            firstNonNull(logger, LogManager.createNullLogManager()));
+
+    if (result != null && isAnnotated) {
+      result = AnnotatedValue.create(result, Optional.ofNullable(annotation));
+    }
+
+    return result;
   }
 
   /**

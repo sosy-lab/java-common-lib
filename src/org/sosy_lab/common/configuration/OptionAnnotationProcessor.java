@@ -361,6 +361,15 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // It is raw and boxed, because we have only class literals in the acceptedClasses list.
       String optionTypeName = getRawTypeName(optionType);
 
+      // Unwrap AnnotatedValue
+      if (optionTypeName.equals(AnnotatedValue.class.getName())) {
+        List<? extends TypeMirror> params = ((DeclaredType) optionType).getTypeArguments();
+        if (params.size() == 1) {
+          optionType = params.get(0);
+          optionTypeName = getRawTypeName(optionType);
+        }
+      }
+
       // acceptedClasses is a List<AnnotationValue>
       // where each AnnotationValue has a TypeMirror/DeclaredType instance as value,
       // because applicableTo is defined as array of Class instances.
