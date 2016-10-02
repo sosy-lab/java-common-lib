@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
+import com.google.errorprone.annotations.Immutable;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -129,6 +130,7 @@ public class MapsDifference {
    * @param <V> The type of the values.
    */
   @AutoValue
+  @Immutable(containerOf={"K", "V"})
   public abstract static class Entry<K, V> {
 
     Entry() {}
