@@ -130,7 +130,7 @@ public class MapsDifference {
    * @param <V> The type of the values.
    */
   @AutoValue
-  @Immutable(containerOf={"K", "V"})
+  @Immutable(containerOf = {"K", "V"})
   public abstract static class Entry<K, V> {
 
     Entry() {}
