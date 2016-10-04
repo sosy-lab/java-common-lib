@@ -24,10 +24,9 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Utility class for generating unique.
- * This class is fully thread-safe.
+ * Utility class for generating unique. This class is fully thread-safe.
  *
- * It gives out at most MAX_INT ids, afterwards it throws an exception.
+ * <p>It gives out at most MAX_INT ids, afterwards it throws an exception.
  */
 public final class UniqueIdGenerator {
 

@@ -27,10 +27,9 @@ import java.io.OutputStream;
 import javax.annotation.Nullable;
 
 /**
- * This class is an OutputStream implementation that sends everything to two
- * other OutputStreams.
+ * This class is an OutputStream implementation that sends everything to two other OutputStreams.
  *
- * Exceptions thrown by any of the streams will be relayed to the caller.
+ * <p>Exceptions thrown by any of the streams will be relayed to the caller.
  */
 public class DuplicateOutputStream extends OutputStream {
 
@@ -43,8 +42,7 @@ public class DuplicateOutputStream extends OutputStream {
   }
 
   /**
-   * Create an output stream that forwards to all given output streams,
-   * ignoring null parameters.
+   * Create an output stream that forwards to all given output streams, ignoring null parameters.
    */
   public static OutputStream mergeStreams(
       @Nullable OutputStream stream1, @Nullable OutputStream stream2) {

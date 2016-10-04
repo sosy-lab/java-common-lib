@@ -26,11 +26,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is an optional annotation for all configuration options (i.e., elements
- * that are annotated with {@link Option}) whose type is an integer number
- * (i.e., int, long, Integer and Long):
+ * This is an optional annotation for all configuration options (i.e., elements that are annotated
+ * with {@link Option}) whose type is an integer number (i.e., int, long, Integer and Long):
  *
- * It serves to specify minimal and/or maximal values.
+ * <p>It serves to specify minimal and/or maximal values.
  */
 @OptionDetailAnnotation(applicableTo = {Integer.class, Long.class})
 @Documented
@@ -38,13 +37,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface IntegerOption {
 
-  /**
-   * An optional minimum value for this option.
-   */
+  /** An optional minimum value for this option. */
   long min() default Long.MIN_VALUE;
 
-  /**
-   * An optional maximum value for this option.
-   */
+  /** An optional maximum value for this option. */
   long max() default Long.MAX_VALUE;
 }

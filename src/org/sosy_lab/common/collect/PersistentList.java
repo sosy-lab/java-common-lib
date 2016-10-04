@@ -26,50 +26,45 @@ import java.util.function.UnaryOperator;
 import javax.annotation.CheckReturnValue;
 
 /**
- * Interface for persistent lists.
- * A persistent data structure is immutable, but provides cheap copy-and-write
- * operations. Thus all write operations ({{@link #with(Object)}, {{@link #without(Object)}})
- * will not modify the current instance, but return a new instance instead.
+ * Interface for persistent lists. A persistent data structure is immutable, but provides cheap
+ * copy-and-write operations. Thus all write operations ({{@link #with(Object)}, {{@link
+ * #without(Object)}}) will not modify the current instance, but return a new instance instead.
  *
- * All modifying operations inherited from {@link List} are not supported and
- * will always throw {@link UnsupportedOperationException}.
+ * <p>All modifying operations inherited from {@link List} are not supported and will always throw
+ * {@link UnsupportedOperationException}.
  *
- * Instances of this interface are thread-safe as long as published safely.
+ * <p>Instances of this interface are thread-safe as long as published safely.
  *
  * @param <T> The type of values.
  */
 public interface PersistentList<T> extends List<T> {
 
   /**
-   * Replacement for {@link #add(Object)} that returns a fresh new instance.
-   * The position of insertion is not specified.
+   * Replacement for {@link #add(Object)} that returns a fresh new instance. The position of
+   * insertion is not specified.
    */
   @CheckReturnValue
   PersistentList<T> with(T value);
 
   /**
-   * Replacement for {@link #addAll(Collection)} that returns a fresh new instance.
-   * The position of insertion is not specified.
+   * Replacement for {@link #addAll(Collection)} that returns a fresh new instance. The position of
+   * insertion is not specified.
    */
   @CheckReturnValue
   PersistentList<T> withAll(List<T> values);
 
   /**
-   * Replacement for {@link #remove(Object)} that returns a fresh new instance.
-   * If the value occurs several times, only the first occurrence is removed.
+   * Replacement for {@link #remove(Object)} that returns a fresh new instance. If the value occurs
+   * several times, only the first occurrence is removed.
    */
   @CheckReturnValue
   PersistentList<T> without(T value);
 
-  /**
-   * Replacement for {{@link #clear()} that returns an empty instance.
-   */
+  /** Replacement for {{@link #clear()} that returns an empty instance. */
   @CheckReturnValue
   PersistentList<T> empty();
 
-  /**
-   * Returns a new list with the elements in the reverse order.
-   */
+  /** Returns a new list with the elements in the reverse order. */
   @CheckReturnValue
   PersistentList<T> reversed();
 

@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -36,20 +35,18 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
-/**
- * Utility class similar to {@link Collections} and {@link Collections2}.
- */
+/** Utility class similar to {@link Collections} and {@link Collections2}. */
 public final class Collections3 {
 
   private Collections3() {}
 
   /**
-   * Apply a function to all elements in a collection and return an {@link ImmutableList}
-   * with the results. This is an eager version of {@link Lists#transform(List, Function)}
-   * and {@link Collections2#transform(Collection, Function)}.
+   * Apply a function to all elements in a collection and return an {@link ImmutableList} with the
+   * results. This is an eager version of {@link Lists#transform(List, Function)} and {@link
+   * Collections2#transform(Collection, Function)}.
    *
-   * This function is more efficient than code doing the same using
-   * {@link Stream} or {@link FluentIterable}.
+   * <p>This function is more efficient than code doing the same using {@link Stream} or {@link
+   * com.google.common.collect.FluentIterable}.
    */
   public static <T1, T2> ImmutableList<T2> transformedImmutableListCopy(
       Collection<T1> input, Function<? super T1, T2> transformer) {
@@ -57,9 +54,8 @@ public final class Collections3 {
   }
 
   /**
-   * Apply a function to all elements in a collection and return an {@link ImmutableSet}
-   * with the results. This is an eager version of
-   * {@link Collections2#transform(Collection, Function)}.
+   * Apply a function to all elements in a collection and return an {@link ImmutableSet} with the
+   * results. This is an eager version of {@link Collections2#transform(Collection, Function)}.
    */
   public static <T1, T2> ImmutableSet<T2> transformedImmutableSetCopy(
       Collection<T1> input, Function<? super T1, T2> transformer) {
@@ -67,9 +63,8 @@ public final class Collections3 {
   }
 
   /**
-   * Given a {@link SortedMap} with {@link String}s as key,
-   * return a partial map (similar to {@link SortedMap#subMap(Object, Object)})
-   * of all keys that have a given prefix.
+   * Given a {@link SortedMap} with {@link String}s as key, return a partial map (similar to {@link
+   * SortedMap#subMap(Object, Object)}) of all keys that have a given prefix.
    *
    * @param map The map to filter.
    * @param prefix The prefix that all keys in the result need to have.
@@ -86,9 +81,8 @@ public final class Collections3 {
   }
 
   /**
-   * Given a {@link SortedSet} of {@link String},
-   * return a set (similar to {@link SortedSet#subSet(Object, Object)})
-   * of all entries that have a given prefix.
+   * Given a {@link SortedSet} of {@link String}, return a set (similar to {@link
+   * SortedSet#subSet(Object, Object)}) of all entries that have a given prefix.
    *
    * @param set The set to filter.
    * @param prefix The prefix that all keys in the result need to have.

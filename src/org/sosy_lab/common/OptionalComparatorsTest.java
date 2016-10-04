@@ -29,9 +29,7 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import org.junit.Test;
 
-/**
- * Tests for {@link OptionalComparators}.
- */
+/** Tests for {@link OptionalComparators}. */
 public final class OptionalComparatorsTest {
 
   @Test

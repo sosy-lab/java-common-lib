@@ -26,17 +26,14 @@ import com.google.errorprone.annotations.Immutable;
 import java.util.Collection;
 import java.util.Optional;
 
-/**
- * Utilities for handling differences between maps.
- */
+/** Utilities for handling differences between maps. */
 public class MapsDifference {
 
   private MapsDifference() {}
 
   /**
-   * Returns a default {@link Visitor} that does nothing.
-   * Use this if a method requires a visitor to be passed
-   * but you are not interested in the elements.
+   * Returns a default {@link Visitor} that does nothing. Use this if a method requires a visitor to
+   * be passed but you are not interested in the elements.
    */
   @SuppressWarnings("unchecked")
   public static <K, V> Visitor<K, V> ignoreMapsDifference() {
@@ -44,8 +41,8 @@ public class MapsDifference {
   }
 
   /**
-   * Returns a {@link Visitor} that collects all map differences
-   * as {@link Entry} objects into a given collection.
+   * Returns a {@link Visitor} that collects all map differences as {@link Entry} objects into a
+   * given collection.
    */
   public static <K, V> Visitor<K, V> collectMapsDifferenceTo(final Collection<Entry<K, V>> target) {
     checkNotNull(target);
@@ -70,11 +67,10 @@ public class MapsDifference {
   /**
    * Interface for visiting map entries differing between two maps.
    *
-   * If you are interested in a visitor that collects all passed elements,
-   * please use {@link MapsDifference#collectMapsDifferenceTo(Collection)}.
-   * A dummy implementation that does nothing is available from
-   * {@link MapsDifference#ignoreMapsDifference()}. For implementing your own visitor,
-   * you can inherit from {@link DefaultVisitor}.
+   * <p>If you are interested in a visitor that collects all passed elements, please use {@link
+   * MapsDifference#collectMapsDifferenceTo(Collection)}. A dummy implementation that does nothing
+   * is available from {@link MapsDifference#ignoreMapsDifference()}. For implementing your own
+   * visitor, you can inherit from {@link DefaultVisitor}.
    *
    * @param <K> The type of the key.
    * @param <V> The type of the values.
@@ -87,6 +83,7 @@ public class MapsDifference {
 
     /**
      * Accept a map difference.
+     *
      * @param key The key.
      * @param leftValue The left value.
      * @param rightValue The right value.
@@ -94,9 +91,7 @@ public class MapsDifference {
     void differingValues(K key, V leftValue, V rightValue);
   }
 
-  /**
-   * Default implementation of {@link Visitor} with empty methods.
-   */
+  /** Default implementation of {@link Visitor} with empty methods. */
   public abstract static class DefaultVisitor<K, V> implements Visitor<K, V> {
 
     @Override
@@ -123,8 +118,9 @@ public class MapsDifference {
   }
 
   /**
-   * Class representing the difference between two maps for a given key.
-   * This class only allows non-null keys and values.
+   * Class representing the difference between two maps for a given key. This class only allows
+   * non-null keys and values.
+   *
    * @param <K> The type of the key.
    * @param <V> The type of the values.
    */
@@ -147,19 +143,13 @@ public class MapsDifference {
           pKey, Optional.of(pLeftValue), Optional.of(pRightValue));
     }
 
-    /**
-     * Returns the map key.
-     */
+    /** Returns the map key. */
     public abstract K getKey();
 
-    /**
-     * Returns the left value, if present.
-     */
+    /** Returns the left value, if present. */
     public abstract Optional<V> getLeftValue();
 
-    /**
-     * Returns the right value, if present.
-     */
+    /** Returns the right value, if present. */
     public abstract Optional<V> getRightValue();
   }
 }

@@ -29,8 +29,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- * Extension of {@link SortedMap} that specifies {@link SortedSet} as type
- * of some collection views (instead of {@link java.util.Set}).
+ * Extension of {@link SortedMap} that specifies {@link SortedSet} as type of some collection views
+ * (instead of {@link java.util.Set}).
  */
 interface OurSortedMap<K, V> extends SortedMap<K, V> {
 

@@ -26,9 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.annotation.Nullable;
 
-/**
- * An extension of {@link LogRecord} that stores additional information.
- */
+/** An extension of {@link LogRecord} that stores additional information. */
 public class ExtendedLogRecord extends LogRecord {
 
   private static final long serialVersionUID = -2531000268930566255L;

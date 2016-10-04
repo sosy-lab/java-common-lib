@@ -44,9 +44,7 @@ import javax.annotation.Nullable;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.MoreFiles;
 
-/**
- * Interface for constructing {@link Configuration} instances.
- */
+/** Interface for constructing {@link Configuration} instances. */
 @CanIgnoreReturnValue
 public final class ConfigurationBuilder {
 
@@ -70,9 +68,7 @@ public final class ConfigurationBuilder {
     }
   }
 
-  /**
-   * Set a single option.
-   */
+  /** Set a single option. */
   public ConfigurationBuilder setOption(String name, String value) {
     checkNotNull(name);
     checkNotNull(value);
@@ -84,9 +80,7 @@ public final class ConfigurationBuilder {
     return this;
   }
 
-  /**
-   * Reset a single option to its default value.
-   */
+  /** Reset a single option to its default value. */
   public ConfigurationBuilder clearOption(String name) {
     checkNotNull(name);
     setupProperties();
@@ -97,9 +91,7 @@ public final class ConfigurationBuilder {
     return this;
   }
 
-  /**
-   * Add all options from a map.
-   */
+  /** Add all options from a map. */
   public ConfigurationBuilder setOptions(Map<String, String> options) {
     checkNotNull(options);
     setupProperties();
@@ -112,9 +104,7 @@ public final class ConfigurationBuilder {
     return this;
   }
 
-  /**
-   * Set the optional prefix for new configuration.
-   */
+  /** Set the optional prefix for new configuration. */
   public ConfigurationBuilder setPrefix(String newPrefix) {
     checkNotNull(newPrefix);
 
@@ -124,13 +114,11 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * Copy everything from an existing Configuration instance. This also means
-   * that the new configuration object created by this builder will share the
-   * set of unused properties with the configuration instance passed to this
-   * class.
+   * Copy everything from an existing Configuration instance. This also means that the new
+   * configuration object created by this builder will share the set of unused properties with the
+   * configuration instance passed to this class.
    *
-   * If this method is called, it has to be the first method call on this
-   * builder instance.
+   * <p>If this method is called, it has to be the first method call on this builder instance.
    */
   public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
     checkNotNull(sourceConfig);
@@ -145,19 +133,18 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * Copy one single option from another Configuration instance,
-   * overwriting the value in this builder, if it is already set.
-   * The given Configuration instance needs to have a value for this option.
+   * Copy one single option from another Configuration instance, overwriting the value in this
+   * builder, if it is already set. The given Configuration instance needs to have a value for this
+   * option.
    *
-   * It is better to use this method instead of
-   * <code>setOption(option, oldConfig.getProperty(option))</code>,
-   * because it retains the mapping to the source of this value,
-   * which allows better error messages and resolving relative file paths.
+   * <p>It is better to use this method instead of <code>
+   * setOption(option, oldConfig.getProperty(option))</code>, because it retains the mapping to the
+   * source of this value, which allows better error messages and resolving relative file paths.
    *
    * @param sourceConfig A configuration instance with a value for option.
    * @param option The name of a configuration option.
-   * @throws IllegalArgumentException If the given configuration
-   * does not specify a value for the given option.
+   * @throws IllegalArgumentException If the given configuration does not specify a value for the
+   *     given option.
    */
   public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option)
       throws IllegalArgumentException {
@@ -173,15 +160,13 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * Copy one single option from another Configuration instance,
-   * overwriting the value in this builder, if it is already set.
-   * If the given Configuration instance does not have a value for this option,
-   * nothing is changed.
+   * Copy one single option from another Configuration instance, overwriting the value in this
+   * builder, if it is already set. If the given Configuration instance does not have a value for
+   * this option, nothing is changed.
    *
-   * It is better to use this method instead of
-   * <code>setOption(option, oldConfig.getProperty(option))</code>,
-   * because it retains the mapping to the source of this value,
-   * which allows better error messages and resolving relative file paths.
+   * <p>It is better to use this method instead of <code>
+   * setOption(option, oldConfig.getProperty(option))</code>, because it retains the mapping to the
+   * source of this value, which allows better error messages and resolving relative file paths.
    *
    * @param sourceConfig A configuration instance.
    * @param option The name of a configuration option.
@@ -198,14 +183,13 @@ public final class ConfigurationBuilder {
   /**
    * Load options from a {@link CharSource} with a "key = value" format.
    *
-   * A stream from this source is opened and closed by this method.
-   * This method may additionally access more files from the file system
-   * if they are included.
+   * <p>A stream from this source is opened and closed by this method. This method may additionally
+   * access more files from the file system if they are included.
    *
    * @param source The source to read from.
    * @param basePath The directory where relative #include directives should be based on.
-   * @param sourceName A string to use as source of the file in error messages
-   * (this should usually be a filename or something similar).
+   * @param sourceName A string to use as source of the file in error messages (this should usually
+   *     be a filename or something similar).
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
@@ -259,12 +243,12 @@ public final class ConfigurationBuilder {
   /**
    * Load options from a class-loader resource with a "key = value" format.
    *
-   * There must not be any #include directives in the resource.
+   * <p>There must not be any #include directives in the resource.
    *
    * @param contextClass The class to use for looking up the resource.
    * @param resourceName The name of the resource relative to {@code contextClass}.
-   * @throws IllegalArgumentException If the resource cannot be found or read,
-   * or contains invalid syntax or #include directives.
+   * @throws IllegalArgumentException If the resource cannot be found or read, or contains invalid
+   *     syntax or #include directives.
    */
   public ConfigurationBuilder loadFromResource(Class<?> contextClass, String resourceName) {
     URL url = Resources.getResource(contextClass, resourceName);
@@ -298,19 +282,18 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * Add a type converter for options with a certain type.
-   * This will enable the Configuration instance to parse strings into values
-   * of the given type and inject them just as the base option types.
+   * Add a type converter for options with a certain type. This will enable the Configuration
+   * instance to parse strings into values of the given type and inject them just as the base option
+   * types.
    *
-   * As an alternative, the type of an option detail annotation
-   * ({@link OptionDetailAnnotation}) can be given. In this case, the type
-   * converter will be called for options annotated with this type.
+   * <p>As an alternative, the type of an option detail annotation ({@link OptionDetailAnnotation})
+   * can be given. In this case, the type converter will be called for options annotated with this
+   * type.
    *
-   * Previous type converters for the same type will be overwritten
-   * (this also works for types usually handled by the Configuration class,
-   * however not for collection and array types).
+   * <p>Previous type converters for the same type will be overwritten (this also works for types
+   * usually handled by the Configuration class, however not for collection and array types).
    *
-   * The same converter may be used for several types.
+   * <p>The same converter may be used for several types.
    *
    * @param cls The type the type converter handles.
    * @param converter A converter instance.
@@ -335,11 +318,11 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * Create a Configuration instance with the settings specified by method
-   * calls on this builder instance.
+   * Create a Configuration instance with the settings specified by method calls on this builder
+   * instance.
    *
-   * This method resets the builder instance, so that after this method has
-   * returned it is exactly in the same state as directly after instantiation.
+   * <p>This method resets the builder instance, so that after this method has returned it is
+   * exactly in the same state as directly after instantiation.
    */
   @CheckReturnValue
   public Configuration build() {

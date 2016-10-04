@@ -24,16 +24,12 @@ import com.google.common.collect.ImmutableSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-/**
- * Additional {@link Collector} implementation, similar to {@link Collectors}.
- */
+/** Additional {@link Collector} implementation, similar to {@link Collectors}. */
 public final class MoreCollectors {
 
   private MoreCollectors() {}
 
-  /**
-   * Return a {@link Collector} that produces {@link PersistentLinkedList}s.
-   */
+  /** Return a {@link Collector} that produces {@link PersistentLinkedList}s. */
   public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
     return PersistentLinkedList.collector();
   }
@@ -41,23 +37,21 @@ public final class MoreCollectors {
   /**
    * Return a {@link Collector} that produces {@link ImmutableList}s.
    *
-   * Prefer to use this over {@link Collectors#toList()}!
-   * The latter does neither guarantee mutability nor immutability,
-   * so if you want immutability, use this method,
-   * and if you need mutability, use {@code Collectors.toCollection(ArrayList::new)}.
+   * <p>Prefer to use this over {@link Collectors#toList()}! The latter does neither guarantee
+   * mutability nor immutability, so if you want immutability, use this method, and if you need
+   * mutability, use {@code Collectors.toCollection(ArrayList::new)}.
    */
   public static <T> Collector<T, ?, ImmutableList<T>> toImmutableList() {
     return Collectors.collectingAndThen(Collectors.toList(), ImmutableList::copyOf);
   }
 
   /**
-   * Return a {@link Collector} that produces {@link ImmutableSet}s.
-   * Just like the usual methods for ImmutableSets, this collector guarantees to keep the order.
+   * Return a {@link Collector} that produces {@link ImmutableSet}s. Just like the usual methods for
+   * ImmutableSets, this collector guarantees to keep the order.
    *
-   * Prefer to use this over {@link Collectors#toSet()}!
-   * The latter does neither guarantee mutability nor immutability,
-   * so if you want immutability, use this method,
-   * and if you need mutability, use {@code Collectors.toCollection(HashSet::new)}.
+   * <p>Prefer to use this over {@link Collectors#toSet()}! The latter does neither guarantee
+   * mutability nor immutability, so if you want immutability, use this method, and if you need
+   * mutability, use {@code Collectors.toCollection(HashSet::new)}.
    */
   public static <T> Collector<T, ?, ImmutableSet<T>> toImmutableSet() {
     return Collectors.collectingAndThen(Collectors.toList(), ImmutableSet::copyOf);

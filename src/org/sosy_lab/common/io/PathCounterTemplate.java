@@ -29,8 +29,8 @@ import java.util.IllegalFormatException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A template for {@link Path} objects that uses a counter
- * to produce paths with a fresh new name for every request.
+ * A template for {@link Path} objects that uses a counter to produce paths with a fresh new name
+ * for every request.
  */
 public final class PathCounterTemplate {
 
@@ -45,8 +45,9 @@ public final class PathCounterTemplate {
   }
 
   /**
-   * Check whether a String is a valid template for inserting one int
-   * with {@link String#format(String, Object...)}.
+   * Check whether a String is a valid template for inserting one int with {@link
+   * String#format(String, Object...)}.
+   *
    * @param pTemplate The template to check.
    */
   @SuppressWarnings("ReturnValueIgnored")
@@ -57,8 +58,9 @@ public final class PathCounterTemplate {
 
   /**
    * Create a new instance.
-   * @param pTemplate A non-null non-empty template String in the format for
-   * {@link String#format(String, Object...)} that is suited for exactly one argument of type int.
+   *
+   * @param pTemplate A non-null non-empty template String in the format for {@link
+   *     String#format(String, Object...)} that is suited for exactly one argument of type int.
    * @throws IllegalFormatException If the template is invalid.
    */
   public static PathCounterTemplate ofFormatString(String pTemplate) {
@@ -67,16 +69,15 @@ public final class PathCounterTemplate {
 
   /**
    * Construct a concrete {@link Path} that was not handed out by this instance before.
-   * @throws IllegalFormatException If the template is invalid,
-   * or the arguments does not match the template.
+   *
+   * @throws IllegalFormatException If the template is invalid, or the arguments does not match the
+   *     template.
    */
   public Path getFreshPath() {
     return Paths.get(String.format(template, counter.getAndIncrement()));
   }
 
-  /**
-   * Returns the raw template of this instance.
-   */
+  /** Returns the raw template of this instance. */
   public String getTemplate() {
     return template;
   }

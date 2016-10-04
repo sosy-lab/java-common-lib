@@ -30,8 +30,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * Extension of {@link URLClassLoader} with an optional child-first strategy
- * and optional overriding of the search path for native libraries.
+ * Extension of {@link URLClassLoader} with an optional child-first strategy and optional overriding
+ * of the search path for native libraries.
  */
 final class ExtendedURLClassLoader extends URLClassLoader {
 

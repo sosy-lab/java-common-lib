@@ -31,37 +31,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 /**
- * Helper class for loading native libraries.
- * The methods in this class search for the library binary in some more directories
- * than those specified in the {@literal java.library.path} system property.
+ * Helper class for loading native libraries. The methods in this class search for the library
+ * binary in some more directories than those specified in the {@literal java.library.path} system
+ * property.
  *
- * The searched directories are:
+ * <p>The searched directories are:
+ *
  * <ul>
- *   <li>the same directory as the JAR file of this library</li>
- *   <li>the "native library path" as returned by {@link #getNativeLibraryPath()}, which is
- *     the directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library,
- *     with {@literal <arch>-<os>} being one of the following values depending on your
- *     system:
- *     <ul>
- *       <li>x86_64-linux</li>
- *       <li>x86-linux</li>
- *       <li>x86-windows</li>
- *       <li>x86_64-windows</li>
- *       <li>x86-macosx</li>
- *       <li>x86_64-macosx</li>
- *     </ul>
- *   </li>
+ *   <li>the same directory as the JAR file of this library
+ *   <li>the "native library path" as returned by {@link #getNativeLibraryPath()}, which is the
+ *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library, with
+ *       {@literal <arch>-<os>} being one of the following values depending on your system:
+ *       <ul>
+ *         <li>x86_64-linux
+ *         <li>x86-linux
+ *         <li>x86-windows
+ *         <li>x86_64-windows
+ *         <li>x86-macosx
+ *         <li>x86_64-macosx
+ *       </ul>
+ *
  * </ul>
  *
- * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary}
- * with the library name,
- * or use {@link Classes#makeExtendedURLClassLoader()}
- * and {@link Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(Predicate)}
- * if third-party code loads the library.
+ * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary} with the library
+ * name, or use {@link Classes#makeExtendedURLClassLoader()} and {@link
+ * Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(java.util.function.Predicate)} if
+ * third-party code loads the library.
  */
 public final class NativeLibraries {
 
@@ -178,7 +176,7 @@ public final class NativeLibraries {
    * Return the "native library path" as defined in the documentation of {@link NativeLibraries},
    * i.e., a directory where members of this class expect native binaries.
    *
-   * It is usually recommended to use the high-level method {@link #loadLibrary(String)} instead.
+   * <p>It is usually recommended to use the high-level method {@link #loadLibrary(String)} instead.
    */
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static Path getNativeLibraryPath() {
@@ -192,9 +190,7 @@ public final class NativeLibraries {
     return nativePath;
   }
 
-  /**
-   * @return Path to <b>this</b> JAR, holding SoSy Lab-Common library.
-   */
+  /** @return Path to <b>this</b> JAR, holding SoSy Lab-Common library. */
   private static Path getPathToJar() {
     URI pathToJar;
     try {
@@ -206,16 +202,14 @@ public final class NativeLibraries {
   }
 
   /**
-   * Load a native library.
-   * This is similar to {@link System#loadLibrary(String)},
-   * but first searches for the library in some other directories
-   * (as explained in {@link NativeLibraries}).
+   * Load a native library. This is similar to {@link System#loadLibrary(String)}, but first
+   * searches for the library in some other directories (as explained in {@link NativeLibraries}).
    * If the library cannot be found there, it falls back to {@link System#loadLibrary(String)},
    * which looks in the directories specified in the {@literal java.library.path} system property.
    *
-   * If you cannot replace the call to {@link System#loadLibrary(String)}, you can use
-   * a class loader created with {@link Classes#makeExtendedURLClassLoader()}
-   * and {@link Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(Predicate)} to let
+   * <p>If you cannot replace the call to {@link System#loadLibrary(String)}, you can use a class
+   * loader created with {@link Classes#makeExtendedURLClassLoader()} and {@link
+   * Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(java.util.function.Predicate)} to let
    * {@link System#loadLibrary(String)} use the same lookup mechanism as this method.
    *
    * @param name A library name as for {@link System#loadLibrary(String)}.
@@ -230,8 +224,8 @@ public final class NativeLibraries {
   }
 
   /**
-   * Search for a native library in some directories as listed in the documentation of
-   * {@link NativeLibraries}.
+   * Search for a native library in some directories as listed in the documentation of {@link
+   * NativeLibraries}.
    *
    * @param libraryName A library name as for {@link System#loadLibrary(String)}.
    * @return Found path or {@code Optional.absent()}

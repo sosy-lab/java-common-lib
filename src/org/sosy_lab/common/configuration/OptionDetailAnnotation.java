@@ -26,9 +26,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is a meta annotation that marks other annotation which may be used in
- * conjunction with {@link Option} to provide more information for a specific
- * option type.
+ * This is a meta annotation that marks other annotation which may be used in conjunction with
+ * {@link Option} to provide more information for a specific option type.
  */
 @Documented
 @Target(ElementType.ANNOTATION_TYPE)
@@ -36,10 +35,9 @@ import java.lang.annotation.Target;
 public @interface OptionDetailAnnotation {
 
   /**
-   * The annotation is applicable to configuration of these types.
-   * If a wrapper class of a primitive type is added here,
-   * the annotation automatically is also applicable to the corresponding primitive type.
-   * Otherwise types have to match exactly, i.e., no sub-types and super types.
+   * The annotation is applicable to configuration of these types. If a wrapper class of a primitive
+   * type is added here, the annotation automatically is also applicable to the corresponding
+   * primitive type. Otherwise types have to match exactly, i.e., no sub-types and super types.
    */
   Class<?>[] applicableTo();
 }

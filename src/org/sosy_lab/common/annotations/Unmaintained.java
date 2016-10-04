@@ -28,11 +28,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for component that are considered unmaintained,
- * and might have inferior quality.
+ * Annotation for component that are considered unmaintained, and might have inferior quality.
  *
- * Effects of this annotation may include hiding warnings produced by static-analysis tools,
- * and a warning given to the user when this component is used.
+ * <p>Effects of this annotation may include hiding warnings produced by static-analysis tools, and
+ * a warning given to the user when this component is used.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

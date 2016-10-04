@@ -64,16 +64,14 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
- * Annotation processor for checking constraints on {@link Option} and {@link Options}
- * annotations.
- * The compiler uses this class during compilation,
- * and we can report compiler errors and warnings.
+ * Annotation processor for checking constraints on {@link Option} and {@link Options} annotations.
+ * The compiler uses this class during compilation, and we can report compiler errors and warnings.
  *
- * When reporting warnings, it honors the {@link SuppressWarnings} annotation
- * either with a value of "all" or "options".
+ * <p>When reporting warnings, it honors the {@link SuppressWarnings} annotation either with a value
+ * of "all" or "options".
  *
- * This class needs to be public and have a public no-arg constructor.
- * However, it is not intended for clients usage.
+ * <p>This class needs to be public and have a public no-arg constructor. However, it is not
+ * intended for clients usage.
  */
 @SupportedAnnotationTypes("org.sosy_lab.common.configuration.*")
 @AutoService(Processor.class)
@@ -125,9 +123,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Check whether an option-detail annotation
-   * such as {@link IntegerOption} is accompanied
-   * with an {@link Option} annotation.
+   * Check whether an option-detail annotation such as {@link IntegerOption} is accompanied with an
+   * {@link Option} annotation.
    */
   private void processOptionDetailAnnotation(Element elem, Class<? extends Annotation> annotation) {
     if (elem.getAnnotation(Option.class) == null) {
@@ -142,12 +139,14 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Checks constraints for {@link Options} annotations.
-   * This contains:
-   * - Only classes are allowed to be annotated.
-   * - Non-private constructors without a Configuration parameter produce a warning
-   *   (maybe injection was forgotten?).
-   * - {@link Options} is irrelevant without at least one {link Option}.
+   * Checks constraints for {@link Options} annotations. This contains:
+   *
+   * <ul>
+   *   <li>Only classes are allowed to be annotated.
+   *   <li>Non-private constructors without a Configuration parameter produce a warning (maybe
+   *       injection was forgotten?).
+   *   <li>{@link Options} is irrelevant without at least one {link Option}.
+   * </ul>
    */
   private void processOptions(Element elem) {
     if (elem.getKind() != ElementKind.CLASS) {
@@ -210,12 +209,14 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Checks constraints for {@link Option} annotations.
-   * This contains:
-   * - Surrounding class needs to have {@link Options}.
-   * - Illegal modifiers (static, final for fields).
-   * - Correct method signature.
-   * - Empty description is discouraged.
+   * Checks constraints for {@link Option} annotations. This contains:
+   *
+   * <ul>
+   *   <li>Surrounding class needs to have {@link Options}.
+   *   <li>Illegal modifiers (static, final for fields).
+   *   <li>Correct method signature.
+   *   <li>Empty description is discouraged.
+   * </ul>
    */
   private void processOption(Element elem) {
     final Option option = elem.getAnnotation(Option.class);
@@ -287,11 +288,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * This method checks constraints of additional option-detail annotations
-   * such as {@link IntegerOption}}.
-   * The following constraints are checked:
-   * - At most one of theese annotations may be present.
-   * - The type of the option must match the applicable types of the annotaton.
+   * This method checks constraints of additional option-detail annotations such as {@link
+   * IntegerOption}}. The following constraints are checked:
+   *
+   * <ul>
+   *   <li>At most one of theese annotations may be present.
+   *   <li>The type of the option must match the applicable types of the annotaton.
+   * </ul>
    */
   private void checkOptionDetailAnnotations(Element elem) {
     final List<String> usedDetailAnnotations = new ArrayList<>(2);
@@ -426,16 +429,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Check whether a type is a sub-type of another one.
-   * A type is considered a sub-type of itself.
+   * Check whether a type is a sub-type of another one. A type is considered a sub-type of itself.
    *
-   * There is the method processingEnv.getTypeUtils().isAssignable(TypeMirror, TypeMirror)
-   * that could be used to check whether two types are assignable,
-   * but it returns false if the two types are from different compilation units
-   * (e.g., one is from this library and the other from the currently compiled source).
-   * So we have to do the compatibility check ourselves.
-   * We just assume that two types with the same fully qualified name
-   * are actually the same type.
+   * <p>There is the method processingEnv.getTypeUtils().isAssignable(TypeMirror, TypeMirror) that
+   * could be used to check whether two types are assignable, but it returns false if the two types
+   * are from different compilation units (e.g., one is from this library and the other from the
+   * currently compiled source). So we have to do the compatibility check ourselves. We just assume
+   * that two types with the same fully qualified name are actually the same type.
    */
   private boolean isSubtypeOf(TypeMirror type, String superType) {
     checkArgument(type instanceof DeclaredType);
@@ -454,10 +454,9 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Check whether there is a {@link SuppressWarnings} annotation on the given
-   * element or any of its enclosing elements (class, package)
-   * with either the value "all" or "options".
-   * Returns true if warnings are not suppressed.
+   * Check whether there is a {@link SuppressWarnings} annotation on the given element or any of its
+   * enclosing elements (class, package) with either the value "all" or "options". Returns true if
+   * warnings are not suppressed.
    */
   private boolean warningsEnabled(Element element) {
     do {
@@ -475,8 +474,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Check whether the given element contains any directly enclosed element
-   * with a specific annotation.
+   * Check whether the given element contains any directly enclosed element with a specific
+   * annotation.
    */
   private boolean hasChildWithAnnotation(
       final Element element, final Class<? extends Annotation> annotation) {
@@ -487,13 +486,14 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Find the {@link AnnotationMirror} for a given annotation on an {@link Element}.
-   * An {@link AnnotationMirror} is the representation of the actual occurence
-   * of the annotation in the source code.
+   * Find the {@link AnnotationMirror} for a given annotation on an {@link Element}. An {@link
+   * AnnotationMirror} is the representation of the actual occurence of the annotation in the source
+   * code.
+   *
    * @param annotation The annotation to look for.
    * @param elem The element that should have the annotation.
-   * @return The corresponding {@link AnnotationMirror},
-   * or <code>Optional.empty()</code> if this element is not annotated with this annotation.
+   * @return The corresponding {@link AnnotationMirror}, or <code>Optional.empty()</code> if this
+   *     element is not annotated with this annotation.
    */
   private Optional<? extends AnnotationMirror> findAnnotationMirror(
       final Class<? extends Annotation> annotation, final Element elem) {
@@ -505,14 +505,14 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Given an {@link AnnotationMirror}, get the value specified
-   * for one field of that annotation
-   * (if a value for this field was given by the programmer).
+   * Given an {@link AnnotationMirror}, get the value specified for one field of that annotation (if
+   * a value for this field was given by the programmer).
+   *
    * @param annotationClass The annotation.
    * @param fieldName The name of the field (needs to exist in the annotation).
    * @param annotation The {@link AnnotationMirror} that represents one use of the annotation.
-   * @return The corresponding {@link AnnotationValue},
-   * or <code>null</code> if this field was not specified.
+   * @return The corresponding {@link AnnotationValue}, or <code>null</code> if this field was not
+   *     specified.
    */
   private @Nullable AnnotationValue findAnnotationValue(
       final Class<? extends Annotation> annotationClass,
@@ -537,9 +537,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Given a TypeMirror representing some type,
-   * this method produces a String representation of the raw type.
-   * It also eliminates primitive types by boxing them.
+   * Given a TypeMirror representing some type, this method produces a String representation of the
+   * raw type. It also eliminates primitive types by boxing them.
    */
   private String getRawTypeName(final TypeMirror t) {
     TypeMirror type = typeUtils().erasure(t);

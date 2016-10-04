@@ -12,11 +12,10 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Simple <i>sparse</i> implementation for <i>homogeneous</i> linear expression
- * of the form $\Sigma a_i  x_i$, where $x_i$ is a set of variables and $a_i$
- * is a set of constants.
+ * Simple <i>sparse</i> implementation for <i>homogeneous</i> linear expression of the form $\Sigma
+ * a_i x_i$, where $x_i$ is a set of variables and $a_i$ is a set of constants.
  *
- * Every constant stored has to have a non-zero value.
+ * <p>Every constant stored has to have a non-zero value.
  */
 @javax.annotation.concurrent.Immutable // does not guarantee deep immutability
 public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
@@ -27,9 +26,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     this.data = ImmutableMap.copyOf(data);
   }
 
-  /**
-   * Creates an empty linear expression.
-   */
+  /** Creates an empty linear expression. */
   public static <T> LinearExpression<T> empty() {
     return new LinearExpression<>(ImmutableMap.of());
   }
@@ -44,9 +41,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return monomial(var, coeff);
   }
 
-  /**
-   * Return a monomial with a variable {@code var} and a coefficient {@code coeff}.
-   */
+  /** Return a monomial with a variable {@code var} and a coefficient {@code coeff}. */
   public static <T> LinearExpression<T> monomial(T var, Rational coeff) {
     if (coeff.equals(Rational.ZERO)) {
       return empty();
@@ -54,16 +49,12 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return new LinearExpression<>(ImmutableMap.of(var, coeff));
   }
 
-  /**
-   * Create a monomial consisting of variable {@code var} with a coefficient of one.
-   */
+  /** Create a monomial consisting of variable {@code var} with a coefficient of one. */
   public static <T> LinearExpression<T> ofVariable(T var) {
     return LinearExpression.monomial(var, Rational.ONE);
   }
 
-  /**
-   * Add {@code other} linear expression.
-   */
+  /** Add {@code other} linear expression. */
   public LinearExpression<T> add(LinearExpression<T> other) {
     Map<T, Rational> newData = new HashMap<>(data);
     for (Entry<T, Rational> e : other.data.entrySet()) {
@@ -82,16 +73,12 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return new LinearExpression<>(newData);
   }
 
-  /**
-   * Subtract {@code other} linear expression.
-   */
+  /** Subtract {@code other} linear expression. */
   public LinearExpression<T> sub(LinearExpression<T> other) {
     return add(other.negate());
   }
 
-  /**
-   * Multiply the linear expression by {@code constant}.
-   */
+  /** Multiply the linear expression by {@code constant}. */
   public LinearExpression<T> multByConst(Rational constant) {
     if (constant.equals(Rational.ZERO)) {
       return empty();
@@ -100,9 +87,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     data.forEach((key, value) -> newData.put(key, value.times(constant)));
     return new LinearExpression<>(newData);
   }
-  /**
-   * Negate the linear expression.
-   */
+  /** Negate the linear expression. */
   public LinearExpression<T> negate() {
     return multByConst(Rational.NEG_ONE);
   }
@@ -116,9 +101,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return out;
   }
 
-  /**
-   * @return Number of variables with non-zero coefficients.
-   */
+  /** @return Number of variables with non-zero coefficients. */
   public int size() {
     return data.size();
   }
@@ -127,16 +110,14 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return data.isEmpty();
   }
 
-  /**
-   * @return Whether all coefficients are integral.
-   */
+  /** @return Whether all coefficients are integral. */
   public boolean isIntegral() {
     return data.values().stream().allMatch(Rational::isIntegral);
   }
 
   /**
-   * @return {@code a} iff {@code other.multByConst(a) == this},
-   * {@code Optional.absent()} if no such constant exists.
+   * @return {@code a} iff {@code other.multByConst(a) == this}, {@code Optional.absent()} if no
+   *     such constant exists.
    */
   public Optional<Rational> divide(LinearExpression<T> other) {
     if (other.size() != data.size()) {
@@ -160,17 +141,12 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return data.entrySet().iterator();
   }
 
-  /**
-   * @return The underlying stored map.
-   */
+  /** @return The underlying stored map. */
   public ImmutableMap<T, Rational> getMap() {
     return data;
   }
 
-  /**
-   * @return Pretty-printing for linear expressions.
-   * E. g. <i>-x + 2y + z</i>
-   */
+  /** @return Pretty-printing for linear expressions. E. g. <i>-x + 2y + z</i> */
   @Override
   public String toString() {
     StringBuilder b = new StringBuilder();
@@ -178,9 +154,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return b.toString();
   }
 
-  /**
-   * Pretty-print monomial to the given {@link StringBuilder}.
-   */
+  /** Pretty-print monomial to the given {@link StringBuilder}. */
   @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public static void writeMonomial(String varSerialized, Rational coeff, StringBuilder b) {
     checkNotNull(varSerialized);

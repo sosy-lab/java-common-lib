@@ -18,12 +18,11 @@
  *  limitations under the License.
  */
 /**
- * This package provides the possibility to convert String values
- * into appropriate objects of certain types.
- * This is used by the {@link org.sosy_lab.common.configuration.Configuration}
- * class to convert configuration options into objects before injecting them.
- * The primary interface is {@link org.sosy_lab.common.configuration.converters.TypeConverter},
- * and some default implementations for commonly-used classes are also provided.
+ * This package provides the possibility to convert String values into appropriate objects of
+ * certain types. This is used by the {@link org.sosy_lab.common.configuration.Configuration} class
+ * to convert configuration options into objects before injecting them. The primary interface is
+ * {@link org.sosy_lab.common.configuration.converters.TypeConverter}, and some default
+ * implementations for commonly-used classes are also provided.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

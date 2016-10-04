@@ -44,36 +44,33 @@ import org.sosy_lab.common.io.MoreFiles;
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
  *
- * The configuration file will always be interpreted as UTF-8.
+ * <p>The configuration file will always be interpreted as UTF-8.
  *
- * Supported features:
- * - Comments at line beginnings with '# ' (with space!) and '//'
- * - Whitespace ignored before comments and around keys and values
- * - Key format is at least one word consisting of a-zA-Z0-9_+-,
- *   words are separated by '.'. Example: foo.bar
- * - Keys may be specified exactly once per file.
- * - Options with a common prefix of words in their key can be put into a section
- *   so that the prefix does not need to be written each time
- *   (similar to Windows-Ini-files).
- *   Example:
- *   <code>
+ * <p>Supported features:
+ *
+ * <ul>
+ *   <li>Comments at line beginnings with '# ' (with space!) and '//'
+ *   <li>Whitespace ignored before comments and around keys and values
+ *   <li>Key format is at least one word consisting of a-zA-Z0-9_+-, words are separated by '.'.
+ *       Example: foo.bar
+ *   <li>Keys may be specified exactly once per file.
+ *   <li>Options with a common prefix of words in their key can be put into a section so that the
+ *       prefix does not need to be written each time (similar to Windows-Ini-files). Example:
+ *       <code>
  *   [foo]
  *   bar = abc
- *   </code>
- *   is equal to
- *   <code>foo.bar = abc</code>
- * - Options before the first section start or in a section with an empty name
- *   have no such prefix.
- * - Inside the value, put '\' at the line end to append the next line to the current value
- *   (not possible in other places like key or section start).
- *   Whitespace at the beginning and end of all lines will be removed, so indentation is possible.
- * - Other files can be included (recursively) with '#include <FILE>'.
- *   If the file name is a relative one, it is considered relative to the directory
- *   of the current file. Directives in the current file will always overwrite
- *   included directives, no matter of their placement.
- *   Directives from an included file will overwrite directives from previously
- *   included files.
- *   Circular inclusions are now allowed.
+ *   </code> is equal to <code>foo.bar = abc</code>
+ *   <li>Options before the first section start or in a section with an empty name have no such
+ *       prefix.
+ *   <li>Inside the value, put '\' at the line end to append the next line to the current value (not
+ *       possible in other places like key or section start). Whitespace at the beginning and end of
+ *       all lines will be removed, so indentation is possible.
+ *   <li>Other files can be included (recursively) with '#include <FILE>'. If the file name is a
+ *       relative one, it is considered relative to the directory of the current file. Directives in
+ *       the current file will always overwrite included directives, no matter of their placement.
+ *       Directives from an included file will overwrite directives from previously included files.
+ *       Circular inclusions are now allowed.
+ * </ul>
  */
 class Parser {
 
@@ -101,16 +98,12 @@ class Parser {
 
   private Parser() {}
 
-  /**
-   * Get the map with all configuration directives in the parsed file.
-   */
+  /** Get the map with all configuration directives in the parsed file. */
   Map<String, String> getOptions() {
     return Collections.unmodifiableMap(options);
   }
 
-  /**
-   * Get the map with the source location of each defined option.
-   */
+  /** Get the map with the source location of each defined option. */
   Map<String, Path> getSources() {
     return Collections.unmodifiableMap(sources);
   }
@@ -157,15 +150,14 @@ class Parser {
   /**
    * Parse a configuration file given as a {@link CharSource} with the format as defined above.
    *
-   * A stream from this source is opened and closed by this method.
-   * This method may additionally access more files from the file system
-   * if they are included.
+   * <p>A stream from this source is opened and closed by this method. This method may additionally
+   * access more files from the file system if they are included.
    *
    * @param source The source to read the file from.
-   * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
-   * Source must not contain #include if absent.
-   * @param sourceName A string to use as source of the file in error messages
-   * (this should usually be a filename or something similar).
+   * @param basePath If #include filenames are relative, resolve them as sibling of basePath. Source
+   *     must not contain #include if absent.
+   * @param sourceName A string to use as source of the file in error messages (this should usually
+   *     be a filename or something similar).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
@@ -184,15 +176,14 @@ class Parser {
   /**
    * Parse a configuration file given as a {@link BufferedReader} with the format as defined above.
    *
-   * The reader is left open after this method returns.
-   * This method may additionally access more files from the file system
-   * if they are included.
+   * <p>The reader is left open after this method returns. This method may additionally access more
+   * files from the file system if they are included.
    *
    * @param r The reader to read the file from.
-   * @param basePath If #include filenames are relative, resolve them as sibling of basePath.
-   * Source must not contain #include if absent.
-   * @param source A string to use as source of the file in error messages
-   * (this should usually be a filename or something similar).
+   * @param basePath If #include filenames are relative, resolve them as sibling of basePath. Source
+   *     must not contain #include if absent.
+   * @param source A string to use as source of the file in error messages (this should usually be a
+   *     filename or something similar).
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */

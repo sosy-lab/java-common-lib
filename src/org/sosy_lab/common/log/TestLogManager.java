@@ -28,14 +28,13 @@ import java.util.logging.Level;
 import javax.annotation.Nullable;
 
 /**
- * LogManager implementation intended for testing
- * when nothing should actually be logged.
+ * LogManager implementation intended for testing when nothing should actually be logged.
  *
- * However, it does check all the parameters for validity,
- * i.e. non-nullness and correct string format.
+ * <p>However, it does check all the parameters for validity, i.e. non-nullness and correct string
+ * format.
  *
- * @deprecated Use {@link LogManager#createTestLogManager()} instead.
- *    This class will be made package-private.
+ * @deprecated Use {@link LogManager#createTestLogManager()} instead. This class will be made
+ *     package-private.
  */
 @Deprecated
 public enum TestLogManager implements LogManager {

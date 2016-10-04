@@ -26,10 +26,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is an optional annotation for all configuration options (i.e., elements
- * that are annotated with {@link Option}) whose type is {@link Class}.
+ * This is an optional annotation for all configuration options (i.e., elements that are annotated
+ * with {@link Option}) whose type is {@link Class}.
  *
- * It serves to specify additional information which is required for class options.
+ * <p>It serves to specify additional information which is required for class options.
  */
 @OptionDetailAnnotation(applicableTo = {})
 @Documented
@@ -38,11 +38,9 @@ import java.lang.annotation.Target;
 public @interface ClassOption {
 
   /**
-   * This field provides optional package prefixes that can be added to the
-   * specified class name.
-   * First the specified class name is tried without any prefix,
-   * and then with each prefix in the given order.
-   * The result is the first class that is found.
+   * This field provides optional package prefixes that can be added to the specified class name.
+   * First the specified class name is tried without any prefix, and then with each prefix in the
+   * given order. The result is the first class that is found.
    */
   String[] packagePrefix() default "";
 }

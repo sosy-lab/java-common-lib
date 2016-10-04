@@ -28,9 +28,7 @@ import javax.annotation.Nullable;
 import org.junit.Test;
 import org.sosy_lab.common.Classes.UnsuitedClassException;
 
-/**
- * Tests for {@link Classes#createFactory(TypeToken, Class)}.
- */
+/** Tests for {@link Classes#createFactory(TypeToken, Class)}. */
 public class ClassesFactoryTest {
 
   public interface TestFactory {

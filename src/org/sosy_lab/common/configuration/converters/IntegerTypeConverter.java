@@ -27,8 +27,8 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 
 /**
- * Type converter for options of types Integer/Long annotated
- * with {@link IntegerOption} (not for integer options without this annotation).
+ * Type converter for options of types Integer/Long annotated with {@link IntegerOption} (not for
+ * integer options without this annotation).
  */
 public class IntegerTypeConverter implements TypeConverter {
 

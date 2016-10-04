@@ -31,9 +31,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-/**
- * Class providing several convenient {@link Ticker} implementations.
- */
+/** Class providing several convenient {@link Ticker} implementations. */
 public class Tickers {
 
   public abstract static class TickerWithUnit extends Ticker {
@@ -147,44 +145,41 @@ public class Tickers {
     }
   }
 
-  /**
-   * Return a dummy {@link TickerWithUnit} that always returns 0.
-   */
+  /** Return a dummy {@link TickerWithUnit} that always returns 0. */
   public static TickerWithUnit getNullTicker() {
     return NullTicker.INSTANCE;
   }
 
   /**
-   * Return a {@link TickerWithUnit} that delegates to {@link System#currentTimeMillis()}.
-   * Note that the returned instance validates the contract of Ticker because
-   * it provides values in milliseconds, not in nanoseconds.
+   * Return a {@link TickerWithUnit} that delegates to {@link System#currentTimeMillis()}. Note that
+   * the returned instance validates the contract of Ticker because it provides values in
+   * milliseconds, not in nanoseconds.
    */
   public static TickerWithUnit getWalltimeMillis() {
     return WalltimeMillis.INSTANCE;
   }
 
-  /**
-   * Return a {@link TickerWithUnit} that delegates to {@link System#nanoTime()}.
-   */
+  /** Return a {@link TickerWithUnit} that delegates to {@link System#nanoTime()}. */
   public static TickerWithUnit getWalltimeNanos() {
     return WalltimeNanos.INSTANCE;
   }
 
   /**
-   * Return a {@link TickerWithUnit} that delegates to
-   * {@link ThreadMXBean#getCurrentThreadCpuTime()}.
-   * @throws UnsupportedOperationException
-   * If the JVM does not support measuring per-thread CPU time.
+   * Return a {@link TickerWithUnit} that delegates to {@link
+   * ThreadMXBean#getCurrentThreadCpuTime()}.
+   *
+   * @throws UnsupportedOperationException If the JVM does not support measuring per-thread CPU
+   *     time.
    */
   public static TickerWithUnit getCurrentThreadCputime() {
     return CurrentThreadCputime.INSTANCE;
   }
 
   /**
-   * Return a {@link TickerWithUnit} that delegates to
-   * <code>com.sun.management.OperatingSystemMXBean.getProcessCpuTime()</code>.
-   * This is available on Sun/Oracle/OpenJDK JVM for Linux,
-   * but not guaranteed on other platforms.
+   * Return a {@link TickerWithUnit} that delegates to <code>
+   * com.sun.management.OperatingSystemMXBean.getProcessCpuTime()</code>. This is available on
+   * Sun/Oracle/OpenJDK JVM for Linux, but not guaranteed on other platforms.
+   *
    * @throws UnsupportedOperationException If the JVM does not support measuring process CPU time.
    */
   public static TickerWithUnit getProcessCputime() {

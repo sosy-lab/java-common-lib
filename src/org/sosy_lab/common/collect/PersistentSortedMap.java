@@ -26,6 +26,7 @@ import javax.annotation.CheckReturnValue;
 
 /**
  * Sub-interface of {@link PersistentMap} analog to {@link SortedMap}.
+ *
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */

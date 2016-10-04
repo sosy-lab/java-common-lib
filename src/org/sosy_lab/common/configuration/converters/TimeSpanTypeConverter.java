@@ -31,9 +31,7 @@ import org.sosy_lab.common.configuration.TimeSpanOption;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
-/**
- * Type converter for options annotated with {@link TimeSpanOption}.
- */
+/** Type converter for options annotated with {@link TimeSpanOption}. */
 public class TimeSpanTypeConverter implements TypeConverter {
 
   private static final BiMap<String, TimeUnit> TIME_UNITS =

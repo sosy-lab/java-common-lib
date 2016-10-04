@@ -37,10 +37,10 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 
 /**
- * A {@link TypeConverter} which handles all the trivial cases like ints, Strings,
- * log levels, regexps, etc.
+ * A {@link TypeConverter} which handles all the trivial cases like ints, Strings, log levels,
+ * regexps, etc.
  *
- * This class should not have any relevance outside the {@link Configuration} class.
+ * <p>This class should not have any relevance outside the {@link Configuration} class.
  */
 public enum BaseTypeConverter implements TypeConverter {
   INSTANCE;
@@ -131,10 +131,7 @@ public enum BaseTypeConverter implements TypeConverter {
     return Enum.valueOf((Class) cls, value);
   }
 
-  /**
-   * Invoke the static "valueOf(String)" method on a class.
-   * Helpful for type converters.
-   */
+  /** Invoke the static "valueOf(String)" method on a class. Helpful for type converters. */
   public static Object valueOf(final Class<?> type, final String optionName, final String value)
       throws InvalidConfigurationException {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);

@@ -47,18 +47,20 @@ import org.sosy_lab.common.log.LogManager;
 
 /**
  * A {@link TypeConverter} for options of type {@link File} or {@link Path} which offers some
- * additional features like a common base directory for all output files.
- * In order to use these features, the options need to be annotated with
- * {@link FileOption}.
+ * additional features like a common base directory for all output files. In order to use these
+ * features, the options need to be annotated with {@link FileOption}.
  *
- * This type converter should be registered for the type {@link FileOption}.
+ * <p>This type converter should be registered for the type {@link FileOption}.
  *
- * The additional features are:
- * - All specified relative paths are resolved against a given root directory.
- * - All relative paths of output files are resolved against a separate output directory.
- * - All output files can be disabled by a central switch.
+ * <p>The additional features are:
  *
- * In order to configure these features, the normal configuration options are used.
+ * <ul>
+ *   <li>All specified relative paths are resolved against a given root directory.
+ *   <li>All relative paths of output files are resolved against a separate output directory.
+ *   <li>All output files can be disabled by a central switch.
+ * </ul>
+ *
+ * <p>In order to configure these features, the normal configuration options are used.
  */
 @Options
 public final class FileTypeConverter implements TypeConverter {
@@ -110,8 +112,8 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   /**
-   * Create an instanceof of this class that allows only injected files
-   * that are below the current directory.
+   * Create an instanceof of this class that allows only injected files that are below the current
+   * directory.
    */
   public static FileTypeConverter createWithSafePathsOnly(Configuration config)
       throws InvalidConfigurationException {
@@ -119,13 +121,12 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   /**
-   * Checks whether a path is safe (i.e., it is below the current directory).
-   * Absolute paths and paths with "../" are forbidden.
-   * Returns the unchanged path if it is safe,
-   * or throws an exception.
+   * Checks whether a path is safe (i.e., it is below the current directory). Absolute paths and
+   * paths with "../" are forbidden. Returns the unchanged path if it is safe, or throws an
+   * exception.
    *
-   * If {@link #safePathsOnly} is false, no checks are done,
-   * and this method always returns the path.
+   * <p>If {@link #safePathsOnly} is false, no checks are done, and this method always returns the
+   * path.
    */
   @VisibleForTesting
   Path checkSafePath(Path pPath, String optionName) throws InvalidConfigurationException {
@@ -271,12 +272,14 @@ public final class FileTypeConverter implements TypeConverter {
     return value;
   }
 
-  /** This function returns a file. It sets the path of the file to
-   * the given outputDirectory in the given rootDirectory.
+  /**
+   * This function returns a file. It sets the path of the file to the given outputDirectory in the
+   * given rootDirectory.
    *
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
-   * @param typeInfo info about the type of the file (outputfile, inputfile) */
+   * @param typeInfo info about the type of the file (outputfile, inputfile)
+   */
   @SuppressWarnings("CheckReturnValue")
   private Object handleFileOption(
       final String optionName,

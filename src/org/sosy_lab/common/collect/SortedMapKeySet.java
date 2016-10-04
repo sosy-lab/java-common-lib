@@ -31,7 +31,7 @@ import java.util.SortedSet;
 /**
  * Implementation of {@link SortedSet} to be used as the key set of a {@link SortedMap}.
  *
- * This implementation forwards all methods to the underlying map.
+ * <p>This implementation forwards all methods to the underlying map.
  *
  * @param <K> The type of keys.
  */

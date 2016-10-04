@@ -29,18 +29,15 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
-/**
- * Utility class providing {@link Appender}s for various cases.
- */
+/** Utility class providing {@link Appender}s for various cases. */
 public class Appenders {
 
   private Appenders() {}
 
   /**
-   * Return an {@link Appender} for the given object.
-   * If the object is an {@link Appender} itself, it is returned.
-   * Otherwise an appender that calls {@link Object#toString()} is returned
-   * (c.f. {@link #fromToStringMethod(Object)}.
+   * Return an {@link Appender} for the given object. If the object is an {@link Appender} itself,
+   * it is returned. Otherwise an appender that calls {@link Object#toString()} is returned (c.f.
+   * {@link #fromToStringMethod(Object)}.
    *
    * @param o The object which will be dumped, may be null.
    * @return an {@link Appender} instance
@@ -54,10 +51,10 @@ public class Appenders {
   }
 
   /**
-   * Write the given object into the given output.
-   * If the object is an {@link Appender}, its {@link Appender#appendTo(Appendable)}
-   * method is called, otherwise the {@link Object#toString()} method is called.
-   * The object may be {@code null}, in this case {@code "null"} is written.
+   * Write the given object into the given output. If the object is an {@link Appender}, its {@link
+   * Appender#appendTo(Appendable)} method is called, otherwise the {@link Object#toString()} method
+   * is called. The object may be {@code null}, in this case {@code "null"} is written.
+   *
    * @param output The appendable to write into.
    * @param o The object which will be dumped, may be null.
    * @throws IOException If the appendable throws an IOException
@@ -72,10 +69,10 @@ public class Appenders {
   }
 
   /**
-   * Let an {@link Appender} dump itself into a {@link StringBuilder}.
-   * This method is similar to passing the {@link StringBuilder} to
-   * the {@link Appender#appendTo(Appendable)} method, just without the checked
-   * exception.
+   * Let an {@link Appender} dump itself into a {@link StringBuilder}. This method is similar to
+   * passing the {@link StringBuilder} to the {@link Appender#appendTo(Appendable)} method, just
+   * without the checked exception.
+   *
    * @param sb The StringBuilder that will receive the content.
    * @param a The Appender to dump into the StringBuilder.
    * @return The passed StringBuilder to allow for method chaining.
@@ -91,8 +88,9 @@ public class Appenders {
   }
 
   /**
-   * Return an {@link Appender} that writes an {@link Iterable} into the output
-   * using a given {@link Joiner}.
+   * Return an {@link Appender} that writes an {@link Iterable} into the output using a given {@link
+   * Joiner}.
+   *
    * @param joiner The joiner that will be used to create a string representation of the iterable.
    * @param it The iterable which will be dumped.
    * @return an {@link Appender} instance
@@ -110,8 +108,9 @@ public class Appenders {
   }
 
   /**
-   * Return an {@link Appender} that writes a {@link Map} into the output
-   * using a given {@link Joiner}.
+   * Return an {@link Appender} that writes a {@link Map} into the output using a given {@link
+   * Joiner}.
+   *
    * @param joiner The joiner that will be used to create a string representation of the map.
    * @param map The map which will be dumped.
    * @return an {@link Appender} instance
@@ -129,16 +128,15 @@ public class Appenders {
   }
 
   /**
-   * Return an {@link Appender} that writes the result of the {@link Object#toString()}
-   * method of an object into the output.
+   * Return an {@link Appender} that writes the result of the {@link Object#toString()} method of an
+   * object into the output.
    *
-   * This will not give the performance benefit that is expected from the use of
-   * appenders, and should only be used to adapt classes not implementing this
-   * interface themselves.
+   * <p>This will not give the performance benefit that is expected from the use of appenders, and
+   * should only be used to adapt classes not implementing this interface themselves.
    *
-   * If {@code null} is passed, the resulting appender will write {@code "null"}.
-   * If an object is passed, the appender will call the {@link Object#toString()}
-   * method once each time it is used (no caching is done).
+   * <p>If {@code null} is passed, the resulting appender will write {@code "null"}. If an object is
+   * passed, the appender will call the {@link Object#toString()} method once each time it is used
+   * (no caching is done).
    *
    * @param o The object which will be dumped, may be null.
    * @return an {@link Appender} instance
@@ -153,11 +151,10 @@ public class Appenders {
   }
 
   /**
-   * Create a new {@link Appender} that consists of the sequential concatenation
-   * of multiple appenders.
-   * The given iterable is traversed once each time the resulting appender's
-   * {@link Appender#appendTo(Appendable)} method is called.
-   * The iterable may not contain nulls or be null itself..
+   * Create a new {@link Appender} that consists of the sequential concatenation of multiple
+   * appenders. The given iterable is traversed once each time the resulting appender's {@link
+   * Appender#appendTo(Appendable)} method is called. The iterable may not contain nulls or be null
+   * itself..
    */
   public static Appender concat(final Iterable<Appender> pAppenders) {
     checkNotNull(pAppenders);
@@ -172,8 +169,8 @@ public class Appenders {
   }
 
   /**
-   * Create a new {@link Appender} that consists of the sequential concatenation
-   * of multiple appenders.
+   * Create a new {@link Appender} that consists of the sequential concatenation of multiple
+   * appenders.
    *
    * @throws NullPointerException if any of the provided appendables is null
    */
@@ -182,15 +179,15 @@ public class Appenders {
   }
 
   /**
-   * Convert an {@link Appender} into a string by calling it's
-   * {@link Appender#appendTo(Appendable)} method.
+   * Convert an {@link Appender} into a string by calling it's {@link Appender#appendTo(Appendable)}
+   * method.
    *
-   * Note that the contract of {@link Appender} specifies that you should be able
-   * to call {@link Object#toString()} on the object and get the same result,
-   * thus it should not be necessary to call this method from client code.
+   * <p>Note that the contract of {@link Appender} specifies that you should be able to call {@link
+   * Object#toString()} on the object and get the same result, thus it should not be necessary to
+   * call this method from client code.
    *
-   * However, it may be practical to implement the {@link Object#toString()}
-   * method of an {@link Appender} by delegating to this method.
+   * <p>However, it may be practical to implement the {@link Object#toString()} method of an {@link
+   * Appender} by delegating to this method.
    *
    * @param a The {@link Appender} to convert into a string.
    * @return a string representation of the passed object.
@@ -204,17 +201,16 @@ public class Appenders {
   }
 
   /**
-   * Convert an {@link Appender} into a string by calling it's
-   * {@link Appender#appendTo(Appendable)} method.
+   * Convert an {@link Appender} into a string by calling it's {@link Appender#appendTo(Appendable)}
+   * method.
    *
-   * This method truncates the returned string at a given length,
-   * and tries to be more efficient than generating the full string
-   * and truncating it at the end (though no guarantees are made).
+   * <p>This method truncates the returned string at a given length, and tries to be more efficient
+   * than generating the full string and truncating it at the end (though no guarantees are made).
    *
    * @param a The {@link Appender} to convert into a string.
    * @param truncateAt The maximum size of the returned string {@code (>= 0)}
-   * @return a string representation of the passed object,
-   * with a maximum size of <code>truncateAt</code>
+   * @return a string representation of the passed object, with a maximum size of <code>truncateAt
+   *     </code>
    */
   public static String toStringWithTruncation(Appender a, final int truncateAt) {
     checkArgument(truncateAt >= 0, "Maximum size of String cannot be negative");
@@ -262,9 +258,9 @@ public class Appenders {
   }
 
   /**
-   * Base implementation of {@link Appender} that ensures that the {@link #toString()}
-   * method returns the same result that {@link #appendTo(Appendable)} produces
-   * in order to ensure that the contract of {@link Appender} is fulfilled.
+   * Base implementation of {@link Appender} that ensures that the {@link #toString()} method
+   * returns the same result that {@link #appendTo(Appendable)} produces in order to ensure that the
+   * contract of {@link Appender} is fulfilled.
    */
   public abstract static class AbstractAppender implements Appender {
 

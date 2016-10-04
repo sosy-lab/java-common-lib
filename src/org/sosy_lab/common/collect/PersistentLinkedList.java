@@ -42,26 +42,23 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 /**
- * A single-linked-list implementation of {@link PersistentList}.
- * Null values are not supported (similarly to {@link ImmutableList}).
+ * A single-linked-list implementation of {@link PersistentList}. Null values are not supported
+ * (similarly to {@link ImmutableList}).
  *
- * Adding to the front of the list needs only O(1) time and memory.
+ * <p>Adding to the front of the list needs only O(1) time and memory.
  *
- * This implementation supports almost all operations, except for the
- * {@link ListIterator#hasPrevious()} and {@link ListIterator#previous()} methods
- * of its list iterator.
+ * <p>This implementation supports almost all operations, except for the {@link
+ * ListIterator#hasPrevious()} and {@link ListIterator#previous()} methods of its list iterator.
  * This means you cannot traverse this list in reverse order.
  *
- * All instances of this class are fully-thread safe.
- * However, note that each modifying operation allocates a new instance
- * whose reference needs to be published safely in order to be usable by other threads.
- * Two concurrent accesses to a modifying operation on the same instance will
- * create two new maps, each reflecting exactly the operation executed by the current thread,
- * and not reflecting the operation executed by the other thread.
+ * <p>All instances of this class are fully-thread safe. However, note that each modifying operation
+ * allocates a new instance whose reference needs to be published safely in order to be usable by
+ * other threads. Two concurrent accesses to a modifying operation on the same instance will create
+ * two new maps, each reflecting exactly the operation executed by the current thread, and not
+ * reflecting the operation executed by the other thread.
  */
 @javax.annotation.concurrent.Immutable
 @SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
@@ -85,48 +82,69 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return new PersistentLinkedList(null, null);
   }
 
-  /** Returns the empty list.
-   *  @return The empty list */
+  /**
+   * Returns the empty list.
+   *
+   * @return The empty list
+   */
   @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of() {
     return EMPTY;
   }
 
-  /** Returns a list containing the specified value.
-   *  @return A list containing the specified value */
+  /**
+   * Returns a list containing the specified value.
+   *
+   * @return A list containing the specified value
+   */
   public static <T> PersistentLinkedList<T> of(final T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
   }
 
-  /** Returns a list containing the specified values.
-   *  @return A list containing the specified values */
+  /**
+   * Returns a list containing the specified values.
+   *
+   * @return A list containing the specified values
+   */
   public static <T> PersistentLinkedList<T> of(final T v1, final T v2) {
     return of(v2).with(v1);
   }
 
-  /** Returns a list containing the specified values.
-   *  @return A list containing the specified values */
+  /**
+   * Returns a list containing the specified values.
+   *
+   * @return A list containing the specified values
+   */
   public static <T> PersistentLinkedList<T> of(final T v1, final T v2, final T v3) {
     return of(v3).with(v2).with(v1);
   }
 
-  /** Returns a list containing the specified values.
-   *  @return A list containing the specified values */
+  /**
+   * Returns a list containing the specified values.
+   *
+   * @return A list containing the specified values
+   */
   @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> of(final T v1, final T... values) {
     return copyOf(values).with(v1);
   }
 
-  /** Returns a list containing the specified values.
-   *  @return A list containing the specified values */
+  /**
+   * Returns a list containing the specified values.
+   *
+   * @return A list containing the specified values
+   */
   @SuppressWarnings("unchecked")
   public static <T> PersistentLinkedList<T> copyOf(final T... values) {
     return copyOf(Arrays.asList(values));
   }
 
-  /** Returns A new list with the values from the Iterable.
-   *  @return A new list with the values from the Iterable */
+  /**
+   * Returns A new list with the values from the Iterable.
+   *
+   * @return A new list with the values from the Iterable
+   */
   public static <T> PersistentLinkedList<T> copyOf(final List<T> values) {
     if (values instanceof PersistentLinkedList<?>) {
       return (PersistentLinkedList<T>) values;
@@ -138,30 +156,42 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return result;
   }
 
-  /** Returns the value at the start of the list.
-   *  @return The value at the start of the list */
+  /**
+   * Returns the value at the start of the list.
+   *
+   * @return The value at the start of the list
+   */
   public T head() {
     checkState(!isEmpty());
     return head;
   }
 
-  /** Returns the remainder of the list without the first element.
-   *  @return The remainder of the list without the first element */
+  /**
+   * Returns the remainder of the list without the first element.
+   *
+   * @return The remainder of the list without the first element
+   */
   public PersistentLinkedList<T> tail() {
     checkState(!isEmpty());
     return tail;
   }
 
-  /** Returns a new list with value as the head and the old list as the tail.
-   *  @return A new list with value as the head and the old list as the tail */
+  /**
+   * Returns a new list with value as the head and the old list as the tail.
+   *
+   * @return A new list with value as the head and the old list as the tail
+   */
   @Override
   public PersistentLinkedList<T> with(final T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, this);
   }
 
-  /** Returns a new list with values as the head and the old list as the tail.
-   *  @return A new list with value sas the head and the old list as the tail */
+  /**
+   * Returns a new list with values as the head and the old list as the tail.
+   *
+   * @return A new list with value sas the head and the old list as the tail
+   */
   @Override
   public PersistentLinkedList<T> withAll(List<T> values) {
     PersistentLinkedList<T> result = this;
@@ -175,9 +205,10 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return result;
   }
 
-  /** Returns a new list omitting the specified value.
-   *  Note: O(N)
-   *  @return A new list omitting the specified value
+  /**
+   * Returns a new list omitting the specified value. Note: O(N)
+   *
+   * @return A new list omitting the specified value
    */
   @Override
   public PersistentLinkedList<T> without(final @Nullable T value) {
@@ -212,8 +243,8 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns the number of elements in the list.
-   * Note: O(N)
+   * Returns the number of elements in the list. Note: O(N)
+   *
    * @return The number of elements in the list
    */
   @Override
@@ -231,9 +262,11 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return this == EMPTY;
   }
 
-  /** Returns a new list with the elements in the reverse order.
-   *  This operation runs in O(n).
-   *  @return A new list with the elements in the reverse order */
+  /**
+   * Returns a new list with the elements in the reverse order. This operation runs in O(n).
+   *
+   * @return A new list with the elements in the reverse order
+   */
   @Override
   public PersistentLinkedList<T> reversed() {
     PersistentLinkedList<T> result = empty();
@@ -310,9 +343,9 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in
-   * {@link Stream#collect(Collector)}.
-   * The returned collector does not support parallel streams.
+   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in {@link
+   * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
+   * streams.
    */
   public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
     return new Collector<T, PersistentLinkedListBuilder<T>, PersistentLinkedList<T>>() {

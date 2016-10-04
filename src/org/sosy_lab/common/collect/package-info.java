@@ -18,8 +18,8 @@
  *  limitations under the License.
  */
 /**
- * This package contains additional interfaces and implementations for collections,
- * as well as further collection utilities.
+ * This package contains additional interfaces and implementations for collections, as well as
+ * further collection utilities.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

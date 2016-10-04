@@ -27,20 +27,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Helper methods for concurrency related things.
- */
+/** Helper methods for concurrency related things. */
 public final class Concurrency {
 
   private Concurrency() {}
 
   /**
-   * Wait uninterruptibly until an ExecutorService has shutdown.
-   * It also ensures full memory visibility of everything that was done in
-   * the callables.
+   * Wait uninterruptibly until an ExecutorService has shutdown. It also ensures full memory
+   * visibility of everything that was done in the callables.
    *
-   * Interrupting the thread will have no effect, but this method
-   * will set the thread's interrupted flag in this case.
+   * <p>Interrupting the thread will have no effect, but this method will set the thread's
+   * interrupted flag in this case.
    */
   public static void waitForTermination(ExecutorService executor) {
     boolean interrupted = Thread.interrupted();
@@ -62,8 +59,7 @@ public final class Concurrency {
   }
 
   /**
-   * Creates a thread pool of fixed size. Size is determined by processors
-   * available to the JVM.
+   * Creates a thread pool of fixed size. Size is determined by processors available to the JVM.
    *
    * @return thread pool
    */
@@ -73,11 +69,9 @@ public final class Concurrency {
   }
 
   /**
-   * Creates a thread pool of fixed size. Size is determined by processors
-   * available to the JVM.
+   * Creates a thread pool of fixed size. Size is determined by processors available to the JVM.
    *
-   * @param threadFactory
-   *            The thread factory to be used.
+   * @param threadFactory The thread factory to be used.
    * @return thread pool
    */
   public static ExecutorService createThreadPool(ThreadFactory threadFactory) {
@@ -86,10 +80,9 @@ public final class Concurrency {
   }
 
   /**
-   * Create a new non-daemon thread with a name.
-   * Compared to creating threads manually, this has the advantage that the thread will be created
-   * with the default settings.
-   * By default, Java lets threads inherit some settings from the creating thread.
+   * Create a new non-daemon thread with a name. Compared to creating threads manually, this has the
+   * advantage that the thread will be created with the default settings. By default, Java lets
+   * threads inherit some settings from the creating thread.
    *
    * @param name The name of the new thread.
    * @param r The {@link Runnable} to execute in the new thread.
@@ -101,10 +94,9 @@ public final class Concurrency {
   }
 
   /**
-   * Create a new daemon thread with a name.
-   * Compared to creating threads manually, this has the advantage that the thread will be created
-   * with the default settings.
-   * By default, Java lets threads inherit some settings from the creating thread.
+   * Create a new daemon thread with a name. Compared to creating threads manually, this has the
+   * advantage that the thread will be created with the default settings. By default, Java lets
+   * threads inherit some settings from the creating thread.
    *
    * @param name The name of the new thread.
    * @param r The {@link Runnable} to execute in the new thread.

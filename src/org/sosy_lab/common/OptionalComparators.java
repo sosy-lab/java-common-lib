@@ -32,8 +32,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * {@link Comparator} implementations for {@link Optional},
- * {@link OptionalInt}, {@link OptionalLong}, and {@link OptionalDouble}.
+ * {@link Comparator} implementations for {@link Optional}, {@link OptionalInt}, {@link
+ * OptionalLong}, and {@link OptionalDouble}.
  */
 final class OptionalComparators {
 

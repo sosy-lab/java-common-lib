@@ -32,19 +32,16 @@ import org.sosy_lab.common.io.MoreFiles;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1
- * (https://code.google.com/p/json-simple/)
- * by Fang Yidong {@code fangyidong@yahoo.com.cn}.
- * The license is the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0.txt).
+ * (https://code.google.com/p/json-simple/) by Fang Yidong {@code fangyidong@yahoo.com.cn}. The
+ * license is the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0.txt).
  *
- * Significant performance improvements were made compared to the library.
+ * <p>Significant performance improvements were made compared to the library.
  */
 public final class JSON {
 
   private JSON() {}
 
-  /**
-   * Encode an object into JSON text and write it to a file.
-   */
+  /** Encode an object into JSON text and write it to a file. */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
     // We escape everything, so pure ASCII remains
     try (Writer out = MoreFiles.openOutputFile(file, StandardCharsets.US_ASCII)) {
@@ -52,9 +49,7 @@ public final class JSON {
     }
   }
 
-  /**
-   * Encode an object into JSON text and write it to out.
-   */
+  /** Encode an object into JSON text and write it to out. */
   public static void writeJSONString(@Nullable Object value, Appendable out) throws IOException {
     if (value == null) {
       out.append("null");
@@ -96,9 +91,7 @@ public final class JSON {
     }
   }
 
-  /**
-   * Encode an list into JSON text and write it to out.
-   */
+  /** Encode an list into JSON text and write it to out. */
   private static void writeJSONString(Iterable<?> list, Appendable out) throws IOException {
     boolean first = true;
 
@@ -115,9 +108,7 @@ public final class JSON {
     out.append(']');
   }
 
-  /**
-   * Encode a map into JSON text and write it to out.
-   */
+  /** Encode a map into JSON text and write it to out. */
   private static void writeJSONString(Map<?, ?> map, Appendable out) throws IOException {
     boolean first = true;
 

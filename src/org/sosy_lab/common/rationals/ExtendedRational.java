@@ -6,12 +6,12 @@ import static com.google.common.base.Preconditions.checkState;
 import javax.annotation.Nullable;
 
 /**
- * This class represents "extended rational": rationals which allow for infinities,
- * negative infinities and undefined numbers.
+ * This class represents "extended rational": rationals which allow for infinities, negative
+ * infinities and undefined numbers.
  *
- * Any operation on the numbers is guaranteed to never yield an exception.
+ * <p>Any operation on the numbers is guaranteed to never yield an exception.
  *
- * Represented as wrapper around {@link Rational} class.
+ * <p>Represented as wrapper around {@link Rational} class.
  */
 @javax.annotation.concurrent.Immutable
 public final class ExtendedRational implements Comparable<ExtendedRational> {
@@ -62,9 +62,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   /**
-   * @return rational converted to double.
-   * The method works, because the Java Double class also supports
-   * Infinity/-Infinity/NaN.
+   * @return rational converted to double. The method works, because the Java Double class also
+   *     supports Infinity/-Infinity/NaN.
    */
   public double toDouble() {
     switch (numberType) {
@@ -83,10 +82,9 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   /**
-   * @return The method can return TWO things.
-   * a) String of the form num/den if the number is rational.
-   * b) String representation of infinity/etc, consistent with the
-   * {@code Double} class.
+   * @return The method can return TWO things. a) String of the form num/den if the number is
+   *     rational. b) String representation of infinity/etc, consistent with the {@code Double}
+   *     class.
    */
   @Override
   public String toString() {
@@ -100,20 +98,19 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   /**
-   * Reverses the effect of {@link ExtendedRational#toString}.
-   * Supports 4 different formats, to be consistent with the {@link Double} class:
+   * Reverses the effect of {@link ExtendedRational#toString}. Supports 4 different formats, to be
+   * consistent with the {@link Double} class:
    *
    * <ul>
-   * <li>{@code "Infinity"}
-   * <li>{@code "-Infinity"}
-   * <li>{@code "NaN"}
-   * <li>{@code a/b} for some integers {@code a} and {@code b}
-   * <li>{@code a} for some integer {@code a}
+   *   <li>{@code "Infinity"}
+   *   <li>{@code "-Infinity"}
+   *   <li>{@code "NaN"}
+   *   <li>{@code a/b} for some integers {@code a} and {@code b}
+   *   <li>{@code a} for some integer {@code a}
    * </ul>
    *
    * @param s Input string,
-   * @throws NumberFormatException {@code s} is not a valid representation
-   * of ExtendedRational.
+   * @throws NumberFormatException {@code s} is not a valid representation of ExtendedRational.
    * @return New {@link ExtendedRational}.
    */
   public static ExtendedRational ofString(String s) {

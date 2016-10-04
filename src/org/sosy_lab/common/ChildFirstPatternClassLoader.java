@@ -27,21 +27,20 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * This is a {@link URLClassLoader} that behaves like a normal class loader
- * except that it loads some classes always by itself, even if the parent
- * class loader would also have been available to load them.
+ * This is a {@link URLClassLoader} that behaves like a normal class loader except that it loads
+ * some classes always by itself, even if the parent class loader would also have been available to
+ * load them.
  *
- * Normal class loaders follow the parent-first strategy, so they never load
- * classes which their parent could also load. This class loader follows the
- * child-first strategy for a specific set of classes (given by a pattern)
- * and the parent-first strategy for the rest.
+ * <p>Normal class loaders follow the parent-first strategy, so they never load classes which their
+ * parent could also load. This class loader follows the child-first strategy for a specific set of
+ * classes (given by a pattern) and the parent-first strategy for the rest.
  *
- * This class loader can be used if you want to load a component with its own
- * class loader (so that it can be garbage collected independently, for example),
- * but the parent class loader also sees the classes.
+ * <p>This class loader can be used if you want to load a component with its own class loader (so
+ * that it can be garbage collected independently, for example), but the parent class loader also
+ * sees the classes.
  *
- * @deprecated replaced with {@link Classes#makeExtendedURLClassLoader()}
- *     and {@link Classes.ClassLoaderBuilder#setDirectLoadClasses(Predicate)}.
+ * @deprecated replaced with {@link Classes#makeExtendedURLClassLoader()} and {@link
+ *     Classes.ClassLoaderBuilder#setDirectLoadClasses(Predicate)}.
  */
 @Deprecated
 public class ChildFirstPatternClassLoader extends URLClassLoader {
@@ -50,6 +49,7 @@ public class ChildFirstPatternClassLoader extends URLClassLoader {
 
   /**
    * Create a new class loader.
+   *
    * @param pLoadInChild The predicate telling which classes should never be loaded by the parent.
    * @param pUrls The sources where this class loader should load classes from.
    * @param pParent The parent class loader.
@@ -62,6 +62,7 @@ public class ChildFirstPatternClassLoader extends URLClassLoader {
 
   /**
    * Create a new class loader.
+   *
    * @param pClassPattern The pattern telling which classes should never be loaded by the parent.
    * @param pUrls The sources where this class loader should load classes from.
    * @param pParent The parent class loader.

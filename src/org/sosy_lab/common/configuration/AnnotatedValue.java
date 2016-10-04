@@ -23,9 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Optional;
 
-/**
- * Immutable container that stores a value and an optional string.
- */
+/** Immutable container that stores a value and an optional string. */
 @Immutable(containerOf = "T")
 @AutoValue
 public abstract class AnnotatedValue<T> {

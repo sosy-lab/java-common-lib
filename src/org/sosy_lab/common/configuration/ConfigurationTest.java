@@ -176,8 +176,9 @@ public class ConfigurationTest {
   }
 
   /**
-   * This is parametrized test case that checks whether the injection with
-   * a default configuration does not change the value of the fields.
+   * This is parametrized test case that checks whether the injection with a default configuration
+   * does not change the value of the fields.
+   *
    * @param clsWithOptions A class with some declared options and a default constructor.
    */
   private void testDefault(Class<?> clsWithOptions) throws InvalidConfigurationException {
@@ -211,9 +212,7 @@ public class ConfigurationTest {
     private String test = "test";
   }
 
-  /**
-   * Deprecated options are acceptable, but throw warnings.
-   */
+  /** Deprecated options are acceptable, but throw warnings. */
   @Test
   @SuppressWarnings("FormatStringAnnotation")
   public void testDeprecatedOptionsWarning() throws Exception {
@@ -229,8 +228,8 @@ public class ConfigurationTest {
   }
 
   /**
-   * When both deprecated and new options are supplied, the new option
-   * is used and the warning is logged.
+   * When both deprecated and new options are supplied, the new option is used and the warning is
+   * logged.
    */
   @Test
   @SuppressWarnings("FormatStringAnnotation")
