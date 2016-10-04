@@ -23,15 +23,13 @@ import com.google.common.base.CharMatcher;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
-
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Type converter for options annotated with {@link TimeSpanOption}.

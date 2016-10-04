@@ -24,11 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.MapMaker;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 

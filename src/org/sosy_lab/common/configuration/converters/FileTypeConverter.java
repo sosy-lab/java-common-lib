@@ -27,7 +27,14 @@ import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -37,16 +44,6 @@ import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.annotation.Annotation;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.annotation.Nullable;
 
 /**
  * A {@link TypeConverter} for options of type {@link File} or {@link Path} which offers some

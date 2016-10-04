@@ -22,16 +22,14 @@ package org.sosy_lab.common.configuration.converters;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
+import java.util.Collections;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnsuitedClassException;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
-
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
-import java.util.Collections;
 
 public class ClassTypeConverter implements TypeConverter {
 

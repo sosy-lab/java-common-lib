@@ -29,16 +29,6 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.sosy_lab.common.configuration.FileOption.Type;
-import org.sosy_lab.common.configuration.converters.FileTypeConverter;
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.rationals.Rational;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
@@ -51,6 +41,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sosy_lab.common.configuration.FileOption.Type;
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 
 public class ConfigurationTest {
 

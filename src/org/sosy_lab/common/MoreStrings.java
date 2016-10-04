@@ -22,7 +22,6 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.Supplier;
-
 import javax.annotation.CheckReturnValue;
 
 /**

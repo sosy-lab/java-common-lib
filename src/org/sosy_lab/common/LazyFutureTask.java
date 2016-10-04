@@ -20,12 +20,10 @@
 package org.sosy_lab.common;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nullable;
 
 /**

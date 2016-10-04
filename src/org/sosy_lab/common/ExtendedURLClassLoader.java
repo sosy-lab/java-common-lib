@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;

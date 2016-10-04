@@ -20,10 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
-
 import java.util.SortedMap;
 import java.util.SortedSet;
-
 import javax.annotation.CheckReturnValue;
 
 /**

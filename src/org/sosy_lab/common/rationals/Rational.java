@@ -3,10 +3,8 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import javax.annotation.Nullable;
 
 /**

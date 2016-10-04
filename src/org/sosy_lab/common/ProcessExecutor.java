@@ -30,10 +30,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-
-import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.log.LogManager;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,6 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.log.LogManager;
 
 /**
  * This class can be used to execute a separate process and read its output in

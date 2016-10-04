@@ -23,10 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Joiner;
-
-import org.sosy_lab.common.configuration.OptionCollector.AnnotationInfo;
-import org.sosy_lab.common.configuration.OptionCollector.OptionInfo;
-
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -35,6 +31,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.sosy_lab.common.configuration.OptionCollector.AnnotationInfo;
+import org.sosy_lab.common.configuration.OptionCollector.OptionInfo;
 
 /**
  * Class that creates a plain-text documentation of options.

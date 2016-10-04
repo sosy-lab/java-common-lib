@@ -28,14 +28,11 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.testers.ListLastIndexOfTester;
 import com.google.common.collect.testing.testers.ListListIteratorTester;
 import com.google.common.collect.testing.testers.ListSubListTester;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestSuite;
-
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
+import org.junit.Test;
 
 public class PersistentLinkedListTest {
 

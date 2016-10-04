@@ -20,11 +20,9 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
-
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
 import javax.annotation.CheckReturnValue;
 
 /**

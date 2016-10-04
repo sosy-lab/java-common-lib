@@ -24,9 +24,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -34,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Predicate;
-
 import javax.annotation.Nullable;
 
 /**

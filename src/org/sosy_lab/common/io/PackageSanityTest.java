@@ -21,7 +21,6 @@ package org.sosy_lab.common.io;
 
 import com.google.common.base.Joiner;
 import com.google.common.testing.AbstractPackageSanityTests;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;

@@ -22,7 +22,6 @@ package org.sosy_lab.common.log;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-
 import javax.annotation.concurrent.GuardedBy;
 
 /**

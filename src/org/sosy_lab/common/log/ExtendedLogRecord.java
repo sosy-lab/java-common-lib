@@ -22,10 +22,8 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-
 import javax.annotation.Nullable;
 
 /**

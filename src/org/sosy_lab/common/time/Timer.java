@@ -23,12 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Ascii;
-
-import org.sosy_lab.common.time.Tickers.TickerWithUnit;
-
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 /**
  * This class represents a timer like a stop watch. It can be started and

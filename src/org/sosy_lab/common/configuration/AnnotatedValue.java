@@ -21,7 +21,6 @@ package org.sosy_lab.common.configuration;
 
 import com.google.auto.value.AutoValue;
 import com.google.errorprone.annotations.Immutable;
-
 import java.util.Optional;
 
 /**

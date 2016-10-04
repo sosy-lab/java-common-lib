@@ -22,7 +22,6 @@ package org.sosy_lab.common.collect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.annotations.Immutable;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;

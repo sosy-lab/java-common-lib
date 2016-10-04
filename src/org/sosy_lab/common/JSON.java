@@ -21,17 +21,14 @@ package org.sosy_lab.common;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.Strings;
-
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.io.MoreFiles;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1

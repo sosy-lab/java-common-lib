@@ -24,11 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
 import com.google.common.io.CharSource;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,8 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import javax.annotation.CheckReturnValue;
+import org.sosy_lab.common.io.MoreFiles;
 
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.

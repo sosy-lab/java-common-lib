@@ -24,11 +24,9 @@ import static org.sosy_lab.common.collect.PersistentSortedMaps.merge;
 
 import com.google.common.base.Equivalence;
 import com.google.common.collect.ImmutableMap;
-
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Test;
 
 public class PersistentSortedMapsTest {
 

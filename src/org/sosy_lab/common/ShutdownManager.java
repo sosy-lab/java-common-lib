@@ -21,9 +21,8 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 
 /**
  * Together with {@link ShutdownNotifier}, this class implements a service

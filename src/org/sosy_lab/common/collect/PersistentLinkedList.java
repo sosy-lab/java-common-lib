@@ -26,7 +26,6 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
-
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -44,7 +43,6 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-
 import javax.annotation.Nullable;
 
 /**

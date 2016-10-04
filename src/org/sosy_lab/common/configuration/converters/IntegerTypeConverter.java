@@ -20,13 +20,11 @@
 package org.sosy_lab.common.configuration.converters;
 
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
-
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
 
 /**
  * Type converter for options of types Integer/Long annotated

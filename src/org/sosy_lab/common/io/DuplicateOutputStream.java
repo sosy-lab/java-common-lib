@@ -22,10 +22,8 @@ package org.sosy_lab.common.io;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.io.ByteStreams;
-
 import java.io.IOException;
 import java.io.OutputStream;
-
 import javax.annotation.Nullable;
 
 /**

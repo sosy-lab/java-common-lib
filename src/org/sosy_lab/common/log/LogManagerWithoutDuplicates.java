@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.FormatMethod;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;

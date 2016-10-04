@@ -40,16 +40,6 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
-
-import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
-import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
-import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
-import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.log.LogManager;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
@@ -78,8 +68,15 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
+import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
+import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
+import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.log.LogManager;
 
 /**
  * Immutable wrapper around a map with properties, providing

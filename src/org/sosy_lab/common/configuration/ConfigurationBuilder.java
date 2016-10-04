@@ -27,10 +27,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharSource;
 import com.google.common.io.Resources;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,9 +39,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.io.MoreFiles;
 
 /**
  * Interface for constructing {@link Configuration} instances.

@@ -20,7 +20,6 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.collect.ImmutableSet;
-
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Filter;

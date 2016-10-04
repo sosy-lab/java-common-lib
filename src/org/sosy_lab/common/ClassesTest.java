@@ -22,11 +22,9 @@ package org.sosy_lab.common;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-
-import org.junit.Test;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.junit.Test;
 
 public class ClassesTest {
 

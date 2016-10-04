@@ -39,14 +39,7 @@ import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
-import org.sosy_lab.common.annotations.Unmaintained;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -65,9 +58,12 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
+import org.sosy_lab.common.annotations.Unmaintained;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 
 /**
  * Helper class for various methods related to handling Java classes and types.

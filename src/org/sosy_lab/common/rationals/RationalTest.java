@@ -2,13 +2,12 @@ package org.sosy_lab.common.rationals;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Test;
 
 public class RationalTest {
   @Test

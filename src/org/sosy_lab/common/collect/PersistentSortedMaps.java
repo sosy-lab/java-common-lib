@@ -25,7 +25,6 @@ import static com.google.common.collect.Iterators.singletonIterator;
 
 import com.google.common.base.Equivalence;
 import com.google.common.collect.Ordering;
-
 import java.util.Iterator;
 import java.util.Map;
 

@@ -24,15 +24,13 @@ import static org.hamcrest.CoreMatchers.is;
 
 import com.google.common.util.concurrent.Callables;
 import com.google.common.util.concurrent.Runnables;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class LazyFutureTaskTest {
 

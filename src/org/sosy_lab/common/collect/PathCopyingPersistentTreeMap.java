@@ -30,9 +30,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.concurrent.LazyInit;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.AbstractSet;
@@ -48,7 +46,6 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-
 import javax.annotation.Nullable;
 
 /**

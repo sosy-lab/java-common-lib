@@ -31,7 +31,6 @@ import static org.junit.Assert.assertEquals;
 import static org.sosy_lab.common.time.TimeSpan.sum;
 
 import com.google.common.testing.EqualsTester;
-
 import org.junit.Test;
 
 @SuppressWarnings("CheckReturnValue")

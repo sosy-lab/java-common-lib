@@ -21,7 +21,6 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 

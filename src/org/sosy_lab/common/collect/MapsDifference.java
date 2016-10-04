@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
 import com.google.errorprone.annotations.Immutable;
-
 import java.util.Collection;
 import java.util.Optional;
 

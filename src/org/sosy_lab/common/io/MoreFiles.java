@@ -28,9 +28,6 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
-
-import org.sosy_lab.common.Appenders;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,8 +40,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.Appenders;
 
 /**
  * Provides helper functions for file access.

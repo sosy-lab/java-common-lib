@@ -20,13 +20,10 @@
 package org.sosy_lab.common.log;
 
 import com.google.errorprone.annotations.FormatMethod;
-
-import org.sosy_lab.common.MoreStrings;
-
 import java.util.function.Supplier;
 import java.util.logging.Level;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.MoreStrings;
 
 /**
  * Main interface for basic logging framework.

@@ -30,11 +30,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -64,6 +60,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.sosy_lab.common.io.MoreFiles;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {

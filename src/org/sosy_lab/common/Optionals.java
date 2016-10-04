@@ -22,7 +22,6 @@ package org.sosy_lab.common;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalDouble;

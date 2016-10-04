@@ -22,13 +22,12 @@ package org.sosy_lab.common;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
-import org.junit.Test;
-import org.sosy_lab.common.Classes.ClassLoaderBuilder;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.regex.Pattern;
+import org.junit.Test;
+import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 
 public class ExtendedURLClassLoaderTest {
 

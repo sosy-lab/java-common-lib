@@ -24,7 +24,10 @@ import static org.sosy_lab.common.configuration.Configuration.defaultConfigurati
 
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.io.CharSource;
-
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,11 +45,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterSafeModeTest;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterUnsafeModeTest;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RunWith(Suite.class)
 @SuiteClasses({FileTypeConverterSafeModeTest.class, FileTypeConverterUnsafeModeTest.class})
