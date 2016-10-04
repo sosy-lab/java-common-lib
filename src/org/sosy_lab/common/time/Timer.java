@@ -101,8 +101,7 @@ public final class Timer {
           String.format(
               "Invalid value \'%s\' for property %s,"
                   + "cannot create Timer without explicitly specified clock.",
-              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME),
-              DEFAULT_CLOCK_PROPERTY_NAME));
+              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
     }
     clock = DEFAULT_CLOCK;
   }

@@ -87,12 +87,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
-              optionName,
-              value,
-              option.min(),
-              codeUnitStr,
-              option.max(),
-              codeUnitStr));
+              optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
     }
 
     Object result;

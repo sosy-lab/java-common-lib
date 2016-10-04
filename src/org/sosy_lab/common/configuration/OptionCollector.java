@@ -208,9 +208,7 @@ public class OptionCollector {
       errorMessages.add(
           String.format(
               "INFO: Could not load '%s' for getting Option annotations: %s: %s",
-              cls.getResourceName(),
-              e.getClass().getName(),
-              e.getMessage()));
+              cls.getResourceName(), e.getClass().getName(), e.getMessage()));
       return Stream.empty();
     }
   }

@@ -41,6 +41,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    * ZERO, ONE and NEG_ONE. That is, they can be compared using the '==' operator.
    */
   private final BigInteger num;
+
   private final BigInteger den;
 
   private Rational(BigInteger numerator, BigInteger denominator) {

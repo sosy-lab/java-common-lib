@@ -603,9 +603,7 @@ public final class Configuration {
         throw new InvalidConfigurationException(
             String.format(
                 "Invalid value in configuration file: \"%s = %s\"%s",
-                name,
-                value,
-                (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
+                name, value, (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
             t);
       }
 
@@ -790,8 +788,7 @@ public final class Configuration {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)",
-              name,
-              valueStr));
+              name, valueStr));
     }
 
     // check if it matches the specification regexp
@@ -800,9 +797,7 @@ public final class Configuration {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (does not match RegExp \"%s\").",
-              name,
-              valueStr,
-              regexp));
+              name, valueStr, regexp));
     }
 
     return valueStr;

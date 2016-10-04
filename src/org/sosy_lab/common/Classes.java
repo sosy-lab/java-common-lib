@@ -210,9 +210,7 @@ public final class Classes {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid %s %s, constructor declares unsupported checked exception %s.",
-              typeName,
-              className,
-              exception));
+              typeName, className, exception));
     }
 
     // instantiate
@@ -223,9 +221,7 @@ public final class Classes {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid %s %s, class cannot be instantiated (%s).",
-              typeName,
-              className,
-              e.getMessage()),
+              typeName, className, e.getMessage()),
           e);
 
     } catch (IllegalAccessException e) {
@@ -626,8 +622,7 @@ public final class Classes {
         } else {
           throw new UnsuitedClassException(
               "'%s' requires parameter of type %s which is not present in factory interface",
-              target,
-              targetParamTypes.get(i));
+              target, targetParamTypes.get(i));
         }
       }
       parameterMapping[i] = sourceIndex;

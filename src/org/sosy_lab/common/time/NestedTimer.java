@@ -59,6 +59,7 @@ public final class NestedTimer {
 
   /** The maximal time of all intervals. */
   private long innerMaxTime = 0;
+
   private long outerMaxTime = 0;
 
   /** The length of the last measured interval. */

@@ -97,9 +97,7 @@ public enum BaseTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Illegal regular expression %s in option  %s (%s).",
-                valueStr,
-                optionName,
-                e.getMessage()),
+                valueStr, optionName, e.getMessage()),
             e);
       }
     } else if (type.equals(Rational.class)) {
@@ -155,17 +153,13 @@ public enum BaseTypeConverter implements TypeConverter {
       throw new AssertionError(
           String.format(
               "Class %s without usable %s(%s) method.",
-              type.getSimpleName(),
-              method,
-              paramType.getSimpleName()),
+              type.getSimpleName(), method, paramType.getSimpleName()),
           e);
     } catch (InvocationTargetException e) {
       throw new InvalidConfigurationException(
           String.format(
               "Could not parse \"%s = %s\" (%s).",
-              optionName,
-              value,
-              e.getTargetException().getMessage()),
+              optionName, value, e.getTargetException().getMessage()),
           e);
     }
   }

@@ -58,10 +58,7 @@ public class IntegerTypeConverter implements TypeConverter {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (not in range [%d, %d]).",
-              optionName,
-              value,
-              option.min(),
-              option.max()));
+              optionName, value, option.min(), option.max()));
     }
 
     return value;

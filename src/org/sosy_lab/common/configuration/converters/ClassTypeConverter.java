@@ -80,9 +80,7 @@ public class ClassTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Class %s specified in option %s is not an instance of %s",
-                value,
-                optionName,
-                targetType));
+                value, optionName, targetType));
       }
 
       result = cls;
@@ -96,9 +94,7 @@ public class ClassTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Class %s specified in option %s is invalid (%s)",
-                value,
-                optionName,
-                e.getMessage()));
+                value, optionName, e.getMessage()));
       }
       Classes.produceClassLoadingWarning(logger, cls, type.getRawType());
     }
