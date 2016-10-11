@@ -2,14 +2,13 @@ package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Test;
-import org.sosy_lab.common.rationals.Rational;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Test;
+import org.sosy_lab.common.rationals.Rational;
 
 public class RationalTest {
   @Test
@@ -184,8 +183,7 @@ public class RationalTest {
 
   @Test
   public void testOfBigInteger() {
-    assertThat(Rational.ofBigInteger(BigInteger.valueOf(300)))
-        .isEqualTo(Rational.of(300));
+    assertThat(Rational.ofBigInteger(BigInteger.valueOf(300))).isEqualTo(Rational.of(300));
   }
 
   @Test

@@ -2,14 +2,13 @@ package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.ExtendedRational;
 import org.sosy_lab.common.rationals.Rational;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class ExtendedRationalTest {
   @Test

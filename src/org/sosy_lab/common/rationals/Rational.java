@@ -247,9 +247,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return num.signum();
   }
 
-  /**
-   * @return Absolute value of {@code this}.
-   */
+  /** @return Absolute value of {@code this}. */
   public Rational abs() {
     return signum() == -1 ? negate() : this;
   }
