@@ -277,6 +277,13 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /**
+   * @return Absolute value of {@code this}.
+   */
+  public Rational abs() {
+    return signum() == -1 ? negate() : this;
+  }
+
+  /**
    * @return String of the form num/den.
    */
   @Override

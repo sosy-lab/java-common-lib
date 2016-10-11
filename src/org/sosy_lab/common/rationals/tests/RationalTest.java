@@ -169,10 +169,10 @@ public class RationalTest {
 
   @Test
   public void testGetDen() {
-    assertThat(Rational.ofLongs(3, 4).getDen()).isEqualTo(Rational.of(4));
-    assertThat(Rational.ofLongs(6, 8).getDen()).isEqualTo(Rational.of(4));
-    assertThat(Rational.ofLongs(3, -4).getDen()).isEqualTo(Rational.of(4));
-    assertThat(Rational.ofLongs(0, 4).getDen()).isEqualTo(Rational.of(1));
+    assertThat(Rational.ofLongs(3, 4).getDen()).isEqualTo(BigInteger.valueOf(4));
+    assertThat(Rational.ofLongs(6, 8).getDen()).isEqualTo(BigInteger.valueOf(4));
+    assertThat(Rational.ofLongs(3, -4).getDen()).isEqualTo(BigInteger.valueOf(4));
+    assertThat(Rational.ofLongs(0, 4).getDen()).isEqualTo(BigInteger.valueOf(1));
   }
 
   @Test
@@ -183,8 +183,16 @@ public class RationalTest {
   }
 
   @Test
-  public void testofBigInteger() {
+  public void testOfBigInteger() {
     assertThat(Rational.ofBigInteger(BigInteger.valueOf(300)))
         .isEqualTo(Rational.of(300));
+  }
+
+  @Test
+  public void testAbs() {
+    assertThat(Rational.of(-100).abs()).isEqualTo(Rational.of(100));
+    assertThat(Rational.of(100).abs()).isEqualTo(Rational.of(100));
+    assertThat(Rational.of(0).abs()).isEqualTo(Rational.of(0));
+    assertThat(Rational.ofLongs(3, -4).abs()).isEqualTo(Rational.ofLongs(3, 4));
   }
 }
