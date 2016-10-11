@@ -21,4 +21,8 @@ package org.sosy_lab.common.rationals;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {}
+public class PackageSanityTest extends AbstractPackageSanityTests {
+  {
+    setDistinctValues(Rational.class, Rational.of(1), Rational.of(2));
+  }
+}
