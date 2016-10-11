@@ -27,7 +27,14 @@ import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -38,29 +45,22 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.annotation.Annotation;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.annotation.Nullable;
-
 /**
  * A {@link TypeConverter} for options of type {@link File} or {@link Path} which offers some
- * additional features like a common base directory for all output files.
- * In order to use these features, the options need to be annotated with
- * {@link FileOption}.
+ * additional features like a common base directory for all output files. In order to use these
+ * features, the options need to be annotated with {@link FileOption}.
  *
- * This type converter should be registered for the type {@link FileOption}.
+ * <p>This type converter should be registered for the type {@link FileOption}.
  *
- * The additional features are:
- * - All specified relative paths are resolved against a given root directory.
- * - All relative paths of output files are resolved against a separate output directory.
- * - All output files can be disabled by a central switch.
+ * <p>The additional features are:
  *
- * In order to configure these features, the normal configuration options are used.
+ * <ul>
+ *   <li>All specified relative paths are resolved against a given root directory.
+ *   <li>All relative paths of output files are resolved against a separate output directory.
+ *   <li>All output files can be disabled by a central switch.
+ * </ul>
+ *
+ * <p>In order to configure these features, the normal configuration options are used.
  */
 @Options
 public final class FileTypeConverter implements TypeConverter {
@@ -112,8 +112,8 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   /**
-   * Create an instanceof of this class that allows only injected files
-   * that are below the current directory.
+   * Create an instanceof of this class that allows only injected files that are below the current
+   * directory.
    */
   public static FileTypeConverter createWithSafePathsOnly(Configuration config)
       throws InvalidConfigurationException {
@@ -121,13 +121,12 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   /**
-   * Checks whether a path is safe (i.e., it is below the current directory).
-   * Absolute paths and paths with "../" are forbidden.
-   * Returns the unchanged path if it is safe,
-   * or throws an exception.
+   * Checks whether a path is safe (i.e., it is below the current directory). Absolute paths and
+   * paths with "../" are forbidden. Returns the unchanged path if it is safe, or throws an
+   * exception.
    *
-   * If {@link #safePathsOnly} is false, no checks are done,
-   * and this method always returns the path.
+   * <p>If {@link #safePathsOnly} is false, no checks are done, and this method always returns the
+   * path.
    */
   @VisibleForTesting
   Path checkSafePath(Path pPath, String optionName) throws InvalidConfigurationException {
@@ -147,8 +146,7 @@ public final class FileTypeConverter implements TypeConverter {
       }
     }
 
-    // We allow :: but not : in path, because the latter is used as a special marker in CPAchecker.
-    if (path.replaceAll("::", "").contains(File.pathSeparator)) {
+    if (path.contains(File.pathSeparator)) {
       throw forbidden(
           "because it contains the character '%s'", optionName, pPath, File.pathSeparator);
     }
@@ -218,8 +216,16 @@ public final class FileTypeConverter implements TypeConverter {
     checkApplicability(type, secondaryOption, optionName);
     assert secondaryOption != null : "checkApplicability should ensure this";
 
+    Path path;
+    try {
+      path = Paths.get(pValue);
+    } catch (InvalidPathException e) {
+      throw new InvalidConfigurationException(
+          String.format("Invalid file name in option %s: %s", optionName, e.getMessage()), e);
+    }
+
     return handleFileOption(
-        optionName, Paths.get(pValue), ((FileOption) secondaryOption).value(), type, pSource);
+        optionName, path, ((FileOption) secondaryOption).value(), type, pSource);
   }
 
   @Override
@@ -245,7 +251,7 @@ public final class FileTypeConverter implements TypeConverter {
       return null;
     }
 
-    if (disableOutput && typeInfo == FileOption.Type.OUTPUT_FILE) {
+    if (disableOutput && isOutputOption(typeInfo)) {
       // disable output by setting the option to null
       return null;
     }
@@ -266,12 +272,14 @@ public final class FileTypeConverter implements TypeConverter {
     return value;
   }
 
-  /** This function returns a file. It sets the path of the file to
-   * the given outputDirectory in the given rootDirectory.
+  /**
+   * This function returns a file. It sets the path of the file to the given outputDirectory in the
+   * given rootDirectory.
    *
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
-   * @param typeInfo info about the type of the file (outputfile, inputfile) */
+   * @param typeInfo info about the type of the file (outputfile, inputfile)
+   */
   @SuppressWarnings("CheckReturnValue")
   private Object handleFileOption(
       final String optionName,
@@ -281,7 +289,7 @@ public final class FileTypeConverter implements TypeConverter {
       final Path source)
       throws InvalidConfigurationException {
 
-    if (typeInfo == FileOption.Type.OUTPUT_FILE) {
+    if (isOutputOption(typeInfo)) {
       file = outputPath.resolve(file);
     } else if (source != null) {
       file = source.resolveSibling(file);
@@ -291,9 +299,16 @@ public final class FileTypeConverter implements TypeConverter {
 
     checkSafePath(file, optionName); // throws exception if unsafe
 
-    if (Files.isDirectory(file)) {
-      throw new InvalidConfigurationException(
-          "Option " + optionName + " specifies a directory instead of a file: " + file);
+    if (typeInfo == FileOption.Type.OUTPUT_DIRECTORY) {
+      if (Files.isRegularFile(file)) {
+        throw new InvalidConfigurationException(
+            "Option " + optionName + " specifies a file instead of a directory: " + file);
+      }
+    } else {
+      if (Files.isDirectory(file)) {
+        throw new InvalidConfigurationException(
+            "Option " + optionName + " specifies a directory instead of a file: " + file);
+      }
     }
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
@@ -315,5 +330,9 @@ public final class FileTypeConverter implements TypeConverter {
       assert targetType.equals(Path.class);
       return file;
     }
+  }
+
+  private boolean isOutputOption(FileOption.Type typeInfo) {
+    return typeInfo == FileOption.Type.OUTPUT_FILE || typeInfo == FileOption.Type.OUTPUT_DIRECTORY;
   }
 }

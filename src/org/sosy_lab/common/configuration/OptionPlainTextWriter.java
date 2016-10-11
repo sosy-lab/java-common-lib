@@ -23,10 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Joiner;
-
-import org.sosy_lab.common.configuration.OptionCollector.AnnotationInfo;
-import org.sosy_lab.common.configuration.OptionCollector.OptionInfo;
-
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -35,10 +31,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.sosy_lab.common.configuration.OptionCollector.AnnotationInfo;
+import org.sosy_lab.common.configuration.OptionCollector.OptionInfo;
 
-/**
- * Class that creates a plain-text documentation of options.
- */
+/** Class that creates a plain-text documentation of options. */
 class OptionPlainTextWriter {
 
   private static final int CHARS_PER_LINE = 75; // for description
@@ -59,6 +55,7 @@ class OptionPlainTextWriter {
 
   /**
    * Write output for a single option.
+   *
    * @param allInstances All appearances of this option with the same name.
    */
   void writeOption(Iterable<AnnotationInfo> allInstances) {
@@ -83,9 +80,11 @@ class OptionPlainTextWriter {
     }
   }
 
-  /** This function returns the formatted description of an {@link Option}.
+  /**
+   * This function returns the formatted description of an {@link Option}.
    *
-   * @param element field with the option */
+   * @param element field with the option
+   */
   static String getOptionDescription(final AnnotatedElement element) {
     String text;
     if (element.isAnnotationPresent(Option.class)) {
@@ -144,8 +143,10 @@ class OptionPlainTextWriter {
     return optionInfo.toString();
   }
 
-  /** This function formats text and splits lines, if they are too long.
-   * This functions adds "#" before each line.*/
+  /**
+   * This function formats text and splits lines, if they are too long. This functions adds "#"
+   * before each line.
+   */
   private static String formatText(final String text) {
     return formatText(text, "# ", true);
   }
@@ -204,7 +205,8 @@ class OptionPlainTextWriter {
     return formattedLines.toString();
   }
 
-  /** This function returns the allowed values or interval for a field.
+  /**
+   * This function returns the allowed values or interval for a field.
    *
    * @param field field with the {@link Option}-annotation
    */
@@ -229,8 +231,10 @@ class OptionPlainTextWriter {
     appendTimeSpanOptionValues(field, str);
   }
 
-  /** This method returns text representing the values,
-   * that are defined in the {@link Option}-annotation. */
+  /**
+   * This method returns text representing the values, that are defined in the {@link
+   * Option}-annotation.
+   */
   private void appendOptionValues(AnnotatedElement field, StringBuilder str) {
     final Option option = field.getAnnotation(Option.class);
     assert option != null;
@@ -247,8 +251,10 @@ class OptionPlainTextWriter {
     }
   }
 
-  /** This method returns text representing the values,
-   * that are defined in the {@link ClassOption}-annotation. */
+  /**
+   * This method returns text representing the values, that are defined in the {@link
+   * ClassOption}-annotation.
+   */
   private void appendClassOptionValues(AnnotatedElement field, StringBuilder str) {
     final ClassOption classOption = field.getAnnotation(ClassOption.class);
     if (classOption != null) {
@@ -260,8 +266,10 @@ class OptionPlainTextWriter {
     }
   }
 
-  /** This method returns text representing the values,
-   * that are defined in the {@link FileOption}-annotation. */
+  /**
+   * This method returns text representing the values, that are defined in the {@link
+   * FileOption}-annotation.
+   */
   private void appendFileOptionValues(AnnotatedElement field, StringBuilder str) {
     final FileOption fileOption = field.getAnnotation(FileOption.class);
     if (fileOption != null) {
@@ -271,8 +279,10 @@ class OptionPlainTextWriter {
     }
   }
 
-  /** This method returns text representing the values,
-   * that are defined in the {@link IntegerOption}-annotation. */
+  /**
+   * This method returns text representing the values, that are defined in the {@link
+   * IntegerOption}-annotation.
+   */
   private void appendIntegerOptionValues(AnnotatedElement field, StringBuilder str) {
     final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
     if (intOption != null) {
@@ -291,8 +301,10 @@ class OptionPlainTextWriter {
     }
   }
 
-  /** This method returns text representing the values,
-   * that are defined in the {@link TimeSpanOption}-annotation. */
+  /**
+   * This method returns text representing the values, that are defined in the {@link
+   * TimeSpanOption}-annotation.
+   */
   private void appendTimeSpanOptionValues(AnnotatedElement field, StringBuilder str) {
     final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
     if (timeSpanOption != null) {

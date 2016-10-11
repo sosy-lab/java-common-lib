@@ -28,9 +28,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
-
+import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.AbstractSet;
@@ -46,44 +46,39 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-
 import javax.annotation.Nullable;
 
 /**
- * This is an implementation of {@link PersistentSortedMap} that is based on
- * left-leaning red-black trees (LLRB) and path copying.
- * Left-leaning red-black trees are similar to red-black trees and 2-3 trees,
- * but are considerably easier to implement than red-black trees. They are
- * described by Robert Sedgewick here:
- * http://www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
+ * This is an implementation of {@link PersistentSortedMap} that is based on left-leaning red-black
+ * trees (LLRB) and path copying. Left-leaning red-black trees are similar to red-black trees and
+ * 2-3 trees, but are considerably easier to implement than red-black trees. They are described by
+ * Robert Sedgewick here: http://www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
  *
- * The operations insert, lookup, and remove are guaranteed to run in O(log n) time.
- * Insert and remove allocate at most O(log n) memory.
- * Traversal through all entries also allocates up to O(log n) memory.
- * Per entry, this map needs memory for one object with 4 reference fields and 1 boolean.
+ * <p>The operations insert, lookup, and remove are guaranteed to run in O(log n) time. Insert and
+ * remove allocate at most O(log n) memory. Traversal through all entries also allocates up to O(log
+ * n) memory. Per entry, this map needs memory for one object with 4 reference fields and 1 boolean.
  * (This is a little bit less than {@link TreeMap} needs.)
  *
- * This implementation does not support <code>null</code> keys (but <code>null</code> values)
- * and always compares according to the natural ordering.
- * All methods may throw {@link ClassCastException} is key objects are passed
- * that do not implement {@link Comparable}.
+ * <p>This implementation does not support <code>null</code> keys (but <code>null</code> values) and
+ * always compares according to the natural ordering. All methods may throw {@link
+ * ClassCastException} is key objects are passed that do not implement {@link Comparable}.
  *
- * The natural ordering of the keys needs to be consistent with equals.
+ * <p>The natural ordering of the keys needs to be consistent with equals.
  *
- * As for all {@link PersistentMap}s, all collection views and all iterators
- * are immutable. They do not reflect changes made to the map and all their
- * modifying operations throw {@link UnsupportedOperationException}.
+ * <p>As for all {@link PersistentMap}s, all collection views and all iterators are immutable. They
+ * do not reflect changes made to the map and all their modifying operations throw {@link
+ * UnsupportedOperationException}.
  *
- * All instances of this class are fully-thread safe.
- * However, note that each modifying operation allocates a new instance
- * whose reference needs to be published safely in order to be usable by other threads.
- * Two concurrent accesses to a modifying operation on the same instance will
- * create two new maps, each reflecting exactly the operation executed by the current thread,
- * and not reflecting the operation executed by the other thread.
+ * <p>All instances of this class are fully-thread safe. However, note that each modifying operation
+ * allocates a new instance whose reference needs to be published safely in order to be usable by
+ * other threads. Two concurrent accesses to a modifying operation on the same instance will create
+ * two new maps, each reflecting exactly the operation executed by the current thread, and not
+ * reflecting the operation executed by the other thread.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
+@Immutable(containerOf = {"K", "V"})
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
@@ -94,6 +89,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     value = "EQ_DOESNT_OVERRIDE_EQUALS",
     justification = "Inherits equals() according to specification."
   )
+  @Immutable(containerOf = {"K", "V"})
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
 
     // Constants for isRed field
@@ -211,7 +207,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   private final @Nullable Node<K, V> root;
 
-  private transient @Nullable EntrySet<K, V> entrySet;
+  private transient @LazyInit @Nullable EntrySet<K, V> entrySet;
 
   private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
@@ -256,6 +252,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Find the node with the smallest key in a given non-empty subtree.
+   *
    * @param root The subtree to search in.
    * @return The node with the smallest key.
    * @throws NullPointerException If tree is empty.
@@ -270,6 +267,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Find the node with the largest key in a given non-empty subtree.
+   *
    * @param root The subtree to search in.
    * @return The node with the largest key.
    * @throws NullPointerException If tree is empty.
@@ -283,13 +281,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Given a key and a tree, find the node in the tree with the given key,
-   * or (if there is no such node) the node with the smallest key
-   * that is still greater than the key to look for.
-   * In terms of SortedMap operations, this returns the node for
-   * map.tailMap(key).first() (tailMap() has an inclusive bound).
-   * Returns null if the tree is empty or there is no node that matches
-   * (i.e., key is larger than the largest key in the map).
+   * Given a key and a tree, find the node in the tree with the given key, or (if there is no such
+   * node) the node with the smallest key that is still greater than the key to look for. In terms
+   * of SortedMap operations, this returns the node for map.tailMap(key).first() (tailMap() has an
+   * inclusive bound). Returns null if the tree is empty or there is no node that matches (i.e., key
+   * is larger than the largest key in the map).
+   *
    * @param key The key to search for.
    * @param root The tree to look in.
    * @return A node or null.
@@ -335,12 +332,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Given a key and a tree, find the node with the largest key
-   * that is still strictly smaller than the key to look for.
-   * In terms of SortedMap operations, this returns the node for
-   * map.headMap(key).last() (heapMap() has an exclusive bound).
-   * Returns null if the tree is empty or there is no node that matches
-   * (i.e., key is smaller than or equal to the smallest key in the map).
+   * Given a key and a tree, find the node with the largest key that is still strictly smaller than
+   * the key to look for. In terms of SortedMap operations, this returns the node for
+   * map.headMap(key).last() (heapMap() has an exclusive bound). Returns null if the tree is empty
+   * or there is no node that matches (i.e., key is smaller than or equal to the smallest key in the
+   * map).
+   *
    * @param key The key to search for.
    * @param root The tree to look in.
    * @return A node or null.
@@ -445,6 +442,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Create a map instance with a given root node.
+   *
    * @param newRoot A node or null (meaning the empty tree).
    * @return A map instance with the given tree.
    */
@@ -605,6 +603,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Unconditionally delete the node with the smallest key in a given subtree.
+   *
    * @return A new subtree reflecting the change.
    */
   @Nullable
@@ -627,8 +626,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Fix the LLRB invariants around a given node
-   * (regarding the node, its children, and grand-children).
+   * Fix the LLRB invariants around a given node (regarding the node, its children, and
+   * grand-children).
+   *
    * @return A new subtree with the same content that is a legal LLRB.
    */
   private static <K, V> Node<K, V> restoreInvariants(Node<K, V> current) {
@@ -653,8 +653,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Flip the colors of current and its two children.
-   * This is an operation that keeps the "black height".
+   * Flip the colors of current and its two children. This is an operation that keeps the "black
+   * height".
+   *
    * @param current A node with two children.
    * @return The same subtree, but with inverted colors for the three top nodes.
    */
@@ -779,18 +780,20 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Entry set implementation.
-   * All methods are implemented by this class, none are delegated to other collections.
+   * Entry set implementation. All methods are implemented by this class, none are delegated to
+   * other collections.
+   *
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
+  @Immutable(containerOf = {"K", "V"})
   private static final class EntrySet<K extends Comparable<? super K>, V>
       extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
 
     private final @Nullable Node<K, V> root;
 
     // Cache size
-    private transient int size = -1;
+    private transient @LazyInit int size = -1;
 
     private EntrySet(Node<K, V> pRoot) {
       root = pRoot;
@@ -985,10 +988,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Tree iterator with in-order iteration returning node objects,
-   * with possibility for lower and upper bound.
-   * The lower bound (if present) needs to exist in the set and is inclusive,
-   * the upper bound is exclusive.
+   * Tree iterator with in-order iteration returning node objects, with possibility for lower and
+   * upper bound. The lower bound (if present) needs to exist in the set and is inclusive, the upper
+   * bound is exclusive.
+   *
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
@@ -1015,6 +1018,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     /**
      * Create a new iterator with an optional lower and upper bound.
+     *
      * @param pFromKey null or inclusive lower bound that needs to exist in the map
      * @param pToKey null or exclusive lower bound
      */
@@ -1098,14 +1102,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Partial map implementation for {@link SortedMap#subMap(Object, Object)} etc.
-   * At least one bound (upper/lower) needs to be present.
-   * The lower bound (if present) needs to exist in the map and is inclusive,
-   * the upper bound is exclusive.
-   * The range needs to contain at least one mapping.
+   * Partial map implementation for {@link SortedMap#subMap(Object, Object)} etc. At least one bound
+   * (upper/lower) needs to be present. The lower bound (if present) needs to exist in the map and
+   * is inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
+   *
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
+  @Immutable(containerOf = {"K", "V"})
   private static class PartialSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V> {
 
@@ -1189,7 +1193,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K fromKey; // inclusive
     private final @Nullable K toKey; // exclusive
 
-    private transient @Nullable SortedSet<Map.Entry<K, V>> entrySet;
+    private transient @LazyInit @Nullable SortedSet<Map.Entry<K, V>> entrySet;
 
     private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
       root = pRoot;
@@ -1273,10 +1277,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     /**
-     * Entry set implementation.
-     * The lower bound (if present) needs to exist in the map and is inclusive,
-     * the upper bound is exclusive.
-     * The range needs to contain at least one mapping.
+     * Entry set implementation. The lower bound (if present) needs to exist in the map and is
+     * inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
      */
     private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>>
         implements SortedSet<Map.Entry<K, V>> {

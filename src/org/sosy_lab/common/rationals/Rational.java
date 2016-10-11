@@ -3,24 +3,21 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import javax.annotation.Nullable;
 
 /**
- * Rational class, throws {@link IllegalArgumentException} on unsupported
- * operations (e.g. {@code 1/0}).
+ * Rational class, throws {@link IllegalArgumentException} on unsupported operations (e.g. {@code
+ * 1/0}).
  *
- * <p>The Rational object is immutable.
- * All arithmetic operations return new instances.
+ * <p>The Rational object is immutable. All arithmetic operations return new instances.
  *
- * <p>For performance and convenience, there is always only a single {@code Rational}
- * instance representing numbers 0, 1 and -1.
- * These numbers can be compared using {@code ==} operator.
+ * <p>For performance and convenience, there is always only a single {@code Rational} instance
+ * representing numbers 0, 1 and -1. These numbers can be compared using {@code ==} operator.
  */
 @SuppressWarnings("NumberEquality")
+@javax.annotation.concurrent.Immutable
 public final class Rational extends Number implements Comparable<Rational> {
 
   private static final long serialVersionUID = 1657347377738275521L;
@@ -37,16 +34,14 @@ public final class Rational extends Number implements Comparable<Rational> {
   @Nullable private transient String stringCache = null;
 
   /**
-   * Rationals are always stored in the normal form.
-   * That is:
+   * Rationals are always stored in the normal form. That is:
    *
-   * a) denominator is strictly positive.
-   * b) numerator and denominator do not have common factors.
-   * c) 0, 1 and -1 have unique representation corresponding to the
-   * class static constants ZERO, ONE and NEG_ONE. That is, they can be
-   * compared using the '==' operator.
+   * <p>a) denominator is strictly positive. b) numerator and denominator do not have common
+   * factors. c) 0, 1 and -1 have unique representation corresponding to the class static constants
+   * ZERO, ONE and NEG_ONE. That is, they can be compared using the '==' operator.
    */
   private final BigInteger num;
+
   private final BigInteger den;
 
   private Rational(BigInteger numerator, BigInteger denominator) {
@@ -57,9 +52,7 @@ public final class Rational extends Number implements Comparable<Rational> {
 
   // Factory functions.
 
-  /**
-   * Create a new rational from a numerator and a denominator.
-   */
+  /** Create a new rational from a numerator and a denominator. */
   public static Rational of(BigInteger numerator, BigInteger denominator) {
     checkNotNull(numerator);
     int denSignum = denominator.signum();
@@ -83,8 +76,8 @@ public final class Rational extends Number implements Comparable<Rational> {
   }
 
   /**
-   * Wrapper around the constructor, returns cached constants if possible.
-   * Assumes that <code>num</code> and <code>den</code> are in the normal form.
+   * Wrapper around the constructor, returns cached constants if possible. Assumes that <code>num
+   * </code> and <code>den</code> are in the normal form.
    */
   private static Rational ofNormalForm(BigInteger num, BigInteger den) {
     if (num.equals(B_ZERO)) {
@@ -99,35 +92,27 @@ public final class Rational extends Number implements Comparable<Rational> {
     return new Rational(num, den);
   }
 
-  /**
-   * Create a new rational from two longs.
-   */
+  /** Create a new rational from two longs. */
   public static Rational ofLongs(long numerator, long denominator) {
     return of(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
   }
 
-  /**
-   * Create a new rational equal to the given long.
-   */
+  /** Create a new rational equal to the given long. */
   public static Rational ofLong(long numerator) {
     return of(BigInteger.valueOf(numerator), B_ONE);
   }
 
-  /**
-   * Create a new rational equal to the given BigInteger.
-   */
+  /** Create a new rational equal to the given BigInteger. */
   public static Rational ofBigInteger(BigInteger numerator) {
     return of(numerator, B_ONE);
   }
 
   /**
-   * Reverses the effect of {@link Rational#toString}.
-   * Supports 2 different formats: with slash (e.g. {@code 25/17})
-   * or without slash (e.g. {@code 5})
+   * Reverses the effect of {@link Rational#toString}. Supports 2 different formats: with slash
+   * (e.g. {@code 25/17}) or without slash (e.g. {@code 5})
    *
    * @param s Input string
-   * @throws NumberFormatException iff {@code s} is not a valid representation
-   * of Rational.
+   * @throws NumberFormatException iff {@code s} is not a valid representation of Rational.
    * @throws IllegalArgumentException If the resulting rational is undefined (e.g. 0/0 or 1/0).
    */
   public static Rational ofString(String s) throws NumberFormatException {
@@ -162,9 +147,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return ofLong(l);
   }
 
-  /**
-   * Convert a given BigDecimal to Rational.
-   */
+  /** Convert a given BigDecimal to Rational. */
   public static Rational ofBigDecimal(BigDecimal decimal) {
     if (decimal.scale() <= 0) {
       BigInteger num = decimal.toBigInteger();
@@ -176,9 +159,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     }
   }
 
-  /**
-   * Multiply by {@code b}, return a new instance.
-   **/
+  /** Multiply by {@code b}, return a new instance. */
   @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public Rational times(Rational b) {
     checkNotNull(b);
@@ -199,9 +180,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return ofNormalForm(c.num.multiply(d.num), c.den.multiply(d.den));
   }
 
-  /**
-   * Return a new instance equal to the sum of {@code this} and {@code b}.
-   */
+  /** Return a new instance equal to the sum of {@code this} and {@code b}. */
   @SuppressWarnings("ReferenceEquality") // normalized form uses cached instances
   public Rational plus(Rational b) {
     checkNotNull(b);
@@ -216,16 +195,12 @@ public final class Rational extends Number implements Comparable<Rational> {
     return of((a.num.multiply(b.den).add(b.num.multiply(a.den))), a.den.multiply(b.den));
   }
 
-  /**
-   * Return a new instance equal to {@code this - b}.
-   */
+  /** Return a new instance equal to {@code this - b}. */
   public Rational minus(Rational b) {
     return plus(b.negate());
   }
 
-  /**
-   * Return {@code this / b}.
-   */
+  /** Return {@code this / b}. */
   public Rational divides(Rational b) {
     // Reciprocal method will throw the exception for the division-by-zero
     // error if required.
@@ -245,9 +220,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return of(den, num);
   }
 
-  /**
-   * Return negation of {@code this}.
-   */
+  /** Return negation of {@code this}. */
   public Rational negate() {
     return ofNormalForm(num.negate(), den);
   }
@@ -269,9 +242,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return den;
   }
 
-  /**
-   * @return -1, 0 or 1, representing the sign of the rational number.
-   */
+  /** @return -1, 0 or 1, representing the sign of the rational number. */
   public int signum() {
     return num.signum();
   }
@@ -283,9 +254,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     return signum() == -1 ? negate() : this;
   }
 
-  /**
-   * @return String of the form num/den.
-   */
+  /** @return String of the form num/den. */
   @Override
   public String toString() {
     if (stringCache == null) {

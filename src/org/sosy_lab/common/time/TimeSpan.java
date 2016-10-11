@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.math.LongMath;
 import com.google.common.primitives.Longs;
-
+import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -48,22 +48,17 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
 /**
- * This is an immutable representation of some time span,
- * using a {@link TimeUnit} and a value.
+ * This is an immutable representation of some time span, using a {@link TimeUnit} and a value.
  *
- * The value may be positive or negative.
- * All operations check for overflows and underflows,
- * the behavior on overflow and underflow differs and is documented for each method.
+ * <p>The value may be positive or negative. All operations check for overflows and underflows, the
+ * behavior on overflow and underflow differs and is documented for each method.
  *
- * Two instances are considered equal if they represent the exact same time span
- * regardless of their unit,
- * for example, 60s and 1min are considered equal.
+ * <p>Two instances are considered equal if they represent the exact same time span regardless of
+ * their unit, for example, 60s and 1min are considered equal.
  */
 @Immutable
 public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
@@ -129,12 +124,13 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Converts the given {@link String} into a {@link TimeSpan} object.
-   * Supported units are day, hour, minute and second.
+   * Converts the given {@link String} into a {@link TimeSpan} object. Supported units are day,
+   * hour, minute and second.
+   *
    * @param input the {@link String} to convert
    * @return a {@link TimeSpan} represented by the given {@link String}
-   * @throws IllegalArgumentException
-   * if the input is not a valid string representation of a {@link TimeSpan}.
+   * @throws IllegalArgumentException if the input is not a valid string representation of a {@link
+   *     TimeSpan}.
    */
   public static TimeSpan valueOf(String input) {
 
@@ -249,11 +245,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Get the value of this TimeSpan represented in the given unit.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
-   * @throws ArithmeticException If the value cannot be represented in the given unit
-   * due to overflow.
+   * Get the value of this TimeSpan represented in the given unit. If the given unit is larger than
+   * the current unit, precision may be lost.
+   *
+   * @throws ArithmeticException If the value cannot be represented in the given unit due to
+   *     overflow.
    */
   public long getChecked(TimeUnit dest) throws ArithmeticException {
     if (dest.compareTo(unit) < 0) {
@@ -268,21 +264,18 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Get the value of this TimeSpan represented in the given unit.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
-   * If the value cannot be represented in the given unit due to overflow,
-   * Long.MAX_VALUE/Long.MIN_VALUE is returned.
+   * Get the value of this TimeSpan represented in the given unit. If the given unit is larger than
+   * the current unit, precision may be lost. If the value cannot be represented in the given unit
+   * due to overflow, Long.MAX_VALUE/Long.MIN_VALUE is returned.
    */
   public long getSaturated(TimeUnit dest) {
     return dest.convert(span, unit);
   }
 
   /**
-   * Return a TimeSpan that represents (approximately) the same time span,
-   * but whose unit is the given unit.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
+   * Return a TimeSpan that represents (approximately) the same time span, but whose unit is the
+   * given unit. If the given unit is larger than the current unit, precision may be lost.
+   *
    * @throws ArithmeticException If the value cannot be represented in the given unit
    */
   public TimeSpan toChecked(TimeUnit dest) throws ArithmeticException {
@@ -293,12 +286,10 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Return a TimeSpan that represents (approximately) the same time span,
-   * but whose unit is the given unit.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
-   * If the value cannot be represented in the given unit due to overflow,
-   * Long.MAX_VALUE/Long.MIN_VALUE is returned.
+   * Return a TimeSpan that represents (approximately) the same time span, but whose unit is the
+   * given unit. If the given unit is larger than the current unit, precision may be lost. If the
+   * value cannot be represented in the given unit due to overflow, Long.MAX_VALUE/Long.MIN_VALUE is
+   * returned.
    */
   public TimeSpan toSaturated(TimeUnit dest) {
     if (dest.equals(unit)) {
@@ -308,13 +299,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Return a TimeSpan that represents (approximately) the same time span,
-   * but whose unit is the given unit, if possible.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
-   * If the value cannot be represented in the given unit due to overflow,
-   * the resulting TimeSpan does not use the given unit,
-   * but the closest unit one that still allows to hold the exact value.
+   * Return a TimeSpan that represents (approximately) the same time span, but whose unit is the
+   * given unit, if possible. If the given unit is larger than the current unit, precision may be
+   * lost. If the value cannot be represented in the given unit due to overflow, the resulting
+   * TimeSpan does not use the given unit, but the closest unit one that still allows to hold the
+   * exact value.
    */
   @VisibleForTesting
   TimeSpan toIfPossible(TimeUnit dest) {
@@ -341,20 +330,20 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Get the value of this TimeSpan as seconds.
-   * If the current unit is smaller than seconds, precision may be lost.
-   * @throws ArithmeticException If the value cannot be represented as seconds
-   * due to overflow.
+   * Get the value of this TimeSpan as seconds. If the current unit is smaller than seconds,
+   * precision may be lost.
+   *
+   * @throws ArithmeticException If the value cannot be represented as seconds due to overflow.
    */
   public long asSeconds() throws ArithmeticException {
     return getChecked(SECONDS);
   }
 
   /**
-   * Get the value of this TimeSpan as milliseconds.
-   * If the current unit is smaller than milliseconds, precision may be lost.
-   * @throws ArithmeticException If the value cannot be represented as milliseconds
-   * due to overflow.
+   * Get the value of this TimeSpan as milliseconds. If the current unit is smaller than
+   * milliseconds, precision may be lost.
+   *
+   * @throws ArithmeticException If the value cannot be represented as milliseconds due to overflow.
    */
   public long asMillis() throws ArithmeticException {
     return getChecked(MILLISECONDS);
@@ -362,8 +351,8 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   /**
    * Get the value of this TimeSpan as nanoseconds.
-   * @throws ArithmeticException If the value cannot be represented as milliseconds
-   * due to overflow.
+   *
+   * @throws ArithmeticException If the value cannot be represented as milliseconds due to overflow.
    */
   public long asNanos() throws ArithmeticException {
     return getChecked(NANOSECONDS);
@@ -374,13 +363,10 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Return a strings that represents (approximately) this time span,
-   * in the given unit if possible.
-   * If the given unit is larger than the current unit,
-   * precision may be lost.
-   * If the value cannot be represented in the given unit due to overflow,
-   * the result does not use the given unit,
-   * but the closest unit one that still allows to hold the exact value.
+   * Return a strings that represents (approximately) this time span, in the given unit if possible.
+   * If the given unit is larger than the current unit, precision may be lost. If the value cannot
+   * be represented in the given unit due to overflow, the result does not use the given unit, but
+   * the closest unit one that still allows to hold the exact value.
    */
   public String formatAs(TimeUnit dest) {
     if (dest.compareTo(unit) <= 0) {
@@ -394,10 +380,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     return String.format(Locale.US, "%9.3f%s", (double) span / scaleFactor, TIME_UNITS.get(dest));
   }
 
-  /**
-   * Check whether this time span is empty,
-   * i.e., represents 0ns (or 0ms or 0s or ...).
-   */
+  /** Check whether this time span is empty, i.e., represents 0ns (or 0ms or 0s or ...). */
   public boolean isEmpty() {
     return span == 0;
   }
@@ -457,10 +440,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Create a new time span that is the sum of two time spans.
-   * The unit of the returned time span is the more precise one if possible,
-   * otherwise the closest unit that still allows to hold both input values and the result.
-   * Note that this can loose precision when adding a very large and a very small value.
+   * Create a new time span that is the sum of two time spans. The unit of the returned time span is
+   * the more precise one if possible, otherwise the closest unit that still allows to hold both
+   * input values and the result. Note that this can loose precision when adding a very large and a
+   * very small value.
+   *
    * @throws ArithmeticException If no unit is large enough to represent the result value.
    */
   public static TimeSpan sum(TimeSpan a, TimeSpan b) throws ArithmeticException {
@@ -483,10 +467,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Create a new time span that is the sum of several time spans.
-   * The unit of the returned time span is the most precise one if possible,
-   * otherwise the closest unit that still allows to hold input values and the result.
-   * Note that this can loose precision when adding very large and very small values.
+   * Create a new time span that is the sum of several time spans. The unit of the returned time
+   * span is the most precise one if possible, otherwise the closest unit that still allows to hold
+   * input values and the result. Note that this can loose precision when adding very large and very
+   * small values.
+   *
    * @throws ArithmeticException If no unit is large enough to represent the result value.
    */
   public static TimeSpan sum(Iterable<TimeSpan> timeSpans) {
@@ -502,18 +487,18 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Create a new time span that is the sum of several time spans.
-   * The unit of the returned time span is the most precise one.
+   * Create a new time span that is the sum of several time spans. The unit of the returned time
+   * span is the most precise one.
    */
   public static TimeSpan sum(TimeSpan... t) {
     return sum(Arrays.asList(t));
   }
 
   /**
-   * Create a new time span that is the difference of two time spans.
-   * The unit of the returned time span is the more precise one if possible,
-   * otherwise the closest unit that still allows to hold both input values and the result.
-   * Note that this can loose precision when subtracting a very large and a very small value.
+   * Create a new time span that is the difference of two time spans. The unit of the returned time
+   * span is the more precise one if possible, otherwise the closest unit that still allows to hold
+   * both input values and the result. Note that this can loose precision when subtracting a very
+   * large and a very small value.
    */
   public static TimeSpan difference(TimeSpan a, TimeSpan b) {
     TimeUnit leastCommonUnit = leastCommonUnit(a, b);
@@ -536,9 +521,8 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   /**
    * Create a new time span that is the current one multiplied by a non-negative integral factor.
-   * The unit of the returned time span is the same as the current one if possible,
-   * otherwise the closest unit that still allows to the result.
-   * Note that this can loose precision.
+   * The unit of the returned time span is the same as the current one if possible, otherwise the
+   * closest unit that still allows to the result. Note that this can loose precision.
    */
   @CheckReturnValue
   public TimeSpan multiply(int factor) {
@@ -560,9 +544,9 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   /**
-   * Create a new time span that is the current one divided by a non-negative integral value.
-   * The result of the division is rounded down (integer division).
-   * The unit of the returned time span is the same as the current one.
+   * Create a new time span that is the current one divided by a non-negative integral value. The
+   * result of the division is rounded down (integer division). The unit of the returned time span
+   * is the same as the current one.
    */
   @CheckReturnValue
   public TimeSpan divide(int divisor) {

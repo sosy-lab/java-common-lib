@@ -24,45 +24,48 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
 
 /**
- * Helper class for loading native libraries.
+ * Helper class for loading native libraries. The methods in this class search for the library
+ * binary in some more directories than those specified in the {@literal java.library.path} system
+ * property.
  *
- * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary}
- * with the library name.
- * The following paths are tried in order:
+ * <p>The searched directories are:
  *
  * <ul>
- *  <li>Standard VM path (as set by the property {@code java.library.path})</li>
- *  <li>{@code native} folder, which is assumed to be two levels above the
- *  directory containing the JAR.
- *  One of the following directories is searched within the {@code native} folder:
- *  <ul>
- *      <li>x86_64-linux</li>
- *      <li>x86-linux</li>
- *      <li>x86-windows</li>
- *      <li>x86_64-windows</li>
- *      <li>x86-macosx</li>
- *      <li>x86_64-macosx</li>
- *  </ul>
- *  <li>Same directory as the JAR file holding {@code NativeLibraries.class}.</li>
+ *   <li>the same directory as the JAR file of this library
+ *   <li>the "native library path" as returned by {@link #getNativeLibraryPath()}, which is the
+ *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library, with
+ *       {@literal <arch>-<os>} being one of the following values depending on your system:
+ *       <ul>
+ *         <li>x86_64-linux
+ *         <li>x86-linux
+ *         <li>x86-windows
+ *         <li>x86_64-windows
+ *         <li>x86-macosx
+ *         <li>x86_64-macosx
+ *       </ul>
+ *
  * </ul>
+ *
+ * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary} with the library
+ * name, or use {@link Classes#makeExtendedURLClassLoader()} and {@link
+ * Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(java.util.function.Predicate)} if
+ * third-party code loads the library.
  */
 public final class NativeLibraries {
 
   private NativeLibraries() {}
 
+  @Deprecated // will become private
   public enum OS {
     LINUX,
     MACOSX,
@@ -103,6 +106,7 @@ public final class NativeLibraries {
     }
   }
 
+  @Deprecated // will become private
   public enum Architecture {
     X86,
     X86_64;
@@ -168,15 +172,14 @@ public final class NativeLibraries {
 
   private static @Nullable Path nativePath = null;
 
+  /**
+   * Return the "native library path" as defined in the documentation of {@link NativeLibraries},
+   * i.e., a directory where members of this class expect native binaries.
+   *
+   * <p>It is usually recommended to use the high-level method {@link #loadLibrary(String)} instead.
+   */
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static Path getNativeLibraryPath() {
-    // We expected the libraries to be in the directory lib/native/<arch>-<os>
-    // relative to the parent of the code.
-    // When the code resides in a JAR file, the JAR file needs to be in the same
-    // directory as the "lib" directory.
-    // When the code is in .class files, those .class files need to be in a
-    // sub-directory of the one with the "lib" directory (e.g., in a "bin" directory).
-
     if (nativePath == null) {
       String arch = Ascii.toLowerCase(Architecture.guessVmArchitecture().name());
       String os = Ascii.toLowerCase(OS.guessOperatingSystem().name());
@@ -187,9 +190,7 @@ public final class NativeLibraries {
     return nativePath;
   }
 
-  /**
-   * @return Path to <b>this</b> JAR, holding SoSy Lab-Common library.
-   */
+  /** @return Path to <b>this</b> JAR, holding SoSy Lab-Common library. */
   private static Path getPathToJar() {
     URI pathToJar;
     try {
@@ -201,19 +202,17 @@ public final class NativeLibraries {
   }
 
   /**
-   * Load a native library.
-   * This is similar to {@link System#loadLibrary(String)},
-   * but additionally tries more directories for the search path of the library.
+   * Load a native library. This is similar to {@link System#loadLibrary(String)}, but first
+   * searches for the library in some other directories (as explained in {@link NativeLibraries}).
+   * If the library cannot be found there, it falls back to {@link System#loadLibrary(String)},
+   * which looks in the directories specified in the {@literal java.library.path} system property.
    *
-   * <p>We first try to load the library via the normal VM way.
-   * This way one can use the java.library.path property to point the VM
-   * to another file.
-   * Only if this fails (which is expected if the user did not specify the library path)
-   * we try to load the file from the architecture-specific directory under "lib/native/",
-   * <b>assuming</b> that the JAR representing this library is in {@code lib} that the JAR
-   * representing this library is in {@code lib}.
+   * <p>If you cannot replace the call to {@link System#loadLibrary(String)}, you can use a class
+   * loader created with {@link Classes#makeExtendedURLClassLoader()} and {@link
+   * Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(java.util.function.Predicate)} to let
+   * {@link System#loadLibrary(String)} use the same lookup mechanism as this method.
    *
-   * <p>Finally, if that fails as well, we search in the same directory this {@code JAR} is.
+   * @param name A library name as for {@link System#loadLibrary(String)}.
    */
   public static void loadLibrary(String name) {
     Optional<Path> path = findPathForLibrary(name);
@@ -225,14 +224,13 @@ public final class NativeLibraries {
   }
 
   /**
-   * Find a path for library.
+   * Search for a native library in some directories as listed in the documentation of {@link
+   * NativeLibraries}.
    *
-   * <p>We first try an architecture-dependent folder under "lib/native",
-   * <b>assuming</b> that the JAR representing this library is in the folder "lib",
-   * and if that fails, we try the same folder this JAR is in.
-   *
+   * @param libraryName A library name as for {@link System#loadLibrary(String)}.
    * @return Found path or {@code Optional.absent()}
    */
+  @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
     String osLibName = System.mapLibraryName(libraryName);
     Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();

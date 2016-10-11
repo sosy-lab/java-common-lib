@@ -20,54 +20,49 @@
 package org.sosy_lab.common.configuration.converters;
 
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.OptionDetailAnnotation;
 import org.sosy_lab.common.log.LogManager;
 
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
-
-import javax.annotation.Nullable;
-
 /**
- * TypeConverters are used to parse Strings into instances of specific types
- * during configuration option injection as performed by {@link Configuration#inject(Object)}.
- * Each type converter may handle one or more types.
+ * TypeConverters are used to parse Strings into instances of specific types during configuration
+ * option injection as performed by {@link Configuration#inject(Object)}. Each type converter may
+ * handle one or more types.
  *
- * TypeConverters need not to be thread safe as long as no injection is performed
- * in parallel, however, they should have no mutable state anyway.
+ * <p>TypeConverters need not to be thread safe as long as no injection is performed in parallel,
+ * however, they should have no mutable state anyway.
  *
- * Primitive types will be converted into their corresponding wrapper type
- * before any type converter is called, so they do not need to care at all about
- * primitive types.
+ * <p>Primitive types will be converted into their corresponding wrapper type before any type
+ * converter is called, so they do not need to care at all about primitive types.
  */
 public interface TypeConverter {
 
   /**
    * Convert a String given by the user to an instance of a given type.
    *
-   * Although the signature of this method does not enforce it,
-   * the class of the returned value needs to be assignable to "type" as defined
-   * by {@link TypeToken#isSupertypeOf(java.lang.reflect.Type)}.
+   * <p>Although the signature of this method does not enforce it, the class of the returned value
+   * needs to be assignable to "type" as defined by {@link
+   * TypeToken#isSupertypeOf(java.lang.reflect.Type)}.
    *
-   * Before this method is called, the caller ensures that all requirements for
-   * the option defined with the {@link Option} annotation are met.
+   * <p>Before this method is called, the caller ensures that all requirements for the option
+   * defined with the {@link Option} annotation are met.
    *
    * @param optionName The name of the option (should only be used for nice error messages).
    * @param value The string to parse.
    * @param type The target type.
-   * @param secondaryOption An optional second annotation for the option
-   * (this is one of the annotations marked with {@link OptionDetailAnnotation}).
-   * @param source The file where the configuration option was read from.
-   * May contain a dummy value if the option was given somehow else.
+   * @param secondaryOption An optional second annotation for the option (this is one of the
+   *     annotations marked with {@link OptionDetailAnnotation}).
+   * @param source The file where the configuration option was read from. May contain a dummy value
+   *     if the option was given somehow else.
    * @param logger A logger for warnings etc.
    * @return An instance of the target type produced from the string representation-
-   *
-   * @throws UnsupportedOperationException If the option specification in the source code
-   * is invalid (e.g., a missing annotation).
+   * @throws UnsupportedOperationException If the option specification in the source code is invalid
+   *     (e.g., a missing annotation).
    * @throws InvalidConfigurationException If the user specified an invalid value.
    */
   @Nullable
@@ -81,8 +76,8 @@ public interface TypeConverter {
       throws InvalidConfigurationException;
 
   /**
-   * Optionally convert the default value for an option that was given in the
-   * source code. This method is called if the user gave no explicit value.
+   * Optionally convert the default value for an option that was given in the source code. This
+   * method is called if the user gave no explicit value.
    *
    * @param optionName The name of the option (should only be used for nice error messages).
    * @param value The default value (may be null).
@@ -90,8 +85,8 @@ public interface TypeConverter {
    * @param secondaryOption An optional second annotation for the option
    * @return An instance of the target type.
    * @throws InvalidConfigurationException If the default value is invalid for this option.
-   * @throws UnsupportedOperationException If the option specification in the source code
-   * is invalid (e.g., a missing annotation).
+   * @throws UnsupportedOperationException If the option specification in the source code is invalid
+   *     (e.g., a missing annotation).
    */
   @Nullable
   <T> T convertDefaultValue(

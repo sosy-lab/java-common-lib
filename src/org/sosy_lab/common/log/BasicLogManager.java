@@ -29,14 +29,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
-
-import org.sosy_lab.common.AbstractMBean;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -49,12 +41,15 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.AbstractMBean;
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.MoreFiles;
 
-/**
- * Default implementation of {@link LogManager}.
- */
+/** Default implementation of {@link LogManager}. */
 public class BasicLogManager implements LogManager, AutoCloseable {
 
   // Number of characters taken from the start of the original output strings when truncating
@@ -152,7 +147,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   /**
    * Constructor which allows to customize where this logger delegates to.
    *
-   * The feature of truncating long log messages is disabled.
+   * <p>The feature of truncating long log messages is disabled.
    *
    * @param pLogger The Java logger where this logger delegates to.
    */
@@ -164,8 +159,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * Constructor which allows to customize where this logger delegates to.
    *
    * @param pLogger The Java logger where this logger delegates to.
-   * @param pTruncateSize A positive integer threshold for truncating long log messages,
-   *    or 0 to disable truncation.
+   * @param pTruncateSize A positive integer threshold for truncating long log messages, or 0 to
+   *     disable truncation.
    */
   public BasicLogManager(Logger pLogger, int pTruncateSize) {
     logger = checkNotNull(pLogger);
@@ -183,8 +178,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Create a {@link BasicLogManager} which delegates to a new logger
-   * with only the given {@link Handler}.
+   * Create a {@link BasicLogManager} which delegates to a new logger with only the given {@link
+   * Handler}.
+   *
    * @param handler The target handler.
    */
   public static LogManager createWithHandler(Handler handler) {
@@ -201,23 +197,22 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Create a {@link BasicLogManager} which logs to a file and the console
-   * according to user configuration.
+   * Create a {@link BasicLogManager} which logs to a file and the console according to user
+   * configuration.
    *
-   * This also adds an MXBean that allows runtime control of some logging options.
-   *
+   * <p>This also adds an MXBean that allows runtime control of some logging options.
    */
   public static LogManager create(Configuration config) throws InvalidConfigurationException {
     return create(new LoggingOptions(config));
   }
 
   /**
-   * Create a {@link BasicLogManager} which logs to a file and the console
-   * according to specified options.
+   * Create a {@link BasicLogManager} which logs to a file and the console according to specified
+   * options.
    *
-   * This also adds an MXBean that allows runtime control of some logging options.
+   * <p>This also adds an MXBean that allows runtime control of some logging options.
    *
-   * Most users will want to use {@link #create(Configuration)} instead.
+   * <p>Most users will want to use {@link #create(Configuration)} instead.
    */
   public static LogManager create(LoggingOptions options) {
     Level fileLevel = options.getFileLevel();
@@ -312,6 +307,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   /**
    * Returns true if a message with the given log level would be logged.
+   *
    * @param priority the log level
    * @return whether this log level is enabled
    */
@@ -321,14 +317,13 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Logs any message occurring during program execution.
-   * The message is constructed lazily by concatenating the parts with " ".
-   * The caller should not use string concatenation to create the message
-   * in order to increase performance if the message is never logged.
+   * Logs any message occurring during program execution. The message is constructed lazily by
+   * concatenating the parts with " ". The caller should not use string concatenation to create the
+   * message in order to increase performance if the message is never logged.
    *
    * @param priority the log level for the message
-   * @param args the parts of the message
-   * (can be an arbitrary number of objects whose {@link Object#toString()} method is called)
+   * @param args the parts of the message (can be an arbitrary number of objects whose {@link
+   *     Object#toString()} method is called)
    */
   @Override
   public void log(Level priority, Object... args) {
@@ -352,8 +347,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Logs any message occurring during program execution.
-   * The message is constructed lazily from <code>String.format(format, args)</code>.
+   * Logs any message occurring during program execution. The message is constructed lazily from
+   * <code>String.format(format, args)</code>.
    *
    * @param priority the log level for the message
    * @param format The format string.
@@ -375,10 +370,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Find the first interesting method in the current stack trace.
-   * We assume that methods starting with "log" are helper methods for logging
-   * and exclude them.
-   * Synthetic accessor methods are also excluded.
+   * Find the first interesting method in the current stack trace. We assume that methods starting
+   * with "log" are helper methods for logging and exclude them. Synthetic accessor methods are also
+   * excluded.
    */
   private StackTraceElement findCallingMethod() {
     // We use lazy stack trace, because this exactly fits our use case:
@@ -399,11 +393,10 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Log a message as if it occurred in a given stack trace and with a given
-   * priority.
+   * Log a message as if it occurred in a given stack trace and with a given priority.
    *
-   * For performance reasons, callers should check if
-   * <code>wouldBeLogged(priority)</code> returns true before calling this message.
+   * <p>For performance reasons, callers should check if <code>wouldBeLogged(priority)</code>
+   * returns true before calling this message.
    *
    * @param priority the log level for the message
    * @param stackElement the stack trace frame to use
@@ -448,16 +441,15 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Log a message by printing its message to the user.
-   * The details (e.g., stack trace) are hidden from the user and logged with
-   * a lower log level.
+   * Log a message by printing its message to the user. The details (e.g., stack trace) are hidden
+   * from the user and logged with a lower log level.
    *
-   * Use this method in cases where an expected exception with a useful error
-   * message is thrown, e.g. an InvalidConfigurationException.
+   * <p>Use this method in cases where an expected exception with a useful error message is thrown,
+   * e.g. an InvalidConfigurationException.
    *
-   * If you want to log an IOException because of a write error, it is recommended
-   * to write the message like "Could not write FOO to file". The final message
-   * will then be "Could not write FOO to file FOO.txt (REASON)".
+   * <p>If you want to log an IOException because of a write error, it is recommended to write the
+   * message like "Could not write FOO to file". The final message will then be "Could not write FOO
+   * to file FOO.txt (REASON)".
    *
    * @param priority the log level for the message
    * @param e the occurred exception
@@ -527,11 +519,11 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Log an exception solely for the purpose of debugging.
-   * In default configuration, this exception is not shown to the user!
+   * Log an exception solely for the purpose of debugging. In default configuration, this exception
+   * is not shown to the user!
    *
-   * Use this method when you want to log an exception that was handled by the
-   * catching site, but you don't want to forget the information completely.
+   * <p>Use this method when you want to log an exception that was handled by the catching site, but
+   * you don't want to forget the information completely.
    *
    * @param e the occurred exception
    * @param additionalMessage an optional message
@@ -542,11 +534,11 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   /**
-   * Log an exception solely for the purpose of debugging.
-   * In default configuration, this exception is not shown to the user!
+   * Log an exception solely for the purpose of debugging. In default configuration, this exception
+   * is not shown to the user!
    *
-   * Use this method when you want to log an exception that was handled by the
-   * catching site, but you don't want to forget the information completely.
+   * <p>Use this method when you want to log an exception that was handled by the catching site, but
+   * you don't want to forget the information completely.
    *
    * @param e the occurred exception
    */
@@ -558,8 +550,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   /**
    * Log an exception by printing the full details to the user.
    *
-   * This method should only be used in cases where logUserException and
-   * logDebugException are not acceptable.
+   * <p>This method should only be used in cases where logUserException and logDebugException are
+   * not acceptable.
    *
    * @param priority the log level for the message
    * @param e the occurred exception

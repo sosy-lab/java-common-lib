@@ -25,9 +25,7 @@ final class LogUtils {
 
   private LogUtils() {}
 
-  /**
-   * Get the simple name of the source class of a log record.
-   */
+  /** Get the simple name of the source class of a log record. */
   static String extractSimpleClassName(LogRecord lr) {
     String fullClassName = lr.getSourceClassName();
     int dotIndex = fullClassName.lastIndexOf('.');

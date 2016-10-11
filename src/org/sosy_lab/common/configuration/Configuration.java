@@ -35,20 +35,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
-
-import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.Classes.UnexpectedCheckedException;
-import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
-import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
-import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
-import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
-import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.log.LogManager;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
@@ -68,53 +59,50 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
+import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
+import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
+import org.sosy_lab.common.configuration.converters.TimeSpanTypeConverter;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
+import org.sosy_lab.common.log.LogManager;
 
-/**
- * Immutable wrapper around a map with properties, providing
- * useful access helper methods.
- */
+/** Immutable wrapper around a map with properties, providing useful access helper methods. */
 public final class Configuration {
 
-  /**
-   * Signal for the processor that the deprecated-prefix feature is not used.
-   */
+  /** Signal for the processor that the deprecated-prefix feature is not used. */
   static final String NO_DEPRECATED_PREFIX = "<NO_DEPRECATION>";
 
-  /**
-   * Dummy value used for source paths that have no correspondence to the file system.
-   */
+  /** Dummy value used for source paths that have no correspondence to the file system. */
   static final String NO_NAMED_SOURCE = "manually set";
 
   private static boolean secureMode = false;
 
-  /**
-   * Create a new Builder instance.
-   */
+  /** Create a new Builder instance. */
   public static ConfigurationBuilder builder() {
     return new ConfigurationBuilder();
   }
 
   /**
-   * Enable a secure mode, i.e., allow only injection of configuration options
-   * marked as secure.
+   * Enable a secure mode, i.e., allow only injection of configuration options marked as secure.
    * Once enabled, this can not be disabled.
    */
   public static void enableSecureModeGlobally() {
     secureMode = true;
   }
 
-  /**
-   * Creates a configuration with all values set to default.
-   */
+  /** Creates a configuration with all values set to default. */
   public static Configuration defaultConfiguration() {
     return new Configuration(
         ImmutableMap.of(),
@@ -127,9 +115,7 @@ public final class Configuration {
         null);
   }
 
-  /**
-   * Creates a copy of a configuration with just the prefix set to a new value.
-   */
+  /** Creates a copy of a configuration with just the prefix set to a new value. */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
     return new Configuration(
         oldConfig.properties,
@@ -144,6 +130,10 @@ public final class Configuration {
 
   /** Splitter to create string arrays. */
   private static final Splitter ARRAY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+
+  /** Splitter that separates the option value and the annotation. */
+  private static final Splitter ANNOTATION_VALUE_SPLITTER =
+      Splitter.on("::").limit(2).trimResults();
 
   /** Map that stores which implementation we use for the collection classes. */
   static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
@@ -193,18 +183,16 @@ public final class Configuration {
   }
 
   /**
-   * Get the map of registered default {@link TypeConverter}s.
-   * These type converters are used whenever a new Configuration instance is
-   * created, except when the {@link ConfigurationBuilder#copyFrom(Configuration)} method is
-   * used.
+   * Get the map of registered default {@link TypeConverter}s. These type converters are used
+   * whenever a new Configuration instance is created, except when the {@link
+   * ConfigurationBuilder#copyFrom(Configuration)} method is used.
    *
-   * The returned map is mutable and changes have immediate effect on this class!
-   * Callers are free to add and remove mappings as they wish.
-   * However, as this is static state, this will affect all other callers as well!
-   * Thus, it should be used only with caution, for example to add default type
-   * converters in a large project at startup.
-   * It is discouraged to change this map, if the same effect can easily be
-   * achieved using {@link ConfigurationBuilder#addConverter(Class, TypeConverter)}.
+   * <p>The returned map is mutable and changes have immediate effect on this class! Callers are
+   * free to add and remove mappings as they wish. However, as this is static state, this will
+   * affect all other callers as well! Thus, it should be used only with caution, for example to add
+   * default type converters in a large project at startup. It is discouraged to change this map, if
+   * the same effect can easily be achieved using {@link ConfigurationBuilder#addConverter(Class,
+   * TypeConverter)}.
    *
    * @return A reference to the map of type converters used by this class.
    */
@@ -213,9 +201,9 @@ public final class Configuration {
   }
 
   /**
-   * Use this method to create a new map for storing type converters.
-   * In addition to being a normal HashMap, the returned map will have some
-   * additional checks on the entries.
+   * Use this method to create a new map for storing type converters. In addition to being a normal
+   * HashMap, the returned map will have some additional checks on the entries.
+   *
    * @return A new map.
    */
   static Map<Class<?>, TypeConverter> createConverterMap() {
@@ -318,8 +306,8 @@ public final class Configuration {
   }
 
   /**
-   * Let this instance write human-readable information about every option that is used
-   * to the given stream.
+   * Let this instance write human-readable information about every option that is used to the given
+   * stream.
    */
   public void dumpUsedOptionsTo(PrintStream out) {
     checkNotNull(out);
@@ -328,11 +316,10 @@ public final class Configuration {
   }
 
   /**
-   * Get the value of an option.
-   * USE OF THIS METHOD IS NOT RECOMMENDED!
+   * Get the value of an option. USE OF THIS METHOD IS NOT RECOMMENDED!
    *
-   * Use configuration injection with {@link Option} and {@link #inject(Object)} instead.
-   * This provides type safety, documentation, logging etc.
+   * <p>Use configuration injection with {@link Option} and {@link #inject(Object)} instead. This
+   * provides type safety, documentation, logging etc.
    */
   @Nullable
   @Deprecated
@@ -349,11 +336,10 @@ public final class Configuration {
   }
 
   /**
-   * Check whether an option has a specified value.
-   * USE OF THIS METHOD IS NOT RECOMMENDED!
+   * Check whether an option has a specified value. USE OF THIS METHOD IS NOT RECOMMENDED!
    *
-   * Use configuration injection with {@link Option} and {@link #inject(Object)} instead.
-   * This provides type safety, documentation, logging, default values, etc.
+   * <p>Use configuration injection with {@link Option} and {@link #inject(Object)} instead. This
+   * provides type safety, documentation, logging, default values, etc.
    */
   @Deprecated
   public boolean hasProperty(String key) {
@@ -379,30 +365,34 @@ public final class Configuration {
   }
 
   /**
-   * Inject the values of configuration options into an object.
-   * The class of the object has to have a {@link Options} annotation, and each
-   * field to set / method to call has to have a {@link Option} annotation.
+   * Inject the values of configuration options into an object. The class of the object has to have
+   * a {@link Options} annotation, and each field to set / method to call has to have a {@link
+   * Option} annotation.
    *
    * <p>Supported types for configuration options:
-   * - all primitive types and their wrapper types
-   * - all enum types
-   * - {@link String} and arrays of it
-   * - {@link File} and {@link Path}
-   *   (the field {@link FileOption#value()} is required in this case!)
-   * - {@code Class<Something>}
-   * - {@link java.nio.charset.Charset}
-   * - {@link java.util.logging.Level}
-   * - {@link java.util.regex.Pattern}
-   * - arbitrary factory interfaces as supported by {@link Classes#createFactory(TypeToken, Class)}
-   * - arrays of the above types
-   * - collection types {@link Iterable}, {@link Collection}, {@link List},
-   *   {@link Set}, {@link SortedSet}, {@link Multiset}, and {@link EnumSet}
-   *   of the above types
    *
-   * <p>For the collection types an immutable instance will be created and injected.
-   * Their type parameter has to be one of the other supported types.
-   * For collection types and arrays the values of the configuration option are
-   * assumed to be comma separated.
+   * <ul>
+   *   <li>all primitive types and their wrapper types
+   *   <li>all enum types
+   *   <li>{@link String} and arrays of it
+   *   <li>{@link File} and {@link Path} (the field {@link FileOption#value()} is required in this
+   *       case!)
+   *   <li>{@code Class<Something>}
+   *   <li>{@link java.nio.charset.Charset}
+   *   <li>{@link java.util.logging.Level}
+   *   <li>{@link java.util.regex.Pattern}
+   *   <li>arbitrary factory interfaces as supported by {@link Classes#createFactory(TypeToken,
+   *       Class)}
+   *   <li>arrays of the above types
+   *   <li>{@link AnnotatedValue} with types of the above as value type (users can specify an
+   *       annotation string after a "::" separator)
+   *   <li>collection types {@link Iterable}, {@link Collection}, {@link List}, {@link Set}, {@link
+   *       SortedSet}, {@link Multiset}, and {@link EnumSet} of the above types
+   * </ul>
+   *
+   * <p>For the collection types an immutable instance will be created and injected. Their type
+   * parameter has to be one of the other supported types. For collection types and arrays the
+   * values of the configuration option are assumed to be comma separated.
    *
    * @param obj The object in which the configuration options should be injected.
    * @throws InvalidConfigurationException If the user specified configuration is wrong.
@@ -413,11 +403,8 @@ public final class Configuration {
 
   /**
    * @see #inject(Object)
-   *
-   * Use this method if the calling class is likely to be sub-classed, so that
-   * the options of the calling class get injected, not the options of the
-   * dynamic class type of the object.
-   *
+   *     <p>Use this method if the calling class is likely to be sub-classed, so that the options of
+   *     the calling class get injected, not the options of the dynamic class type of the object.
    * @param cls The static class type of the object to inject.
    */
   public void inject(Object obj, Class<?> cls) throws InvalidConfigurationException {
@@ -460,8 +447,8 @@ public final class Configuration {
   }
 
   /**
-   * Call {@link #inject(Object, Class)} for this object with its actual class
-   * and all super class that have an {@link Options} annotation.
+   * Call {@link #inject(Object, Class)} for this object with its actual class and all super class
+   * that have an {@link Options} annotation.
    *
    * @param obj The object in which the configuration options should be injected.
    * @throws InvalidConfigurationException If the user specified configuration is wrong.
@@ -482,13 +469,14 @@ public final class Configuration {
     } while (cls != null);
   }
 
-  /** This method sets a new value to a field with an {@link Options}-annotation.
-   * It takes the name and the new value of an option,
-   * checks it for allowed values and injects it into the object.
+  /**
+   * This method sets a new value to a field with an {@link Options}-annotation. It takes the name
+   * and the new value of an option, checks it for allowed values and injects it into the object.
    *
    * @param obj the object to be injected
    * @param field the field of the value to be injected
-   * @param options options-annotation of the class of the object */
+   * @param options options-annotation of the class of the object
+   */
   private <T> void setOptionValueForField(
       final Object obj, final Field field, final Options options)
       throws InvalidConfigurationException, IllegalAccessException {
@@ -556,13 +544,14 @@ public final class Configuration {
     }
   }
 
-  /** This method sets a new value to a method with an {@link Options}-annotation.
-   * It takes the name and the new value of an option,
-   * checks it for allowed values and injects it into the object.
+  /**
+   * This method sets a new value to a method with an {@link Options}-annotation. It takes the name
+   * and the new value of an option, checks it for allowed values and injects it into the object.
    *
    * @param obj the object to be injected
    * @param method the method of the value to be injected
-   * @param options options-annotation of the class of the object */
+   * @param options options-annotation of the class of the object
+   */
   private void setOptionValueForMethod(final Object obj, final Method method, final Options options)
       throws InvalidConfigurationException, IllegalAccessException {
 
@@ -614,9 +603,7 @@ public final class Configuration {
         throw new InvalidConfigurationException(
             String.format(
                 "Invalid value in configuration file: \"%s = %s\"%s",
-                name,
-                value,
-                (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
+                name, value, (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
             t);
       }
 
@@ -629,15 +616,14 @@ public final class Configuration {
     return getOptionName(options, member, option, false);
   }
 
-  /** This function return the name of an {@link Option}.
-   * If no option name is defined, the name of the member is returned.
-   * If a prefix is defined, it is added in front of the name.
+  /**
+   * This function return the name of an {@link Option}. If no option name is defined, the name of
+   * the member is returned. If a prefix is defined, it is added in front of the name.
    *
    * @param options the @Options annotation of the class, that contains the member
    * @param member member with @Option annotation
    * @param option the @Option annotation
-   * @param isDeprecated flag specifying whether the deprecated prefix should be
-   *                     used.
+   * @param isDeprecated flag specifying whether the deprecated prefix should be used.
    */
   private static String getOptionName(
       final Options options, final Member member, final Option option, boolean isDeprecated) {
@@ -679,9 +665,8 @@ public final class Configuration {
    * @param option The annotation of the option.
    * @param member The member that declares the option.
    * @return The value to assign (may be null).
-   *
-   * @throws UnsupportedOperationException If the declaration of the option
-   * in the source code is invalid.
+   * @throws UnsupportedOperationException If the declaration of the option in the source code is
+   *     invalid.
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
   @Nullable
@@ -760,8 +745,8 @@ public final class Configuration {
   }
 
   /**
-   * Return a string describing the source of an option suitable for logging
-   * (best-effort, may return an empty string).
+   * Return a string describing the source of an option suitable for logging (best-effort, may
+   * return an empty string).
    */
   private String getOptionSourceForLogging(String optionDeprecatedName) {
     if (sources.containsKey(optionDeprecatedName)) {
@@ -774,8 +759,8 @@ public final class Configuration {
   }
 
   /**
-   * This function takes the new value of an {@link Option}
-   * in the property, checks it (allowed values, regexp) and returns it.
+   * This function takes the new value of an {@link Option} in the property, checks it (allowed
+   * values, regexp) and returns it.
    *
    * @param name name of the value
    * @param option the option-annotation of the field of the value
@@ -803,8 +788,7 @@ public final class Configuration {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)",
-              name,
-              valueStr));
+              name, valueStr));
     }
 
     // check if it matches the specification regexp
@@ -813,17 +797,14 @@ public final class Configuration {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s\" (does not match RegExp \"%s\").",
-              name,
-              valueStr,
-              regexp));
+              name, valueStr, regexp));
     }
 
     return valueStr;
   }
 
   /**
-   * Find any annotation which itself is annotated with {@link OptionDetailAnnotation}
-   * on a member.
+   * Find any annotation which itself is annotated with {@link OptionDetailAnnotation} on a member.
    */
   private @Nullable Annotation getSecondaryAnnotation(AnnotatedElement element) {
     Annotation result = null;
@@ -840,12 +821,12 @@ public final class Configuration {
   }
 
   /**
-   * Check whether a given annotation (which itself has to be annotated with
-   * {@link OptionDetailAnnotation}!) is applicable to an option of a given type.
+   * Check whether a given annotation (which itself has to be annotated with {@link
+   * OptionDetailAnnotation}!) is applicable to an option of a given type.
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(@Nullable Annotation annotation, final TypeToken<?> optionType)
+  private void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType)
       throws UnsupportedOperationException {
     if (annotation == null) {
       return;
@@ -854,6 +835,10 @@ public final class Configuration {
     List<Class<?>> applicableTypes =
         Arrays.asList(
             annotation.annotationType().getAnnotation(OptionDetailAnnotation.class).applicableTo());
+
+    if (optionType.getRawType() == AnnotatedValue.class) {
+      optionType = Classes.getSingleTypeArgument(optionType);
+    }
 
     if (!applicableTypes.isEmpty() && !applicableTypes.contains(optionType.getRawType())) {
       throw new UnsupportedOperationException(
@@ -894,8 +879,8 @@ public final class Configuration {
   }
 
   /**
-   * This function takes a value (String) and a type and
-   * returns an Object of this type with the value as content.
+   * This function takes a value (String) and a type and returns an Object of this type with the
+   * value as content.
    *
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
@@ -968,11 +953,11 @@ public final class Configuration {
   }
 
   /**
-   * This function takes a value (String) and a type and
-   * returns an Object of this type with the value as content.
+   * This function takes a value (String) and a type and returns an Object of this type with the
+   * value as content.
    *
-   * The type may not be an array or a collection type, and the value may only
-   * be a single value (not multiple values).
+   * <p>The type may not be an array or a collection type, and the value may only be a single value
+   * (not multiple values).
    *
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
@@ -981,26 +966,42 @@ public final class Configuration {
    */
   private @Nullable Object convertSingleValue(
       final String optionName,
-      final String valueStr,
-      final TypeToken<?> type,
+      String valueStr,
+      TypeToken<?> type,
       @Nullable final Annotation secondaryOption)
       throws InvalidConfigurationException {
+
+    final boolean isAnnotated = type.getRawType() == AnnotatedValue.class;
+    String annotation = null;
+    if (isAnnotated) {
+      type = Classes.getSingleTypeArgument(type);
+      Iterator<String> parts = ANNOTATION_VALUE_SPLITTER.split(valueStr).iterator();
+      valueStr = parts.next();
+      annotation = Iterators.getNext(parts, null);
+    }
 
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
-    return converter.convert(
-        optionName,
-        valueStr,
-        type,
-        secondaryOption,
-        sources.get(optionName),
-        firstNonNull(logger, LogManager.createNullLogManager()));
+    Object result =
+        converter.convert(
+            optionName,
+            valueStr,
+            type,
+            secondaryOption,
+            sources.get(optionName),
+            firstNonNull(logger, LogManager.createNullLogManager()));
+
+    if (result != null && isAnnotated) {
+      result = AnnotatedValue.create(result, Optional.ofNullable(annotation));
+    }
+
+    return result;
   }
 
   /**
-   * Convert a String which possibly contains multiple values into a list of objects
-   * of the correct type.
+   * Convert a String which possibly contains multiple values into a list of objects of the correct
+   * type.
    *
    * @param optionName name of option, only for error handling
    * @param valueStr new value of the option
@@ -1061,6 +1062,7 @@ public final class Configuration {
 
   /**
    * Find a type converter for an option.
+   *
    * @return A type converter.
    */
   private TypeConverter getConverter(
@@ -1078,9 +1080,7 @@ public final class Configuration {
     return converter;
   }
 
-  /**
-   * A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}.
-   */
+  /** A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}. */
   @Nullable
   private static String trimToNull(@Nullable String s) {
     if (s == null) {
@@ -1110,6 +1110,7 @@ public final class Configuration {
    * Construct a configuration object from the array of command line arguments.
    *
    * <p>The input format is as follows:
+   *
    * <pre>
    * <code>
    *   --option=Value
@@ -1118,8 +1119,8 @@ public final class Configuration {
    *
    * @param args Command line arguments
    * @return Constructed {@link Configuration} instance
-   * @throws InvalidConfigurationException On incorrect format
-   * or when configuration options for Configurations class are invalid
+   * @throws InvalidConfigurationException On incorrect format or when configuration options for
+   *     Configurations class are invalid
    */
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {

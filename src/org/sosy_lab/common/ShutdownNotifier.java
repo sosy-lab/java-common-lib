@@ -24,36 +24,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.MapMaker;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
 /**
- * This class allows code to check whether it should terminate for some reason,
- * and to be notified of such requests.
+ * This class allows code to check whether it should terminate for some reason, and to be notified
+ * of such requests.
  *
- * It works passively, the running analysis will not be interrupted directly,
- * but instead it has to check every then and now whether it should shutdown.
- * This ensures that the running code is not left in an unclean state.
+ * <p>It works passively, the running analysis will not be interrupted directly, but instead it has
+ * to check every then and now whether it should shutdown. This ensures that the running code is not
+ * left in an unclean state.
  *
- * The check whether a shutdown was requested is cheap and should be done quite often
- * in order to ensure a timely response to a shutdown request.
- * As a rule of thumb, all operations that may take longer than 1s
- * should take care of calling {@link #shouldShutdown()} or {@link #shutdownIfNecessary()}
- * from time to time.
+ * <p>The check whether a shutdown was requested is cheap and should be done quite often in order to
+ * ensure a timely response to a shutdown request. As a rule of thumb, all operations that may take
+ * longer than 1s should take care of calling {@link #shouldShutdown()} or {@link
+ * #shutdownIfNecessary()} from time to time.
  *
- * Shutdown requests cannot be issued via this class,
- * but only via {@link ShutdownManager} to allow restricting
- * which code is allowed to request shutdowns.
+ * <p>Shutdown requests cannot be issued via this class, but only via {@link ShutdownManager} to
+ * allow restricting which code is allowed to request shutdowns.
  *
- * Instances of this class cannot be created directly,
- * instead create a {@link ShutdownManager} and call {@link ShutdownManager#getNotifier()}.
+ * <p>Instances of this class cannot be created directly, instead create a {@link ShutdownManager}
+ * and call {@link ShutdownManager#getNotifier()}.
  *
- * This class is completely thread safe.
+ * <p>This class is completely thread safe.
  */
 public final class ShutdownNotifier {
 
@@ -70,9 +66,8 @@ public final class ShutdownNotifier {
   private final AtomicReference<String> shutdownRequested = new AtomicReference<>();
 
   /**
-   * For maintaining the list of listeners, the AtomicReference shutdownRequest
-   * is not enough, so we synchronize on the list and have a second flag
-   * whether they were already notified.
+   * For maintaining the list of listeners, the AtomicReference shutdownRequest is not enough, so we
+   * synchronize on the list and have a second flag whether they were already notified.
    */
   private final Set<ShutdownRequestListener> listeners =
       // This creates a set which is backed by a thread-safe map
@@ -104,30 +99,26 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Create an instance that will never return true for {@link #shouldShutdown()}
-   * and will never notify its listeners.
-   * This may be handy for tests.
+   * Create an instance that will never return true for {@link #shouldShutdown()} and will never
+   * notify its listeners. This may be handy for tests.
    *
-   * To create a real usable ShutdownNotifier, use {@link ShutdownManager#create()}.
+   * <p>To create a real usable ShutdownNotifier, use {@link ShutdownManager#create()}.
    */
   public static ShutdownNotifier createDummy() {
     return new ShutdownNotifier(null);
   }
 
   /**
-   * Request a shutdown of all components that check this instance,
-   * by letting {@link #shouldShutdown()} return true in the future,
-   * and by notifying all registered listeners.
-   * Only the first call to this method has an effect.
-   * When this method returns, it is guaranteed that all currently registered
-   * listeners where notified and have been unregistered.
+   * Request a shutdown of all components that check this instance, by letting {@link
+   * #shouldShutdown()} return true in the future, and by notifying all registered listeners. Only
+   * the first call to this method has an effect. When this method returns, it is guaranteed that
+   * all currently registered listeners where notified and have been unregistered.
    *
-   * This method is implemented here but only called from
-   * {@link ShutdownManager#requestShutdown(String)},
-   * which exposes it publicly.
+   * <p>This method is implemented here but only called from {@link
+   * ShutdownManager#requestShutdown(String)}, which exposes it publicly.
    *
-   * @param pReason A non-null human-readable string that tells the user
-   * why a shutdown was requested.
+   * @param pReason A non-null human-readable string that tells the user why a shutdown was
+   *     requested.
    */
   void requestShutdown(String pReason) {
     checkNotNull(pReason);
@@ -152,23 +143,20 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Check whether a shutdown was previously requested.
-   * This method returns false immediately after this instance was constructed,
-   * and may return true later on.
-   * After it returned true once it will always keep returning true,
-   * and never return false again.
-   * Calling this method is very cheap.
+   * Check whether a shutdown was previously requested. This method returns false immediately after
+   * this instance was constructed, and may return true later on. After it returned true once it
+   * will always keep returning true, and never return false again. Calling this method is very
+   * cheap.
    */
   public boolean shouldShutdown() {
     return shutdownRequested.get() != null;
   }
 
   /**
-   * Check whether a shutdown was previously requested,
-   * and throw an {@link InterruptedException} in this case.
-   * Once a shutdown was requested, every call to this method will throw an exception.
-   * In the common case that no shutdown was yet requested,
-   * calling this method is very cheap.
+   * Check whether a shutdown was previously requested, and throw an {@link InterruptedException} in
+   * this case. Once a shutdown was requested, every call to this method will throw an exception. In
+   * the common case that no shutdown was yet requested, calling this method is very cheap.
+   *
    * @throws InterruptedException If a shutdown was requested.
    */
   public void shutdownIfNecessary() throws InterruptedException {
@@ -179,6 +167,7 @@ public final class ShutdownNotifier {
 
   /**
    * Return the reason for the shutdown request on this instance.
+   *
    * @return A non-null human-readable string.
    * @throws IllegalStateException If there was no shutdown request on this instance.
    */
@@ -189,16 +178,15 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Register a listener that will be notified once a shutdown is requested for the first time
-   * on the associated {@link ShutdownManager} instance with
-   * {@link ShutdownManager#requestShutdown(String)}.
+   * Register a listener that will be notified once a shutdown is requested for the first time on
+   * the associated {@link ShutdownManager} instance with {@link
+   * ShutdownManager#requestShutdown(String)}.
    *
-   * Listeners registered when {@link #shouldShutdown()} already returns true
-   * will never be notified (so calling this method at that time has no effect).
+   * <p>Listeners registered when {@link #shouldShutdown()} already returns true will never be
+   * notified (so calling this method at that time has no effect).
    *
-   * This class keeps only weak reference to the listener to allow the GC
-   * to collect them, so make sure to keep a strong reference to your instance
-   * as long as you won't to be notified.
+   * <p>This class keeps only weak reference to the listener to allow the GC to collect them, so
+   * make sure to keep a strong reference to your instance as long as you won't to be notified.
    *
    * @param listener A non-null and not already registered listener.
    */
@@ -215,18 +203,15 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Register a listener that will be notified once a shutdown is requested for the first time
-   * on the associated {@link ShutdownManager} instance with
-   * {@link ShutdownManager#requestShutdown(String)},
-   * or immediately if this was already the case.
+   * Register a listener that will be notified once a shutdown is requested for the first time on
+   * the associated {@link ShutdownManager} instance with {@link
+   * ShutdownManager#requestShutdown(String)}, or immediately if this was already the case.
    *
-   * Use this method to avoid a race condition when registering the listener
-   * and checking for a requested shutdown at the same time
-   * (you could loose a notification).
+   * <p>Use this method to avoid a race condition when registering the listener and checking for a
+   * requested shutdown at the same time (you could loose a notification).
    *
-   * This class keeps only weak reference to the listener to allow the GC
-   * to collect them, so make sure to keep a strong reference to your instance
-   * as long as you won't to be notified.
+   * <p>This class keeps only weak reference to the listener to allow the GC to collect them, so
+   * make sure to keep a strong reference to your instance as long as you won't to be notified.
    *
    * @param listener A non-null and not already registered listener.
    */
@@ -244,10 +229,9 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Unregister a listener.
-   * This listener will not be notified in the future.
-   * It is safe to call this method twice with the same listener.
-   * It is not necessary to call this method for a listener that was already notified.
+   * Unregister a listener. This listener will not be notified in the future. It is safe to call
+   * this method twice with the same listener. It is not necessary to call this method for a
+   * listener that was already notified.
    *
    * @param listener A previously registered listener.
    */
@@ -259,10 +243,9 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Utility method for creating a {@link ShutdownRequestListener}
-   * that interrupts the current thread (that calls this method) on a shutdown.
-   * Note that this method does not actually do anything, you need to
-   * register the returned listener with an instance of this class.
+   * Utility method for creating a {@link ShutdownRequestListener} that interrupts the current
+   * thread (that calls this method) on a shutdown. Note that this method does not actually do
+   * anything, you need to register the returned listener with an instance of this class.
    */
   public static ShutdownRequestListener interruptCurrentThreadOnShutdown() {
     final Thread currentThread = Thread.currentThread();
@@ -273,20 +256,19 @@ public final class ShutdownNotifier {
   public interface ShutdownRequestListener {
 
     /**
-     * This method is called on registered listeners the first time
-     * {@link ShutdownManager#requestShutdown(String)}
-     * on the associated {@link ShutdownManager} instance is called.
+     * This method is called on registered listeners the first time {@link
+     * ShutdownManager#requestShutdown(String)} on the associated {@link ShutdownManager} instance
+     * is called.
      *
-     * Implementations of this method should be reasonably quick
-     * and never throw an exception.
+     * <p>Implementations of this method should be reasonably quick and never throw an exception.
      *
-     * Note that it is usually not necessary to use a listener when
-     * all you want to do in this method is to set some boolean flag.
-     * Instead, just call {@link ShutdownNotifier#shouldShutdown()}
-     * whenever you would check the flag (this is similarly cheap and thread-safe).
+     * <p>Note that it is usually not necessary to use a listener when all you want to do in this
+     * method is to set some boolean flag. Instead, just call {@link
+     * ShutdownNotifier#shouldShutdown()} whenever you would check the flag (this is similarly cheap
+     * and thread-safe).
      *
-     * @param reason A non-null human-readable string that tells the user
-     * why a shutdown was requested.
+     * @param reason A non-null human-readable string that tells the user why a shutdown was
+     *     requested.
      */
     void shutdownRequested(String reason);
   }

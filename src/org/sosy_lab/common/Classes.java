@@ -26,10 +26,11 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.reflect.AbstractInvocationHandler;
@@ -37,11 +38,8 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
-
-import org.sosy_lab.common.annotations.Unmaintained;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -50,25 +48,29 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
+import org.sosy_lab.common.annotations.Unmaintained;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 
-/**
- * Helper class for various methods related to handling Java classes and types.
- */
+/** Helper class for various methods related to handling Java classes and types. */
 public final class Classes {
 
   private Classes() {}
 
-  /**
-   * Exception thrown by {@link Classes#createInstance(Class, Class[], Object[], Class)}.
-   */
+  /** Exception thrown by {@link Classes#createInstance(Class, Class[], Object[], Class)}. */
   @Deprecated
   public static class ClassInstantiationException extends Exception {
 
@@ -84,10 +86,9 @@ public final class Classes {
   }
 
   /**
-   * An exception that should be used if a checked exception is encountered in
-   * a situation where it is not excepted
-   * (e.g., when getting the result from a {@link Callable} of which you know
-   * it shouldn't throw such exceptions).
+   * An exception that should be used if a checked exception is encountered in a situation where it
+   * is not excepted (e.g., when getting the result from a {@link Callable} of which you know it
+   * shouldn't throw such exceptions).
    */
   public static final class UnexpectedCheckedException extends RuntimeException {
 
@@ -106,15 +107,15 @@ public final class Classes {
   }
 
   /**
-   * Creates an instance of class cls, passing the objects from argumentList
-   * to the constructor and casting the object to class type.
+   * Creates an instance of class cls, passing the objects from argumentList to the constructor and
+   * casting the object to class type.
    *
    * @param cls The class to instantiate.
    * @param argumentTypes Array with the types of the parameters of the desired constructor.
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param type The return type (has to be a super type of the class, of course).
-   * @throws ClassInstantiationException If something goes wrong
-   * (like class cannot be found or has no constructor).
+   * @throws ClassInstantiationException If something goes wrong (like class cannot be found or has
+   *     no constructor).
    * @throws InvocationTargetException If the constructor throws an exception.
    */
   @Deprecated
@@ -138,18 +139,17 @@ public final class Classes {
   }
 
   /**
-   * Creates an instance of class cls, passing the objects from argumentList
-   * to the constructor and casting the object to class type.
+   * Creates an instance of class cls, passing the objects from argumentList to the constructor and
+   * casting the object to class type.
    *
-   * If there is no matching constructor or the the class cannot be instantiated,
-   * an InvalidConfigurationException is thrown.
+   * <p>If there is no matching constructor or the the class cannot be instantiated, an
+   * InvalidConfigurationException is thrown.
    *
    * @param type The return type (has to be a super type of the class, of course).
    * @param cls The class to instantiate.
-   * @param argumentTypes Array with the types of the parameters
-   * of the desired constructor (optional).
-   * @param argumentValues Array with the values
-   * that will be passed to the constructor.
+   * @param argumentTypes Array with the types of the parameters of the desired constructor
+   *     (optional).
+   * @param argumentValues Array with the values that will be passed to the constructor.
    */
   @Deprecated
   public static <T> T createInstance(
@@ -162,16 +162,16 @@ public final class Classes {
   }
 
   /**
-   * Creates an instance of class cls, passing the objects from argumentList
-   * to the constructor and casting the object to class type.
+   * Creates an instance of class cls, passing the objects from argumentList to the constructor and
+   * casting the object to class type.
    *
-   * If there is no matching constructor or the the class cannot be instantiated,
-   * an InvalidConfigurationException is thrown.
+   * <p>If there is no matching constructor or the the class cannot be instantiated, an
+   * InvalidConfigurationException is thrown.
    *
    * @param type The return type (has to be a super type of the class, of course).
    * @param cls The class to instantiate.
-   * @param argumentTypes Array with the types of the parameters
-   * of the desired constructor (optional).
+   * @param argumentTypes Array with the types of the parameters of the desired constructor
+   *     (optional).
    * @param argumentValues Array with the values that will be passed to the constructor.
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
@@ -210,9 +210,7 @@ public final class Classes {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid %s %s, constructor declares unsupported checked exception %s.",
-              typeName,
-              className,
-              exception));
+              typeName, className, exception));
     }
 
     // instantiate
@@ -223,9 +221,7 @@ public final class Classes {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid %s %s, class cannot be instantiated (%s).",
-              typeName,
-              className,
-              e.getMessage()),
+              typeName, className, e.getMessage()),
           e);
 
     } catch (IllegalAccessException e) {
@@ -241,12 +237,12 @@ public final class Classes {
   }
 
   /**
-   * Similar to {@link Class#forName(String)}, but if the class is not found this
-   * method re-tries with a package name prefixed.
+   * Similar to {@link Class#forName(String)}, but if the class is not found this method re-tries
+   * with a package name prefixed.
    *
    * @param name The class name.
    * @param prefix An optional package name as prefix.
-   * @return The class object for  name  or  prefix + "." + name
+   * @return The class object for name or prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
   public static Class<?> forName(String name, @Nullable String prefix)
@@ -255,14 +251,13 @@ public final class Classes {
   }
 
   /**
-   * Similar to {@link Class#forName(String)} and {@link ClassLoader#loadClass(String)},
-   * but if the class is not found this
-   * method re-tries with a package name prefixed.
+   * Similar to {@link Class#forName(String)} and {@link ClassLoader#loadClass(String)}, but if the
+   * class is not found this method re-tries with a package name prefixed.
    *
    * @param name The class name.
    * @param prefix An optional package name as prefix.
    * @param cl An optional class loader to load the class (may be null).
-   * @return The class object for  name  or  prefix + "." + name
+   * @return The class object for name or prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
    */
   private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl)
@@ -290,10 +285,9 @@ public final class Classes {
   }
 
   /**
-   * Verify that a constructor or method declares no other checked exceptions except a
-   * given type.
+   * Verify that a constructor or method declares no other checked exceptions except a given type.
    *
-   * Returns the name of any violating exception, or null if there is none.
+   * <p>Returns the name of any violating exception, or null if there is none.
    *
    * @param executable The executable to check.
    * @param allowedExceptionTypes The type of exception that is allowed.
@@ -306,10 +300,9 @@ public final class Classes {
   }
 
   /**
-   * Verify that a constructor or method declares no other checked exceptions except a
-   * given type.
+   * Verify that a constructor or method declares no other checked exceptions except a given type.
    *
-   * Returns the name of any violating exception, or null if there is none.
+   * <p>Returns the name of any violating exception, or null if there is none.
    *
    * @param invokable The invokable to check.
    * @param allowedExceptionTypes The type of exception that is allowed.
@@ -338,27 +331,23 @@ public final class Classes {
     return null;
   }
 
-  /**
-   * @see #getSingleTypeArgument(Type)
-   */
+  /** @see #getSingleTypeArgument(Type) */
   public static TypeToken<?> getSingleTypeArgument(final TypeToken<?> type) {
     return TypeToken.of(getSingleTypeArgument(type.getType()));
   }
 
   /**
-   * From a type {@code X<Foo>}, extract the {@code Foo}.
-   * This is the value of {@link ParameterizedType#getActualTypeArguments()}.
-   * This method also supports {@code X<? extends Foo>}, {@code X<Foo<?>>} etc.
+   * From a type {@code X<Foo>}, extract the {@code Foo}. This is the value of {@link
+   * ParameterizedType#getActualTypeArguments()}. This method also supports {@code X<? extends
+   * Foo>}, {@code X<Foo<?>>} etc.
    *
    * <p>Example results:
    *
-   * <pre>
-   * {@code
+   * <pre>{@code
    * X<Foo>          : Foo
    * X<? extends Foo>: Foo
    * X<Foo<Bar>>     : Foo<Bar>
-   * }
-   * </pre>
+   * }</pre>
    *
    * @param type The type (needs to be parameterized with exactly one parameter)
    * @return A Type object.
@@ -383,10 +372,10 @@ public final class Classes {
   }
 
   /**
-   * Simplify a {@link Type} instance: if it is a wildcard generic type, replace
-   * it with its upper bound.
+   * Simplify a {@link Type} instance: if it is a wildcard generic type, replace it with its upper
+   * bound.
    *
-   * It does not support wildcards with several upper bounds.
+   * <p>It does not support wildcards with several upper bounds.
    *
    * @param type A possibly generic type.
    * @return The type or its simplification.
@@ -433,26 +422,128 @@ public final class Classes {
     }
   }
 
-  public static final Predicate<Class<?>> IS_GENERATED =
+  public static final com.google.common.base.Predicate<Class<?>> IS_GENERATED =
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
 
+  /** A builder for class loaders with more features than {@link URLClassLoader}. */
+  @CanIgnoreReturnValue
+  public abstract static class ClassLoaderBuilder {
+    ClassLoaderBuilder() {}
+
+    /**
+     * Set parent of new class loader. If not set the default delegation parent class loader will be
+     * used (like {@link URLClassLoader#URLClassLoader(URL[])}.
+     */
+    public abstract ClassLoaderBuilder setParent(ClassLoader parent);
+
+    /**
+     * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
+     * {@link #setUrls(URL...)} are required).
+     */
+    public abstract ClassLoaderBuilder setUrls(Iterable<URL> urls);
+
+    /**
+     * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
+     * {@link #setUrls(Iterable)} are required).
+     */
+    public ClassLoaderBuilder setUrls(URL... urls) {
+      return setUrls(ImmutableList.copyOf(urls));
+    }
+
+    /**
+     * Set an {@link URLClassLoader} as parent and its URLs from {@link URLClassLoader#getURLs()} as
+     * sources for new class loader.
+     */
+    public ClassLoaderBuilder setParentAndUrls(URLClassLoader parent) {
+      return setParent(parent).setUrls(parent.getURLs());
+    }
+
+    /**
+     * Set a predicate that specifies which classes are forced to be loaded by the new class loader
+     * and not its parent, even if the latter could load them.
+     *
+     * <p>The predicate should match the fully-qualified class name. The default is to not match any
+     * classes.
+     *
+     * <p>Normally class loaders follow the parent-first strategy, so they never load classes which
+     * their parent could also load. The new class loader follows the child-first strategy for a
+     * specific set of classes (as specified by this predicate) and the parent-first strategy for
+     * the rest.
+     *
+     * <p>This feature can be used if you want to load a component with its own class loader (so
+     * that it can be garbage collected independently, for example), but the parent class loader
+     * also sees the classes.
+     */
+    public abstract ClassLoaderBuilder setDirectLoadClasses(Predicate<String> classes);
+
+    /** @see #setDirectLoadClasses(Predicate) */
+    public ClassLoaderBuilder setDirectLoadClasses(Pattern classes) {
+      return setDirectLoadClasses(matching(classes));
+    }
+
+    /**
+     * Set a predicate that specifies for which native libraries we should use a custom lookup for
+     * the binary as documented in {@link NativeLibraries}.
+     *
+     * <p>The predicate should match the library name as given to {@link
+     * System#loadLibrary(String)}. The default is to not match any libraries.
+     *
+     * <p>Note that this is only effective if the new class loader is actually the one that is asked
+     * to load the new library. Because Java's class loaders follow the parent-first strategy, it is
+     * easy to end up with a parent class loader loading the library, if the parent can see the
+     * class(es) that do the loading. In this case, use {@link #setDirectLoadClasses(Predicate)} to
+     * ensure the new class loader loads all relevant classes itself.
+     */
+    public abstract ClassLoaderBuilder setCustomLookupNativeLibraries(Predicate<String> libraries);
+
+    /** @see #setCustomLookupNativeLibraries(Predicate) */
+    public ClassLoaderBuilder setCustomLookupNativeLibraries(Pattern nativeLibraries) {
+      return setCustomLookupNativeLibraries(matching(nativeLibraries));
+    }
+
+    /** @see #setCustomLookupNativeLibraries(Predicate) */
+    public ClassLoaderBuilder setCustomLookupNativeLibraries(String... nativeLibraries) {
+      return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
+    }
+
+    private static Predicate<String> matching(Pattern pattern) {
+      return s -> pattern.matcher(s).matches();
+    }
+
+    abstract ExtendedURLClassLoaderConfiguration autoBuild();
+
+    @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
+    @CheckReturnValue
+    public URLClassLoader build() {
+      return new ExtendedURLClassLoader(autoBuild());
+    }
+  }
+
   /**
-   * Create a factory at runtime that implements the interface {@code factoryType}
-   * and delegates to either a constructor or a static factory method of {@code cls}.
+   * Create a class loader that is based on an {@link URLClassLoader} but implements some additional
+   * features. This method returns a builder that can be used to configure the new class loader.
+   */
+  public static ClassLoaderBuilder makeExtendedURLClassLoader() {
+    return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder()
+        .setDirectLoadClasses(c -> false)
+        .setCustomLookupNativeLibraries(l -> false);
+  }
+
+  /**
+   * Create a factory at runtime that implements the interface {@code factoryType} and delegates to
+   * either a constructor or a static factory method of {@code cls}.
    *
-   * The factory interface needs to have exactly one method.
-   * The target class needs to have either a single public static method name {@code create},
-   * or a single public constructor.
-   * The declared exceptions of the static method/constructor
-   * need to be a subset of those of the method of the factory interface,
-   * and the same holds for the parameters.
-   * Parameters that are declared {@link Nullable} may be missing in the factory interface.
+   * <p>The factory interface needs to have exactly one method. The target class needs to have
+   * either a single public static method name {@code create}, or a single public constructor. The
+   * declared exceptions of the static method/constructor need to be a subset of those of the method
+   * of the factory interface, and the same holds for the parameters. Parameters that are declared
+   * {@link Nullable} may be missing in the factory interface.
    *
    * @param factoryType The factory interface
    * @param cls The class which should be instantiated by the returned factory
    * @return An implementation of {@code factoryType} that instantiates {@code cls}
-   * @throws UnsuitedClassException If the static method/constructor of {@code cls}
-   *    does not fulfill the restrictions of the factory interface
+   * @throws UnsuitedClassException If the static method/constructor of {@code cls} does not fulfill
+   *     the restrictions of the factory interface
    */
   public static <I> I createFactory(final Class<I> factoryType, final Class<?> cls)
       throws UnsuitedClassException {
@@ -460,22 +551,20 @@ public final class Classes {
   }
 
   /**
-   * Create a factory at runtime that implements the interface {@code factoryType}
-   * and delegates to either a constructor or a static factory method of {@code cls}.
+   * Create a factory at runtime that implements the interface {@code factoryType} and delegates to
+   * either a constructor or a static factory method of {@code cls}.
    *
-   * The factory interface needs to have exactly one method.
-   * The target class needs to have either a single public static method name {@code create},
-   * or a single public constructor.
-   * The declared exceptions of the static method/constructor
-   * need to be a subset of those of the method of the factory interface,
-   * and the same holds for the parameters.
-   * Parameters that are declared {@link Nullable} may be missing in the factory interface.
+   * <p>The factory interface needs to have exactly one method. The target class needs to have
+   * either a single public static method name {@code create}, or a single public constructor. The
+   * declared exceptions of the static method/constructor need to be a subset of those of the method
+   * of the factory interface, and the same holds for the parameters. Parameters that are declared
+   * {@link Nullable} may be missing in the factory interface.
    *
    * @param factoryType A type token that represents the factory interface
    * @param cls The class which should be instantiated by the returned factory
    * @return An implementation of {@code factoryType} that instantiates {@code cls}
-   * @throws UnsuitedClassException If the static method/constructor of {@code cls}
-   *    does not fulfill the restrictions of the factory interface
+   * @throws UnsuitedClassException If the static method/constructor of {@code cls} does not fulfill
+   *     the restrictions of the factory interface
    */
   public static <I> I createFactory(final TypeToken<I> factoryType, final Class<?> cls)
       throws UnsuitedClassException {
@@ -533,8 +622,7 @@ public final class Classes {
         } else {
           throw new UnsuitedClassException(
               "'%s' requires parameter of type %s which is not present in factory interface",
-              target,
-              targetParamTypes.get(i));
+              target, targetParamTypes.get(i));
         }
       }
       parameterMapping[i] = sourceIndex;
@@ -555,9 +643,9 @@ public final class Classes {
   }
 
   /**
-   * Search for a method that we should use to instantiate the class.
-   * First, it looks for a public static method named "create",
-   * second, for a public constructor.
+   * Search for a method that we should use to instantiate the class. First, it looks for a public
+   * static method named "create", second, for a public constructor.
+   *
    * @throws UnsuitedClassException if no matching method can be found
    */
   private static Invokable<?, ?> getInstantiationMethodForClass(Class<?> cls)
@@ -640,8 +728,8 @@ public final class Classes {
   }
 
   /**
-   * Exception thrown when {@link Classes#createFactory(TypeToken, Class)}
-   * is called with a class that does not satisfy the requirements of the factory interface.
+   * Exception thrown when {@link Classes#createFactory(TypeToken, Class)} is called with a class
+   * that does not satisfy the requirements of the factory interface.
    */
   public static final class UnsuitedClassException extends Exception {
 

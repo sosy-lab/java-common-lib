@@ -21,7 +21,6 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.base.Predicates;
 import com.google.common.testing.AbstractPackageSanityTests;
-
 import org.sosy_lab.common.Classes;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {

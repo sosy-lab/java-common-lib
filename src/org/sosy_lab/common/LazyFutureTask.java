@@ -20,31 +20,26 @@
 package org.sosy_lab.common;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nullable;
 
 /**
- * Future implementation that can be used when a task should be executed
- * only lazily at the first time {@link #get()} is called.
- * I.e., it is not guaranteed that the task is run at all,
- * but it is called at most once.
+ * Future implementation that can be used when a task should be executed only lazily at the first
+ * time {@link #get()} is called. I.e., it is not guaranteed that the task is run at all, but it is
+ * called at most once.
  *
- * Execution of the task happens in the caller's thread,
- * a little bit similar to the use of
- * {@link com.google.common.util.concurrent.MoreExecutors#sameThreadExecutor()},
- * however, it is executed on the thread calling {@link #get()}
- * and not on the thread calling
- * {@link java.util.concurrent.ExecutorService#submit(Runnable)}.
+ * <p>Execution of the task happens in the caller's thread, a little bit similar to the use of
+ * {@link com.google.common.util.concurrent.MoreExecutors#sameThreadExecutor()}, however, it is
+ * executed on the thread calling {@link #get()} and not on the thread calling {@link
+ * java.util.concurrent.ExecutorService#submit(Runnable)}.
  *
- * Important: Calling {@link #get(long, TimeUnit)} is not supported
- * and will always throw {@link UnsupportedOperationException}.
+ * <p>Important: Calling {@link #get(long, TimeUnit)} is not supported and will always throw {@link
+ * UnsupportedOperationException}.
  *
- * Canceling this future works as expected.
+ * <p>Canceling this future works as expected.
  */
 public class LazyFutureTask<V> extends FutureTask<V> {
 

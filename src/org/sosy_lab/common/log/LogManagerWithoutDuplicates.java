@@ -22,15 +22,15 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-
+import com.google.errorprone.annotations.FormatMethod;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
 /**
- * LogManager implementation which helps to get log messages printed only once,
- * and avoid duplicate messages.
+ * LogManager implementation which helps to get log messages printed only once, and avoid duplicate
+ * messages.
  */
 public class LogManagerWithoutDuplicates extends ForwardingLogManager implements LogManager {
 
@@ -49,11 +49,9 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
 
   /**
    * @see LogManager#withComponentName(String)
-   *
-   * This method returns a new LogManagerWithoutDuplicates,
-   * which does not share state with the current instance
-   * (i.e., it is possible to log the same message both through the old
-   * and the new instance once).
+   *     <p>This method returns a new LogManagerWithoutDuplicates, which does not share state with
+   *     the current instance (i.e., it is possible to log the same message both through the old and
+   *     the new instance once).
    */
   @Override
   public LogManagerWithoutDuplicates withComponentName(String pName) {
@@ -61,15 +59,12 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
   }
 
   /**
-   * Logging method similar to {@link #log(Level, Object...)},
-   * however, subsequent calls to this method with the same arguments
-   * will be silently ignored.
-   * Direct calls to {@link #log(Level, Object...)} are not affected.
+   * Logging method similar to {@link #log(Level, Object...)}, however, subsequent calls to this
+   * method with the same arguments will be silently ignored. Direct calls to {@link #log(Level,
+   * Object...)} are not affected.
    *
-   * Make sure to call this method only with immutable parameters,
-   * such as Strings!
-   * If objects are changed after being passed to this method,
-   * detecting duplicate log messages may not work,
+   * <p>Make sure to call this method only with immutable parameters, such as Strings! If objects
+   * are changed after being passed to this method, detecting duplicate log messages may not work,
    * or too many log messages may be ignored.
    */
   public void logOnce(Level pPriority, Object... pArgs) {
@@ -84,15 +79,12 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
   }
 
   /**
-   * Logging method similar to {@link #log(Level, Supplier)},
-   * however, subsequent calls to this method with the same arguments
-   * will be silently ignored.
-   * Direct calls to {@link #log(Level, Supplier)} are not affected.
+   * Logging method similar to {@link #log(Level, Supplier)}, however, subsequent calls to this
+   * method with the same arguments will be silently ignored. Direct calls to {@link #log(Level,
+   * Supplier)} are not affected.
    *
-   * Make sure to call this method only with immutable parameters,
-   * such as Strings!
-   * If objects are changed after being passed to this method,
-   * detecting duplicate log messages may not work,
+   * <p>Make sure to call this method only with immutable parameters, such as Strings! If objects
+   * are changed after being passed to this method, detecting duplicate log messages may not work,
    * or too many log messages may be ignored.
    */
   public void logOnce(Level pPriority, Supplier<String> pMsgSupplier) {
@@ -108,17 +100,15 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
   }
 
   /**
-   * Logging method similar to {@link #logf(Level, String, Object...)},
-   * however, subsequent calls to this method with the same arguments
-   * will be silently ignored.
-   * Direct calls to {@link #logf(Level, String, Object...)} are not affected.
+   * Logging method similar to {@link #logf(Level, String, Object...)}, however, subsequent calls to
+   * this method with the same arguments will be silently ignored. Direct calls to {@link
+   * #logf(Level, String, Object...)} are not affected.
    *
-   * Make sure to call this method only with immutable parameters,
-   * such as Strings!
-   * If objects are changed after being passed to this method,
-   * detecting duplicate log messages may not work,
+   * <p>Make sure to call this method only with immutable parameters, such as Strings! If objects
+   * are changed after being passed to this method, detecting duplicate log messages may not work,
    * or too many log messages may be ignored.
    */
+  @FormatMethod
   public void logfOnce(Level pPriority, String pFormat, Object... pArgs) {
     checkNotNull(pFormat);
     checkNotNull(pArgs);
@@ -136,9 +126,9 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
   }
 
   /**
-   * Reset all seen log messages, such that {@link #logfOnce(Level, String, Object...)}
-   * and {@link #logfOnce(Level, String, Object...)} will be guaranteed
-   * to behave exactly like in a fresh instance of this class.
+   * Reset all seen log messages, such that {@link #logfOnce(Level, String, Object...)} and {@link
+   * #logfOnce(Level, String, Object...)} will be guaranteed to behave exactly like in a fresh
+   * instance of this class.
    */
   public void resetSeenMessages() {
     seenMessages.clear();

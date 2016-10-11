@@ -25,11 +25,10 @@ import java.util.logging.Level;
 /**
  * {@link LogManager} implementation that does not log anything.
  *
- * Note: Do not use this implementation for unit tests,
- * use {@link TestLogManager} instead.
+ * <p>Note: Do not use this implementation for unit tests, use {@link TestLogManager} instead.
  *
- * @deprecated Use {@link LogManager#createNullLogManager()} instead.
- *    This class will be made package-private.
+ * @deprecated Use {@link LogManager#createNullLogManager()} instead. This class will be made
+ *     package-private.
  */
 @Deprecated
 public enum NullLogManager implements LogManager {

@@ -22,16 +22,17 @@ package org.sosy_lab.common.io;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.MoreObjects;
-
+import com.google.errorprone.annotations.Immutable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 
 /**
- * A template for paths, from which a real path can be constructed
- * by passing some values to fill in the blanks.
+ * A template for paths, from which a real path can be constructed by passing some values to fill in
+ * the blanks.
  */
+@Immutable
 public final class PathTemplate {
 
   private final String template;
@@ -43,8 +44,9 @@ public final class PathTemplate {
 
   /**
    * Create a new instance.
-   * @param pTemplate A non-null non-empty template String in the format for
-   * {@link String#format(String, Object...)}.
+   *
+   * @param pTemplate A non-null non-empty template String in the format for {@link
+   *     String#format(String, Object...)}.
    */
   public static PathTemplate ofFormatString(String pTemplate) {
     return new PathTemplate(pTemplate);
@@ -52,8 +54,9 @@ public final class PathTemplate {
 
   /**
    * Construct a concrete {@link Path} from this template and the given values.
-   * @throws IllegalFormatException If the template is invalid,
-   * or the arguments does not match the template.
+   *
+   * @throws IllegalFormatException If the template is invalid, or the arguments does not match the
+   *     template.
    */
   public Path getPath(Object... args) {
     checkArgument(!Arrays.asList(args).contains(null), "Values for PathTemplate may not be null");
@@ -61,9 +64,7 @@ public final class PathTemplate {
     return Paths.get(String.format(template, args));
   }
 
-  /**
-   * Returns the raw template of this instance.
-   */
+  /** Returns the raw template of this instance. */
   public String getTemplate() {
     return template;
   }

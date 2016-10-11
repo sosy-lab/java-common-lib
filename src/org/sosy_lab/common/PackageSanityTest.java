@@ -22,7 +22,6 @@ package org.sosy_lab.common;
 import com.google.common.base.Joiner;
 import com.google.common.reflect.Invokable;
 import com.google.common.testing.AbstractPackageSanityTests;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -30,6 +29,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
@@ -37,6 +37,9 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(String[].class, new String[] {"test"});
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
+    setDefault(
+        ExtendedURLClassLoaderConfiguration.class,
+        Classes.makeExtendedURLClassLoader().setUrls().autoBuild());
     setDefault(Path.class, Paths.get(""));
     try {
       setDefault(Constructor.class, PackageSanityTest.class.getConstructor());

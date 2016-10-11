@@ -23,17 +23,15 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Strings;
 import com.google.common.testing.TestLogHandler;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.sosy_lab.common.Appenders.AbstractAppender;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.sosy_lab.common.Appenders.AbstractAppender;
 
 public class BasicLogManagerTest {
 

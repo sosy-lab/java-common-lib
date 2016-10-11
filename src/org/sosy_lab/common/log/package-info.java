@@ -18,10 +18,9 @@
  *  limitations under the License.
  */
 /**
- * This package provides a logging framework.
- * It is based on the JDK-internal logging,
- * but provides many additional features such as lazy log message creation,
- * and convenience methods for exceptions.
+ * This package provides a logging framework. It is based on the JDK-internal logging, but provides
+ * many additional features such as lazy log message creation, and convenience methods for
+ * exceptions.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

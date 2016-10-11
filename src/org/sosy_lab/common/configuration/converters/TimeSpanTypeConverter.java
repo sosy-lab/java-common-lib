@@ -23,19 +23,15 @@ import com.google.common.base.CharMatcher;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.TimeSpanOption;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
-
-/**
- * Type converter for options annotated with {@link TimeSpanOption}.
- */
+/** Type converter for options annotated with {@link TimeSpanOption}. */
 public class TimeSpanTypeConverter implements TypeConverter {
 
   private static final BiMap<String, TimeUnit> TIME_UNITS =
@@ -91,12 +87,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
       throw new InvalidConfigurationException(
           String.format(
               "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
-              optionName,
-              value,
-              option.min(),
-              codeUnitStr,
-              option.max(),
-              codeUnitStr));
+              optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
     }
 
     Object result;

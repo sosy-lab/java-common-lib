@@ -21,12 +21,10 @@ package org.sosy_lab.common.configuration;
 
 import com.google.common.io.CharSource;
 import com.google.common.testing.AbstractPackageSanityTests;
-
-import org.sosy_lab.common.Classes;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import org.sosy_lab.common.Classes;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 

@@ -23,17 +23,16 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
 
 /**
- * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault}
- * that defines that all methods inside the annotated element
- * do not return null, unless this is overridden with another annotation.
+ * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault} that defines that
+ * all methods inside the annotated element do not return null, unless this is overridden with
+ * another annotation.
  *
- * It is defined here because the annotation supplied by FindBugs
- * is deprecated: {@link edu.umd.cs.findbugs.annotations.ReturnValuesAreNonnullByDefault}.
+ * <p>It is defined here because the annotation supplied by FindBugs is deprecated: {@link
+ * edu.umd.cs.findbugs.annotations.ReturnValuesAreNonnullByDefault}.
  */
 @Documented
 @Nonnull

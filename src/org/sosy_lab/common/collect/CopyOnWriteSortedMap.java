@@ -25,43 +25,34 @@ import com.google.common.collect.ForwardingCollection;
 import com.google.common.collect.ForwardingSortedMap;
 import com.google.common.collect.ForwardingSortedSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nullable;
 
 /**
- * This is a map implementation that uses copy-on-write behavior.
- * This may be a good fit when you want to keep old snapshots of the map
- * while modifying it. Through the use of a {@link PersistentMap} backend,
- * snapshots and modifying operations are both cheap (O(1) for the former,
+ * This is a map implementation that uses copy-on-write behavior. This may be a good fit when you
+ * want to keep old snapshots of the map while modifying it. Through the use of a {@link
+ * PersistentMap} backend, snapshots and modifying operations are both cheap (O(1) for the former,
  * usually O(log n) for the latter).
  *
- * There are two usage patterns for this map.
- * First, you can keep one instance of of the map which you modify,
- * and eventually call {@link #getSnapshot()} to take immutable snapshots.
- * Second, you can use an instance of the map and create copies of it with the
- * {@link #copyOf(CopyOnWriteSortedMap)} method (these copies are O(1)).
- * Then you can modify both the old and the new instance, but modifications
- * to one of it won't be reflected by the other.
+ * <p>There are two usage patterns for this map. First, you can keep one instance of of the map
+ * which you modify, and eventually call {@link #getSnapshot()} to take immutable snapshots. Second,
+ * you can use an instance of the map and create copies of it with the {@link
+ * #copyOf(CopyOnWriteSortedMap)} method (these copies are O(1)). Then you can modify both the old
+ * and the new instance, but modifications to one of it won't be reflected by the other.
  *
- * All collection views returned my methods of this map are live views
- * and change if this map is modified.
- * However, they currently do not support any modifying operations.
- * All iterators produced by the collection views iterate over an immutable
- * snapshot of the map taken at iterator creation time and thus do not reflect
- * intermediate changes to the map.
- * The iterators also don't support the {@link Iterator#remove()} method.
- * Thus it is safe to iterate over the map while changing it.
+ * <p>All collection views returned my methods of this map are live views and change if this map is
+ * modified. However, they currently do not support any modifying operations. All iterators produced
+ * by the collection views iterate over an immutable snapshot of the map taken at iterator creation
+ * time and thus do not reflect intermediate changes to the map. The iterators also don't support
+ * the {@link Iterator#remove()} method. Thus it is safe to iterate over the map while changing it.
  *
- * This implementation is thread-safe and lock free,
- * but does not guarantee freedom of starvation.
- * Bulk operations are not atomic.
+ * <p>This implementation is thread-safe and lock free, but does not guarantee freedom of
+ * starvation. Bulk operations are not atomic.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
@@ -75,9 +66,9 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
-   * Create a new map instance with an initial content of the given map.
-   * To create an empty instance, get an empty instance of your favorite
-   * {@link PersistentSortedMap} implementation and pass it to this method.
+   * Create a new map instance with an initial content of the given map. To create an empty
+   * instance, get an empty instance of your favorite {@link PersistentSortedMap} implementation and
+   * pass it to this method.
    */
   public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(
       PersistentSortedMap<K, V> pMap) {
@@ -85,9 +76,9 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
-   * Create a new map instance containing all entries of the given map.
-   * The snapshot of the given map is created atomically.
-   * Changes to the new map don't reflect in the given map and vice-versa.
+   * Create a new map instance containing all entries of the given map. The snapshot of the given
+   * map is created atomically. Changes to the new map don't reflect in the given map and
+   * vice-versa.
    */
   public static <K extends Comparable<? super K>, V> CopyOnWriteSortedMap<K, V> copyOf(
       CopyOnWriteSortedMap<K, V> pMap) {
@@ -99,19 +90,15 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
     return map.get();
   }
 
-  /**
-   * Return a immutable snapshot of the current state of the map.
-   */
+  /** Return a immutable snapshot of the current state of the map. */
   public PersistentSortedMap<K, V> getSnapshot() {
     return map.get();
   }
 
   /**
    * @see Map#put(Object, Object)
-   *
-   * This method is not starvation free,
-   * and thus not strictly guaranteed to terminate in presence of concurrent
-   * modifying operations.
+   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
+   *     presence of concurrent modifying operations.
    */
   @Override
   @CanIgnoreReturnValue
@@ -123,9 +110,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
     return oldMap.get(pKey);
   }
 
-  /**
-   * Update and replace the map, returning the previous map.
-   */
+  /** Update and replace the map, returning the previous map. */
   private PersistentSortedMap<K, V> put0(K pKey, V pValue) {
     PersistentSortedMap<K, V> oldMap;
     PersistentSortedMap<K, V> newMap;
@@ -139,10 +124,8 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
 
   /**
    * @see Map#remove(Object)
-   *
-   * This method is not starvation free,
-   * and thus not strictly guaranteed to terminate in presence of concurrent
-   * modifying operations.
+   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
+   *     presence of concurrent modifying operations.
    */
   @Override
   @CanIgnoreReturnValue
@@ -164,24 +147,17 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
 
   /**
    * @see Map#putAll(Map)
-   *
-   * This method is not atomic!
-   * It inserts all keys one after the other,
-   * and in between each operation arbitrary operations from other threads
-   * might get executed.
-   *
-   * This method is not starvation free,
-   * and thus not strictly guaranteed to terminate in presence of concurrent
-   * modifying operations.
+   *     <p>This method is not atomic! It inserts all keys one after the other, and in between each
+   *     operation arbitrary operations from other threads might get executed.
+   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
+   *     presence of concurrent modifying operations.
    */
   @Override
   public void putAll(Map<? extends K, ? extends V> pMap) {
     pMap.forEach((key, value) -> put(key, value));
   }
 
-  /**
-   * @see Map#clear()
-   */
+  /** @see Map#clear() */
   @Override
   public void clear() {
     map.set(map.get().empty());

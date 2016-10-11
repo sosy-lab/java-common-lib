@@ -21,14 +21,12 @@ package org.sosy_lab.common.log;
 
 import com.google.common.base.Predicates;
 import com.google.common.testing.AbstractPackageSanityTests;
-
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 @SuppressWarnings("deprecation")
 public class PackageSanityTest extends AbstractPackageSanityTests {

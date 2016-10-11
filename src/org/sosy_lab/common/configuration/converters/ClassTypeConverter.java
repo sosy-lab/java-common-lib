@@ -22,16 +22,14 @@ package org.sosy_lab.common.configuration.converters;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.reflect.TypeToken;
-
+import java.lang.annotation.Annotation;
+import java.nio.file.Path;
+import java.util.Collections;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnsuitedClassException;
 import org.sosy_lab.common.configuration.ClassOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
-
-import java.lang.annotation.Annotation;
-import java.nio.file.Path;
-import java.util.Collections;
 
 public class ClassTypeConverter implements TypeConverter {
 
@@ -82,9 +80,7 @@ public class ClassTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Class %s specified in option %s is not an instance of %s",
-                value,
-                optionName,
-                targetType));
+                value, optionName, targetType));
       }
 
       result = cls;
@@ -98,9 +94,7 @@ public class ClassTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Class %s specified in option %s is invalid (%s)",
-                value,
-                optionName,
-                e.getMessage()));
+                value, optionName, e.getMessage()));
       }
       Classes.produceClassLoadingWarning(logger, cls, type.getRawType());
     }

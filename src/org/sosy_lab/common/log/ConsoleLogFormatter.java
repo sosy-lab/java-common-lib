@@ -23,9 +23,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/**
- * Class to handle formatting for console output.
- */
+/** Class to handle formatting for console output. */
 public class ConsoleLogFormatter extends Formatter {
 
   private final boolean useColors;

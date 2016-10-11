@@ -17,9 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-/**
- * This package contains several general-purpose annotations.
- */
+/** This package contains several general-purpose annotations. */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

@@ -18,9 +18,8 @@
  *  limitations under the License.
  */
 /**
- * This package provides possibilities for measuring elapsed time,
- * and a data class {@link org.sosy_lab.common.time.TimeSpan} for storing
- * time spans together with the respective time unit.
+ * This package provides possibilities for measuring elapsed time, and a data class {@link
+ * org.sosy_lab.common.time.TimeSpan} for storing time spans together with the respective time unit.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

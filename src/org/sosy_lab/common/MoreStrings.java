@@ -22,20 +22,16 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.Supplier;
-
 import javax.annotation.CheckReturnValue;
 
-/**
- * Utility class for String-related helpers,
- * similar to {@link com.google.common.base.Strings}.
- */
+/** Utility class for String-related helpers, similar to {@link com.google.common.base.Strings}. */
 public final class MoreStrings {
   private MoreStrings() {}
 
   /**
-   * Check whether a string starts with a given prefix
-   * similar to {@link String#startsWith(String)},
+   * Check whether a string starts with a given prefix similar to {@link String#startsWith(String)},
    * but ignoring the case like {@link String#equalsIgnoreCase(String)}.
+   *
    * @param s The string to check whether it contains the prefix.
    * @param prefix The prefix.
    * @return Whether {@code s} starts with {@code prefix} in any case.
@@ -50,12 +46,11 @@ public final class MoreStrings {
   }
 
   /**
-   * Return an {@link Object} instance whose {@link Object#toString()} method
-   * lazily delegates to the given supplier.
-   * This can be used for logging to make a single logging argument lazy, e.g.
-   * {@code
-   * logger.log(Level.FINE, "Some message with %s and %s args", lazyString(() -> "lazy"), "eager");
-   * }
+   * Return an {@link Object} instance whose {@link Object#toString()} method lazily delegates to
+   * the given supplier. This can be used for logging to make a single logging argument lazy, e.g.
+   * {@code logger.log(Level.FINE, "Some message with %s and %s args", lazyString(() -> "lazy"),
+   * "eager"); }
+   *
    * @param stringSupplier A non-null supplier that returns a non-null string.
    * @return A object that should only be used for {@link Object#toString()}.
    */
@@ -71,13 +66,12 @@ public final class MoreStrings {
   }
 
   /**
-   * Return an {@link Object} instance whose {@link Object#toString()} method
-   * delegates to {@link WithLongString#toLongString()}.
-   * This can be used for logging as a lazy alternative to calling
-   * {@link WithLongString#toLongString()} directly, e.g.
-   * <code>
+   * Return an {@link Object} instance whose {@link Object#toString()} method delegates to {@link
+   * WithLongString#toLongString()}. This can be used for logging as a lazy alternative to calling
+   * {@link WithLongString#toLongString()} directly, e.g. <code>
    * logger.log(Level.FINE, longStringOf(instance));
    * </code>
+   *
    * @param obj A non-null instance of {@link WithLongString}
    * @return A object that should only be used for {@link Object#toString()}.
    */
@@ -93,16 +87,16 @@ public final class MoreStrings {
   }
 
   /**
-   * Interface for classes that have a second, longer, string representation
-   * (with more information) in addition to {@link Object#toString()}.
+   * Interface for classes that have a second, longer, string representation (with more information)
+   * in addition to {@link Object#toString()}.
    */
   public interface WithLongString {
 
     /**
-     * Return a string representation of this instance
-     * that has some more details than {@link Object#toString()}.
-     * If you want to call this method lazily,
-     * use {@link MoreStrings#longStringOf(WithLongString)}.
+     * Return a string representation of this instance that has some more details than {@link
+     * Object#toString()}. If you want to call this method lazily, use {@link
+     * MoreStrings#longStringOf(WithLongString)}.
+     *
      * @return a non-null string
      */
     @CheckReturnValue

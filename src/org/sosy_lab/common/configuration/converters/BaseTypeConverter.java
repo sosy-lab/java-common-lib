@@ -21,12 +21,6 @@ package org.sosy_lab.common.configuration.converters;
 
 import com.google.common.primitives.Primitives;
 import com.google.common.reflect.TypeToken;
-
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.rationals.Rational;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,12 +31,16 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 
 /**
- * A {@link TypeConverter} which handles all the trivial cases like ints, Strings,
- * log levels, regexps, etc.
+ * A {@link TypeConverter} which handles all the trivial cases like ints, Strings, log levels,
+ * regexps, etc.
  *
- * This class should not have any relevance outside the {@link Configuration} class.
+ * <p>This class should not have any relevance outside the {@link Configuration} class.
  */
 public enum BaseTypeConverter implements TypeConverter {
   INSTANCE;
@@ -99,9 +97,7 @@ public enum BaseTypeConverter implements TypeConverter {
         throw new InvalidConfigurationException(
             String.format(
                 "Illegal regular expression %s in option  %s (%s).",
-                valueStr,
-                optionName,
-                e.getMessage()),
+                valueStr, optionName, e.getMessage()),
             e);
       }
     } else if (type.equals(Rational.class)) {
@@ -133,10 +129,7 @@ public enum BaseTypeConverter implements TypeConverter {
     return Enum.valueOf((Class) cls, value);
   }
 
-  /**
-   * Invoke the static "valueOf(String)" method on a class.
-   * Helpful for type converters.
-   */
+  /** Invoke the static "valueOf(String)" method on a class. Helpful for type converters. */
   public static Object valueOf(final Class<?> type, final String optionName, final String value)
       throws InvalidConfigurationException {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
@@ -160,17 +153,13 @@ public enum BaseTypeConverter implements TypeConverter {
       throw new AssertionError(
           String.format(
               "Class %s without usable %s(%s) method.",
-              type.getSimpleName(),
-              method,
-              paramType.getSimpleName()),
+              type.getSimpleName(), method, paramType.getSimpleName()),
           e);
     } catch (InvocationTargetException e) {
       throw new InvalidConfigurationException(
           String.format(
               "Could not parse \"%s = %s\" (%s).",
-              optionName,
-              value,
-              e.getTargetException().getMessage()),
+              optionName, value, e.getTargetException().getMessage()),
           e);
     }
   }

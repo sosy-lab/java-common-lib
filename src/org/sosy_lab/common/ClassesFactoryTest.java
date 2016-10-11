@@ -22,18 +22,13 @@ package org.sosy_lab.common;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.reflect.TypeToken;
-
+import java.io.IOException;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.junit.Test;
 import org.sosy_lab.common.Classes.UnsuitedClassException;
 
-import java.io.IOException;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
-/**
- * Tests for {@link Classes#createFactory(TypeToken, Class)}.
- */
+/** Tests for {@link Classes#createFactory(TypeToken, Class)}. */
 public class ClassesFactoryTest {
 
   public interface TestFactory {

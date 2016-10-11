@@ -30,11 +30,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import org.sosy_lab.common.io.MoreFiles;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -64,6 +60,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.sosy_lab.common.io.MoreFiles;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
@@ -77,10 +74,11 @@ public class OptionCollector {
   private static final Pattern IMMUTABLE_LIST_PATTERN =
       Pattern.compile("ImmutableList\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
 
-  /** The main-method collects all classes of a program and
-   * then it searches for all {@link Option}s.
+  /**
+   * The main-method collects all classes of a program and then it searches for all {@link Option}s.
    *
-   * @param args use '-v' for verbose output */
+   * @param args use '-v' for verbose output
+   */
   public static void main(final String[] args) {
 
     // parse args
@@ -97,12 +95,13 @@ public class OptionCollector {
     collectOptions(verbose, includeLibraryOptions, System.out);
   }
 
-  /** This function collects options from all classes and outputs them.
-   * Error message are written to System.err.
+  /**
+   * This function collects options from all classes and outputs them. Error message are written to
+   * System.err.
    *
    * @param verbose short or long output?
-   * @param includeLibraryOptions whether options defined by libraries on the classpath
-   * should be included
+   * @param includeLibraryOptions whether options defined by libraries on the classpath should be
+   *     included
    * @param out the output target
    */
   public static void collectOptions(
@@ -138,9 +137,7 @@ public class OptionCollector {
     includeLibraryOptions = pIncludeLibraryOptions;
   }
 
-  /**
-   * This function collects options from all classes and writes them to the output.
-   */
+  /** This function collects options from all classes and writes them to the output. */
   private void collectOptions(final PrintStream out) {
     ClassPath classPath;
     try {
@@ -169,9 +166,7 @@ public class OptionCollector {
         .forEach(outputWriter::writeOption);
   }
 
-  /**
-   * Copy files with options documentation found on the class path to the output.
-   */
+  /** Copy files with options documentation found on the class path to the output. */
   private void copyOptionFilesToOutput(ClassPath classPath, final PrintStream out) {
     for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
       if (new File(resourceInfo.getResourceName()).getName().equals(OPTIONS_FILE)) {
@@ -185,9 +180,10 @@ public class OptionCollector {
   }
 
   /**
-   * Collects classes with options from the given {@link ClassPath}.
-   * Ignores classes that do not have file:// URLs (e.g., packaged inside JARs)
-   * certain blacklisted classes, and interfaces, classes without options.
+   * Collects classes with options from the given {@link ClassPath}. Ignores classes that do not
+   * have file:// URLs (e.g., packaged inside JARs) certain blacklisted classes, and interfaces,
+   * classes without options.
+   *
    * @return stream of classes with options
    */
   private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
@@ -212,14 +208,13 @@ public class OptionCollector {
       errorMessages.add(
           String.format(
               "INFO: Could not load '%s' for getting Option annotations: %s: %s",
-              cls.getResourceName(),
-              e.getClass().getName(),
-              e.getMessage()));
+              cls.getResourceName(), e.getClass().getName(), e.getMessage()));
       return Stream.empty();
     }
   }
 
-  /** This method collects every {@link Option} of a class.
+  /**
+   * This method collects every {@link Option} of a class.
    *
    * @param c class where to take the Option from
    */
@@ -250,7 +245,8 @@ public class OptionCollector {
     return result.build();
   }
 
-  /** This function returns the content of a sourcefile as String.
+  /**
+   * This function returns the content of a sourcefile as String.
    *
    * @param cls the class whose sourcefile should be retrieved
    */
@@ -276,8 +272,10 @@ public class OptionCollector {
     }
   }
 
-  /** This method tries to get Source-Path. This path is used
-   * to get default values for options without instantiating the classes. */
+  /**
+   * This method tries to get Source-Path. This path is used to get default values for options
+   * without instantiating the classes.
+   */
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private static Path getSourcePath(CodeSource codeSource) throws URISyntaxException {
     // Get base folder for classes, go via URI to handle escaping
@@ -309,13 +307,14 @@ public class OptionCollector {
     return basePath;
   }
 
-  /** This function searches for the default field value of an {@link Option}
-   * in the sourcefile of the actual field/class and returns it
-   * or an emtpy String, if the value not found.
+  /**
+   * This function searches for the default field value of an {@link Option} in the sourcefile of
+   * the actual field/class and returns it or an emtpy String, if the value not found.
    *
-   * This part only works, if you have the source code.
+   * <p>This part only works, if you have the source code.
    *
-   * @param field where to get the default value */
+   * @param field where to get the default value
+   */
   private static String getDefaultValue(final Field field, final String classSource) {
     // genericType: "boolean" or "java.util.List<java.util.logging.Level>"
     String typeString = field.getGenericType().toString();
@@ -367,15 +366,15 @@ public class OptionCollector {
   }
 
   /**
-   * Get pattern for matching a field declaration in a source file.
-   * Example: 'private boolean shouldCheck'
+   * Get pattern for matching a field declaration in a source file. Example: 'private boolean
+   * shouldCheck'
    */
   private static String getFieldMatchingPattern(final Field field, String type) {
     return Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+" + field.getName();
   }
 
-  /** This function searches for fieldstring in content and
-   * returns the value of the field.
+  /**
+   * This function searches for fieldstring in content and returns the value of the field.
    *
    * @param content sourcecode where to search
    * @param fieldPattern regexp specifying the name of the field, whose value is returned
@@ -452,8 +451,8 @@ public class OptionCollector {
   }
 
   /**
-   * If the string matches something like "<func>(<args>)" for a given <func>,
-   * return only the <args> part, otherwise the full string.
+   * If the string matches something like "<func>(<args>)" for a given <func>, return only the
+   * <args> part, otherwise the full string.
    */
   private static String stripSurroundingFunctionCall(String s, String partToBeStripped) {
     String toBeStripped = partToBeStripped + "(";
@@ -464,8 +463,8 @@ public class OptionCollector {
   }
 
   /**
-   * Return a collector that groups values by keys into a map,
-   * and sorts both keys and the values per key.
+   * Return a collector that groups values by keys into a map, and sorts both keys and the values
+   * per key.
    */
   private static <T, K> Collector<T, ?, SortedMap<K, List<T>>> groupingBySorted(
       Function<? super T, ? extends K> classifier,
@@ -483,14 +482,10 @@ public class OptionCollector {
 
   abstract static class AnnotationInfo {
 
-    /**
-     * The annotated element or class.
-     */
+    /** The annotated element or class. */
     abstract AnnotatedElement element();
 
-    /**
-     * The name for this annotation.
-     */
+    /** The name for this annotation. */
     abstract String name();
 
     abstract Class<?> owningClass();

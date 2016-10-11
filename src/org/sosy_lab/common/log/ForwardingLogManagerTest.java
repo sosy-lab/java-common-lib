@@ -20,7 +20,6 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.testing.ForwardingWrapperTester;
-
 import org.junit.Test;
 
 public class ForwardingLogManagerTest {

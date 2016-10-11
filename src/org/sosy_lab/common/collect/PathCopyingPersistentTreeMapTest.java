@@ -31,20 +31,17 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.testing.EqualsTester;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestSuite;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class PathCopyingPersistentTreeMapTest {
 

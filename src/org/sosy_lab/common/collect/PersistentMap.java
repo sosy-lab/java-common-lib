@@ -19,45 +19,39 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
 import javax.annotation.CheckReturnValue;
 
 /**
- * Interface for persistent map.
- * A persistent data structure is immutable, but provides cheap copy-and-write
- * operations. Thus all write operations
- * ({{@link #putAndCopy(Object, Object)}, {{@link #removeAndCopy(Object)}})
- * will not modify the current instance, but return a new instance instead.
+ * Interface for persistent map. A persistent data structure is immutable, but provides cheap
+ * copy-and-write operations. Thus all write operations ({{@link #putAndCopy(Object, Object)},
+ * {{@link #removeAndCopy(Object)}}) will not modify the current instance, but return a new instance
+ * instead.
  *
- * All modifying operations inherited from {@link Map} are not supported and
- * will always throw {@link UnsupportedOperationException}.
- * All collections returned by methods of this interface are also immutable.
+ * <p>All modifying operations inherited from {@link Map} are not supported and will always throw
+ * {@link UnsupportedOperationException}. All collections returned by methods of this interface are
+ * also immutable.
  *
- * Instances of this interface are thread-safe as long as published safely.
+ * <p>Instances of this interface are thread-safe as long as published safely.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
+@Immutable(containerOf = {"K", "V"})
 public interface PersistentMap<K, V> extends Map<K, V> {
 
-  /**
-   * Replacement for {{@link #put(Object, Object)} that returns a fresh instance.
-   */
+  /** Replacement for {{@link #put(Object, Object)} that returns a fresh instance. */
   @CheckReturnValue
   PersistentMap<K, V> putAndCopy(K key, V value);
 
-  /**
-   * Replacement for {{@link #remove(Object)} that returns a fresh instance.
-   */
+  /** Replacement for {{@link #remove(Object)} that returns a fresh instance. */
   @CheckReturnValue
   PersistentMap<K, V> removeAndCopy(Object key);
 
-  /**
-   * Replacement for {{@link #clear()} that returns an empty instance.
-   */
+  /** Replacement for {{@link #clear()} that returns an empty instance. */
   @CheckReturnValue
   PersistentMap<K, V> empty();
 

@@ -22,18 +22,14 @@ package org.sosy_lab.common;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.testing.ClassSanityTester;
-
-import org.junit.Test;
-
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import org.junit.Test;
 
-/**
- * Tests for {@link OptionalComparators}.
- */
+/** Tests for {@link OptionalComparators}. */
 public final class OptionalComparatorsTest {
 
   @Test

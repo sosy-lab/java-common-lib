@@ -23,29 +23,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Ascii;
-
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
 /**
- * This class represents a timer like a stop watch. It can be started and
- * stopped several times. It measures return the sum, the average, the maximum and
- * the number of those intervals.
- * This class is similar to {@link com.google.common.base.Stopwatch} but has more features.
+ * This class represents a timer like a stop watch. It can be started and stopped several times. It
+ * measures return the sum, the average, the maximum and the number of those intervals. This class
+ * is similar to {@link com.google.common.base.Stopwatch} but has more features.
  *
- * This class is not thread-safe and may be used only from within a single thread.
+ * <p>This class is not thread-safe and may be used only from within a single thread.
  */
 public final class Timer {
 
   private static final String DEFAULT_CLOCK_PROPERTY_NAME =
       Timer.class.getCanonicalName() + ".timeSource";
 
-  /**
-   * The clock we use for accessing the time.
-   */
+  /** The clock we use for accessing the time. */
   static final @Nullable TickerWithUnit DEFAULT_CLOCK;
 
   static {
@@ -83,9 +77,8 @@ public final class Timer {
   private long startTime = 0;
 
   /**
-   * The sum of times of all intervals.
-   * This field should be accessed through {@link #sumTime()}
-   * to account for a currently running interval.
+   * The sum of times of all intervals. This field should be accessed through {@link #sumTime()} to
+   * account for a currently running interval.
    */
   private long sumTime = 0;
 
@@ -93,8 +86,7 @@ public final class Timer {
   private long maxTime = 0;
 
   /**
-   * The number of intervals.
-   * This field should be accessed through {@link #getNumberOfIntervals()}
+   * The number of intervals. This field should be accessed through {@link #getNumberOfIntervals()}
    * to account for a currently running interval.
    */
   private int numberOfIntervals = 0;
@@ -102,17 +94,14 @@ public final class Timer {
   /** The length of the last measured interval. */
   private long lastIntervalLength = 0;
 
-  /**
-   * Create a fresh timer in the not-running state.
-   */
+  /** Create a fresh timer in the not-running state. */
   public Timer() {
     if (DEFAULT_CLOCK == null) {
       throw new IllegalArgumentException(
           String.format(
               "Invalid value \'%s\' for property %s,"
                   + "cannot create Timer without explicitly specified clock.",
-              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME),
-              DEFAULT_CLOCK_PROPERTY_NAME));
+              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
     }
     clock = DEFAULT_CLOCK;
   }
@@ -121,10 +110,7 @@ public final class Timer {
     clock = checkNotNull(pClock);
   }
 
-  /**
-   * Start the timer.
-   * May be called only if the timer is currently not running.
-   */
+  /** Start the timer. May be called only if the timer is currently not running. */
   public void start() {
     start(clock.read());
   }
@@ -138,10 +124,7 @@ public final class Timer {
     running = true;
   }
 
-  /**
-   * Stop the timer.
-   * May be called only if the timer is currently running.
-   */
+  /** Stop the timer. May be called only if the timer is currently running. */
   public void stop() {
     stop(clock.read());
   }
@@ -169,9 +152,8 @@ public final class Timer {
   }
 
   /**
-   * Check if the timer is running.
-   * Contrary to all other methods of this class, this method is thread-safe.
-   * This means it can be safely run from another thread.
+   * Check if the timer is running. Contrary to all other methods of this class, this method is
+   * thread-safe. This means it can be safely run from another thread.
    */
   public boolean isRunning() {
     return running;
@@ -182,9 +164,8 @@ public final class Timer {
   }
 
   /**
-   * Return the sum of all intervals.
-   * If timer is running, the current interval is also counted (up to the current time).
-   * If the timer was never started, this method returns 0.
+   * Return the sum of all intervals. If timer is running, the current interval is also counted (up
+   * to the current time). If the timer was never started, this method returns 0.
    */
   public TimeSpan getSumTime() {
     return export(sumTime());
@@ -195,9 +176,8 @@ public final class Timer {
   }
 
   /**
-   * Return the maximal time of all intervals.
-   * If timer is running, the current interval is also counted (up to the current time).
-   * If the timer was never started, this method returns 0.
+   * Return the maximal time of all intervals. If timer is running, the current interval is also
+   * counted (up to the current time). If the timer was never started, this method returns 0.
    */
   public TimeSpan getMaxTime() {
     return export(maxTime());
@@ -208,19 +188,17 @@ public final class Timer {
   }
 
   /**
-   * Return the number of intervals.
-   * If timer is running, the current interval is also counted.
-   * If the timer was never started, this method returns 0.
+   * Return the number of intervals. If timer is running, the current interval is also counted. If
+   * the timer was never started, this method returns 0.
    */
   public int getNumberOfIntervals() {
     return numberOfIntervals + (running ? 1 : 0);
   }
 
   /**
-   * Return the length of the last measured interval.
-   * If the timer is running, this is the time from the start of the current interval
-   * up to now.
-   * If the timer was never started, this method returns 0.
+   * Return the length of the last measured interval. If the timer is running, this is the time from
+   * the start of the current interval up to now. If the timer was never started, this method
+   * returns 0.
    */
   public TimeSpan getLengthOfLastInterval() {
     return export(lengthOfLastInterval());
@@ -231,9 +209,8 @@ public final class Timer {
   }
 
   /**
-   * Return the average of all intervals.
-   * If timer is running, the current interval is also counted (up to the current time).
-   * If the timer was never started, this method returns 0.
+   * Return the average of all intervals. If timer is running, the current interval is also counted
+   * (up to the current time). If the timer was never started, this method returns 0.
    */
   public TimeSpan getAvgTime() {
     int currentNumberOfIntervals = getNumberOfIntervals();
@@ -245,20 +222,17 @@ public final class Timer {
   }
 
   /**
-   * Return a String with a default representation of the the sum of the times of all intervals.
-   * For printing other times, or with a specific unit,
-   * use the appropriate getter and call {@link TimeSpan#formatAs(java.util.concurrent.TimeUnit)}.
-   * The format and the content of the String returned by this method
-   * is not guaranteed to be the same in future versions of this code.
+   * Return a String with a default representation of the the sum of the times of all intervals. For
+   * printing other times, or with a specific unit, use the appropriate getter and call {@link
+   * TimeSpan#formatAs(java.util.concurrent.TimeUnit)}. The format and the content of the String
+   * returned by this method is not guaranteed to be the same in future versions of this code.
    */
   @Override
   public String toString() {
     return getSumTime().formatAs(TimeUnit.SECONDS);
   }
 
-  /**
-   * Syntax sugar method: pretty-format the timer output into a string in seconds.
-   */
+  /** Syntax sugar method: pretty-format the timer output into a string in seconds. */
   public String prettyFormat() {
     TimeUnit t = TimeUnit.SECONDS;
     return String.format(

@@ -28,9 +28,6 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
-
-import org.sosy_lab.common.Appenders;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,60 +40,48 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.Appenders;
 
-/**
- * Provides helper functions for file access.
- */
+/** Provides helper functions for file access. */
 public final class MoreFiles {
 
   private MoreFiles() {
     /* utility class */
   }
 
-  /**
-   * @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...)
-   */
+  /** @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...) */
   public static ByteSink asByteSink(Path path, FileWriteMode... options) {
     return com.google.common.io.Files.asByteSink(path.toFile(), options);
   }
 
-  /**
-   * @see com.google.common.io.Files#asByteSource(java.io.File)
-   */
+  /** @see com.google.common.io.Files#asByteSource(java.io.File) */
   public static ByteSource asByteSource(Path path) {
     return com.google.common.io.Files.asByteSource(path.toFile());
   }
 
-  /**
-   * @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...)
-   */
+  /** @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...) */
   public static CharSink asCharSink(Path path, Charset charset, FileWriteMode... options) {
     return com.google.common.io.Files.asCharSink(path.toFile(), charset, options);
   }
 
-  /**
-   * @see com.google.common.io.Files#asCharSource(java.io.File, Charset)
-   */
+  /** @see com.google.common.io.Files#asCharSource(java.io.File, Charset) */
   public static CharSource asCharSource(Path path, Charset charset) {
     return com.google.common.io.Files.asCharSource(path.toFile(), charset);
   }
 
   /**
-   * Creates a temporary file with an optional content. The file is marked for
-   * deletion when the Java VM exits.
-   * @param  prefix     The prefix string to be used in generating the file's
-   *                    name; must be at least three characters long
-   * @param  suffix     The suffix string to be used in generating the file's
-   *                    name; may be <code>null</code>, in which case the
-   *                    suffix <code>".tmp"</code> will be used
-   * @param content The content to write (may be null). Will be written with default charset.
+   * Creates a temporary file with an optional content. The file is marked for deletion when the
+   * Java VM exits.
    *
-   * @throws  IllegalArgumentException
-   *          If the <code>prefix</code> argument contains fewer than three
-   *          characters
-   * @throws  IOException  If a file could not be created
+   * @param prefix The prefix string to be used in generating the file's name; must be at least
+   *     three characters long
+   * @param suffix The suffix string to be used in generating the file's name; may be <code>null
+   *     </code>, in which case the suffix <code>".tmp"</code> will be used
+   * @param content The content to write (may be null). Will be written with default charset.
+   * @throws IllegalArgumentException If the <code>prefix</code> argument contains fewer than three
+   *     characters
+   * @throws IOException If a file could not be created
    */
   public static Path createTempFile(
       String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
@@ -148,20 +133,16 @@ public final class MoreFiles {
   }
 
   /**
-   * Create a temporary file similar to
-   * {@link java.io.File#createTempFile(String, String)}.
+   * Create a temporary file similar to {@link java.io.File#createTempFile(String, String)}.
    *
-   * The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseFile},
-   * which deletes the file as soon as {@link DeleteOnCloseFile#close()} is called.
+   * <p>The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseFile}, which deletes
+   * the file as soon as {@link DeleteOnCloseFile#close()} is called.
    *
-   * It is recommended to use the following pattern:
-   * <code>
+   * <p>It is recommended to use the following pattern: <code>
    * try (DeleteOnCloseFile tempFile = Files.createTempFile(...)) {
    *   // use tempFile.toPath() for writing and reading of the temporary file
    * }
-   * </code>
-   *
-   * The file can be opened and closed multiple times, potentially from different processes.
+   * </code> The file can be opened and closed multiple times, potentially from different processes.
    */
   public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix)
       throws IOException {
@@ -170,9 +151,10 @@ public final class MoreFiles {
   }
 
   /**
-   * A simple wrapper around {@link Path} that calls
-   * {@link Files#deleteIfExists(Path)} from {@link AutoCloseable#close()}.
+   * A simple wrapper around {@link Path} that calls {@link Files#deleteIfExists(Path)} from {@link
+   * AutoCloseable#close()}.
    */
+  @javax.annotation.concurrent.Immutable
   public static class DeleteOnCloseFile implements AutoCloseable {
 
     private final Path path;
@@ -193,6 +175,7 @@ public final class MoreFiles {
 
   /**
    * Read the full content of a file.
+   *
    * @param file The file.
    */
   public static String toString(Path file, Charset charset) throws IOException {
@@ -201,6 +184,7 @@ public final class MoreFiles {
 
   /**
    * Writes content to a file.
+   *
    * @param file The file.
    * @param content The content which shall be written.
    */
@@ -213,6 +197,7 @@ public final class MoreFiles {
 
   /**
    * Writes content to a file compressed in GZIP format.
+   *
    * @param file The file.
    * @param content The content which shall be written.
    */
@@ -229,8 +214,7 @@ public final class MoreFiles {
   }
 
   /**
-   * Open a buffered Writer to a file.
-   * This method creates necessary parent directories beforehand.
+   * Open a buffered Writer to a file. This method creates necessary parent directories beforehand.
    */
   public static Writer openOutputFile(Path file, Charset charset, FileWriteMode... options)
       throws IOException {
@@ -241,8 +225,8 @@ public final class MoreFiles {
   }
 
   /**
-   * Appends content to a file (without overwriting the file,
-   * but creating it if necessary).
+   * Appends content to a file (without overwriting the file, but creating it if necessary).
+   *
    * @param file The file.
    * @param content The content which will be written to the end of the file.
    */
@@ -254,8 +238,8 @@ public final class MoreFiles {
   }
 
   /**
-   * Verifies if a file exists, is a normal file and is readable. If this is not
-   * the case, a FileNotFoundException with a nice message is thrown.
+   * Verifies if a file exists, is a normal file and is readable. If this is not the case, a
+   * FileNotFoundException with a nice message is thrown.
    *
    * @param path The file to check.
    * @throws FileNotFoundException If one of the conditions is not true.
@@ -276,9 +260,7 @@ public final class MoreFiles {
     }
   }
 
-  /**
-   * @see com.google.common.io.Files#createParentDirs(java.io.File)
-   */
+  /** @see com.google.common.io.Files#createParentDirs(java.io.File) */
   public static void createParentDirs(Path path) throws IOException {
     com.google.common.io.Files.createParentDirs(path.toFile());
   }

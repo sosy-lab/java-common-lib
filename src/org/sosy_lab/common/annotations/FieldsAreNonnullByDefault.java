@@ -23,14 +23,13 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
 
 /**
- * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault}
- * that defines that all fields inside the annotated element
- * are never null, unless this is overridden with another method.
+ * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault} that defines that
+ * all fields inside the annotated element are never null, unless this is overridden with another
+ * method.
  */
 @Documented
 @Nonnull

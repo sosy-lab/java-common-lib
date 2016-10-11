@@ -20,16 +20,13 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.collect.ImmutableSet;
-
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/**
- * {@link Filter} implementation for blacklisting log levels.
- */
+/** {@link Filter} implementation for blacklisting log levels. */
 class LogLevelFilter implements Filter {
 
   private final Set<Level> excludeLevels;

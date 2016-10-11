@@ -21,23 +21,20 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sosy_lab.common.log.LogManager;
-
 import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
-
 import javax.annotation.Nullable;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import org.sosy_lab.common.log.LogManager;
 
 /**
- * Abstract class that encapsulates the registration of an MBean with the
- * {@link MBeanServer}.
+ * Abstract class that encapsulates the registration of an MBean with the {@link MBeanServer}.
  * Exceptions that occur are swallowed and logged.
  *
- * This class is not thread-safe.
+ * <p>This class is not thread-safe.
  */
 public abstract class AbstractMBean {
 
@@ -72,8 +69,8 @@ public abstract class AbstractMBean {
   }
 
   /**
-   * Register this instance at the platform MBeanServer.
-   * Swallows all checked exceptions that might occur and logs them.
+   * Register this instance at the platform MBeanServer. Swallows all checked exceptions that might
+   * occur and logs them.
    */
   public void register() {
     if (MBEAN_SERVER != null && oname != null) {
@@ -99,8 +96,8 @@ public abstract class AbstractMBean {
   }
 
   /**
-   * Unregister this instance.
-   * May be called even if registration was not successful (does nothing in this case).
+   * Unregister this instance. May be called even if registration was not successful (does nothing
+   * in this case).
    */
   public void unregister() {
     if (MBEAN_SERVER != null && oname != null) {

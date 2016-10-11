@@ -22,13 +22,6 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.io.CharSource;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
-import org.sosy_lab.common.io.MoreFiles;
-import org.sosy_lab.common.io.MoreFiles.DeleteOnCloseFile;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,6 +33,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
+import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
+import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.MoreFiles.DeleteOnCloseFile;
 
 @SuppressWarnings("CheckReturnValue")
 public class ParserTest {

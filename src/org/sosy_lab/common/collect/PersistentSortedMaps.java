@@ -25,40 +25,35 @@ import static com.google.common.collect.Iterators.singletonIterator;
 
 import com.google.common.base.Equivalence;
 import com.google.common.collect.Ordering;
-
 import java.util.Iterator;
 import java.util.Map;
 
 /**
  * Utility class for {@link PersistentSortedMap}s.
  *
- * Currently this class provides a merge operation.
- * The result of merging two maps is defined as a map
- * whose keyset is the union of the keyset of both input maps.
- * The values of the resulting map are the corresponding values of the input maps
- * as long as they are not differing.
- * Differing values for one key are resolved by passing them to a callback function.
+ * <p>Currently this class provides a merge operation. The result of merging two maps is defined as
+ * a map whose keyset is the union of the keyset of both input maps. The values of the resulting map
+ * are the corresponding values of the input maps as long as they are not differing. Differing
+ * values for one key are resolved by passing them to a callback function.
  */
 public class PersistentSortedMaps {
 
   private PersistentSortedMaps() {} // utility class
 
   /**
-   * A callback that is used when a key with two different values
-   * is encountered during the merge of two maps.
+   * A callback that is used when a key with two different values is encountered during the merge of
+   * two maps.
    */
   @FunctionalInterface
   public interface MergeConflictHandler<K, V> {
 
     /**
-     * Resolve a conflict for one given key.
-     * This handler is called only with two values
-     * that are not considered equal according to the used {@link Equivalence}.
-     * One of the values may be {@code null},
-     * which means that the corresponding map contains {@code null} as value
-     * for this key.
-     * The handler may return {@code null}, and in this case the resulting map
-     * will contain a mapping {@code key -> null}.
+     * Resolve a conflict for one given key. This handler is called only with two values that are
+     * not considered equal according to the used {@link Equivalence}. One of the values may be
+     * {@code null}, which means that the corresponding map contains {@code null} as value for this
+     * key. The handler may return {@code null}, and in this case the resulting map will contain a
+     * mapping {@code key -> null}.
+     *
      * @param key The key.
      * @param value1 The value from the first map.
      * @param value2 The value from the second map.
@@ -68,9 +63,9 @@ public class PersistentSortedMaps {
   }
 
   /**
-   * Returns a {@link MergeConflictHandler} that will always throw an
-   * {@link IllegalArgumentException}.
-   * Use this in cases where you never expect differing values for one key.
+   * Returns a {@link MergeConflictHandler} that will always throw an {@link
+   * IllegalArgumentException}. Use this in cases where you never expect differing values for one
+   * key.
    */
   public static <K, V> MergeConflictHandler<K, V> getExceptionMergeConflictHandler() {
     return (key, value1, value2) -> {
@@ -81,9 +76,8 @@ public class PersistentSortedMaps {
   }
 
   /**
-   * Returns a {@link MergeConflictHandler} that will always return the maximum
-   * (according to the natural order).
-   * This may not be used if the map contains {@code null} as value.
+   * Returns a {@link MergeConflictHandler} that will always return the maximum (according to the
+   * natural order). This may not be used if the map contains {@code null} as value.
    */
   public static <K, V extends Comparable<? super V>>
       MergeConflictHandler<K, V> getMaximumMergeConflictHandler() {
@@ -91,9 +85,8 @@ public class PersistentSortedMaps {
   }
 
   /**
-   * Returns a {@link MergeConflictHandler} that will always return the minimum
-   * (according to the natural order).
-   * This may not be used if the map contains {@code null} as value.
+   * Returns a {@link MergeConflictHandler} that will always return the minimum (according to the
+   * natural order). This may not be used if the map contains {@code null} as value.
    */
   public static <K, V extends Comparable<? super V>>
       MergeConflictHandler<K, V> getMinimumMergeConflictHandler() {
@@ -106,11 +99,10 @@ public class PersistentSortedMaps {
   }
 
   /**
-   * Merge two PersistentSortedMaps.
-   * The result has all key-value pairs where the key is only in one of the map,
-   * those which are identical in both map,
-   * and for those keys that have a different value in both maps a handler is called,
-   * and the result is put in the resulting map.
+   * Merge two PersistentSortedMaps. The result has all key-value pairs where the key is only in one
+   * of the map, those which are identical in both map, and for those keys that have a different
+   * value in both maps a handler is called, and the result is put in the resulting map.
+   *
    * @param map1 The first map.
    * @param map2 The second map.
    * @param conflictHandler The handler that is called for a key with two different values.
@@ -135,28 +127,24 @@ public class PersistentSortedMaps {
   }
 
   /**
-   * Merge two PersistentSortedMaps.
-   * The result has all key-value pairs where the key is only in one of the map,
-   * those which are identical in both map,
-   * and for those keys that have a different value in both maps a handler is called,
-   * and the result is put in the resulting map.
+   * Merge two PersistentSortedMaps. The result has all key-value pairs where the key is only in one
+   * of the map, those which are identical in both map, and for those keys that have a different
+   * value in both maps a handler is called, and the result is put in the resulting map.
    *
-   * Optionally you can pass a list that will receive all encountered differences,
-   * i.e., keys which are present in only one map, or have different values.
-   * The list will contain triples with key and both values,
-   * where missing values are replaced by null.
+   * <p>Optionally you can pass a list that will receive all encountered differences, i.e., keys
+   * which are present in only one map, or have different values. The list will contain triples with
+   * key and both values, where missing values are replaced by null.
    *
-   * Implementation note:
-   * It may be faster to call this method with the bigger of the input maps
+   * <p>Implementation note: It may be faster to call this method with the bigger of the input maps
    * as the first parameter.
    *
    * @param map1 The first map.
    * @param map2 The second map.
-   * @param valueEquals The {@link Equivalence} that will determine
-   * whether two values are considered equal.
+   * @param valueEquals The {@link Equivalence} that will determine whether two values are
+   *     considered equal.
    * @param conflictHandler The handler that is called for a key with two different values.
-   * @param collectDifferences A visitor which receives keys with two different values
-   * or keys that are present only in one of the maps.
+   * @param collectDifferences A visitor which receives keys with two different values or keys that
+   *     are present only in one of the maps.
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
