@@ -55,7 +55,7 @@ public final class Rational extends Number implements Comparable<Rational> {
     assert den.signum() == 1;
   }
 
-  /** Factory functions **/
+  // Factory functions.
 
   /**
    * Create a new rational from a numerator and a denominator.

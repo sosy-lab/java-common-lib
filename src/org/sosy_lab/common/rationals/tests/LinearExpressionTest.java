@@ -1,10 +1,12 @@
-package org.sosy_lab.common.rationals;
+package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
+import org.sosy_lab.common.rationals.LinearExpression;
+import org.sosy_lab.common.rationals.Rational;
 
 import java.util.Optional;
 

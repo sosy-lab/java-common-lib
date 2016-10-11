@@ -1,8 +1,9 @@
-package org.sosy_lab.common.rationals;
+package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
+import org.sosy_lab.common.rationals.Rational;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -159,5 +160,31 @@ public class RationalTest {
     assertThat(Rational.of(10).negate()).isEqualTo(Rational.of(-10));
     assertThat(Rational.ZERO.negate()).isEqualTo(Rational.ZERO);
     assertThat(Rational.of(-10).negate()).isEqualTo(Rational.of(10));
+  }
+
+  @Test
+  public void testNegate2() {
+    assertThat(Rational.of(10).negate()).isEqualTo(Rational.of(10).times(Rational.NEG_ONE));
+  }
+
+  @Test
+  public void testGetDen() {
+    assertThat(Rational.ofLongs(3, 4).getDen()).isEqualTo(Rational.of(4));
+    assertThat(Rational.ofLongs(6, 8).getDen()).isEqualTo(Rational.of(4));
+    assertThat(Rational.ofLongs(3, -4).getDen()).isEqualTo(Rational.of(4));
+    assertThat(Rational.ofLongs(0, 4).getDen()).isEqualTo(Rational.of(1));
+  }
+
+  @Test
+  public void testSignum() {
+    assertThat(Rational.of(2).signum()).isEqualTo(1);
+    assertThat(Rational.of(-2).signum()).isEqualTo(-1);
+    assertThat(Rational.of(0).signum()).isEqualTo(0);
+  }
+
+  @Test
+  public void testofBigInteger() {
+    assertThat(Rational.ofBigInteger(BigInteger.valueOf(300)))
+        .isEqualTo(Rational.of(300));
   }
 }
