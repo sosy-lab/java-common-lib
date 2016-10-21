@@ -20,14 +20,19 @@
 package org.sosy_lab.common.configuration.converters;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
 
+import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
+import com.google.common.collect.Lists;
 import com.google.common.io.CharSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -69,6 +74,11 @@ public class FileTypeConverterTest {
     boolean isAllowed(boolean isInFile) {
       return isInFile ? isSafeWhenInConfigFile : isSafe;
     }
+
+    @BeforeClass
+    public static void skipOnWindows() {
+      assume().withFailureMessage("Safe mode not supported on Windows").that(isWindows()).isFalse();
+    }
   }
 
   public static class FileTypeConverterUnsafeModeTest extends FileTypeConverterTestBase {
@@ -89,24 +99,33 @@ public class FileTypeConverterTest {
   public abstract static class FileTypeConverterTestBase {
 
     @Parameters(name = "{0} (safe={1}, safeInFile={2})")
-    public static Object[][] testPaths() {
-      return new Object[][] {
-        // path and whether it is allowed in safe mode and when included from config/file
-        {"/etc/passwd", false, false},
-        {"relative/dir" + File.pathSeparator + "/etc", false, false},
-        {"file::name", false, false},
-        {"file::name:illegal", false, false},
-        {"file:::illegal", false, false},
-        {"file", true, true},
-        {"dir/../file", true, true},
-        {"./dir/file", true, true},
-        {"../dir", false, true},
-        {"dir/../../file", false, true},
-        {"../../file", false, false},
-        {"dir/../../../file", false, false},
-        {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
-        {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
-      };
+    public static List<Object[]> testPaths() {
+      List<Object[]> tests =
+          Lists.newArrayList(
+              new Object[][] {
+                // path and whether it is allowed in safe mode and when included from config/file
+                {"/etc/passwd", false, false},
+                {"relative/dir" + File.pathSeparator + "/etc", false, false},
+                {"file", true, true},
+                {"dir/../file", true, true},
+                {"./dir/file", true, true},
+                {"../dir", false, true},
+                {"dir/../../file", false, true},
+                {"../../file", false, false},
+                {"dir/../../../file", false, false},
+                {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
+                {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
+              });
+      if (!isWindows()) {
+        tests.add(new Object[] {"file::name", false, false});
+        tests.add(new Object[] {"file::name:illegal", false, false});
+        tests.add(new Object[] {"file:::illegal", false, false});
+      }
+      return tests;
+    }
+
+    protected static boolean isWindows() {
+      return Ascii.toLowerCase(StandardSystemProperty.OS_NAME.value()).contains("windows");
     }
 
     @Parameter(0)
