@@ -15,6 +15,7 @@ install:
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
   - cmd: SET PATH=C:\ant\apache-ant-1.9.7\bin;%JAVA_HOME%\bin;%PATH
+  - cmd: echo %USERPROFILE%
   - cmd: echo %PATH%
   - cmd: java -version
 
@@ -24,8 +25,11 @@ build_script:
 test_script:
   - ant unit-tests -Dversion=dummy
 
-artifacts:
-  - path: JUnit.html
+after_test:
+  - ps: |
+      $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+      $file = '.\junit\TESTS-TestSuites.xml'
+      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
 
 cache:
   - C:\ant\
