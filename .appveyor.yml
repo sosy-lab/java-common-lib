@@ -1,4 +1,9 @@
+version: build {build} {branch}
+
 os: Visual Studio 2015
+
+clone_depth: 1
+
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -18,6 +23,9 @@ build_script:
 
 test_script:
   - ant unit-tests -Dversion=dummy
+
+artifacts:
+  - path: JUnit.html
 
 cache:
   - C:\ant\
