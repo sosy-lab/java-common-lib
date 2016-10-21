@@ -6,7 +6,7 @@
 
     <!-- Keep this file synchronized between SoSy-Lab Java-Common-Lib and JavaSMT. -->
 
-    <target name="determine-version">
+    <target name="determine-version" unless="version">
         <exec executable="git"
                 outputproperty="version"
                 failonerror="true"
