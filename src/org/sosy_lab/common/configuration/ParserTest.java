@@ -287,7 +287,7 @@ public class ParserTest {
   public final void includeWithSpecialCharsFilename() throws IOException {
     Path included =
         MoreFiles.createTempFile(
-            "SoSy-Lab Common\tParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
+            "SoSy-Lab CommonParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(" #include " + included.toAbsolutePath() + "\t", "foo.bar", "abc");
     } finally {

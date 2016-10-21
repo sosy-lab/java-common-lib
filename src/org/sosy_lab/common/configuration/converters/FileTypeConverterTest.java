@@ -132,6 +132,14 @@ public class FileTypeConverterTest {
 
     abstract boolean isAllowed(boolean isInFile);
 
+    private void expectExceptionAbout(String... msgParts) {
+      thrown.expect(InvalidConfigurationException.class);
+      thrown.expectMessage(testPath.replace('/', File.separatorChar));
+      for (String part : msgParts) {
+        thrown.expectMessage(part);
+      }
+    }
+
     @Test
     public void testCheckSafePath() throws InvalidConfigurationException {
       FileTypeConverter conv = createFileTypeConverter(defaultConfiguration());
@@ -139,10 +147,7 @@ public class FileTypeConverterTest {
       Path path = Paths.get(testPath);
 
       if (!isAllowed(false)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("safe mode");
-        thrown.expectMessage("dummy");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("safe mode", "dummy");
       }
 
       assertThat((Comparable<?>) conv.checkSafePath(path, "dummy")).isEqualTo(path);
@@ -153,10 +158,7 @@ public class FileTypeConverterTest {
       Configuration config = Configuration.builder().setOption("rootDirectory", testPath).build();
 
       if (!isAllowed(false)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("safe mode");
-        thrown.expectMessage("rootDirectory");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("safe mode", "rootDirectory");
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
@@ -169,9 +171,7 @@ public class FileTypeConverterTest {
       Configuration config = Configuration.builder().setOption("output.path", testPath).build();
 
       if (!isAllowed(false)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("output.path");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("output.path");
       }
 
       FileTypeConverter conv = createFileTypeConverter(config);
@@ -188,10 +188,7 @@ public class FileTypeConverterTest {
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
       if (!isAllowed(false)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("safe mode");
-        thrown.expectMessage("test.path");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("safe mode", "test.path");
       }
 
       config.inject(options);
@@ -209,10 +206,7 @@ public class FileTypeConverterTest {
       options.path = Paths.get(testPath);
 
       if (!isAllowed(false)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("safe mode");
-        thrown.expectMessage("test.path");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("safe mode", "test.path");
       }
 
       config.inject(options);
@@ -230,10 +224,7 @@ public class FileTypeConverterTest {
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
       if (!isAllowed(true)) {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("safe mode");
-        thrown.expectMessage("test.path");
-        thrown.expectMessage(testPath);
+        expectExceptionAbout("safe mode", "test.path");
       }
 
       config.inject(options);
