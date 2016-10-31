@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -202,7 +201,7 @@ public class ConfigurationTest {
       }
 
     } catch (ReflectiveOperationException e) {
-      Throwables.propagate(e);
+      throw new RuntimeException(e);
     }
   }
 

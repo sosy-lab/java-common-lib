@@ -27,7 +27,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
-import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -171,7 +170,7 @@ public class OptionCollector {
     for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
       if (new File(resourceInfo.getResourceName()).getName().equals(OPTIONS_FILE)) {
         try {
-          Resources.asCharSource(resourceInfo.url(), StandardCharsets.UTF_8).copyTo(out);
+          resourceInfo.asCharSource(StandardCharsets.UTF_8).copyTo(out);
         } catch (IOException e) {
           errorMessages.add("Could not find the required resource " + resourceInfo.url());
         }

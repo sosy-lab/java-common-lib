@@ -19,12 +19,10 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import static com.google.common.collect.FluentIterable.from;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import java.io.File;
@@ -179,7 +177,7 @@ public final class FileTypeConverter implements TypeConverter {
     throw new InvalidConfigurationException(
         String.format(
             "The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".",
-            from(ImmutableList.<Object>of(optionName, path)).append(args).toArray(Object.class)));
+            FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
   }
 
   public String getOutputDirectory() {
