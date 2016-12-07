@@ -122,14 +122,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return left == null && right == null;
     }
 
-    boolean isRed() {
-      return isRed;
-    }
-
-    boolean isBlack() {
-      return !isRed;
-    }
-
     boolean getColor() {
       return isRed;
     }
@@ -139,7 +131,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     static boolean isBlack(@Nullable Node<?, ?> n) {
-      return n != null && n.isBlack();
+      return n != null && !n.isRed;
     }
 
     // Methods for creating new nodes based on current node.
@@ -426,7 +418,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight);
 
     int blackHeight = leftBlackHeight;
-    if (current.isBlack()) {
+    if (!current.isRed) {
       blackHeight++;
     }
     return blackHeight;
