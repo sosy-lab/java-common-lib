@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.CompatibleWith;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -45,11 +46,11 @@ public interface PersistentMap<K, V> extends Map<K, V> {
 
   /** Replacement for {{@link #put(Object, Object)} that returns a fresh instance. */
   @CheckReturnValue
-  PersistentMap<K, V> putAndCopy(K key, V value);
+  PersistentMap<K, V> putAndCopy(@CompatibleWith("K") K key, @CompatibleWith("V") V value);
 
   /** Replacement for {{@link #remove(Object)} that returns a fresh instance. */
   @CheckReturnValue
-  PersistentMap<K, V> removeAndCopy(Object key);
+  PersistentMap<K, V> removeAndCopy(@CompatibleWith("K") Object key);
 
   /** Replacement for {{@link #clear()} that returns an empty instance. */
   @CheckReturnValue
