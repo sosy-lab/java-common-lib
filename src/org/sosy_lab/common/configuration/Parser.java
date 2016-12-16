@@ -88,7 +88,7 @@ class Parser {
   }
 
   private static final Pattern OPTION_NAME =
-      Pattern.compile("^[a-zA-Z0-9_+-]+(\\.[a-zA-Z0-9_+-]+)*$");
+      Pattern.compile("^[a-zA-Z0-9_+-]+(\\.[a-zA-Z0-9_+-]+)*((::required)?)$");
 
   private final Map<String, String> options = new HashMap<>();
   private final Map<String, Path> sources = new HashMap<>();
