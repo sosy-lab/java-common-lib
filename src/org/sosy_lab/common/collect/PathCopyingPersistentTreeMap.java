@@ -46,6 +46,10 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -193,6 +197,45 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       result = result.putAndCopy(entry.getKey(), entry.getValue());
     }
     return result;
+  }
+
+  /**
+   * Return a {@link Collector} that accumulates elements into a {@link
+   * PathCopyingPersistentTreeMap}. Keys and values are the result of the respective functions. If
+   * duplicate keys appear, the collector throws an {@link IllegalArgumentException}.
+   */
+  public static <T, K extends Comparable<? super K>, V>
+      Collector<T, ?, PersistentSortedMap<K, V>> toPathCopyingPersistentTreeMap(
+          Function<? super T, ? extends K> keyFunction,
+          Function<? super T, ? extends V> valueFunction) {
+    return toPathCopyingPersistentTreeMap(
+        keyFunction,
+        valueFunction,
+        (k, v) -> {
+          throw new IllegalArgumentException("Duplicate key " + k);
+        });
+  }
+
+  /**
+   * Return a {@link Collector} that accumulates elements into a {@link
+   * PathCopyingPersistentTreeMap}. Keys and values are the result of the respective functions.
+   * Duplicate keys are resolved using the given merge function.
+   */
+  public static <T, K extends Comparable<? super K>, V>
+      Collector<T, ?, PersistentSortedMap<K, V>> toPathCopyingPersistentTreeMap(
+          Function<? super T, ? extends K> keyFunction,
+          Function<? super T, ? extends V> valueFunction,
+          BinaryOperator<V> mergeFunction) {
+    checkNotNull(keyFunction);
+    checkNotNull(valueFunction);
+    checkNotNull(mergeFunction);
+    return Collectors.collectingAndThen(
+        Collectors.toMap(
+            keyFunction,
+            valueFunction,
+            mergeFunction,
+            () -> CopyOnWriteSortedMap.copyOf(PathCopyingPersistentTreeMap.<K, V>of())),
+        CopyOnWriteSortedMap::getSnapshot);
   }
 
   // state and constructor
