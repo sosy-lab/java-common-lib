@@ -37,7 +37,7 @@ The dependency is:
 And the Ivy repository URL is:
 
 ```xml
-http://www.sosy-lab.org/ivy
+https://www.sosy-lab.org/ivy
 ```
 
 ### From Maven Central
@@ -67,7 +67,7 @@ dependencies {
 The latest JAR can be downloaded directly from the Ivy repository, served at
 
 ```
-http://www.sosy-lab.org/ivy/org.sosy_lab/common/
+https://www.sosy-lab.org/ivy/org.sosy_lab/common/
 ```
 
 This option is least recommended, as the required dependencies (namely,

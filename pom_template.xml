@@ -19,7 +19,7 @@
 
     <organization>
         <name>Software Systems Lab</name>
-        <url>http://www.sosy-lab.org/</url>
+        <url>https://www.sosy-lab.org/</url>
     </organization>
 
     <scm>
@@ -32,9 +32,9 @@
         <developer>
             <name>Dirk Beyer</name>
             <email>dirk.beyer@sosy-lab.org</email>
-            <url>http://www.sosy-lab.org/~dbeyer/</url>
+            <url>https://www.sosy-lab.org/~dbeyer/</url>
             <organization>Software Systems Lab</organization>
-            <organizationUrl>http://www.sosy-lab.org/</organizationUrl>
+            <organizationUrl>https://www.sosy-lab.org/</organizationUrl>
             <roles>
                 <role>project manager</role>
             </roles>
