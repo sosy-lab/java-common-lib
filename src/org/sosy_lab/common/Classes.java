@@ -427,26 +427,26 @@ public final class Classes {
 
   /** A builder for class loaders with more features than {@link URLClassLoader}. */
   @CanIgnoreReturnValue
-  public abstract static class ClassLoaderBuilder {
+  public abstract static class ClassLoaderBuilder<B extends ClassLoaderBuilder<B>> {
     ClassLoaderBuilder() {}
 
     /**
      * Set parent of new class loader. If not set the default delegation parent class loader will be
      * used (like {@link URLClassLoader#URLClassLoader(URL[])}.
      */
-    public abstract ClassLoaderBuilder setParent(ClassLoader parent);
+    public abstract B setParent(ClassLoader parent);
 
     /**
      * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
      * {@link #setUrls(URL...)} are required).
      */
-    public abstract ClassLoaderBuilder setUrls(Iterable<URL> urls);
+    public abstract B setUrls(Iterable<URL> urls);
 
     /**
      * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
      * {@link #setUrls(Iterable)} are required).
      */
-    public ClassLoaderBuilder setUrls(URL... urls) {
+    public B setUrls(URL... urls) {
       return setUrls(ImmutableList.copyOf(urls));
     }
 
@@ -454,7 +454,7 @@ public final class Classes {
      * Set an {@link URLClassLoader} as parent and its URLs from {@link URLClassLoader#getURLs()} as
      * sources for new class loader.
      */
-    public ClassLoaderBuilder setParentAndUrls(URLClassLoader parent) {
+    public B setParentAndUrls(URLClassLoader parent) {
       return setParent(parent).setUrls(parent.getURLs());
     }
 
@@ -474,10 +474,10 @@ public final class Classes {
      * that it can be garbage collected independently, for example), but the parent class loader
      * also sees the classes.
      */
-    public abstract ClassLoaderBuilder setDirectLoadClasses(Predicate<String> classes);
+    public abstract B setDirectLoadClasses(Predicate<String> classes);
 
     /** @see #setDirectLoadClasses(Predicate) */
-    public ClassLoaderBuilder setDirectLoadClasses(Pattern classes) {
+    public B setDirectLoadClasses(Pattern classes) {
       return setDirectLoadClasses(matching(classes));
     }
 
@@ -494,15 +494,15 @@ public final class Classes {
      * class(es) that do the loading. In this case, use {@link #setDirectLoadClasses(Predicate)} to
      * ensure the new class loader loads all relevant classes itself.
      */
-    public abstract ClassLoaderBuilder setCustomLookupNativeLibraries(Predicate<String> libraries);
+    public abstract B setCustomLookupNativeLibraries(Predicate<String> libraries);
 
     /** @see #setCustomLookupNativeLibraries(Predicate) */
-    public ClassLoaderBuilder setCustomLookupNativeLibraries(Pattern nativeLibraries) {
+    public B setCustomLookupNativeLibraries(Pattern nativeLibraries) {
       return setCustomLookupNativeLibraries(matching(nativeLibraries));
     }
 
     /** @see #setCustomLookupNativeLibraries(Predicate) */
-    public ClassLoaderBuilder setCustomLookupNativeLibraries(String... nativeLibraries) {
+    public B setCustomLookupNativeLibraries(String... nativeLibraries) {
       return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
     }
 
@@ -523,7 +523,7 @@ public final class Classes {
    * Create a class loader that is based on an {@link URLClassLoader} but implements some additional
    * features. This method returns a builder that can be used to configure the new class loader.
    */
-  public static ClassLoaderBuilder makeExtendedURLClassLoader() {
+  public static ClassLoaderBuilder<?> makeExtendedURLClassLoader() {
     return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder()
         .setDirectLoadClasses(c -> false)
         .setCustomLookupNativeLibraries(l -> false);

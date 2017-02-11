@@ -33,7 +33,7 @@ public class ExtendedURLClassLoaderTest {
 
   private static final Class<String> TEST_CLASS = String.class;
 
-  private ClassLoaderBuilder newDefaultBuilder() {
+  private ClassLoaderBuilder<?> newDefaultBuilder() {
     return Classes.makeExtendedURLClassLoader().setUrls();
   }
 
