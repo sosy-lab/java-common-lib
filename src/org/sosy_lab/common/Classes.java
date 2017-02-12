@@ -39,7 +39,6 @@ import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -512,11 +511,8 @@ public final class Classes {
 
     abstract ExtendedURLClassLoaderConfiguration autoBuild();
 
-    @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
     @CheckReturnValue
-    public URLClassLoader build() {
-      return new ExtendedURLClassLoader(autoBuild());
-    }
+    public abstract URLClassLoader build();
   }
 
   /**
