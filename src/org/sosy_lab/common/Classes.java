@@ -603,17 +603,19 @@ public final class Classes {
       throw new UnsuitedClassException(
           "'%s' declares illegal checked exception %s", target, exception);
     }
+    final List<Parameter> targetParameters = target.getParameters();
     final List<TypeToken<?>> targetParamTypes =
-        Lists.transform(target.getParameters(), Parameter::getType);
+        Lists.transform(targetParameters, Parameter::getType);
 
     // For each parameter of the constructor, this array contains the position of the value
     // in the parameters of the interface method.
     final int[] parameterMapping = new int[targetParamTypes.size()];
+    final boolean[] parameterNullability = new boolean[targetParamTypes.size()];
     for (int i = 0; i < targetParamTypes.size(); i++) {
       int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
       if (sourceIndex == -1) {
-        if (target.getParameters().get(i).isAnnotationPresent(Nullable.class)) {
-          sourceIndex = -1; // marker for passing value null
+        if (targetParameters.get(i).isAnnotationPresent(Nullable.class)) {
+          parameterNullability[i] = true;
         } else {
           throw new UnsuitedClassException(
               "'%s' requires parameter of type %s which is not present in factory interface",
@@ -623,13 +625,40 @@ public final class Classes {
       parameterMapping[i] = sourceIndex;
     }
 
+    final class FactoryInvocationHandler extends AbstractInvocationHandler {
+
+      @Override
+      protected Object handleInvocation(Object pProxy, Method pMethod, Object[] pActualArgs)
+          throws Throwable {
+        verify(pMethod.equals(interfaceMethod));
+
+        Object[] targetArgs = new Object[parameterMapping.length];
+        for (int i = 0; i < parameterMapping.length; i++) {
+          Object value = parameterMapping[i] == -1 ? null : pActualArgs[parameterMapping[i]];
+          if (value == null && !parameterNullability[i]) {
+            throw new NullPointerException(
+                String.format(
+                    "Value null for parameter %d of type %s in %s",
+                    i, interfaceMethod.getGenericParameterTypes()[i], this));
+          }
+          targetArgs[i] = value;
+        }
+
+        try {
+          return target.invoke(null, targetArgs);
+        } catch (InvocationTargetException e) {
+          throw e.getCause();
+        }
+      }
+
+      @Override
+      public String toString() {
+        return factoryType + " implementation for '" + target + "'";
+      }
+    }
+
     @SuppressWarnings("unchecked")
-    final I factory =
-        (I)
-            Reflection.newProxy(
-                factoryInterface,
-                new FactoryInvocationHandler(
-                    factoryType, interfaceMethod, target, parameterMapping));
+    final I factory = (I) Reflection.newProxy(factoryInterface, new FactoryInvocationHandler());
     return factory;
   }
 
@@ -670,55 +699,6 @@ public final class Classes {
 
       default:
         throw new UnsuitedClassException("class has more than one static methods named \"create\"");
-    }
-  }
-
-  private static final class FactoryInvocationHandler extends AbstractInvocationHandler {
-
-    private final TypeToken<?> factoryType;
-    private final Method interfaceMethod;
-
-    private final Invokable<?, ?> target;
-    private final List<Parameter> targetParameters;
-    private final int[] parameterMapping;
-
-    FactoryInvocationHandler(
-        TypeToken<?> pFactoryType,
-        Method pInterfaceMethod,
-        Invokable<?, ?> pTarget,
-        int[] pParameterMapping) {
-      factoryType = pFactoryType;
-      interfaceMethod = pInterfaceMethod;
-      target = pTarget;
-      targetParameters = pTarget.getParameters();
-      parameterMapping = pParameterMapping;
-    }
-
-    @Override
-    protected Object handleInvocation(Object pProxy, Method pMethod, Object[] pActualArgs)
-        throws Throwable {
-      verify(pMethod.equals(interfaceMethod));
-
-      Object[] targetArgs = new Object[parameterMapping.length];
-      for (int i = 0; i < parameterMapping.length; i++) {
-        Object value = parameterMapping[i] == -1 ? null : pActualArgs[parameterMapping[i]];
-        if (value == null && !targetParameters.get(i).isAnnotationPresent(Nullable.class)) {
-          throw new NullPointerException(
-              "Value null for parameter " + targetParameters.get(i) + " in " + factoryType);
-        }
-        targetArgs[i] = value;
-      }
-
-      try {
-        return target.invoke(null, targetArgs);
-      } catch (InvocationTargetException e) {
-        throw e.getCause();
-      }
-    }
-
-    @Override
-    public String toString() {
-      return factoryType + " implementation for '" + target + "'";
     }
   }
 
