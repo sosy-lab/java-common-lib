@@ -28,7 +28,6 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -445,9 +444,7 @@ public final class Classes {
      * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
      * {@link #setUrls(Iterable)} are required).
      */
-    public B setUrls(URL... urls) {
-      return setUrls(ImmutableList.copyOf(urls));
-    }
+    public abstract B setUrls(URL... urls);
 
     /**
      * Set an {@link URLClassLoader} as parent and its URLs from {@link URLClassLoader#getURLs()} as
