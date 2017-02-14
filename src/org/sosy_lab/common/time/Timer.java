@@ -192,7 +192,7 @@ public final class Timer {
    * the timer was never started, this method returns 0.
    */
   public int getNumberOfIntervals() {
-    return numberOfIntervals + (running ? 1 : 0);
+    return numberOfIntervals;
   }
 
   /**
