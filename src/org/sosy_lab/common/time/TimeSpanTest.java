@@ -324,7 +324,7 @@ public class TimeSpanTest {
     LARGE_AS_HOURS.multiply(1000 * 1000);
   }
 
-  private String format(TimeSpan t) {
+  private static String format(TimeSpan t) {
     return TimeSpan.FORMAT_HUMAN_READABLE_LARGE.apply(t);
   }
 

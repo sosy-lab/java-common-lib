@@ -188,7 +188,7 @@ public final class FileTypeConverter implements TypeConverter {
     return outputPath;
   }
 
-  private void checkApplicability(
+  private static void checkApplicability(
       Class<?> type, @Nullable Annotation secondaryOption, String optionName) {
     if (!SUPPORTED_TYPES.contains(type) || !(secondaryOption instanceof FileOption)) {
 
@@ -330,7 +330,7 @@ public final class FileTypeConverter implements TypeConverter {
     }
   }
 
-  private boolean isOutputOption(FileOption.Type typeInfo) {
+  private static boolean isOutputOption(FileOption.Type typeInfo) {
     return typeInfo == FileOption.Type.OUTPUT_FILE || typeInfo == FileOption.Type.OUTPUT_DIRECTORY;
   }
 }

@@ -806,7 +806,7 @@ public final class Configuration {
   /**
    * Find any annotation which itself is annotated with {@link OptionDetailAnnotation} on a member.
    */
-  private @Nullable Annotation getSecondaryAnnotation(AnnotatedElement element) {
+  private static @Nullable Annotation getSecondaryAnnotation(AnnotatedElement element) {
     Annotation result = null;
     for (Annotation a : element.getDeclaredAnnotations()) {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
@@ -826,7 +826,7 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType)
+  private static void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType)
       throws UnsupportedOperationException {
     if (annotation == null) {
       return;

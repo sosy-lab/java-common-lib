@@ -353,7 +353,7 @@ public class PathCopyingPersistentTreeMapTest {
     checkEqualTo(comparison, map);
   }
 
-  private void checkEqualTo(
+  private static void checkEqualTo(
       SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
     assertEquals(comparison, testMap);
     assertEquals(comparison.hashCode(), testMap.hashCode());
@@ -368,13 +368,13 @@ public class PathCopyingPersistentTreeMapTest {
     }
   }
 
-  private <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
+  private static <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
     assertEquals(comparison, set);
     assertEquals(comparison.hashCode(), set.hashCode());
     checkEqualTo((Collection<T>) comparison, (Collection<T>) set);
   }
 
-  private <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {
+  private static <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {
     // equals() and hashCode() is undefined for Collections
     assertThat(set.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
     assertThat(set).hasSize(comparison.size());

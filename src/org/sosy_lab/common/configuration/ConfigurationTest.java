@@ -66,7 +66,7 @@ public class ConfigurationTest {
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
   }
 
-  private Configuration enumTestConfiguration() {
+  private static Configuration enumTestConfiguration() {
     return Configuration.builder().setOption("values", "E3, E2").build();
   }
 
@@ -180,7 +180,7 @@ public class ConfigurationTest {
    *
    * @param clsWithOptions A class with some declared options and a default constructor.
    */
-  private void testDefault(Class<?> clsWithOptions) throws InvalidConfigurationException {
+  private static void testDefault(Class<?> clsWithOptions) throws InvalidConfigurationException {
     Configuration config = Configuration.defaultConfiguration();
 
     try {
@@ -342,7 +342,7 @@ public class ConfigurationTest {
     private String optionWithoutDeprecatedName = "default";
   }
 
-  private DeprecatedOptionNames deprecatedInjectionResultOf(String option)
+  private static DeprecatedOptionNames deprecatedInjectionResultOf(String option)
       throws InvalidConfigurationException {
     Configuration c = Configuration.builder().setOption(option, "value").build();
     DeprecatedOptionNames opts = new DeprecatedOptionNames();

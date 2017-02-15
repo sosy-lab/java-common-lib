@@ -434,7 +434,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * currently compiled source). So we have to do the compatibility check ourselves. We just assume
    * that two types with the same fully qualified name are actually the same type.
    */
-  private boolean isSubtypeOf(TypeMirror type, String superType) {
+  private static boolean isSubtypeOf(TypeMirror type, String superType) {
     checkArgument(type instanceof DeclaredType);
     checkNotNull(superType);
 
@@ -455,7 +455,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * enclosing elements (class, package) with either the value "all" or "options". Returns true if
    * warnings are not suppressed.
    */
-  private boolean warningsEnabled(Element element) {
+  private static boolean warningsEnabled(Element element) {
     do {
       SuppressWarnings suppress = element.getAnnotation(SuppressWarnings.class);
       if (suppress != null) {
@@ -511,7 +511,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * @return The corresponding {@link AnnotationValue}, or <code>null</code> if this field was not
    *     specified.
    */
-  private @Nullable AnnotationValue findAnnotationValue(
+  private static @Nullable AnnotationValue findAnnotationValue(
       final Class<? extends Annotation> annotationClass,
       final String fieldName,
       final AnnotationMirror annotation) {

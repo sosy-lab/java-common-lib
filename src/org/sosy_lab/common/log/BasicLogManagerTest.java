@@ -66,7 +66,7 @@ public class BasicLogManagerTest {
     assertThat(called.get()).isFalse();
   }
 
-  private void checkExpectedLogRecordSource(TestLogHandler handler, String methodName) {
+  private static void checkExpectedLogRecordSource(TestLogHandler handler, String methodName) {
     List<LogRecord> records = handler.getStoredLogRecords();
     assertThat(records).hasSize(1);
     assertThat(records.get(0).getSourceClassName()).isEqualTo(BasicLogManagerTest.class.getName());
@@ -102,7 +102,7 @@ public class BasicLogManagerTest {
     checkExpectedLogRecordSource(testHandler, "throwException");
   }
 
-  private void throwException() {
+  private static void throwException() {
     throw new RuntimeException();
   }
 

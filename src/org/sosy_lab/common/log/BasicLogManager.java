@@ -374,7 +374,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * with "log" are helper methods for logging and exclude them. Synthetic accessor methods are also
    * excluded.
    */
-  private StackTraceElement findCallingMethod() {
+  private static StackTraceElement findCallingMethod() {
     // We use lazy stack trace, because this exactly fits our use case:
     // Typically we need only one or two StackTraceElements from the top of the trace.
     List<StackTraceElement> trace = Throwables.lazyStackTrace(new Throwable());
