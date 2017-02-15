@@ -146,8 +146,7 @@ public final class ConfigurationBuilder {
    * @throws IllegalArgumentException If the given configuration does not specify a value for the
    *     given option.
    */
-  public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option)
-      throws IllegalArgumentException {
+  public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option) {
     checkNotNull(sourceConfig);
     checkNotNull(option);
     checkArgument(sourceConfig.properties.containsKey(option));

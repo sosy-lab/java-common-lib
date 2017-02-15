@@ -74,7 +74,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean add(T pE) throws UnsupportedOperationException;
+  boolean add(T pE);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -82,7 +82,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  void add(int pIndex, T pElement) throws UnsupportedOperationException;
+  void add(int pIndex, T pElement);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -90,7 +90,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean addAll(Collection<? extends T> pC) throws UnsupportedOperationException;
+  boolean addAll(Collection<? extends T> pC);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -98,7 +98,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean addAll(int pIndex, Collection<? extends T> pC) throws UnsupportedOperationException;
+  boolean addAll(int pIndex, Collection<? extends T> pC);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -106,7 +106,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  void clear() throws UnsupportedOperationException;
+  void clear();
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -114,7 +114,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  T remove(int pIndex) throws UnsupportedOperationException;
+  T remove(int pIndex);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -122,7 +122,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean remove(Object pO) throws UnsupportedOperationException;
+  boolean remove(Object pO);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -130,7 +130,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean removeAll(Collection<?> pC) throws UnsupportedOperationException;
+  boolean removeAll(Collection<?> pC);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -146,7 +146,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  boolean retainAll(Collection<?> pC) throws UnsupportedOperationException;
+  boolean retainAll(Collection<?> pC);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -154,7 +154,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
-  T set(int pIndex, T pElement) throws UnsupportedOperationException;
+  T set(int pIndex, T pElement);
 
   /**
    * @throws UnsupportedOperationException Always.

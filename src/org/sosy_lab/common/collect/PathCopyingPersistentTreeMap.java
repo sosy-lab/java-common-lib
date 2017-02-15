@@ -425,8 +425,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
-  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current)
-      throws IllegalStateException {
+  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) {
     if (current == null) {
       return 0;
     }
@@ -467,9 +466,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return blackHeight;
   }
 
+  /**
+   * Check the map for violation of its invariants.
+   *
+   * @throws IllegalStateException If any invariant is violated.
+   */
   @VisibleForTesting
   @SuppressWarnings("CheckReturnValue")
-  void checkAssertions() throws IllegalStateException {
+  void checkAssertions() {
     checkAssertions(root);
   }
 

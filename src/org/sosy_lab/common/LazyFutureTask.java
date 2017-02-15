@@ -81,7 +81,7 @@ public class LazyFutureTask<V> extends FutureTask<V> {
    */
   @Deprecated
   @Override
-  public V get(long pTimeout, TimeUnit pUnit) throws UnsupportedOperationException {
+  public V get(long pTimeout, TimeUnit pUnit) {
     throw new UnsupportedOperationException();
   }
 }

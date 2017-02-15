@@ -138,7 +138,7 @@ public class CopyOnWriteSortedMapTest {
         }
       };
 
-  public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
+  public static junit.framework.Test suite() throws NoSuchMethodException {
     // Our collection views are unmodifiable, so we need special TestSuiteBuilder
     return new UnmodifiableViewSortedMapTestSuiteBuilder<String, String>()
         .usingGenerator(mapGenerator)

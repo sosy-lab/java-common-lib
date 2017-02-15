@@ -58,7 +58,7 @@ public class PathCopyingPersistentTreeMapTest {
         }
       };
 
-  public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
+  public static junit.framework.Test suite() throws NoSuchMethodException {
     TestSuite suite = new TestSuite();
     suite.addTest(new JUnit4TestAdapter(PathCopyingPersistentTreeMapTest.class));
 

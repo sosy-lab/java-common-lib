@@ -115,7 +115,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    * @throws NumberFormatException iff {@code s} is not a valid representation of Rational.
    * @throws IllegalArgumentException If the resulting rational is undefined (e.g. 0/0 or 1/0).
    */
-  public static Rational ofString(String s) throws NumberFormatException {
+  public static Rational ofString(String s) {
     int idx = s.indexOf('/');
     BigInteger num;
     BigInteger den;
@@ -134,7 +134,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    *
    * @see #ofString(String)
    */
-  public static Rational of(String s) throws NumberFormatException {
+  public static Rational of(String s) {
     return ofString(s);
   }
 
@@ -143,7 +143,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    *
    * @see #ofLong(long)
    */
-  public static Rational of(long l) throws NumberFormatException {
+  public static Rational of(long l) {
     return ofLong(l);
   }
 
@@ -212,7 +212,7 @@ public final class Rational extends Number implements Comparable<Rational> {
    *
    * @throws IllegalArgumentException If invoked on zero.
    */
-  public Rational reciprocal() throws IllegalArgumentException {
+  public Rational reciprocal() {
     if (num.equals(B_ZERO)) {
       throw new IllegalArgumentException(
           "Division by zero not supported, use ExtendedRational if you need it");

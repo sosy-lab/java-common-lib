@@ -203,7 +203,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     return sum(of(seconds, SECONDS), of(minutes, MINUTES), of(hours, HOURS), of(days, DAYS));
   }
 
-  private static List<String> splitIntoTokens(String input) throws IllegalArgumentException {
+  private static List<String> splitIntoTokens(String input) {
     List<String> tokens = Lists.newArrayList();
     CharType previous = CharType.BEGIN;
     int pos = 0;
@@ -251,7 +251,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * @throws ArithmeticException If the value cannot be represented in the given unit due to
    *     overflow.
    */
-  public long getChecked(TimeUnit dest) throws ArithmeticException {
+  public long getChecked(TimeUnit dest) {
     if (dest.compareTo(unit) < 0) {
       // Example case: we have seconds, but we want milliseconds (can overflow)
       long factor = dest.convert(1, unit);
@@ -278,7 +278,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    *
    * @throws ArithmeticException If the value cannot be represented in the given unit
    */
-  public TimeSpan toChecked(TimeUnit dest) throws ArithmeticException {
+  public TimeSpan toChecked(TimeUnit dest) {
     if (dest.equals(unit)) {
       return this;
     }
@@ -335,7 +335,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    *
    * @throws ArithmeticException If the value cannot be represented as seconds due to overflow.
    */
-  public long asSeconds() throws ArithmeticException {
+  public long asSeconds() {
     return getChecked(SECONDS);
   }
 
@@ -345,7 +345,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    *
    * @throws ArithmeticException If the value cannot be represented as milliseconds due to overflow.
    */
-  public long asMillis() throws ArithmeticException {
+  public long asMillis() {
     return getChecked(MILLISECONDS);
   }
 
@@ -354,7 +354,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    *
    * @throws ArithmeticException If the value cannot be represented as milliseconds due to overflow.
    */
-  public long asNanos() throws ArithmeticException {
+  public long asNanos() {
     return getChecked(NANOSECONDS);
   }
 
@@ -447,7 +447,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    *
    * @throws ArithmeticException If no unit is large enough to represent the result value.
    */
-  public static TimeSpan sum(TimeSpan a, TimeSpan b) throws ArithmeticException {
+  public static TimeSpan sum(TimeSpan a, TimeSpan b) {
     TimeUnit leastCommonUnit = leastCommonUnit(a, b);
     while (true) {
       try {

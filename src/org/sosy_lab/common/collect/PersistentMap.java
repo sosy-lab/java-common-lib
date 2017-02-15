@@ -62,7 +62,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
-  V put(K pKey, V pValue) throws UnsupportedOperationException;
+  V put(K pKey, V pValue);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -78,7 +78,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
-  void putAll(Map<? extends K, ? extends V> pM) throws UnsupportedOperationException;
+  void putAll(Map<? extends K, ? extends V> pM);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -86,7 +86,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
-  V remove(Object pKey) throws UnsupportedOperationException;
+  V remove(Object pKey);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -102,7 +102,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
-  void clear() throws UnsupportedOperationException;
+  void clear();
 
   /**
    * @throws UnsupportedOperationException Always.

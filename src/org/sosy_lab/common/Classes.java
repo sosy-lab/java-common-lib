@@ -242,9 +242,10 @@ public final class Classes {
    * @param prefix An optional package name as prefix.
    * @return The class object for name or prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
+   * @throws SecurityException If a security manager denies access to the class loader
    */
   public static Class<?> forName(String name, @Nullable String prefix)
-      throws ClassNotFoundException, SecurityException {
+      throws ClassNotFoundException {
     return forName(name, prefix, null);
   }
 
@@ -257,9 +258,10 @@ public final class Classes {
    * @param cl An optional class loader to load the class (may be null).
    * @return The class object for name or prefix + "." + name
    * @throws ClassNotFoundException If none of the two classes can be found.
+   * @throws SecurityException If a security manager denies access to the class loader
    */
   private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl)
-      throws ClassNotFoundException, SecurityException {
+      throws ClassNotFoundException {
     if (cl == null) {
       // use the class loader of this class to simulate the behaviour
       // of Class#forName(String)

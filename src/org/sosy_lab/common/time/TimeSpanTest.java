@@ -44,124 +44,124 @@ public class TimeSpanTest {
   private static final long VERY_LARGE_VALUE = 4611686018427387905L; //2^62 + 1
 
   @Test
-  public void testValueOfZero() throws Exception {
+  public void testValueOfZero() {
     TimeSpan result = TimeSpan.valueOf("0");
     TimeSpan expected = TimeSpan.empty();
     assertEquals(expected, result);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testValueOfNegative() throws Exception {
+  public void testValueOfNegative() {
     TimeSpan.valueOf("-10");
   }
 
   @Test
-  public void testValueOfNoUnit() throws Exception {
+  public void testValueOfNoUnit() {
     TimeSpan result = TimeSpan.valueOf("214");
     TimeSpan expected = TimeSpan.ofSeconds(214);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSeconds() throws Exception {
+  public void testValueOfSeconds() {
     TimeSpan result = TimeSpan.valueOf("13s");
     TimeSpan expected = TimeSpan.ofSeconds(13);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsSpaceBeforeUnit() throws Exception {
+  public void testValueOfSecondsSpaceBeforeUnit() {
     TimeSpan result = TimeSpan.valueOf("13 s");
     TimeSpan expected = TimeSpan.ofSeconds(13);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfMinutes() throws Exception {
+  public void testValueOfMinutes() {
     TimeSpan result = TimeSpan.valueOf("5min");
     TimeSpan expected = TimeSpan.of(5, MINUTES);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfHours() throws Exception {
+  public void testValueOfHours() {
     TimeSpan result = TimeSpan.valueOf("7h");
     TimeSpan expected = TimeSpan.of(7, HOURS);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfDays() throws Exception {
+  public void testValueOfDays() {
     TimeSpan result = TimeSpan.valueOf("4d");
     TimeSpan expected = TimeSpan.of(4, DAYS);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfAlternativeDay() throws Exception {
+  public void testValueOfAlternativeDay() {
     TimeSpan result = TimeSpan.valueOf("1day");
     TimeSpan expected = TimeSpan.of(1, DAYS);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfAlternativeDays() throws Exception {
+  public void testValueOfAlternativeDays() {
     TimeSpan result = TimeSpan.valueOf("1days");
     TimeSpan expected = TimeSpan.of(1, DAYS);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsMinutes() throws Exception {
+  public void testValueOfSecondsMinutes() {
     TimeSpan result = TimeSpan.valueOf("15min13s");
     TimeSpan expected = sum(TimeSpan.of(15, MINUTES), TimeSpan.of(13, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsHours() throws Exception {
+  public void testValueOfSecondsHours() {
     TimeSpan result = TimeSpan.valueOf("3h13s");
     TimeSpan expected = sum(TimeSpan.of(3, HOURS), TimeSpan.of(13, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsHoursWhitespace() throws Exception {
+  public void testValueOfSecondsHoursWhitespace() {
     TimeSpan result = TimeSpan.valueOf("2h 22s");
     TimeSpan expected = sum(TimeSpan.of(2, HOURS), TimeSpan.of(22, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsHoursSuperflousWhitespace() throws Exception {
+  public void testValueOfSecondsHoursSuperflousWhitespace() {
     TimeSpan result = TimeSpan.valueOf("2h    22s");
     TimeSpan expected = sum(TimeSpan.of(2, HOURS), TimeSpan.of(22, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsTrailingWhitespace() throws Exception {
+  public void testValueOfSecondsTrailingWhitespace() {
     TimeSpan result = TimeSpan.valueOf("222  ");
     TimeSpan expected = TimeSpan.ofSeconds(222);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsLeadingWhitespace() throws Exception {
+  public void testValueOfSecondsLeadingWhitespace() {
     TimeSpan result = TimeSpan.valueOf("   222");
     TimeSpan expected = TimeSpan.ofSeconds(222);
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsHoursAllWhitespaceSeparated() throws Exception {
+  public void testValueOfSecondsHoursAllWhitespaceSeparated() {
     TimeSpan result = TimeSpan.valueOf("2 h 22 s");
     TimeSpan expected = sum(TimeSpan.of(2, HOURS), TimeSpan.of(22, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test
-  public void testValueOfSecondsMinutesHours() throws Exception {
+  public void testValueOfSecondsMinutesHours() {
     TimeSpan result = TimeSpan.valueOf("2h13min22s");
     TimeSpan expected =
         sum(TimeSpan.of(2, HOURS), TimeSpan.of(13, MINUTES), TimeSpan.of(22, SECONDS));
@@ -169,7 +169,7 @@ public class TimeSpanTest {
   }
 
   @Test
-  public void testValueOfAll() throws Exception {
+  public void testValueOfAll() {
     TimeSpan result = TimeSpan.valueOf("4d2h13min22s");
     TimeSpan expected =
         sum(
@@ -181,19 +181,19 @@ public class TimeSpanTest {
   }
 
   @Test
-  public void testValueOfOverflow() throws Exception {
+  public void testValueOfOverflow() {
     TimeSpan result = TimeSpan.valueOf("55h77s");
     TimeSpan expected = sum(TimeSpan.of(55, HOURS), TimeSpan.of(77, SECONDS));
     assertEquals(expected, result);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDoubleDeclaration() throws Exception {
+  public void testDoubleDeclaration() {
     TimeSpan.valueOf("77s314s");
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNonsense() throws Exception {
+  public void testNonsense() {
     TimeSpan.valueOf("1asdflkajsd1`;32asd fva");
   }
 

@@ -216,7 +216,7 @@ public final class Configuration {
         return delegate;
       }
 
-      private void check(Class<?> cls, TypeConverter pValue) throws IllegalArgumentException {
+      private void check(Class<?> cls, TypeConverter pValue) {
         checkNotNull(cls);
         checkNotNull(pValue);
         if (cls.isAnnotation() && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
@@ -677,7 +677,7 @@ public final class Configuration {
       final TypeToken<T> type,
       final Option option,
       final AnnotatedElement member)
-      throws UnsupportedOperationException, InvalidConfigurationException {
+      throws InvalidConfigurationException {
 
     final boolean isEnum = type.getRawType().isEnum();
     final String optionName = getOptionName(options, method, option);
@@ -826,8 +826,7 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private static void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType)
-      throws UnsupportedOperationException {
+  private static void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType) {
     if (annotation == null) {
       return;
     }
@@ -892,7 +891,7 @@ public final class Configuration {
       final String valueStr,
       final TypeToken<?> pType,
       @Nullable final Annotation secondaryOption)
-      throws UnsupportedOperationException, InvalidConfigurationException {
+      throws InvalidConfigurationException {
     // convert value to correct type
 
     Class<?> collectionClass = COLLECTIONS.get(pType.getRawType());
