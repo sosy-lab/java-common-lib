@@ -76,9 +76,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
         return Double.POSITIVE_INFINITY;
       case NaN:
         return Double.NaN;
-      default:
-        throw new UnsupportedOperationException("Unexpected number type");
     }
+    throw new UnsupportedOperationException("Unexpected number type");
   }
 
   /**

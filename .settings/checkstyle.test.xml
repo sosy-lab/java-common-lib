@@ -128,7 +128,6 @@
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
-    <module name="MissingSwitchDefault"/>
     <module name="MultipleVariableDeclarations"/>
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
