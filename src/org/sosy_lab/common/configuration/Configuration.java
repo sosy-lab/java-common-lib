@@ -496,7 +496,7 @@ public final class Configuration {
     try {
       defaultValue = field.get(obj);
     } catch (IllegalArgumentException e) {
-      assert false : "Type checks above were not successful apparently.";
+      throw new AssertionError("Type checks above were not successful apparently.", e);
     }
 
     @SuppressWarnings("unchecked")
@@ -540,7 +540,7 @@ public final class Configuration {
     try {
       field.set(obj, value);
     } catch (IllegalArgumentException e) {
-      assert false : "Type checks above were not successful apparently.";
+      throw new AssertionError("Type checks above were not successful apparently.", e);
     }
   }
 
@@ -591,7 +591,7 @@ public final class Configuration {
     try {
       method.invoke(obj, value);
     } catch (IllegalArgumentException e) {
-      assert false : "Type checks above were not successful apparently.";
+      throw new AssertionError("Type checks above were not successful apparently.", e);
     } catch (InvocationTargetException e) {
       // ITEs always have a wrapped exception which is the real one thrown by
       // the invoked method. We want to handle this exception.
