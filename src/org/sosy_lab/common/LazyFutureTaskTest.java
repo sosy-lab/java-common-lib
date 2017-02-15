@@ -58,15 +58,14 @@ public class LazyFutureTaskTest {
   public void testException() throws InterruptedException, ExecutionException {
     final NullPointerException testException = new NullPointerException();
 
-    thrown.expect(ExecutionException.class);
-    thrown.expectCause(is(testException));
-
     Future<Boolean> f =
         new LazyFutureTask<>(
             () -> {
               throw testException;
             });
 
+    thrown.expect(ExecutionException.class);
+    thrown.expectCause(is(testException));
     f.get();
   }
 
@@ -94,11 +93,11 @@ public class LazyFutureTaskTest {
 
   @Test
   public void testCancel() throws InterruptedException, ExecutionException {
-    thrown.expect(CancellationException.class);
-
     Future<Void> f = new LazyFutureTask<>(Runnables.doNothing(), null);
 
     f.cancel(false);
+
+    thrown.expect(CancellationException.class);
     f.get();
   }
 }

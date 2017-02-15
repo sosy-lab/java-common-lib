@@ -284,10 +284,10 @@ public class ConfigurationTest {
   public void testSecureMode() throws Exception {
     Configuration c = Configuration.builder().setOption("prefix.test", "value").build();
     Configuration.enableSecureModeGlobally();
+    SecureOptions opts = new SecureOptions();
 
     thrown.expect(InvalidConfigurationException.class);
     thrown.expectMessage("not allowed in secure mode");
-    SecureOptions opts = new SecureOptions();
     c.inject(opts);
   }
 
