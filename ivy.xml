@@ -92,7 +92,8 @@
 
         <!-- FindBugs -->
         <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
-        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
+        <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
+        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="runtime->default"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.0.13"/>
