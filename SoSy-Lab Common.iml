@@ -10,7 +10,7 @@
     <libelement value="file://lib/java/test/hamcrest-core.jar" />
     <libelement value="file://lib/java/test/mockito-core.jar" />
     <libelement value="file://lib/java/test/objenesis.jar" />
-    <libelement value="file://lib/java/build/annotations.jar" />
+    <libelement value="file://lib/java/runtime/annotations.jar" />
     <libelement value="file://lib/java/build/auto-service.jar" />
     <libelement value="file://lib/java/build/error_prone_annotations.jar" />
     <src_description expected_position="0">
@@ -119,11 +119,11 @@
     <orderEntry type="module-library">
       <library name="annotations.jar">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/build/annotations.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/annotations.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java/build/annotations.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/annotations.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
