@@ -37,8 +37,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.zip.GZIPOutputStream;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Appenders;
@@ -52,22 +54,34 @@ public final class MoreFiles {
 
   /** @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...) */
   public static ByteSink asByteSink(Path path, FileWriteMode... options) {
-    return com.google.common.io.Files.asByteSink(path.toFile(), options);
+    return com.google.common.io.MoreFiles.asByteSink(path, fileWriteModeToOption(options));
   }
 
   /** @see com.google.common.io.Files#asByteSource(java.io.File) */
   public static ByteSource asByteSource(Path path) {
-    return com.google.common.io.Files.asByteSource(path.toFile());
+    return com.google.common.io.MoreFiles.asByteSource(path);
   }
 
   /** @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...) */
   public static CharSink asCharSink(Path path, Charset charset, FileWriteMode... options) {
-    return com.google.common.io.Files.asCharSink(path.toFile(), charset, options);
+    return com.google.common.io.MoreFiles.asCharSink(path, charset, fileWriteModeToOption(options));
   }
 
   /** @see com.google.common.io.Files#asCharSource(java.io.File, Charset) */
   public static CharSource asCharSource(Path path, Charset charset) {
-    return com.google.common.io.Files.asCharSource(path.toFile(), charset);
+    return com.google.common.io.MoreFiles.asCharSource(path, charset);
+  }
+
+  private static OpenOption[] fileWriteModeToOption(FileWriteMode[] modes) {
+    boolean append = false;
+    for (FileWriteMode mode : modes) {
+      if (mode == FileWriteMode.APPEND) {
+        append = true;
+      } else if (mode != null) {
+        throw new AssertionError("unknown FileWriteMode " + mode);
+      }
+    }
+    return append ? new OpenOption[] {StandardOpenOption.APPEND} : new OpenOption[0];
   }
 
   /**
@@ -177,7 +191,9 @@ public final class MoreFiles {
    * Read the full content of a file.
    *
    * @param file The file.
+   * @deprecated use {@code asCharSource(file, charset).read()}
    */
+  @Deprecated
   public static String toString(Path file, Charset charset) throws IOException {
     return asCharSource(file, charset).read();
   }
@@ -262,6 +278,6 @@ public final class MoreFiles {
 
   /** @see com.google.common.io.Files#createParentDirs(java.io.File) */
   public static void createParentDirs(Path path) throws IOException {
-    com.google.common.io.Files.createParentDirs(path.toFile());
+    com.google.common.io.MoreFiles.createParentDirectories(path);
   }
 }

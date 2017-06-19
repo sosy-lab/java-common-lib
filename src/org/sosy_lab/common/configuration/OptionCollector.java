@@ -27,6 +27,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
+import com.google.common.io.MoreFiles;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,7 +60,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.sosy_lab.common.io.MoreFiles;
 
 /** This class collects all {@link Option}s of a program. */
 public class OptionCollector {
@@ -261,7 +261,7 @@ public class OptionCollector {
 
     try {
       Path path = codeSourceToSourcePath.get(cls.getProtectionDomain().getCodeSource());
-      return MoreFiles.toString(path.resolve(filename), StandardCharsets.UTF_8);
+      return MoreFiles.asCharSource(path.resolve(filename), StandardCharsets.UTF_8).read();
     } catch (ExecutionException | IOException e) {
       // Do not print exception message to avoid having a different error message for each file.
       errorMessages.add(

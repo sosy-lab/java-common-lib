@@ -40,9 +40,12 @@ public final class MoreCollectors {
    * <p>Prefer to use this over {@link Collectors#toList()}! The latter does neither guarantee
    * mutability nor immutability, so if you want immutability, use this method, and if you need
    * mutability, use {@code Collectors.toCollection(ArrayList::new)}.
+   *
+   * @deprecated use {@link ImmutableList#toImmutableList()}
    */
+  @Deprecated
   public static <T> Collector<T, ?, ImmutableList<T>> toImmutableList() {
-    return Collectors.collectingAndThen(Collectors.toList(), ImmutableList::copyOf);
+    return ImmutableList.toImmutableList();
   }
 
   /**
@@ -52,8 +55,11 @@ public final class MoreCollectors {
    * <p>Prefer to use this over {@link Collectors#toSet()}! The latter does neither guarantee
    * mutability nor immutability, so if you want immutability, use this method, and if you need
    * mutability, use {@code Collectors.toCollection(HashSet::new)}.
+   *
+   * @deprecated use {@link ImmutableList#toImmutableList()}
    */
+  @Deprecated
   public static <T> Collector<T, ?, ImmutableSet<T>> toImmutableSet() {
-    return Collectors.collectingAndThen(Collectors.toList(), ImmutableSet::copyOf);
+    return ImmutableSet.toImmutableSet();
   }
 }

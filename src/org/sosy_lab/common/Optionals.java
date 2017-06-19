@@ -19,9 +19,12 @@
  */
 package org.sosy_lab.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Streams;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -37,14 +40,24 @@ public final class Optionals {
 
   private Optionals() {}
 
-  /** Convert an {@link Optional} to a Guava {@link com.google.common.base.Optional}. */
+  /**
+   * Convert an {@link Optional} to a Guava {@link com.google.common.base.Optional}.
+   *
+   * @deprecated use {@link com.google.common.base.Optional#fromJavaUtil(Optional)}
+   */
+  @Deprecated
   public static <T> com.google.common.base.Optional<T> toGuavaOptional(Optional<T> optional) {
-    return com.google.common.base.Optional.fromNullable(optional.orElse(null));
+    return com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional));
   }
 
-  /** Convert a Guava {@link com.google.common.base.Optional} to an {@link Optional}. */
+  /**
+   * Convert a Guava {@link com.google.common.base.Optional} to an {@link Optional}.
+   *
+   * @deprecated use {@link com.google.common.base.Optional#toJavaUtil()}
+   */
+  @Deprecated
   public static <T> Optional<T> fromGuavaOptional(com.google.common.base.Optional<T> optional) {
-    return Optional.ofNullable(optional.orNull());
+    return optional.toJavaUtil();
   }
 
   /**
@@ -70,9 +83,11 @@ public final class Optionals {
    *
    * @param optional An Optional.
    * @return A stream with size at most one.
+   * @deprecated use {@link Streams#stream(Optional)}
    */
+  @Deprecated
   public static <T> Stream<T> asStream(Optional<T> optional) {
-    return optional.isPresent() ? Stream.of(optional.get()) : Stream.empty();
+    return Streams.stream(optional);
   }
 
   /** Get an {@link Iterable} of the present instances of an iterable of {@link Optional}s. */
