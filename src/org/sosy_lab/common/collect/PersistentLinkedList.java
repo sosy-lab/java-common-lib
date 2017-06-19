@@ -347,7 +347,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
    * streams.
    */
-  public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
+  public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
     return new Collector<T, PersistentLinkedListBuilder<T>, PersistentLinkedList<T>>() {
 
       @Override
@@ -377,6 +377,18 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
         return EnumSet.noneOf(Characteristics.class);
       }
     };
+  }
+
+  /**
+   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in {@link
+   * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
+   * streams.
+   *
+   * @deprecated renamed to {@link #toPersistentLinkedList()} to conform with Guava's naming
+   */
+  @Deprecated
+  public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
+    return toPersistentLinkedList();
   }
 
   private static class PersistentLinkedListBuilder<T> {

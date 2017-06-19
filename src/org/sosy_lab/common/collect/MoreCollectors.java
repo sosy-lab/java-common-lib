@@ -29,9 +29,14 @@ public final class MoreCollectors {
 
   private MoreCollectors() {}
 
-  /** Return a {@link Collector} that produces {@link PersistentLinkedList}s. */
+  /**
+   * Return a {@link Collector} that produces {@link PersistentLinkedList}s.
+   *
+   * @deprecated use {@link PersistentLinkedList#toPersistentLinkedList()}
+   */
+  @Deprecated
   public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
-    return PersistentLinkedList.collector();
+    return PersistentLinkedList.toPersistentLinkedList();
   }
 
   /**
