@@ -47,7 +47,7 @@
 
         <!-- Google Auto-Service
              Library for easy registration of services for java.util.ServiceLoader. -->
-        <dependency org="com.google.auto.service" name="auto-service" rev="1.0-rc2" conf="build->default"/>
+        <dependency org="com.google.auto.service" name="auto-service" rev="1.0-rc3" conf="build->default"/>
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
