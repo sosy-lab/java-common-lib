@@ -20,7 +20,6 @@
 package org.sosy_lab.common.configuration.converters;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
@@ -34,7 +33,7 @@ import org.sosy_lab.common.time.TimeSpan;
 /** Type converter for options annotated with {@link TimeSpanOption}. */
 public class TimeSpanTypeConverter implements TypeConverter {
 
-  private static final BiMap<String, TimeUnit> TIME_UNITS =
+  private static final ImmutableBiMap<String, TimeUnit> TIME_UNITS =
       ImmutableBiMap.of(
           "ns", TimeUnit.NANOSECONDS,
           "ms", TimeUnit.MILLISECONDS,

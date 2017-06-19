@@ -79,7 +79,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   // The set of known option-detail annotations.
   // For those we can check that @Option is not missing if one of them is present.
-  private static final Set<Class<? extends Annotation>> KNOWN_OPTION_DETAIL_ANNOTATIONS =
+  private static final ImmutableSet<Class<? extends Annotation>> KNOWN_OPTION_DETAIL_ANNOTATIONS =
       ImmutableSet.of(
           ClassOption.class, FileOption.class, IntegerOption.class, TimeSpanOption.class);
 
