@@ -22,6 +22,7 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
@@ -252,8 +253,8 @@ public class ProcessExecutor<E extends Exception> {
           public void onSuccess(Object pArg0) {}
         };
 
-    Futures.addCallback(outFuture, cancelProcessOnFailure);
-    Futures.addCallback(errFuture, cancelProcessOnFailure);
+    Futures.addCallback(outFuture, cancelProcessOnFailure, directExecutor());
+    Futures.addCallback(errFuture, cancelProcessOnFailure, directExecutor());
 
     executor.shutdown(); // don't accept further tasks
   }
