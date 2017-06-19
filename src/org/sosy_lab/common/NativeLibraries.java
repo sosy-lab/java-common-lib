@@ -53,7 +53,6 @@ import javax.annotation.Nullable;
  *         <li>x86-macosx
  *         <li>x86_64-macosx
  *       </ul>
- *
  * </ul>
  *
  * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary} with the library
