@@ -36,10 +36,10 @@
     <dependencies>
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="20.0" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="21.0" conf="runtime->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="20.0" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="21.0" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build.xml for upgrading. -->

@@ -32,9 +32,9 @@ import javax.annotation.Nullable;
  * called at most once.
  *
  * <p>Execution of the task happens in the caller's thread, a little bit similar to the use of
- * {@link com.google.common.util.concurrent.MoreExecutors#sameThreadExecutor()}, however, it is
- * executed on the thread calling {@link #get()} and not on the thread calling {@link
- * java.util.concurrent.ExecutorService#submit(Runnable)}.
+ * {@link com.google.common.util.concurrent.MoreExecutors#newDirectExecutorService()}, however, it
+ * is executed on the thread calling {@link #get()} and not on the thread calling {@link
+ * java.util.concurrent.ExecutorService#submit(Callable)}.
  *
  * <p>Important: Calling {@link #get(long, TimeUnit)} is not supported and will always throw {@link
  * UnsupportedOperationException}.
