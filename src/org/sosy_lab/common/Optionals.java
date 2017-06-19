@@ -21,6 +21,7 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Comparators;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
@@ -118,35 +119,45 @@ public final class Optionals {
   /**
    * Return a {@link Ordering} for {@link Optional} that compares empty optionals as smaller than
    * all non-empty instances, and compares present values using their natural order.
+   *
+   * @deprecated Use {@link Comparators#emptiesFirst(Comparator)}
    */
-  @SuppressWarnings("unchecked")
+  @Deprecated
   public static <T extends Comparable<T>> Comparator<Optional<T>> comparingEmptyFirst() {
-    return (Comparator<Optional<T>>) OptionalComparators.NATURAL_EMTPY_FIRST;
+    return Comparators.emptiesFirst(Comparator.<T>naturalOrder());
   }
 
   /**
    * Return a {@link Ordering} for {@link Optional} that compares empty optionals as smaller than
    * all non-empty instances, and compares present values using the given comparator.
+   *
+   * @deprecated Use {@link Comparators#emptiesFirst(Comparator)}
    */
-  public static <T> Comparator<Optional<T>> comparingEmptyFirst(Comparator<? super T> comparator) {
-    return new OptionalComparators.OptionalComparator<>(true, comparator);
+  @Deprecated
+  public static <T> Comparator<Optional<T>> comparingEmptyFirst(Comparator<T> comparator) {
+    return Comparators.emptiesFirst(comparator);
   }
 
   /**
    * Return a {@link Ordering} for {@link Optional} that compares empty optionals as larger than all
    * non-empty instances, and compares present values using their natural order.
+   *
+   * @deprecated Use {@link Comparators#emptiesLast(Comparator)}
    */
-  @SuppressWarnings("unchecked")
+  @Deprecated
   public static <T extends Comparable<T>> Comparator<Optional<T>> comparingEmptyLast() {
-    return (Comparator<Optional<T>>) OptionalComparators.NATURAL_EMTPY_LAST;
+    return Comparators.emptiesLast(Comparator.<T>naturalOrder());
   }
 
   /**
    * Return a {@link Ordering} for {@link Optional} that compares empty optionals as larger than all
    * non-empty instances, and compares present values using the given comparator.
+   *
+   * @deprecated Use {@link Comparators#emptiesLast(Comparator)}
    */
-  public static <T> Comparator<Optional<T>> comparingEmptyLast(Comparator<? super T> comparator) {
-    return new OptionalComparators.OptionalComparator<>(false, comparator);
+  @Deprecated
+  public static <T> Comparator<Optional<T>> comparingEmptyLast(Comparator<T> comparator) {
+    return Comparators.emptiesLast(comparator);
   }
 
   /**

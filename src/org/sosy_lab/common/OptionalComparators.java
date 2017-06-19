@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Ordering;
 import java.io.Serializable;
 import java.util.Comparator;
@@ -29,7 +27,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * {@link Comparator} implementations for {@link Optional}, {@link OptionalInt}, {@link
@@ -38,66 +35,6 @@ import javax.annotation.Nullable;
 final class OptionalComparators {
 
   private OptionalComparators() {}
-
-  static final Ordering<?> NATURAL_EMTPY_FIRST =
-      new OptionalComparator<>(true, Comparator.naturalOrder());
-  static final Ordering<?> NATURAL_EMTPY_LAST =
-      new OptionalComparator<>(false, Comparator.naturalOrder());
-
-  static final class OptionalComparator<T> extends Ordering<Optional<T>> implements Serializable {
-
-    private static final long serialVersionUID = -7331129739725853987L;
-    private final boolean emptyFirst;
-    private final Comparator<? super T> valueComparator;
-
-    OptionalComparator(boolean pEmptyFirst, Comparator<? super T> pValueComparator) {
-      emptyFirst = pEmptyFirst;
-      valueComparator = checkNotNull(pValueComparator);
-    }
-
-    @Override
-    public int compare(final @Nonnull Optional<T> left, final @Nonnull Optional<T> right) {
-      if (!left.isPresent()) {
-        if (right.isPresent()) {
-          // left no, right yes
-          return emptyFirst ? -1 : 1;
-        } else {
-          return 0;
-        }
-      }
-      if (!right.isPresent()) {
-        // left yes, right no
-        return emptyFirst ? 1 : -1;
-      }
-      return valueComparator.compare(left.get(), right.get());
-    }
-
-    @Override
-    public String toString() {
-      return "Optionals.comparingEmpty"
-          + (emptyFirst ? "First" : "Last")
-          + "("
-          + valueComparator
-          + ")";
-    }
-
-    @Override
-    public int hashCode() {
-      return valueComparator.hashCode() * 31 + (emptyFirst ? 1231 : 1237);
-    }
-
-    @Override
-    public boolean equals(@Nullable Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof OptionalComparator)) {
-        return false;
-      }
-      OptionalComparator<?> other = (OptionalComparator<?>) obj;
-      return emptyFirst == other.emptyFirst && valueComparator.equals(other.valueComparator);
-    }
-  }
 
   static final Ordering<OptionalInt> INT_EMTPY_FIRST = new OptionalIntComparator(true);
   static final Ordering<OptionalInt> INT_EMTPY_LAST = new OptionalIntComparator(false);
