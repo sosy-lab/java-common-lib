@@ -77,7 +77,7 @@ public class FileTypeConverterTest {
 
     @BeforeClass
     public static void skipOnWindows() {
-      assume().withFailureMessage("Safe mode not supported on Windows").that(isWindows()).isFalse();
+      assume().withMessage("Safe mode not supported on Windows").that(isWindows()).isFalse();
     }
   }
 
