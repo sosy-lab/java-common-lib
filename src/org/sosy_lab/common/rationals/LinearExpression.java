@@ -3,8 +3,8 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.concurrent.LazyInit;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,21 +56,25 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
 
   /** Add {@code other} linear expression. */
   public LinearExpression<T> add(LinearExpression<T> other) {
-    Map<T, Rational> newData = new HashMap<>(data);
-    for (Entry<T, Rational> e : other.data.entrySet()) {
+    ImmutableMap.Builder<T, Rational> resultData = ImmutableMap.builder();
+    for (Entry<T, Rational> e : data.entrySet()) {
       T var = e.getKey();
-      Rational oldValue = newData.get(var);
-      Rational newValue = e.getValue();
-      if (oldValue != null) {
-        newValue = newValue.plus(oldValue);
+      Rational value = e.getValue();
+      Rational otherValue = other.data.get(var);
+      if (otherValue != null) {
+        value = value.plus(otherValue);
       }
-      if (newValue.equals(Rational.ZERO)) {
-        newData.remove(var);
-      } else {
-        newData.put(var, newValue);
+      if (!value.equals(Rational.ZERO)) {
+        resultData.put(var, value);
       }
     }
-    return new LinearExpression<>(newData);
+    for (Entry<T, Rational> e : other.data.entrySet()) {
+      T var = e.getKey();
+      if (!data.containsKey(var)) {
+        resultData.put(e.getKey(), e.getValue());
+      }
+    }
+    return new LinearExpression<>(resultData.build());
   }
 
   /** Subtract {@code other} linear expression. */
@@ -83,9 +87,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     if (constant.equals(Rational.ZERO)) {
       return empty();
     }
-    Map<T, Rational> newData = new HashMap<>(data.size());
-    data.forEach((key, value) -> newData.put(key, value.times(constant)));
-    return new LinearExpression<>(newData);
+    return new LinearExpression<>(Maps.transformValues(data, value -> value.times(constant)));
   }
   /** Negate the linear expression. */
   public LinearExpression<T> negate() {
