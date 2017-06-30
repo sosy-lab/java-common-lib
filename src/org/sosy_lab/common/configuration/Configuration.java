@@ -234,9 +234,7 @@ public final class Configuration {
 
       @Override
       public void putAll(Map<? extends Class<?>, ? extends TypeConverter> pMap) {
-        for (Map.Entry<? extends Class<?>, ? extends TypeConverter> entry : pMap.entrySet()) {
-          check(entry.getKey(), entry.getValue());
-        }
+        pMap.forEach(this::check);
         super.putAll(pMap);
       }
 

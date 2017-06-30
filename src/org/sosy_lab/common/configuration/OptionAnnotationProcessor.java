@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -277,7 +276,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
     if (option.description().isEmpty() && warningsEnabled(elem)) {
       AnnotationMirror optionAnnotation = findAnnotationMirror(Option.class, elem).get();
-      AnnotationValue value = findAnnotationValue(Option.class, "description", optionAnnotation);
+      AnnotationValue value =
+          findAnnotationValue(Option.class, "description", optionAnnotation).orElse(null);
       message(
           WARNING,
           elem,
@@ -378,6 +378,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
           (Iterable<?>)
               findAnnotationValue(
                       OptionDetailAnnotation.class, "applicableTo", optionDetailAnnotation.get())
+                  .get()
                   .getValue();
 
       boolean foundMatchingType = false;
@@ -511,7 +512,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * @return The corresponding {@link AnnotationValue}, or <code>null</code> if this field was not
    *     specified.
    */
-  private static @Nullable AnnotationValue findAnnotationValue(
+  private static Optional<? extends AnnotationValue> findAnnotationValue(
       final Class<? extends Annotation> annotationClass,
       final String fieldName,
       final AnnotationMirror annotation) {
@@ -524,13 +525,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       throw new IllegalArgumentException(e);
     }
 
-    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-        annotation.getElementValues().entrySet()) {
-      if (entry.getKey().getSimpleName().contentEquals(fieldName)) {
-        return entry.getValue();
-      }
-    }
-    return null; // this field is not used for this annotation instance
+    return annotation
+        .getElementValues()
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getKey().getSimpleName().contentEquals(fieldName))
+        .map(entry -> entry.getValue())
+        .findFirst();
   }
 
   /**
