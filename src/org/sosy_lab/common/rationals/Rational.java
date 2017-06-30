@@ -3,6 +3,8 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
+import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.annotation.Nullable;
@@ -17,7 +19,7 @@ import javax.annotation.Nullable;
  * representing numbers 0, 1 and -1. These numbers can be compared using {@code ==} operator.
  */
 @SuppressWarnings("NumberEquality")
-@javax.annotation.concurrent.Immutable
+@Immutable
 public final class Rational extends Number implements Comparable<Rational> {
 
   private static final long serialVersionUID = 1657347377738275521L;
@@ -31,7 +33,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   public static final Rational ONE = new Rational(B_ONE, B_ONE);
   public static final Rational NEG_ONE = new Rational(B_M_ONE, B_ONE);
 
-  @Nullable private transient String stringCache = null;
+  private transient @LazyInit @Nullable String stringCache = null;
 
   /**
    * Rationals are always stored in the normal form. That is:

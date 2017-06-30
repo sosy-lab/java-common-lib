@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,7 +18,7 @@ import javax.annotation.Nullable;
  *
  * <p>Every constant stored has to have a non-zero value.
  */
-@javax.annotation.concurrent.Immutable // does not guarantee deep immutability
+@Immutable(containerOf = "T")
 public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   private final ImmutableMap<T, Rational> data;
   private transient @LazyInit int hashCache = 0;

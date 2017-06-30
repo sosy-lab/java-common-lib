@@ -3,6 +3,7 @@ package org.sosy_lab.common.rationals;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.errorprone.annotations.Immutable;
 import javax.annotation.Nullable;
 
 /**
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
  *
  * <p>Represented as wrapper around {@link Rational} class.
  */
-@javax.annotation.concurrent.Immutable
+@Immutable
 public final class ExtendedRational implements Comparable<ExtendedRational> {
   @SuppressWarnings("hiding")
   public enum NumberType {
