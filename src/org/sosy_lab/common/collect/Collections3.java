@@ -28,11 +28,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 /** Utility class similar to {@link Collections} and {@link Collections2}. */
@@ -54,12 +57,34 @@ public final class Collections3 {
   }
 
   /**
+   * Apply a function to all elements in an array and return an {@link ImmutableList} with the
+   * results.
+   *
+   * <p>This function is more efficient than code doing the same using {@link Stream} or {@link
+   * com.google.common.collect.FluentIterable}.
+   */
+  public static <T1, T2> ImmutableList<T2> transformedImmutableListCopy(
+      T1[] input, Function<? super T1, T2> transformer) {
+    return ImmutableList.copyOf(Lists.transform(Arrays.asList(input), transformer));
+  }
+
+  /**
    * Apply a function to all elements in a collection and return an {@link ImmutableSet} with the
    * results. This is an eager version of {@link Collections2#transform(Collection, Function)}.
    */
   public static <T1, T2> ImmutableSet<T2> transformedImmutableSetCopy(
       Collection<T1> input, Function<? super T1, T2> transformer) {
     return ImmutableSet.copyOf(Collections2.transform(input, transformer));
+  }
+
+  /**
+   * Provide a steam that consists of the result of applying the given function to each of a map's
+   * entries, similarly to {@link com.google.common.collect.Streams#zip(Stream, Stream,
+   * BiFunction)}.
+   */
+  public static <K, V, R> Stream<R> zipMapEntries(Map<K, V> map, BiFunction<K, V, R> func) {
+    checkNotNull(func);
+    return map.entrySet().stream().map(entry -> func.apply(entry.getKey(), entry.getValue()));
   }
 
   /**

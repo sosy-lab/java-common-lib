@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
 import org.sosy_lab.common.configuration.converters.IntegerTypeConverter;
@@ -354,10 +355,7 @@ public final class Configuration {
   }
 
   public String asPropertiesString() {
-    return properties
-        .entrySet()
-        .stream()
-        .map((entry) -> entry.getKey() + " = " + entry.getValue() + "\n")
+    return Collections3.zipMapEntries(properties, (key, value) -> key + " = " + value + "\n")
         .sorted(String.CASE_INSENSITIVE_ORDER)
         .collect(Collectors.joining());
   }
