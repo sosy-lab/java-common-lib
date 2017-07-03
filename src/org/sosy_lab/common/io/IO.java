@@ -21,6 +21,7 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.io.CharSource;
 import com.google.common.io.MoreFiles;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -44,6 +45,21 @@ public final class IO {
 
   private IO() {
     /* utility class */
+  }
+
+  /** Read the full content of a {@link CharSource} to a new {@link StringBuilder}. */
+  public static StringBuilder toStringBuilder(CharSource source) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    source.copyTo(sb);
+    return sb;
+  }
+
+  /** Read the full content of a {@link CharSource} to a char array. */
+  public static char[] toCharArray(CharSource source) throws IOException {
+    StringBuilder sb = toStringBuilder(source);
+    char[] result = new char[sb.length()];
+    sb.getChars(0, sb.length(), result, 0);
+    return result;
   }
 
   /**
