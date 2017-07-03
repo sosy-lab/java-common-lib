@@ -37,7 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
 import org.sosy_lab.common.io.MoreFiles;
-import org.sosy_lab.common.io.MoreFiles.DeleteOnCloseFile;
+import org.sosy_lab.common.io.TempFile;
+import org.sosy_lab.common.io.TempFile.DeleteOnCloseFile;
 
 @SuppressWarnings("CheckReturnValue")
 public class ParserTest {
@@ -268,9 +269,17 @@ public class ParserTest {
     test("[foo] \n bar=abc \n [] \n foo.bar=abc");
   }
 
+  private Path createTempFile(String prefix, String suffix, String content) throws IOException {
+    return TempFile.builder()
+        .prefix(prefix)
+        .suffix(suffix)
+        .initialContent(content, Charset.defaultCharset())
+        .create();
+  }
+
   @Test
   public final void simpleInclude() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(" #include  " + included.toAbsolutePath() + "\t", "foo.bar", "abc");
     } finally {
@@ -286,7 +295,7 @@ public class ParserTest {
   @Test
   public final void includeWithSpecialCharsFilename() throws IOException {
     Path included =
-        MoreFiles.createTempFile("SoSy-Lab CommonParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
+        createTempFile("SoSy-Lab CommonParserTestÄöüß", TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(" #include " + included.toAbsolutePath() + "\t", "foo.bar", "abc");
     } finally {
@@ -296,9 +305,9 @@ public class ParserTest {
 
   @Test
   public final void includeDepthTwo() throws IOException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        MoreFiles.createTempFile(
+        createTempFile(
             TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
     try {
       testSingleOption("#include " + included2.toAbsolutePath(), "foo.bar", "abc");
@@ -312,14 +321,14 @@ public class ParserTest {
 
   @Test
   public final void includeDepthN() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(included);
 
     for (int i = 0; i < MAX_INCLUDE_TEST_DEPTH; i++) {
       included =
-          MoreFiles.createTempFile(
+          createTempFile(
               TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.toAbsolutePath());
       allFiles.add(included);
     }
@@ -335,7 +344,7 @@ public class ParserTest {
 
   @Test
   public final void includeTwice() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(
           "#include " + included.toAbsolutePath() + "\n#include " + included.toAbsolutePath(),
@@ -349,7 +358,10 @@ public class ParserTest {
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveInclude() throws IOException, InvalidConfigurationException {
     try (DeleteOnCloseFile included =
-        MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX)) {
+        TempFile.builder()
+            .prefix(TEST_FILE_PREFIX)
+            .suffix(TEST_FILE_SUFFIX)
+            .createDeleteOnClose()) {
       MoreFiles.writeFile(
           included.toPath(),
           Charset.defaultCharset(),
@@ -360,9 +372,9 @@ public class ParserTest {
 
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveIncludeDepthTwo() throws IOException, InvalidConfigurationException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
+    Path included1 = TempFile.builder().prefix(TEST_FILE_PREFIX).suffix(TEST_FILE_SUFFIX).create();
     Path included2 =
-        MoreFiles.createTempFile(
+        createTempFile(
             TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
     MoreFiles.writeFile(
         included1, Charset.defaultCharset(), "#include " + included2.toAbsolutePath());
@@ -378,7 +390,8 @@ public class ParserTest {
 
   @Test(expected = InvalidConfigurationFileException.class)
   public final void recursiveIncludeDepthN() throws IOException, InvalidConfigurationException {
-    Path firstIncluded = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, null);
+    Path firstIncluded =
+        TempFile.builder().prefix(TEST_FILE_PREFIX).suffix(TEST_FILE_SUFFIX).create();
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(firstIncluded);
@@ -386,7 +399,7 @@ public class ParserTest {
 
     for (int i = 0; i < MAX_RECURSIVE_INCLUDE_TEST_DEPTH; i++) {
       included =
-          MoreFiles.createTempFile(
+          createTempFile(
               TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included.toAbsolutePath());
       allFiles.add(included);
     }
@@ -405,7 +418,7 @@ public class ParserTest {
 
   @Test
   public final void overwriteIncludedOptionBefore() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption("foo.bar=123 \n#include " + included.toAbsolutePath(), "foo.bar", "123");
     } finally {
@@ -415,7 +428,7 @@ public class ParserTest {
 
   @Test
   public final void overwriteIncludedOptionAfter() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     try {
       testSingleOption(
           "#include " + included.toAbsolutePath() + " \n foo.bar=123", "foo.bar", "123");
@@ -426,9 +439,9 @@ public class ParserTest {
 
   @Test
   public final void overwriteIncludedDepthTwo1() throws IOException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        MoreFiles.createTempFile(
+        createTempFile(
             TEST_FILE_PREFIX,
             TEST_FILE_SUFFIX,
             "#include " + included1.toAbsolutePath() + "\n foo.bar=xyz");
@@ -442,9 +455,9 @@ public class ParserTest {
 
   @Test
   public final void overwriteIncludedDepthTwo2() throws IOException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        MoreFiles.createTempFile(
+        createTempFile(
             TEST_FILE_PREFIX,
             TEST_FILE_SUFFIX,
             "#include " + included1.toAbsolutePath() + "\n foo.bar=xyz");
@@ -458,8 +471,8 @@ public class ParserTest {
 
   @Test
   public final void contradictoryIncludes() throws IOException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
-    Path included2 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=xyz");
+    Path included1 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included2 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=xyz");
     try {
       testSingleOption(
           "#include " + included1.toAbsolutePath() + "\n#include " + included2.toAbsolutePath(),
@@ -473,7 +486,7 @@ public class ParserTest {
 
   @Test
   public final void relativePath1() throws IOException {
-    Path included = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     basePath = included;
 
     try {
@@ -485,10 +498,9 @@ public class ParserTest {
 
   @Test
   public final void relativePath2() throws IOException {
-    Path included1 = MoreFiles.createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    Path included1 = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
     Path included2 =
-        MoreFiles.createTempFile(
-            TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getFileName());
+        createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.getFileName());
 
     try {
       testSingleOption("#include " + included2.toAbsolutePath(), "foo.bar", "abc");

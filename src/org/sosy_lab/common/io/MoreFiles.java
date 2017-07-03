@@ -21,15 +21,12 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.StandardSystemProperty;
-import com.google.common.base.Strings;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,11 +36,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.zip.GZIPOutputStream;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.io.TempFile.TempFileBuilder;
 
 /** Provides helper functions for file access. */
 public final class MoreFiles {
@@ -96,54 +93,19 @@ public final class MoreFiles {
    * @throws IllegalArgumentException If the <code>prefix</code> argument contains fewer than three
    *     characters
    * @throws IOException If a file could not be created
+   * @deprecated Use {@link TempFile#builder()}.
    */
+  @Deprecated
   public static Path createTempFile(
       String prefix, @Nullable String suffix, @Nullable String content) throws IOException {
-    if (prefix.length() < 3) {
-      throw new IllegalArgumentException("The prefix must at least be three characters long.");
+    TempFileBuilder builder = TempFile.builder().prefix(prefix);
+    if (suffix != null) {
+      builder.suffix(suffix);
     }
-
-    if (suffix == null) {
-      suffix = ".tmp";
+    if (content != null) {
+      builder.initialContent(content, Charset.defaultCharset());
     }
-
-    File file;
-    try {
-      file = File.createTempFile(prefix, suffix);
-    } catch (IOException e) {
-      // The message of this exception is often quite unhelpful,
-      // improve it by adding the path were we attempted to write.
-      String tmpDir = StandardSystemProperty.JAVA_IO_TMPDIR.value();
-      if (e.getMessage() != null && e.getMessage().contains(tmpDir)) {
-        throw e;
-      }
-
-      String fileName = Paths.get(tmpDir, prefix + "*" + suffix).toString();
-      if (Strings.nullToEmpty(e.getMessage()).isEmpty()) {
-        throw new IOException(fileName, e);
-      } else {
-        throw new IOException(fileName + " (" + e.getMessage() + ")", e);
-      }
-    }
-
-    Path path = file.toPath();
-    file.deleteOnExit();
-
-    if (!Strings.isNullOrEmpty(content)) {
-      try {
-        writeFile(path, Charset.defaultCharset(), content);
-      } catch (IOException e) {
-        // creation was successful, but writing failed
-        // -> delete file
-        try {
-          Files.delete(path);
-        } catch (IOException deleteException) {
-          e.addSuppressed(deleteException);
-        }
-        throw e;
-      }
-    }
-    return path;
+    return builder.create();
   }
 
   /**
@@ -157,23 +119,33 @@ public final class MoreFiles {
    *   // use tempFile.toPath() for writing and reading of the temporary file
    * }
    * </code> The file can be opened and closed multiple times, potentially from different processes.
+   *
+   * @deprecated Use {@link TempFile#builder()} and {@link
+   *     TempFile.TempFileBuilder#createDeleteOnClose()}.
    */
+  @Deprecated
   public static DeleteOnCloseFile createTempFile(String prefix, @Nullable String suffix)
       throws IOException {
-    Path tempFile = createTempFile(prefix, suffix, null);
-    return new DeleteOnCloseFile(tempFile);
+    TempFileBuilder builder = TempFile.builder().prefix(prefix);
+    if (suffix != null) {
+      builder.suffix(suffix);
+    }
+    return builder.createDeleteOnClose();
   }
 
   /**
    * A simple wrapper around {@link Path} that calls {@link Files#deleteIfExists(Path)} from {@link
    * AutoCloseable#close()}.
+   *
+   * @deprecated Use {@link TempFile.DeleteOnCloseFile}.
    */
   @javax.annotation.concurrent.Immutable
+  @Deprecated
   public static class DeleteOnCloseFile implements AutoCloseable {
 
     private final Path path;
 
-    private DeleteOnCloseFile(Path pFile) {
+    DeleteOnCloseFile(Path pFile) {
       path = pFile;
     }
 
