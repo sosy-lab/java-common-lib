@@ -29,6 +29,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
+import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -47,7 +48,6 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.io.MoreFiles;
 
 /** Default implementation of {@link LogManager}. */
 public class BasicLogManager implements LogManager, AutoCloseable {
@@ -235,7 +235,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     Path outputFile = options.getOutputFile();
     if (!fileLevel.equals(Level.OFF) && outputFile != null) {
       try {
-        MoreFiles.createParentDirs(outputFile);
+        MoreFiles.createParentDirectories(outputFile);
 
         Handler outfileHandler = new FileHandler(outputFile.toAbsolutePath().toString(), false);
         setupHandler(

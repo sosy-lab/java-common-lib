@@ -146,7 +146,7 @@ public class TempFile {
 
       if (content != null) {
         try {
-          MoreFiles.writeFile(file, charset, content);
+          IO.writeFile(file, charset, content);
         } catch (IOException e) {
           // creation was successful, but writing failed
           // -> delete file

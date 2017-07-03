@@ -19,30 +19,24 @@
  */
 package org.sosy_lab.common.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.zip.GZIPOutputStream;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.io.TempFile.TempFileBuilder;
 
 /** Provides helper functions for file access. */
+@Deprecated
 public final class MoreFiles {
 
   private MoreFiles() {
@@ -50,21 +44,25 @@ public final class MoreFiles {
   }
 
   /** @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...) */
+  @Deprecated
   public static ByteSink asByteSink(Path path, FileWriteMode... options) {
     return com.google.common.io.MoreFiles.asByteSink(path, fileWriteModeToOption(options));
   }
 
   /** @see com.google.common.io.Files#asByteSource(java.io.File) */
+  @Deprecated
   public static ByteSource asByteSource(Path path) {
     return com.google.common.io.MoreFiles.asByteSource(path);
   }
 
   /** @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...) */
+  @Deprecated
   public static CharSink asCharSink(Path path, Charset charset, FileWriteMode... options) {
     return com.google.common.io.MoreFiles.asCharSink(path, charset, fileWriteModeToOption(options));
   }
 
   /** @see com.google.common.io.Files#asCharSource(java.io.File, Charset) */
+  @Deprecated
   public static CharSource asCharSource(Path path, Charset charset) {
     return com.google.common.io.MoreFiles.asCharSource(path, charset);
   }
@@ -175,12 +173,11 @@ public final class MoreFiles {
    *
    * @param file The file.
    * @param content The content which shall be written.
+   * @deprecated moved to {@link IO}
    */
+  @Deprecated
   public static void writeFile(Path file, Charset charset, Object content) throws IOException {
-    checkNotNull(content);
-    try (Writer w = openOutputFile(file, charset)) {
-      Appenders.appendTo(w, content);
-    }
+    IO.writeFile(file, charset, content);
   }
 
   /**
@@ -188,28 +185,22 @@ public final class MoreFiles {
    *
    * @param file The file.
    * @param content The content which shall be written.
+   * @deprecated moved to {@link IO}
    */
+  @Deprecated
   public static void writeGZIPFile(Path file, Charset charset, Object content) throws IOException {
-    checkNotNull(content);
-    checkNotNull(charset);
-    createParentDirs(file);
-    try (OutputStream outputStream = Files.newOutputStream(file);
-        OutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
-        Writer outputStreamWriter = new OutputStreamWriter(gzipOutputStream, charset);
-        Writer w = new BufferedWriter(outputStreamWriter)) {
-      Appenders.appendTo(w, content);
-    }
+    IO.writeGZIPFile(file, charset, content);
   }
 
   /**
    * Open a buffered Writer to a file. This method creates necessary parent directories beforehand.
+   *
+   * @deprecated moved to {@link IO}
    */
+  @Deprecated
   public static Writer openOutputFile(Path file, Charset charset, FileWriteMode... options)
       throws IOException {
-    checkNotNull(charset);
-    checkNotNull(options);
-    createParentDirs(file);
-    return asCharSink(file, charset, options).openBufferedStream();
+    return IO.openOutputFile(file, charset, fileWriteModeToOption(options));
   }
 
   /**
@@ -217,12 +208,11 @@ public final class MoreFiles {
    *
    * @param file The file.
    * @param content The content which will be written to the end of the file.
+   * @deprecated moved to {@link IO}
    */
+  @Deprecated
   public static void appendToFile(Path file, Charset charset, Object content) throws IOException {
-    checkNotNull(content);
-    try (Writer w = openOutputFile(file, charset, FileWriteMode.APPEND)) {
-      Appenders.appendTo(w, content);
-    }
+    IO.appendToFile(file, charset, content);
   }
 
   /**
@@ -231,24 +221,15 @@ public final class MoreFiles {
    *
    * @param path The file to check.
    * @throws FileNotFoundException If one of the conditions is not true.
+   * @deprecated moved to {@link IO}
    */
+  @Deprecated
   public static void checkReadableFile(Path path) throws FileNotFoundException {
-    checkNotNull(path);
-
-    if (!Files.exists(path)) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " does not exist!");
-    }
-
-    if (!Files.isRegularFile(path)) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not a normal file!");
-    }
-
-    if (!Files.isReadable(path)) {
-      throw new FileNotFoundException("File " + path.toAbsolutePath() + " is not readable!");
-    }
+    IO.checkReadableFile(path);
   }
 
   /** @see com.google.common.io.Files#createParentDirs(java.io.File) */
+  @Deprecated
   public static void createParentDirs(Path path) throws IOException {
     com.google.common.io.MoreFiles.createParentDirectories(path);
   }

@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 
 /**
  * This class is based on code from the library JSON.simple in version 1.1
@@ -44,7 +44,7 @@ public final class JSON {
   /** Encode an object into JSON text and write it to a file. */
   public static void writeJSONString(@Nullable Object value, Path file) throws IOException {
     // We escape everything, so pure ASCII remains
-    try (Writer out = MoreFiles.openOutputFile(file, StandardCharsets.US_ASCII)) {
+    try (Writer out = IO.openOutputFile(file, StandardCharsets.US_ASCII)) {
       writeJSONString(value, out);
     }
   }

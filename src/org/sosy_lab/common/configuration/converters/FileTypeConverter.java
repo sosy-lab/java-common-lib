@@ -38,7 +38,7 @@ import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
@@ -311,7 +311,7 @@ public final class FileTypeConverter implements TypeConverter {
 
     if (typeInfo == FileOption.Type.REQUIRED_INPUT_FILE) {
       try {
-        MoreFiles.checkReadableFile(file);
+        IO.checkReadableFile(file);
       } catch (FileNotFoundException e) {
         throw new InvalidConfigurationException(
             "Option " + optionName + " specifies an invalid input file: " + e.getMessage(), e);

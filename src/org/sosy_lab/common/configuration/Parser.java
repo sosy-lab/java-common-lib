@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.CheckReturnValue;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 
 /**
  * A parser for a simple configuration file format based on "key = value" pairs.
@@ -132,7 +132,7 @@ class Parser {
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   private void parse0(Path file) throws IOException, InvalidConfigurationException {
-    MoreFiles.checkReadableFile(file);
+    IO.checkReadableFile(file);
 
     String fileName = file.toAbsolutePath().toString();
     if (includeStack.contains(fileName)) {

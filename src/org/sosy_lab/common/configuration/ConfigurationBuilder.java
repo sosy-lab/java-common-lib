@@ -42,7 +42,7 @@ import java.util.Set;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 
 /** Interface for constructing {@link Configuration} instances. */
 @CanIgnoreReturnValue
@@ -228,7 +228,7 @@ public final class ConfigurationBuilder {
       throws IOException, InvalidConfigurationException {
     checkNotNull(file);
 
-    MoreFiles.checkReadableFile(file);
+    IO.checkReadableFile(file);
 
     setupProperties();
 

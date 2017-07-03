@@ -36,7 +36,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.TempFile;
 import org.sosy_lab.common.io.TempFile.DeleteOnCloseFile;
 
@@ -362,7 +362,7 @@ public class ParserTest {
             .prefix(TEST_FILE_PREFIX)
             .suffix(TEST_FILE_SUFFIX)
             .createDeleteOnClose()) {
-      MoreFiles.writeFile(
+      IO.writeFile(
           included.toPath(),
           Charset.defaultCharset(),
           "#include " + included.toPath().toAbsolutePath());
@@ -376,8 +376,7 @@ public class ParserTest {
     Path included2 =
         createTempFile(
             TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
-    MoreFiles.writeFile(
-        included1, Charset.defaultCharset(), "#include " + included2.toAbsolutePath());
+    IO.writeFile(included1, Charset.defaultCharset(), "#include " + included2.toAbsolutePath());
     try {
       test("#include " + included1.toAbsolutePath());
     } finally {
@@ -404,8 +403,7 @@ public class ParserTest {
       allFiles.add(included);
     }
 
-    MoreFiles.writeFile(
-        firstIncluded, Charset.defaultCharset(), "#include " + included.toAbsolutePath());
+    IO.writeFile(firstIncluded, Charset.defaultCharset(), "#include " + included.toAbsolutePath());
 
     try {
       test("#include " + included.toAbsolutePath());
