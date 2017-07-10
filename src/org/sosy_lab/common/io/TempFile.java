@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
+import javax.annotation.Nullable;
 
 /** Utilities for temporary files. */
 public class TempFile {
@@ -43,10 +44,7 @@ public class TempFile {
 
   private TempFile() {}
 
-  /**
-   * Create a builder for temporary files. At least the {@link TempFileBuilder#prefix} method must
-   * be called.
-   */
+  /** Create a builder for temporary files. */
   public static TempFileBuilder builder() {
     return new TempFileBuilder();
   }
@@ -55,9 +53,9 @@ public class TempFile {
 
     private Path dir = TMPDIR;
     private String suffix = ".tmp";
-    private String prefix;
-    private Object content;
-    private Charset charset;
+    private @Nullable String prefix;
+    private @Nullable Object content;
+    private @Nullable Charset charset;
     private boolean deleteOnJvmExit = true;
     private FileAttribute<?>[] fileAttributes = new FileAttribute<?>[0];
 
@@ -70,14 +68,10 @@ public class TempFile {
       return this;
     }
 
-    /**
-     * Prefix of randomly-generated file name, needs to be given and have at least three characters.
-     */
+    /** Prefix of randomly-generated file name. */
     @CanIgnoreReturnValue
     public TempFileBuilder prefix(String pPrefix) {
-      if (pPrefix.length() < 3) {
-        throw new IllegalArgumentException("The prefix must at least be three characters long.");
-      }
+      suffix = checkNotNull(pPrefix);
       prefix = pPrefix;
       return this;
     }
