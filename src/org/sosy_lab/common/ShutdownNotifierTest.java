@@ -93,7 +93,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerNotification() {
-    final AtomicBoolean flag = new AtomicBoolean(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
 
     instance.register(reason -> flag.set(true));
 
@@ -103,7 +103,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerNotificationReason() {
-    final AtomicReference<String> reasonReference = new AtomicReference<>();
+    AtomicReference<String> reasonReference = new AtomicReference<>();
 
     instance.register(reasonReference::set);
 
@@ -113,8 +113,8 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerNotification10() {
-    final int count = 10;
-    final AtomicInteger i = new AtomicInteger(0);
+    int count = 10;
+    AtomicInteger i = new AtomicInteger(0);
 
     for (int j = 0; j < count; j++) {
       instance.register(reason -> i.incrementAndGet());
@@ -126,7 +126,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testUnregisterListener() {
-    final AtomicBoolean flag = new AtomicBoolean(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
 
     ShutdownRequestListener l = reason -> flag.set(true);
     instance.register(l);
@@ -138,7 +138,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerRegisterAndCheck() {
-    final AtomicBoolean flag = new AtomicBoolean(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
 
     instance.registerAndCheckImmediately(reason -> flag.set(true));
 
@@ -149,7 +149,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerNotificationOnRegister() {
-    final AtomicBoolean flag = new AtomicBoolean(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
 
     instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(reason -> flag.set(true));
@@ -159,7 +159,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testListenerNotificationReasonOnRegister() {
-    final AtomicReference<String> reasonReference = new AtomicReference<>();
+    AtomicReference<String> reasonReference = new AtomicReference<>();
 
     instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(reasonReference::set);
@@ -196,7 +196,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testParentChildListenerNotification() {
-    final AtomicBoolean flag = new AtomicBoolean(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
 
     ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
@@ -208,7 +208,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testParentChildListenerNotificationReason() {
-    final AtomicReference<String> reasonReference = new AtomicReference<>();
+    AtomicReference<String> reasonReference = new AtomicReference<>();
 
     ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 

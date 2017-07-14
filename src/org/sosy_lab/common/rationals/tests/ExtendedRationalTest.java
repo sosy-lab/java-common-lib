@@ -2,6 +2,7 @@ package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -96,8 +97,8 @@ public class ExtendedRationalTest {
 
   @Test
   public void testMultiplicationZero() {
-    ExtendedRational a = ExtendedRational.ZERO;
-    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    @Var ExtendedRational a = ExtendedRational.ZERO;
+    @Var ExtendedRational b = ExtendedRational.NEG_INFTY;
     assertThat(a.times(b)).isEqualTo(ExtendedRational.ZERO);
 
     a = ExtendedRational.ZERO;
@@ -108,7 +109,7 @@ public class ExtendedRationalTest {
   @Test
   public void testMultiplicationNegInfty() {
     ExtendedRational a = ExtendedRational.NEG_INFTY;
-    ExtendedRational b = ExtendedRational.NEG_INFTY;
+    @Var ExtendedRational b = ExtendedRational.NEG_INFTY;
     assertThat(a.times(b)).isEqualTo(ExtendedRational.INFTY);
 
     b = ExtendedRational.INFTY;

@@ -50,7 +50,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(final @Nonnull OptionalInt left, final @Nonnull OptionalInt right) {
+    public int compare(@Nonnull OptionalInt left, @Nonnull OptionalInt right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -91,7 +91,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(final @Nonnull OptionalLong left, final @Nonnull OptionalLong right) {
+    public int compare(@Nonnull OptionalLong left, @Nonnull OptionalLong right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -132,7 +132,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(final @Nonnull OptionalDouble left, final @Nonnull OptionalDouble right) {
+    public int compare(@Nonnull OptionalDouble left, @Nonnull OptionalDouble right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes

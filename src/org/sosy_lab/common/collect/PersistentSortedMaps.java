@@ -25,6 +25,7 @@ import static com.google.common.collect.Iterators.singletonIterator;
 
 import com.google.common.base.Equivalence;
 import com.google.common.collect.Ordering;
+import com.google.errorprone.annotations.Var;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ public class PersistentSortedMaps {
   }
 
   private static <K, V> MergeConflictHandler<K, V> inverseMergeConflictHandler(
-      final MergeConflictHandler<K, V> delegate) {
+      MergeConflictHandler<K, V> delegate) {
     return (pKey, pValue1, pValue2) -> delegate.resolveConflict(pKey, pValue2, pValue1);
   }
 
@@ -109,9 +110,9 @@ public class PersistentSortedMaps {
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
-      final PersistentSortedMap<K, V> map1,
-      final PersistentSortedMap<K, V> map2,
-      final MergeConflictHandler<K, V> conflictHandler) {
+      PersistentSortedMap<K, V> map1,
+      PersistentSortedMap<K, V> map2,
+      MergeConflictHandler<K, V> conflictHandler) {
 
     if (map1.size() >= map2.size()) {
       return merge(
@@ -148,11 +149,11 @@ public class PersistentSortedMaps {
    * @return The merged map.
    */
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> merge(
-      final PersistentSortedMap<K, V> map1,
-      final PersistentSortedMap<K, V> map2,
-      final Equivalence<? super V> valueEquals,
-      final MergeConflictHandler<? super K, V> conflictHandler,
-      final MapsDifference.Visitor<? super K, ? super V> collectDifferences) {
+      PersistentSortedMap<K, V> map1,
+      PersistentSortedMap<K, V> map2,
+      Equivalence<? super V> valueEquals,
+      MergeConflictHandler<? super K, V> conflictHandler,
+      MapsDifference.Visitor<? super K, ? super V> collectDifferences) {
 
     checkNotNull(map1);
     checkNotNull(map2);
@@ -168,13 +169,13 @@ public class PersistentSortedMaps {
     }
 
     // Assume map1 is the bigger one, so we use it as the base.
-    PersistentSortedMap<K, V> result = map1;
+    @Var PersistentSortedMap<K, V> result = map1;
 
-    final Iterator<Map.Entry<K, V>> it1 = map1.entrySet().iterator();
-    final Iterator<Map.Entry<K, V>> it2 = map2.entrySet().iterator();
+    Iterator<Map.Entry<K, V>> it1 = map1.entrySet().iterator();
+    Iterator<Map.Entry<K, V>> it2 = map2.entrySet().iterator();
 
-    Map.Entry<K, V> e1 = null;
-    Map.Entry<K, V> e2 = null;
+    @Var Map.Entry<K, V> e1 = null;
+    @Var Map.Entry<K, V> e2 = null;
 
     // This loop iterates synchronously through both sets
     // by trying to keep the keys equal.
@@ -192,13 +193,13 @@ public class PersistentSortedMaps {
         e2 = it2.next();
       }
 
-      final int comp = e1.getKey().compareTo(e2.getKey());
+      int comp = e1.getKey().compareTo(e2.getKey());
 
       if (comp < 0) {
         // e1 < e2
 
-        final K key = e1.getKey();
-        final V value1 = e1.getValue();
+        K key = e1.getKey();
+        V value1 = e1.getValue();
 
         collectDifferences.leftValueOnly(key, value1);
 
@@ -208,8 +209,8 @@ public class PersistentSortedMaps {
       } else if (comp > 0) {
         // e1 > e2
 
-        final K key = e2.getKey();
-        final V value2 = e2.getValue();
+        K key = e2.getKey();
+        V value2 = e2.getValue();
 
         // e2 is not in map
         assert !result.containsKey(key);
@@ -223,9 +224,9 @@ public class PersistentSortedMaps {
       } else {
         // e1 == e2
 
-        final K key = e1.getKey();
-        final V value1 = e1.getValue();
-        final V value2 = e2.getValue();
+        K key = e1.getKey();
+        V value1 = e1.getValue();
+        V value2 = e2.getValue();
 
         if (!valueEquals.equivalent(value1, value2)) {
           V newValue = conflictHandler.resolveConflict(key, value1, value2);

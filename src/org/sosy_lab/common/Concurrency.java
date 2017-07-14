@@ -22,6 +22,7 @@ package org.sosy_lab.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.errorprone.annotations.Var;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -40,7 +41,7 @@ public final class Concurrency {
    * interrupted flag in this case.
    */
   public static void waitForTermination(ExecutorService executor) {
-    boolean interrupted = Thread.interrupted();
+    @Var boolean interrupted = Thread.interrupted();
 
     while (!executor.isTerminated()) {
       try {
@@ -64,7 +65,7 @@ public final class Concurrency {
    * @return thread pool
    */
   public static ExecutorService createThreadPool() {
-    final int processors = Runtime.getRuntime().availableProcessors();
+    int processors = Runtime.getRuntime().availableProcessors();
     return Executors.newFixedThreadPool(processors);
   }
 
@@ -75,7 +76,7 @@ public final class Concurrency {
    * @return thread pool
    */
   public static ExecutorService createThreadPool(ThreadFactory threadFactory) {
-    final int processors = Runtime.getRuntime().availableProcessors();
+    int processors = Runtime.getRuntime().availableProcessors();
     return Executors.newFixedThreadPool(processors, threadFactory);
   }
 

@@ -21,6 +21,7 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.Var;
 import java.util.function.Supplier;
 import javax.annotation.CheckReturnValue;
 
@@ -36,7 +37,7 @@ public final class MoreStrings {
    * @param prefix The prefix.
    * @return Whether {@code s} starts with {@code prefix} in any case.
    */
-  public static boolean startsWithIgnoreCase(String s, String prefix) {
+  public static boolean startsWithIgnoreCase(@Var String s, String prefix) {
     int prefixLength = prefix.length();
     if (prefixLength > s.length()) {
       return false;
@@ -76,7 +77,7 @@ public final class MoreStrings {
    * @return A object that should only be used for {@link Object#toString()}.
    */
   @CheckReturnValue
-  public static Object longStringOf(final WithLongString obj) {
+  public static Object longStringOf(WithLongString obj) {
     checkNotNull(obj);
     return new Object() {
       @Override

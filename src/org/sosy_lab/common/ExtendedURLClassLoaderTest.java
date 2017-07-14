@@ -54,7 +54,7 @@ public class ExtendedURLClassLoaderTest {
 
   @Test
   public void testCreateWithURLs() throws IOException {
-    final URL testUrl = new URL("file:///");
+    URL testUrl = new URL("file:///");
     try (URLClassLoader cl = newDefaultBuilder().setUrls(testUrl).build()) {
       assertThat(cl.getURLs()).asList().containsExactly(testUrl);
     }

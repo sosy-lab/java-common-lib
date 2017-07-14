@@ -2,6 +2,7 @@ package org.sosy_lab.common.rationals.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.errorprone.annotations.Var;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -19,7 +20,7 @@ public class RationalTest {
 
   @Test
   public void testInstantiationBigDecimal() {
-    BigDecimal a = BigDecimal.valueOf(1, 3);
+    @Var BigDecimal a = BigDecimal.valueOf(1, 3);
     assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of("1/1000"));
     a = BigDecimal.valueOf(1, -4);
     assertThat(Rational.ofBigDecimal(a)).isEqualTo(Rational.of("10000"));

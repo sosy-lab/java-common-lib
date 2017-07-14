@@ -22,6 +22,7 @@ package org.sosy_lab.common.time;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import com.google.errorprone.annotations.Var;
 import javax.annotation.Nullable;
 
 /**
@@ -98,7 +99,7 @@ public final class NestedTimer {
     stopOuter(totalTimer.clock.read());
   }
 
-  private void stopOuter(final long endTime) {
+  private void stopOuter(long endTime) {
     assert !currentInnerTimer.isRunning();
 
     totalTimer.stop(endTime);
@@ -186,7 +187,7 @@ public final class NestedTimer {
   }
 
   private long innerSumTime() {
-    long result = innerSumTime;
+    @Var long result = innerSumTime;
     if (isRunning()) {
       result += currentInnerTimer.sumTime();
     }
@@ -216,7 +217,7 @@ public final class NestedTimer {
    * also counted (up to the current time). If the timer was never started, this method returns 0.
    */
   public TimeSpan getInnerMaxTime() {
-    long result = innerMaxTime;
+    @Var long result = innerMaxTime;
     if (isRunning()) {
       result = Math.max(result, currentInnerTimer.maxTime());
     }

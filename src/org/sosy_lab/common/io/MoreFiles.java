@@ -24,6 +24,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
+import com.google.errorprone.annotations.Var;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
@@ -68,7 +69,7 @@ public final class MoreFiles {
   }
 
   private static OpenOption[] fileWriteModeToOption(FileWriteMode[] modes) {
-    boolean append = false;
+    @Var boolean append = false;
     for (FileWriteMode mode : modes) {
       if (mode == FileWriteMode.APPEND) {
         append = true;

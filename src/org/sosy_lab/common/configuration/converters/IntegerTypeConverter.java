@@ -41,7 +41,7 @@ public class IntegerTypeConverter implements TypeConverter {
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
-    final Class<?> type = pType.getRawType();
+    Class<?> type = pType.getRawType();
 
     if (!(pOption instanceof IntegerOption)) {
       throw new UnsupportedOperationException(

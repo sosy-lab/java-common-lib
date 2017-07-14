@@ -49,7 +49,7 @@ public class MoreStringsTest {
 
   @Test
   public void test_longStringOf() {
-    final String testString = "TEST-STRING";
+    String testString = "TEST-STRING";
     WithLongString instance = () -> testString;
 
     assertThat(MoreStrings.longStringOf(instance).toString()).isEqualTo(testString);
@@ -58,7 +58,7 @@ public class MoreStringsTest {
   @Test
   @SuppressWarnings("unused")
   public void test_longStringOf_lazy() {
-    final AtomicBoolean wasCalled = new AtomicBoolean(false);
+    AtomicBoolean wasCalled = new AtomicBoolean(false);
     WithLongString instance =
         () -> {
           wasCalled.set(true);

@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Joiner;
+import com.google.errorprone.annotations.Var;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -59,7 +60,7 @@ class OptionPlainTextWriter {
    * @param allInstances All appearances of this option with the same name.
    */
   void writeOption(Iterable<AnnotationInfo> allInstances) {
-    boolean first = true;
+    @Var boolean first = true;
     for (AnnotationInfo annotation : allInstances) {
       String description = getOptionDescription(annotation.element());
       if (!description.isEmpty() && !lastDescription.equals(description)) {
@@ -85,8 +86,8 @@ class OptionPlainTextWriter {
    *
    * @param element field with the option
    */
-  static String getOptionDescription(final AnnotatedElement element) {
-    String text;
+  static String getOptionDescription(AnnotatedElement element) {
+    @Var String text;
     if (element.isAnnotationPresent(Option.class)) {
       text = element.getAnnotation(Option.class).description();
     } else if (element.isAnnotationPresent(Options.class)) {
@@ -104,7 +105,7 @@ class OptionPlainTextWriter {
 
   /** This function returns the formatted information about an {@link Option}. */
   private String getOptionInfo(OptionInfo info) {
-    final StringBuilder optionInfo = new StringBuilder(200);
+    StringBuilder optionInfo = new StringBuilder(200);
     optionInfo.append(info.name());
 
     if (verbose) {
@@ -147,28 +148,27 @@ class OptionPlainTextWriter {
    * This function formats text and splits lines, if they are too long. This functions adds "#"
    * before each line.
    */
-  private static String formatText(final String text) {
+  private static String formatText(String text) {
     return formatText(text, "# ", true);
   }
 
   /** This function formats text and splits lines, if they are too long. */
-  private static String formatText(
-      final String text, final String lineStart, final boolean useLineStartInFirstLine) {
+  private static String formatText(String text, String lineStart, boolean useLineStartInFirstLine) {
     checkNotNull(lineStart);
     if (text.isEmpty()) {
       return text;
     }
 
     // split description into lines
-    final String[] lines = text.split("\n");
+    String[] lines = text.split("\n");
 
     // split lines into more lines, if they are too long
-    final List<String> splittedLines = new ArrayList<>();
-    for (final String fullLine : lines) {
-      String remainingLine = fullLine;
+    List<String> splittedLines = new ArrayList<>();
+    for (String fullLine : lines) {
+      @Var String remainingLine = fullLine;
       while (remainingLine.length() > CHARS_PER_LINE) {
 
-        int spaceIndex = remainingLine.lastIndexOf(' ', CHARS_PER_LINE);
+        @Var int spaceIndex = remainingLine.lastIndexOf(' ', CHARS_PER_LINE);
         if (spaceIndex == -1) {
           spaceIndex = remainingLine.indexOf(' ');
         }
@@ -176,7 +176,7 @@ class OptionPlainTextWriter {
           spaceIndex = remainingLine.length() - 1;
         }
 
-        final String start = remainingLine.substring(0, spaceIndex);
+        String start = remainingLine.substring(0, spaceIndex);
         if (!start.isEmpty()) {
           splittedLines.add(start);
         }
@@ -210,13 +210,12 @@ class OptionPlainTextWriter {
    *
    * @param field field with the {@link Option}-annotation
    */
-  private void appendAllowedValues(
-      final AnnotatedElement field, final Class<?> type, final StringBuilder str) {
+  private void appendAllowedValues(AnnotatedElement field, Class<?> type, StringBuilder str) {
     // if the type is enum,
     // the allowed values can be extracted the enum-class
     if (type.isEnum()) {
-      final Object[] enums = type.getEnumConstants();
-      final String[] enumTitles = new String[enums.length];
+      Object[] enums = type.getEnumConstants();
+      String[] enumTitles = new String[enums.length];
       for (int i = 0; i < enums.length; i++) {
         enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
@@ -236,7 +235,7 @@ class OptionPlainTextWriter {
    * Option}-annotation.
    */
   private void appendOptionValues(AnnotatedElement field, StringBuilder str) {
-    final Option option = field.getAnnotation(Option.class);
+    Option option = field.getAnnotation(Option.class);
     assert option != null;
     if (option.values().length != 0) {
       str.append("  allowed values: ").append(Arrays.toString(option.values())).append('\n');
@@ -256,7 +255,7 @@ class OptionPlainTextWriter {
    * ClassOption}-annotation.
    */
   private void appendClassOptionValues(AnnotatedElement field, StringBuilder str) {
-    final ClassOption classOption = field.getAnnotation(ClassOption.class);
+    ClassOption classOption = field.getAnnotation(ClassOption.class);
     if (classOption != null) {
       if (verbose && classOption.packagePrefix().length != 0) {
         str.append("  packagePrefix: ");
@@ -271,7 +270,7 @@ class OptionPlainTextWriter {
    * FileOption}-annotation.
    */
   private void appendFileOptionValues(AnnotatedElement field, StringBuilder str) {
-    final FileOption fileOption = field.getAnnotation(FileOption.class);
+    FileOption fileOption = field.getAnnotation(FileOption.class);
     if (fileOption != null) {
       if (verbose) {
         str.append("  type of file: ").append(fileOption.value()).append('\n');
@@ -284,7 +283,7 @@ class OptionPlainTextWriter {
    * IntegerOption}-annotation.
    */
   private void appendIntegerOptionValues(AnnotatedElement field, StringBuilder str) {
-    final IntegerOption intOption = field.getAnnotation(IntegerOption.class);
+    IntegerOption intOption = field.getAnnotation(IntegerOption.class);
     if (intOption != null) {
       if (verbose) {
         if (intOption.min() == Long.MIN_VALUE) {
@@ -306,7 +305,7 @@ class OptionPlainTextWriter {
    * TimeSpanOption}-annotation.
    */
   private void appendTimeSpanOptionValues(AnnotatedElement field, StringBuilder str) {
-    final TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
+    TimeSpanOption timeSpanOption = field.getAnnotation(TimeSpanOption.class);
     if (timeSpanOption != null) {
       if (verbose) {
         str.append("  code unit:     ")

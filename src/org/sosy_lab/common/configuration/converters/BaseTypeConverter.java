@@ -130,17 +130,13 @@ public enum BaseTypeConverter implements TypeConverter {
   }
 
   /** Invoke the static "valueOf(String)" method on a class. Helpful for type converters. */
-  public static Object valueOf(final Class<?> type, final String optionName, final String value)
+  public static Object valueOf(Class<?> type, String optionName, String value)
       throws InvalidConfigurationException {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
   }
 
   public static <T> Object invokeStaticMethod(
-      final Class<?> type,
-      final String method,
-      final Class<T> paramType,
-      final T value,
-      final String optionName)
+      Class<?> type, String method, Class<T> paramType, T value, String optionName)
       throws InvalidConfigurationException {
     try {
       Method m = type.getMethod(method, paramType);

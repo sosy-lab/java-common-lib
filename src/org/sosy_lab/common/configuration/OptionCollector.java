@@ -30,6 +30,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.io.MoreFiles;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -78,11 +79,11 @@ public class OptionCollector {
    *
    * @param args use '-v' for verbose output
    */
-  public static void main(final String[] args) {
+  public static void main(String[] args) {
 
     // parse args
-    boolean verbose = false;
-    boolean includeLibraryOptions = false;
+    @Var boolean verbose = false;
+    @Var boolean includeLibraryOptions = false;
     for (String arg : args) {
       if ("-v".equals(arg) || "-verbose".equals(arg)) {
         verbose = true;
@@ -104,7 +105,7 @@ public class OptionCollector {
    * @param out the output target
    */
   public static void collectOptions(
-      final boolean verbose, final boolean includeLibraryOptions, final PrintStream out) {
+      boolean verbose, boolean includeLibraryOptions, PrintStream out) {
     OptionCollector optionCollector = new OptionCollector(verbose, includeLibraryOptions);
     try {
       optionCollector.collectOptions(out);
@@ -137,7 +138,7 @@ public class OptionCollector {
   }
 
   /** This function collects options from all classes and writes them to the output. */
-  private void collectOptions(final PrintStream out) {
+  private void collectOptions(PrintStream out) {
     ClassPath classPath;
     try {
       classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
@@ -166,7 +167,7 @@ public class OptionCollector {
   }
 
   /** Copy files with options documentation found on the class path to the output. */
-  private void copyOptionFilesToOutput(ClassPath classPath, final PrintStream out) {
+  private void copyOptionFilesToOutput(ClassPath classPath, PrintStream out) {
     for (ClassPath.ResourceInfo resourceInfo : classPath.getResources()) {
       if (new File(resourceInfo.getResourceName()).getName().equals(OPTIONS_FILE)) {
         try {
@@ -217,27 +218,27 @@ public class OptionCollector {
    *
    * @param c class where to take the Option from
    */
-  private Stream<AnnotationInfo> collectOptions(final Class<?> c) {
+  private Stream<AnnotationInfo> collectOptions(Class<?> c) {
     Stream.Builder<AnnotationInfo> result = Stream.builder();
     String classSource = getSourceCode(c);
 
-    final Options classOption = c.getAnnotation(Options.class);
+    Options classOption = c.getAnnotation(Options.class);
     verifyNotNull(classOption, "Class without @Options annotation");
     result.accept(OptionsInfo.create(c, classOption.prefix()));
 
-    for (final Field field : c.getDeclaredFields()) {
+    for (Field field : c.getDeclaredFields()) {
       if (field.isAnnotationPresent(Option.class)) {
         Option option = field.getAnnotation(Option.class);
-        final String optionName = Configuration.getOptionName(classOption, field, option);
-        final String defaultValue = getDefaultValue(field, classSource);
+        String optionName = Configuration.getOptionName(classOption, field, option);
+        String defaultValue = getDefaultValue(field, classSource);
         result.accept(OptionInfo.createForField(field, optionName, defaultValue));
       }
     }
 
-    for (final Method method : c.getDeclaredMethods()) {
+    for (Method method : c.getDeclaredMethods()) {
       if (method.isAnnotationPresent(Option.class)) {
         Option option = method.getAnnotation(Option.class);
-        final String optionName = Configuration.getOptionName(classOption, method, option);
+        String optionName = Configuration.getOptionName(classOption, method, option);
         result.accept(OptionInfo.createForMethod(method, optionName));
       }
     }
@@ -249,9 +250,9 @@ public class OptionCollector {
    *
    * @param cls the class whose sourcefile should be retrieved
    */
-  private String getSourceCode(final Class<?> cls) {
+  private String getSourceCode(Class<?> cls) {
     // get name of sourcefile
-    String filename = cls.getName().replace('.', File.separatorChar);
+    @Var String filename = cls.getName().replace('.', File.separatorChar);
 
     // encapsulated classes have a "$" in filename
     if (filename.contains("$")) {
@@ -278,7 +279,7 @@ public class OptionCollector {
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private static Path getSourcePath(CodeSource codeSource) throws URISyntaxException {
     // Get base folder for classes, go via URI to handle escaping
-    Path basePath = Paths.get(codeSource.getLocation().toURI());
+    @Var Path basePath = Paths.get(codeSource.getLocation().toURI());
 
     // check the folders known as source, depending on the current folder
     // structure for the class files
@@ -314,9 +315,9 @@ public class OptionCollector {
    *
    * @param field where to get the default value
    */
-  private static String getDefaultValue(final Field field, final String classSource) {
+  private static String getDefaultValue(Field field, String classSource) {
     // genericType: "boolean" or "java.util.List<java.util.logging.Level>"
-    String typeString = field.getGenericType().toString();
+    @Var String typeString = field.getGenericType().toString();
     if (typeString.matches(".*<.*>")) {
 
       // remove package-definition at front:
@@ -340,6 +341,7 @@ public class OptionCollector {
     // remove prefix of inner classes
     typeString = typeString.replaceAll("[^<>, ]*\\$([^<>, $]*)", "$1");
 
+    @Var
     String defaultValue =
         getDefaultValueFromContent(classSource, getFieldMatchingPattern(field, typeString));
 
@@ -348,7 +350,7 @@ public class OptionCollector {
     // then fieldString is different.
     if (field.getType().isEnum()) {
       if (defaultValue.isEmpty()) {
-        String type = field.getType().toString();
+        @Var String type = field.getType().toString();
         type = type.substring(type.lastIndexOf('.') + 1).replace("$", ".");
         defaultValue =
             getDefaultValueFromContent(classSource, getFieldMatchingPattern(field, type));
@@ -368,7 +370,7 @@ public class OptionCollector {
    * Get pattern for matching a field declaration in a source file. Example: 'private boolean
    * shouldCheck'
    */
-  private static String getFieldMatchingPattern(final Field field, String type) {
+  private static String getFieldMatchingPattern(Field field, String type) {
     return Modifier.toString(field.getModifiers()) + "\\s+" + type + "\\s+" + field.getName();
   }
 
@@ -378,14 +380,13 @@ public class OptionCollector {
    * @param content sourcecode where to search
    * @param fieldPattern regexp specifying the name of the field, whose value is returned
    */
-  private static String getDefaultValueFromContent(
-      final String content, final String fieldPattern) {
+  private static String getDefaultValueFromContent(String content, String fieldPattern) {
     // search for fieldString and get the whole content after it (=rest),
     // in 'rest' search for ';' and return all before it (=defaultValue)
-    String defaultValue = "";
+    @Var String defaultValue = "";
     String[] splitted = content.split(fieldPattern);
     if (splitted.length > 1) { // first part is before fieldString, second part is after it
-      final String rest = splitted[1];
+      String rest = splitted[1];
       defaultValue = rest.substring(0, rest.indexOf(';')).trim();
 
       // remove unnecessary parts of field
@@ -427,7 +428,7 @@ public class OptionCollector {
                   + "s";
         }
 
-        Matcher match = IMMUTABLE_SET_PATTERN.matcher(defaultValue);
+        @Var Matcher match = IMMUTABLE_SET_PATTERN.matcher(defaultValue);
         if (match.matches()) {
           defaultValue = "{" + match.group(2) + "}";
         }
@@ -439,8 +440,7 @@ public class OptionCollector {
     } else {
 
       // special handling for generics
-      final String stringSetFieldPattern =
-          fieldPattern.replace("\\s+Set\\s+", "\\s+Set<String>\\s+");
+      String stringSetFieldPattern = fieldPattern.replace("\\s+Set\\s+", "\\s+Set<String>\\s+");
       if (content.contains(stringSetFieldPattern)) {
         return getDefaultValueFromContent(content, stringSetFieldPattern);
       }

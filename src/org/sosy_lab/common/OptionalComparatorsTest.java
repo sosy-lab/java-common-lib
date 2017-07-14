@@ -67,7 +67,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingIntEmptyFirst_AllPresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
     assertThat(comp.compare(I1, I1)).isEqualTo(0);
     assertThat(comp.compare(I2, I2)).isEqualTo(0);
     assertThat(comp.compare(I1, I2)).isLessThan(0);
@@ -76,7 +76,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingIntEmptyFirst_IomePresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
     assertThat(comp.compare(I1, I_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(I2, I_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(I_EMPTY, I1)).isLessThan(0);
@@ -85,13 +85,13 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingIntEmptyFirst_NonPresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyFirst();
     assertThat(comp.compare(I_EMPTY, I_EMPTY)).isEqualTo(0);
   }
 
   @Test
   public void testComparingIntEmptyLast_AllPresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
     assertThat(comp.compare(I1, I1)).isEqualTo(0);
     assertThat(comp.compare(I2, I2)).isEqualTo(0);
     assertThat(comp.compare(I1, I2)).isLessThan(0);
@@ -100,7 +100,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingIntEmptyLast_IomePresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
     assertThat(comp.compare(I1, I_EMPTY)).isLessThan(0);
     assertThat(comp.compare(I2, I_EMPTY)).isLessThan(0);
     assertThat(comp.compare(I_EMPTY, I1)).isGreaterThan(0);
@@ -109,7 +109,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingIntEmptyLast_NonPresent() {
-    final Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
+    Comparator<OptionalInt> comp = Optionals.comparingIntEmptyLast();
     assertThat(comp.compare(I_EMPTY, I_EMPTY)).isEqualTo(0);
   }
 
@@ -119,7 +119,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingLongEmptyFirst_AllPresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
     assertThat(comp.compare(L1, L1)).isEqualTo(0);
     assertThat(comp.compare(L2, L2)).isEqualTo(0);
     assertThat(comp.compare(L1, L2)).isLessThan(0);
@@ -128,7 +128,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingLongEmptyFirst_LomePresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
     assertThat(comp.compare(L1, L_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(L2, L_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(L_EMPTY, L1)).isLessThan(0);
@@ -137,13 +137,13 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingLongEmptyFirst_NonPresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyFirst();
     assertThat(comp.compare(L_EMPTY, L_EMPTY)).isEqualTo(0);
   }
 
   @Test
   public void testComparingLongEmptyLast_AllPresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
     assertThat(comp.compare(L1, L1)).isEqualTo(0);
     assertThat(comp.compare(L2, L2)).isEqualTo(0);
     assertThat(comp.compare(L1, L2)).isLessThan(0);
@@ -152,7 +152,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingLongEmptyLast_LomePresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
     assertThat(comp.compare(L1, L_EMPTY)).isLessThan(0);
     assertThat(comp.compare(L2, L_EMPTY)).isLessThan(0);
     assertThat(comp.compare(L_EMPTY, L1)).isGreaterThan(0);
@@ -161,7 +161,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingLongEmptyLast_NonPresent() {
-    final Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
+    Comparator<OptionalLong> comp = Optionals.comparingLongEmptyLast();
     assertThat(comp.compare(L_EMPTY, L_EMPTY)).isEqualTo(0);
   }
 
@@ -171,7 +171,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingDoubleEmptyFirst_AllPresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
     assertThat(comp.compare(D1, D1)).isEqualTo(0);
     assertThat(comp.compare(D2, D2)).isEqualTo(0);
     assertThat(comp.compare(D1, D2)).isLessThan(0);
@@ -180,7 +180,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingDoubleEmptyFirst_DomePresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
     assertThat(comp.compare(D1, D_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(D2, D_EMPTY)).isGreaterThan(0);
     assertThat(comp.compare(D_EMPTY, D1)).isLessThan(0);
@@ -189,13 +189,13 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingDoubleEmptyFirst_NonPresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyFirst();
     assertThat(comp.compare(D_EMPTY, D_EMPTY)).isEqualTo(0);
   }
 
   @Test
   public void testComparingDoubleEmptyDast_AllPresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
     assertThat(comp.compare(D1, D1)).isEqualTo(0);
     assertThat(comp.compare(D2, D2)).isEqualTo(0);
     assertThat(comp.compare(D1, D2)).isLessThan(0);
@@ -204,7 +204,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingDoubleEmptyDast_DomePresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
     assertThat(comp.compare(D1, D_EMPTY)).isLessThan(0);
     assertThat(comp.compare(D2, D_EMPTY)).isLessThan(0);
     assertThat(comp.compare(D_EMPTY, D1)).isGreaterThan(0);
@@ -213,7 +213,7 @@ public final class OptionalComparatorsTest {
 
   @Test
   public void testComparingDoubleEmptyDast_NonPresent() {
-    final Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
+    Comparator<OptionalDouble> comp = Optionals.comparingDoubleEmptyLast();
     assertThat(comp.compare(D_EMPTY, D_EMPTY)).isEqualTo(0);
   }
 }

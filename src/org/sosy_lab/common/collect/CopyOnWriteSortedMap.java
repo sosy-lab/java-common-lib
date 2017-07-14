@@ -25,6 +25,7 @@ import com.google.common.collect.ForwardingCollection;
 import com.google.common.collect.ForwardingSortedMap;
 import com.google.common.collect.ForwardingSortedSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -112,8 +113,8 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
 
   /** Update and replace the map, returning the previous map. */
   private PersistentSortedMap<K, V> put0(K pKey, V pValue) {
-    PersistentSortedMap<K, V> oldMap;
-    PersistentSortedMap<K, V> newMap;
+    @Var PersistentSortedMap<K, V> oldMap;
+    @Var PersistentSortedMap<K, V> newMap;
     do {
       oldMap = map.get();
       newMap = oldMap.putAndCopy(pKey, pValue);
@@ -130,8 +131,8 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   @Override
   @CanIgnoreReturnValue
   public @Nullable V remove(Object pKey) {
-    PersistentSortedMap<K, V> oldMap;
-    PersistentSortedMap<K, V> newMap;
+    @Var PersistentSortedMap<K, V> oldMap;
+    @Var PersistentSortedMap<K, V> newMap;
 
     do {
       oldMap = map.get();
@@ -200,7 +201,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   @Override
-  public SortedMap<K, V> headMap(final K pToKey) {
+  public SortedMap<K, V> headMap(K pToKey) {
     checkNotNull(pToKey);
     return new ForwardingSortedMap<K, V>() {
 
@@ -212,7 +213,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   @Override
-  public SortedMap<K, V> tailMap(final K pFromKey) {
+  public SortedMap<K, V> tailMap(K pFromKey) {
     checkNotNull(pFromKey);
     return new ForwardingSortedMap<K, V>() {
 
@@ -224,7 +225,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   @Override
-  public SortedMap<K, V> subMap(final K pFromKey, final K pToKey) {
+  public SortedMap<K, V> subMap(K pFromKey, K pToKey) {
     checkNotNull(pFromKey);
     checkNotNull(pToKey);
     return new ForwardingSortedMap<K, V>() {

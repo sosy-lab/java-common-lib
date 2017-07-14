@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.errorprone.annotations.Var;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -32,7 +33,7 @@ public class ConsoleLogFormatter extends Formatter {
     this(options.useColors());
   }
 
-  private ConsoleLogFormatter(boolean pUseColors) {
+  private ConsoleLogFormatter(@Var boolean pUseColors) {
     // Using colors is only good if stderr is connected to a terminal and not
     // redirected into a file.
     // AFAIK there is no way to determine this from Java, but at least there

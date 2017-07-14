@@ -30,6 +30,7 @@ import com.google.auto.service.AutoService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,7 +158,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     // Check for constructor without Configuration parameter.
     // Private classes and constructors are ignored, these are often used for tests.
     if (!element.getModifiers().contains(Modifier.PRIVATE)) {
-      final List<ExecutableElement> constructors = constructorsIn(element.getEnclosedElements());
+      List<ExecutableElement> constructors = constructorsIn(element.getEnclosedElements());
       for (ExecutableElement constructor : constructors) {
         if (constructor.getModifiers().contains(Modifier.PRIVATE)) {
           continue;
@@ -188,8 +189,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     }
 
     // check if there is any @Option inside or in its super classes (for recursive inject)
-    boolean foundOption = false;
-    TypeElement currentClass = element;
+    @Var boolean foundOption = false;
+    @Var TypeElement currentClass = element;
     do {
       if (hasChildWithAnnotation(currentClass, Option.class)) {
         foundOption = true;
@@ -218,7 +219,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * </ul>
    */
   private void processOption(Element elem) {
-    final Option option = elem.getAnnotation(Option.class);
+    Option option = elem.getAnnotation(Option.class);
 
     Element cls = elem.getEnclosingElement();
     if (cls.getAnnotation(Options.class) == null) {
@@ -244,7 +245,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         break;
       case METHOD:
         // check signature (parameter count, declared exceptions)
-        final ExecutableElement method = (ExecutableElement) elem;
+        ExecutableElement method = (ExecutableElement) elem;
         if (method.getParameters().size() != 1) {
           message(
               ERROR, method, "Methods annotated with @Option need to have exactly one parameter.");
@@ -297,20 +298,20 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * </ul>
    */
   private void checkOptionDetailAnnotations(Element elem) {
-    final List<String> usedDetailAnnotations = new ArrayList<>(2);
+    List<String> usedDetailAnnotations = new ArrayList<>(2);
 
-    for (final AnnotationMirror am : elem.getAnnotationMirrors()) {
+    for (AnnotationMirror am : elem.getAnnotationMirrors()) {
       // The @SomeTypeOption annotation at the current element
-      final Element annotation = am.getAnnotationType().asElement();
+      Element annotation = am.getAnnotationType().asElement();
 
       // The @OptionDetailAnnotation at the declaration of @SomeTypeOption
-      final Optional<? extends AnnotationMirror> optionDetailAnnotation =
+      Optional<? extends AnnotationMirror> optionDetailAnnotation =
           findAnnotationMirror(OptionDetailAnnotation.class, annotation);
       if (!optionDetailAnnotation.isPresent()) {
         continue; // not an option-detail annotation
       }
 
-      final String annotationName = "@" + annotation.getSimpleName();
+      String annotationName = "@" + annotation.getSimpleName();
       usedDetailAnnotations.add(annotationName);
 
       // Now we want to compare the type of the option against the types
@@ -318,7 +319,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // (cf. OptionDetailAnnotation.applicableTo()).
 
       // Determine type of option as declared in source.
-      TypeMirror optionType;
+      @Var TypeMirror optionType;
       switch (elem.getKind()) {
         case FIELD:
           optionType = elem.asType();
@@ -335,8 +336,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       }
 
       // If this option is an array or a collection, get the component type.
-      boolean isArray = false;
-      boolean isCollection = false;
+      @Var boolean isArray = false;
+      @Var boolean isCollection = false;
       if (optionType.getKind() == TypeKind.ARRAY) {
         isArray = true;
         optionType = ((ArrayType) optionType).getComponentType();
@@ -360,7 +361,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
       // This is the string we will use for type matching.
       // It is raw and boxed, because we have only class literals in the acceptedClasses list.
-      String optionTypeName = getRawTypeName(optionType);
+      @Var String optionTypeName = getRawTypeName(optionType);
 
       // Unwrap AnnotatedValue
       if (optionTypeName.equals(AnnotatedValue.class.getName())) {
@@ -381,8 +382,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
                   .get()
                   .getValue();
 
-      boolean foundMatchingType = false;
-      final Set<String> acceptedTypeNames = new HashSet<>();
+      @Var boolean foundMatchingType = false;
+      Set<String> acceptedTypeNames = new HashSet<>();
 
       for (Object listEntry : acceptedClasses) {
         DeclaredType acceptedType = (DeclaredType) ((AnnotationValue) listEntry).getValue();
@@ -435,7 +436,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * currently compiled source). So we have to do the compatibility check ourselves. We just assume
    * that two types with the same fully qualified name are actually the same type.
    */
-  private static boolean isSubtypeOf(TypeMirror type, String superType) {
+  private static boolean isSubtypeOf(@Var TypeMirror type, String superType) {
     checkArgument(type instanceof DeclaredType);
     checkNotNull(superType);
 
@@ -456,7 +457,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * enclosing elements (class, package) with either the value "all" or "options". Returns true if
    * warnings are not suppressed.
    */
-  private static boolean warningsEnabled(Element element) {
+  private static boolean warningsEnabled(@Var Element element) {
     do {
       SuppressWarnings suppress = element.getAnnotation(SuppressWarnings.class);
       if (suppress != null) {
@@ -475,8 +476,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * Check whether the given element contains any directly enclosed element with a specific
    * annotation.
    */
-  private boolean hasChildWithAnnotation(
-      final Element element, final Class<? extends Annotation> annotation) {
+  private boolean hasChildWithAnnotation(Element element, Class<? extends Annotation> annotation) {
     return element
         .getEnclosedElements()
         .stream()
@@ -494,8 +494,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    *     element is not annotated with this annotation.
    */
   private Optional<? extends AnnotationMirror> findAnnotationMirror(
-      final Class<? extends Annotation> annotation, final Element elem) {
-    final String annotationName = annotation.getName();
+      Class<? extends Annotation> annotation, Element elem) {
+    String annotationName = annotation.getName();
     return elem.getAnnotationMirrors()
         .stream()
         .filter((am) -> am.getAnnotationType().toString().equals(annotationName))
@@ -513,9 +513,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    *     specified.
    */
   private static Optional<? extends AnnotationValue> findAnnotationValue(
-      final Class<? extends Annotation> annotationClass,
-      final String fieldName,
-      final AnnotationMirror annotation) {
+      Class<? extends Annotation> annotationClass, String fieldName, AnnotationMirror annotation) {
     checkArgument(annotation.getAnnotationType().toString().equals(annotationClass.getName()));
 
     // check whether annotation declares field
@@ -538,12 +536,12 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * Given a TypeMirror representing some type, this method produces a String representation of the
    * raw type. It also eliminates primitive types by boxing them.
    */
-  private String getRawTypeName(final TypeMirror t) {
-    TypeMirror type = typeUtils().erasure(t);
+  private String getRawTypeName(TypeMirror t) {
+    @Var TypeMirror type = typeUtils().erasure(t);
     if (type.getKind().isPrimitive()) {
       type = typeUtils().boxedClass((PrimitiveType) type).asType();
     }
-    String typeName = type.toString();
+    @Var String typeName = type.toString();
 
     // Unfortunately, there is an Eclipse bug in the erasure() method called above:
     // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340635
@@ -557,10 +555,10 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public Iterable<? extends Completion> getCompletions(
-      final @Nullable Element element,
-      final @Nullable AnnotationMirror annotation,
-      final @Nullable ExecutableElement field,
-      final @Nullable String userText) {
+      @Nullable Element element,
+      @Nullable AnnotationMirror annotation,
+      @Nullable ExecutableElement field,
+      @Nullable String userText) {
 
     if (element == null || annotation == null || field == null) {
       return super.getCompletions(element, annotation, field, userText);
@@ -579,11 +577,11 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   }
 
   private Iterable<? extends Completion> returnPackagePrefixCompletions(
-      final Element element, final String userText) {
+      Element element, String userText) {
     List<Completion> packages = new ArrayList<>();
     PackageElement pkg = elementUtils().getPackageOf(element);
     if (!pkg.isUnnamed()) {
-      String name = pkg.getQualifiedName().toString();
+      @Var String name = pkg.getQualifiedName().toString();
       do {
         if (!name.startsWith(userText)) {
           break;

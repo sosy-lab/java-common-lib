@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -77,7 +78,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
     // except that it never asks the parent class loader
     synchronized (getClassLoadingLock(name)) {
       // First, check if the class has already been loaded
-      Class<?> c = findLoadedClass(name);
+      @Var Class<?> c = findLoadedClass(name);
       if (c == null) {
         // If still not found, then invoke findClass in order
         // to find the class.

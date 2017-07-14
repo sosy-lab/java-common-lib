@@ -21,6 +21,7 @@ package org.sosy_lab.common;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.Strings;
+import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Writer;
@@ -93,7 +94,7 @@ public final class JSON {
 
   /** Encode an list into JSON text and write it to out. */
   private static void writeJSONString(Iterable<?> list, Appendable out) throws IOException {
-    boolean first = true;
+    @Var boolean first = true;
 
     out.append('[');
     for (Object value : list) {
@@ -110,7 +111,7 @@ public final class JSON {
 
   /** Encode a map into JSON text and write it to out. */
   private static void writeJSONString(Map<?, ?> map, Appendable out) throws IOException {
-    boolean first = true;
+    @Var boolean first = true;
 
     out.append('{');
     for (Map.Entry<?, ?> entry : map.entrySet()) {

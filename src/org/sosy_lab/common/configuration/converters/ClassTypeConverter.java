@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration.converters;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class ClassTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
 
     // null means "no prefix"
-    Iterable<String> packagePrefixes = Collections.<String>singleton(null);
+    @Var Iterable<String> packagePrefixes = Collections.<String>singleton(null);
 
     // get optional package prefix
     if (secondaryOption != null) {
@@ -57,7 +58,7 @@ public class ClassTypeConverter implements TypeConverter {
     }
 
     // get class object
-    Class<?> cls = null;
+    @Var Class<?> cls = null;
     for (String prefix : packagePrefixes) {
       try {
         cls = Classes.forName(value, prefix);
@@ -73,7 +74,7 @@ public class ClassTypeConverter implements TypeConverter {
     Object result;
     if (type.getRawType().equals(Class.class)) {
       // get value of type parameter
-      final TypeToken<?> targetType = Classes.getSingleTypeArgument(type);
+      TypeToken<?> targetType = Classes.getSingleTypeArgument(type);
 
       // check type
       if (!targetType.isSupertypeOf(cls)) {

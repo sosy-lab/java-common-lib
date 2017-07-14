@@ -44,7 +44,7 @@ public class MapsDifference {
    * Returns a {@link Visitor} that collects all map differences as {@link Entry} objects into a
    * given collection.
    */
-  public static <K, V> Visitor<K, V> collectMapsDifferenceTo(final Collection<Entry<K, V>> target) {
+  public static <K, V> Visitor<K, V> collectMapsDifferenceTo(Collection<Entry<K, V>> target) {
     checkNotNull(target);
     return new Visitor<K, V>() {
       @Override

@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.io.CharSource;
+import com.google.errorprone.annotations.Var;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -321,7 +322,7 @@ public class ParserTest {
 
   @Test
   public final void includeDepthN() throws IOException {
-    Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
+    @Var Path included = createTempFile(TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "foo.bar=abc");
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(included);
@@ -394,7 +395,7 @@ public class ParserTest {
 
     List<Path> allFiles = new ArrayList<>();
     allFiles.add(firstIncluded);
-    Path included = firstIncluded;
+    @Var Path included = firstIncluded;
 
     for (int i = 0; i < MAX_RECURSIVE_INCLUDE_TEST_DEPTH; i++) {
       included =

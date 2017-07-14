@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration.converters;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
       Path pSource,
       LogManager logger)
       throws InvalidConfigurationException {
-    final Class<?> type = pType.getRawType();
+    Class<?> type = pType.getRawType();
 
     if (!(pOption instanceof TimeSpanOption)) {
       throw new UnsupportedOperationException(
@@ -59,7 +60,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
     TimeSpanOption option = (TimeSpanOption) pOption;
 
     // find unit in input string
-    int i = valueStr.length() - 1;
+    @Var int i = valueStr.length() - 1;
     CharMatcher letterMatcher = CharMatcher.javaLetter();
     while (i >= 0 && letterMatcher.matches(valueStr.charAt(i))) {
       i--;
@@ -69,7 +70,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
     }
 
     // convert unit string to TimeUnit
-    TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i + 1));
+    @Var TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i + 1));
     if (userUnit == null) {
       userUnit = option.defaultUserUnit();
     }

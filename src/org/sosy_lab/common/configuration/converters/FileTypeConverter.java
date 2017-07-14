@@ -25,6 +25,7 @@ import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.Var;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
@@ -132,7 +133,7 @@ public final class FileTypeConverter implements TypeConverter {
       return pPath; // any path allowed
     }
 
-    String path = pPath.toString();
+    @Var String path = pPath.toString();
 
     if (pPath.isAbsolute()) {
       if (pPath.startsWith(TEMP_DIR)) {
@@ -149,7 +150,7 @@ public final class FileTypeConverter implements TypeConverter {
           "because it contains the character '%s'", optionName, pPath, File.pathSeparator);
     }
 
-    int depth = 0;
+    @Var int depth = 0;
     for (String component : Splitter.on(File.separator).split(path)) {
       switch (component) {
         case "":
@@ -231,7 +232,7 @@ public final class FileTypeConverter implements TypeConverter {
       String optionName, T pDefaultValue, TypeToken<T> pType, Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    final Class<?> type = pType.getRawType();
+    Class<?> type = pType.getRawType();
     checkApplicability(type, secondaryOption, optionName);
     assert secondaryOption != null : "checkApplicability should ensure this";
 
@@ -280,11 +281,7 @@ public final class FileTypeConverter implements TypeConverter {
    */
   @SuppressWarnings("CheckReturnValue")
   private Object handleFileOption(
-      final String optionName,
-      Path file,
-      final FileOption.Type typeInfo,
-      final Class<?> targetType,
-      final Path source)
+      String optionName, @Var Path file, FileOption.Type typeInfo, Class<?> targetType, Path source)
       throws InvalidConfigurationException {
 
     if (isOutputOption(typeInfo)) {

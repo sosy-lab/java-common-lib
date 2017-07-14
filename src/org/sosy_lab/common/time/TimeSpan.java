@@ -38,6 +38,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.math.LongMath;
 import com.google.common.primitives.Longs;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.Var;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -143,10 +144,10 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     // values with units: more elaborate parsing necessary
     List<String> tokens = splitIntoTokens(input);
 
-    long days = 0;
-    long hours = 0;
-    long minutes = 0;
-    long seconds = 0;
+    @Var long days = 0;
+    @Var long hours = 0;
+    @Var long minutes = 0;
+    @Var long seconds = 0;
 
     Iterator<String> it = tokens.iterator();
 
@@ -205,8 +206,8 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   private static List<String> splitIntoTokens(String input) {
     List<String> tokens = Lists.newArrayList();
-    CharType previous = CharType.BEGIN;
-    int pos = 0;
+    @Var CharType previous = CharType.BEGIN;
+    @Var int pos = 0;
 
     for (int i = 0; i <= input.length(); ++i) {
 
@@ -306,7 +307,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * exact value.
    */
   @VisibleForTesting
-  TimeSpan toIfPossible(TimeUnit dest) {
+  TimeSpan toIfPossible(@Var TimeUnit dest) {
     if (dest.equals(unit)) {
       return this;
     }
@@ -448,7 +449,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * @throws ArithmeticException If no unit is large enough to represent the result value.
    */
   public static TimeSpan sum(TimeSpan a, TimeSpan b) {
-    TimeUnit leastCommonUnit = leastCommonUnit(a, b);
+    @Var TimeUnit leastCommonUnit = leastCommonUnit(a, b);
     while (true) {
       try {
         return new TimeSpan(
@@ -478,7 +479,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     Iterator<TimeSpan> it = timeSpans.iterator();
     checkArgument(it.hasNext());
 
-    TimeSpan result = it.next();
+    @Var TimeSpan result = it.next();
     // TODO Summing in loop looses more precision than necessary.
     while (it.hasNext()) {
       result = sum(result, it.next());
@@ -501,7 +502,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
    * large and a very small value.
    */
   public static TimeSpan difference(TimeSpan a, TimeSpan b) {
-    TimeUnit leastCommonUnit = leastCommonUnit(a, b);
+    @Var TimeUnit leastCommonUnit = leastCommonUnit(a, b);
     while (true) {
       try {
         return new TimeSpan(
@@ -527,7 +528,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   @CheckReturnValue
   public TimeSpan multiply(int factor) {
     checkArgument(factor >= 0, "Cannot multiply TimeSpan with negative value %s", factor);
-    TimeUnit dest = unit;
+    @Var TimeUnit dest = unit;
     while (true) {
       try {
         return new TimeSpan(LongMath.checkedMultiply(getChecked(dest), factor), dest);
@@ -562,9 +563,9 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   @VisibleForTesting
   static final Function<TimeSpan, String> FORMAT_HUMAN_READABLE_LARGE =
       pInput -> {
-        final TimeUnit unit = pInput.getUnit();
-        final StringBuilder result = new StringBuilder();
-        boolean started = false;
+        TimeUnit unit = pInput.getUnit();
+        StringBuilder result = new StringBuilder();
+        @Var boolean started = false;
 
         long years = pInput.getChecked(DAYS) / 365;
         if (years > 0) {

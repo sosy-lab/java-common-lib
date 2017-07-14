@@ -30,6 +30,7 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.common.io.MoreFiles;
+import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -381,9 +382,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
     // First method in stacktrace is this method, second is the log() method.
     // So we can skip 2 stack trace elements in any case.
-    int traceIndex = 2;
+    @Var int traceIndex = 2;
 
-    StackTraceElement frame = trace.get(traceIndex);
+    @Var StackTraceElement frame = trace.get(traceIndex);
     while (frame.getMethodName().startsWith("log") || frame.getMethodName().startsWith("access$")) {
       traceIndex++;
       frame = trace.get(traceIndex);
@@ -417,7 +418,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     String[] argsStr = new String[args.length];
     for (int i = 0; i < args.length; i++) {
       Object o = firstNonNull(args[i], "null");
-      String arg;
+      @Var String arg;
       if (o instanceof Appender && (truncateSize > 0)) {
         arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
       } else {
@@ -499,13 +500,13 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       // use exception stack trace here so that the location where the exception
       // occurred appears in the message
       List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
-      StackTraceElement frame = trace.get(0);
+      @Var StackTraceElement frame = trace.get(0);
 
       if (e instanceof InvalidConfigurationException) {
         // find first method outside of the Configuration class,
         // this is probably the most interesting trace element
         String confPackage = Configuration.class.getPackage().getName();
-        int traceIndex = 0;
+        @Var int traceIndex = 0;
         while (frame.getClassName().startsWith(confPackage)) {
           traceIndex++;
           frame = trace.get(traceIndex);

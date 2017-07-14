@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
 import com.google.common.io.CharSource;
+import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -196,17 +197,17 @@ class Parser {
     checkNotNull(basePath);
     checkNotNull(source);
 
-    String line;
-    int lineno = 0;
-    String currentPrefix = "";
-    String currentOptionName = null;
-    String currentValue = null;
+    @Var String line;
+    @Var int lineno = 0;
+    @Var String currentPrefix = "";
+    @Var String currentOptionName = null;
+    @Var String currentValue = null;
     Map<String, String> definedOptions = new HashMap<>();
 
     while ((line = r.readLine()) != null) {
       lineno++;
       line = line.trim();
-      final String fullLine = line;
+      String fullLine = line;
 
       assert (currentValue == null) == (currentOptionName == null);
 

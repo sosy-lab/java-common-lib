@@ -31,6 +31,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.errorprone.annotations.Var;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -85,7 +86,7 @@ public class ProcessExecutor<E extends Exception> {
   protected final LogManager logger;
 
   /** @see #ProcessExecutor(LogManager, Class, String...) */
-  public ProcessExecutor(final LogManager logger, Class<E> exceptionClass, String... cmd)
+  public ProcessExecutor(LogManager logger, Class<E> exceptionClass, String... cmd)
       throws IOException {
     this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
   }
@@ -113,7 +114,7 @@ public class ProcessExecutor<E extends Exception> {
    * @throws IOException If the process cannot be executed.
    */
   public ProcessExecutor(
-      final LogManager logger,
+      LogManager logger,
       Class<E> exceptionClass,
       Map<String, String> environmentOverride,
       String... cmd)
@@ -138,7 +139,7 @@ public class ProcessExecutor<E extends Exception> {
       }
     }
 
-    final Process process = proc.start();
+    Process process = proc.start();
     processFuture =
         executor.submit(
             () -> {
@@ -190,7 +191,7 @@ public class ProcessExecutor<E extends Exception> {
                   new BufferedReader(
                       // platform charset is what processes usually use for communication
                       new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
-                String line;
+                @Var String line;
                 while ((line = reader.readLine()) != null) {
                   handleOutput(line);
                 }
@@ -215,7 +216,7 @@ public class ProcessExecutor<E extends Exception> {
                   new BufferedReader(
                       // platform charset is what processes usually use for communication
                       new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
-                String line;
+                @Var String line;
                 while ((line = reader.readLine()) != null) {
                   handleErrorOutput(line);
                 }
@@ -297,10 +298,9 @@ public class ProcessExecutor<E extends Exception> {
    * @throws TimeoutException If timeout is hit.
    * @throws InterruptedException If the current thread is interrupted.
    */
-  public int join(final long timelimit)
-      throws IOException, E, TimeoutException, InterruptedException {
+  public int join(long timelimit) throws IOException, E, TimeoutException, InterruptedException {
     try {
-      Integer exitCode = null;
+      @Var Integer exitCode = null;
       try {
         if (timelimit > 0) {
           exitCode = processFuture.get(timelimit, TimeUnit.MILLISECONDS);

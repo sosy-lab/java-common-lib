@@ -115,7 +115,7 @@ public final class Timer {
     start(clock.read());
   }
 
-  void start(final long newStartTime) {
+  void start(long newStartTime) {
     checkState(!running);
 
     startTime = newStartTime;
@@ -135,7 +135,7 @@ public final class Timer {
     }
   }
 
-  void stop(final long endTime) {
+  void stop(long endTime) {
     checkState(running);
 
     lastIntervalLength = endTime - startTime;

@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharSource;
 import com.google.common.io.Resources;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -200,7 +201,7 @@ public final class ConfigurationBuilder {
 
     // Need to append something to base path because resolveSibling() is used.
     Path base = Paths.get(basePath).resolve("dummy");
-    final Parser parser = Parser.parse(source, Optional.of(base), sourceName);
+    Parser parser = Parser.parse(source, Optional.of(base), sourceName);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -232,7 +233,7 @@ public final class ConfigurationBuilder {
 
     setupProperties();
 
-    final Parser parser = Parser.parse(file);
+    Parser parser = Parser.parse(file);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -256,8 +257,8 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     // Get the path to the source, used for error messages and resolving relative path names.
-    Path sourcePath;
-    String sourceString;
+    @Var Path sourcePath;
+    @Var String sourceString;
     try {
       sourcePath = Paths.get(url.toURI());
       sourceString = sourcePath.toString();
@@ -269,7 +270,7 @@ public final class ConfigurationBuilder {
     }
 
     try {
-      final Parser parser = Parser.parse(source, Optional.ofNullable(sourcePath), sourceString);
+      Parser parser = Parser.parse(source, Optional.ofNullable(sourcePath), sourceString);
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {

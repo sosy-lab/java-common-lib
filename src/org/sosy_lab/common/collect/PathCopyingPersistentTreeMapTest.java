@@ -31,6 +31,7 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.testing.EqualsTester;
+import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -50,7 +51,7 @@ public class PathCopyingPersistentTreeMapTest {
 
         @Override
         protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
-          PersistentSortedMap<String, String> result = PathCopyingPersistentTreeMap.of();
+          @Var PersistentSortedMap<String, String> result = PathCopyingPersistentTreeMap.of();
           for (Entry<String, String> entry : pEntries) {
             result = result.putAndCopy(entry.getKey(), entry.getValue());
           }
@@ -291,7 +292,7 @@ public class PathCopyingPersistentTreeMapTest {
 
   @Test
   public void testRandom() {
-    final int iterations = 50;
+    int iterations = 50;
     Random rnd = new Random(3987432434L); // static seed for reproducibility
     SortedMap<String, String> comparison = new TreeMap<>();
 

@@ -26,6 +26,7 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
+import com.google.errorprone.annotations.Var;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -68,8 +69,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   private final @Nullable T head; // only null for the empty list
   private final @Nullable PersistentLinkedList<T> tail; // only null for the empty list
 
-  private PersistentLinkedList(
-      final @Nullable T head, final @Nullable PersistentLinkedList<T> tail) {
+  private PersistentLinkedList(@Nullable T head, @Nullable PersistentLinkedList<T> tail) {
     this.head = head;
     this.tail = tail;
   }
@@ -97,7 +97,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    *
    * @return A list containing the specified value
    */
-  public static <T> PersistentLinkedList<T> of(final T value) {
+  public static <T> PersistentLinkedList<T> of(T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
   }
@@ -107,7 +107,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    *
    * @return A list containing the specified values
    */
-  public static <T> PersistentLinkedList<T> of(final T v1, final T v2) {
+  public static <T> PersistentLinkedList<T> of(T v1, T v2) {
     return of(v2).with(v1);
   }
 
@@ -116,7 +116,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    *
    * @return A list containing the specified values
    */
-  public static <T> PersistentLinkedList<T> of(final T v1, final T v2, final T v3) {
+  public static <T> PersistentLinkedList<T> of(T v1, T v2, T v3) {
     return of(v3).with(v2).with(v1);
   }
 
@@ -126,7 +126,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return A list containing the specified values
    */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> of(final T v1, final T... values) {
+  public static <T> PersistentLinkedList<T> of(T v1, T... values) {
     return copyOf(values).with(v1);
   }
 
@@ -136,7 +136,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return A list containing the specified values
    */
   @SuppressWarnings("unchecked")
-  public static <T> PersistentLinkedList<T> copyOf(final T... values) {
+  public static <T> PersistentLinkedList<T> copyOf(T... values) {
     return copyOf(Arrays.asList(values));
   }
 
@@ -145,11 +145,11 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    *
    * @return A new list with the values from the Iterable
    */
-  public static <T> PersistentLinkedList<T> copyOf(final List<T> values) {
+  public static <T> PersistentLinkedList<T> copyOf(List<T> values) {
     if (values instanceof PersistentLinkedList<?>) {
       return (PersistentLinkedList<T>) values;
     }
-    PersistentLinkedList<T> result = PersistentLinkedList.<T>of();
+    @Var PersistentLinkedList<T> result = PersistentLinkedList.<T>of();
     for (T value : Lists.reverse(values)) {
       result = result.with(value);
     }
@@ -182,7 +182,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return A new list with value as the head and the old list as the tail
    */
   @Override
-  public PersistentLinkedList<T> with(final T value) {
+  public PersistentLinkedList<T> with(T value) {
     checkNotNull(value);
     return new PersistentLinkedList<>(value, this);
   }
@@ -193,8 +193,8 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return A new list with value sas the head and the old list as the tail
    */
   @Override
-  public PersistentLinkedList<T> withAll(List<T> values) {
-    PersistentLinkedList<T> result = this;
+  public PersistentLinkedList<T> withAll(@Var List<T> values) {
+    @Var PersistentLinkedList<T> result = this;
     if (values instanceof PersistentLinkedList<?>) {
       // does not support listIterator() and thus fails on Lists.reverse()
       values = ImmutableList.copyOf(values);
@@ -211,11 +211,11 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return A new list omitting the specified value
    */
   @Override
-  public PersistentLinkedList<T> without(final @Nullable T value) {
-    PersistentLinkedList<T> suffix = of(); // remainder of list after value
+  public PersistentLinkedList<T> without(@Nullable T value) {
+    @Var PersistentLinkedList<T> suffix = of(); // remainder of list after value
 
     // find position of value and update suffix
-    int pos = 0;
+    @Var int pos = 0;
     for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
       if (Objects.equals(value, list.head)) {
         suffix = list.tail;
@@ -229,7 +229,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     ImmutableList<T> prefix = from(this).limit(pos).toList();
 
     // concatenate prefix and suffix
-    PersistentLinkedList<T> result = suffix;
+    @Var PersistentLinkedList<T> result = suffix;
     for (T v : prefix.reverse()) {
       result = result.with(v);
     }
@@ -249,7 +249,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    */
   @Override
   public int size() {
-    int size = 0;
+    @Var int size = 0;
     for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
       ++size;
     }
@@ -269,7 +269,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    */
   @Override
   public PersistentLinkedList<T> reversed() {
-    PersistentLinkedList<T> result = empty();
+    @Var PersistentLinkedList<T> result = empty();
     for (PersistentLinkedList<T> p = this; !p.isEmpty(); p = p.tail) {
       result = result.with(p.head);
     }
@@ -282,7 +282,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   @Override
-  public ListIterator<T> listIterator(final int index) {
+  public ListIterator<T> listIterator(int index) {
     if (index < 0) {
       throw new IndexOutOfBoundsException();
     }
@@ -394,7 +394,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   private static class PersistentLinkedListBuilder<T> {
     private PersistentLinkedList<T> list = PersistentLinkedList.of();
 
-    void add(final T e) {
+    void add(T e) {
       list = list.with(e);
     }
 

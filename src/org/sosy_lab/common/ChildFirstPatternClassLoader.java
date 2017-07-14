@@ -21,6 +21,7 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.Var;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.function.Predicate;
@@ -83,7 +84,7 @@ public class ChildFirstPatternClassLoader extends URLClassLoader {
     // except that it never asks the parent class loader
     synchronized (getClassLoadingLock(name)) {
       // First, check if the class has already been loaded
-      Class<?> c = findLoadedClass(name);
+      @Var Class<?> c = findLoadedClass(name);
       if (c == null) {
         // If still not found, then invoke findClass in order
         // to find the class.

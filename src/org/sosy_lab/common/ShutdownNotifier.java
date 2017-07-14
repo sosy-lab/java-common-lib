@@ -248,7 +248,7 @@ public final class ShutdownNotifier {
    * anything, you need to register the returned listener with an instance of this class.
    */
   public static ShutdownRequestListener interruptCurrentThreadOnShutdown() {
-    final Thread currentThread = Thread.currentThread();
+    Thread currentThread = Thread.currentThread();
     return pReason -> currentThread.interrupt();
   }
 

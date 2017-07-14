@@ -235,30 +235,30 @@ public class TimeSpanTest {
 
   @Test
   public void testToIfPossibleNoOverflow() {
-    final TimeSpan resultAsHours = LARGE.toIfPossible(HOURS);
+    TimeSpan resultAsHours = LARGE.toIfPossible(HOURS);
     assertThat(resultAsHours.getUnit()).isEqualTo(HOURS);
     assertThat(resultAsHours).isEqualTo(LARGE_AS_HOURS);
 
-    final TimeSpan resultAsMinutes = LARGE.toIfPossible(MINUTES);
+    TimeSpan resultAsMinutes = LARGE.toIfPossible(MINUTES);
     assertThat(resultAsMinutes.getUnit()).isEqualTo(MINUTES);
     assertThat(resultAsMinutes).isEqualTo(LARGE_AS_MINUTES);
   }
 
   @Test
   public void testToIfPossibleOverflow() {
-    final TimeSpan resultForSeconds = LARGE.toIfPossible(SECONDS);
+    TimeSpan resultForSeconds = LARGE.toIfPossible(SECONDS);
     assertThat(resultForSeconds.getUnit()).isEqualTo(MINUTES);
     assertThat(resultForSeconds).isEqualTo(LARGE_AS_MINUTES);
 
-    final TimeSpan resultForMillis = LARGE.toIfPossible(MILLISECONDS);
+    TimeSpan resultForMillis = LARGE.toIfPossible(MILLISECONDS);
     assertThat(resultForMillis.getUnit()).isEqualTo(MINUTES);
     assertThat(resultForMillis).isEqualTo(LARGE_AS_MINUTES);
 
-    final TimeSpan resultForMicros = LARGE.toIfPossible(MICROSECONDS);
+    TimeSpan resultForMicros = LARGE.toIfPossible(MICROSECONDS);
     assertThat(resultForMicros.getUnit()).isEqualTo(MINUTES);
     assertThat(resultForMicros).isEqualTo(LARGE_AS_MINUTES);
 
-    final TimeSpan resultForNanos = LARGE.toIfPossible(NANOSECONDS);
+    TimeSpan resultForNanos = LARGE.toIfPossible(NANOSECONDS);
     assertThat(resultForNanos.getUnit()).isEqualTo(MINUTES);
     assertThat(resultForNanos).isEqualTo(LARGE_AS_MINUTES);
   }

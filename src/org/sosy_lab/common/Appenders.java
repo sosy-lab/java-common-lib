@@ -42,7 +42,7 @@ public class Appenders {
    * @param o The object which will be dumped, may be null.
    * @return an {@link Appender} instance
    */
-  public static Appender createAppender(@Nullable final Object o) {
+  public static Appender createAppender(@Nullable Object o) {
     if (o instanceof Appender) {
       return (Appender) o;
     } else {
@@ -59,8 +59,7 @@ public class Appenders {
    * @param o The object which will be dumped, may be null.
    * @throws IOException If the appendable throws an IOException
    */
-  public static void appendTo(final Appendable output, @Nullable final Object o)
-      throws IOException {
+  public static void appendTo(Appendable output, @Nullable Object o) throws IOException {
     if (o instanceof Appender) {
       ((Appender) o).appendTo(output);
     } else {
@@ -95,7 +94,7 @@ public class Appenders {
    * @param it The iterable which will be dumped.
    * @return an {@link Appender} instance
    */
-  public static Appender forIterable(final Joiner joiner, final Iterable<?> it) {
+  public static Appender forIterable(Joiner joiner, Iterable<?> it) {
     checkNotNull(joiner);
     checkNotNull(it);
 
@@ -115,7 +114,7 @@ public class Appenders {
    * @param map The map which will be dumped.
    * @return an {@link Appender} instance
    */
-  public static Appender forMap(final Joiner.MapJoiner joiner, final Map<?, ?> map) {
+  public static Appender forMap(Joiner.MapJoiner joiner, Map<?, ?> map) {
     checkNotNull(joiner);
     checkNotNull(map);
 
@@ -141,7 +140,7 @@ public class Appenders {
    * @param o The object which will be dumped, may be null.
    * @return an {@link Appender} instance
    */
-  public static Appender fromToStringMethod(@Nullable final Object o) {
+  public static Appender fromToStringMethod(@Nullable Object o) {
     return new AbstractAppender() {
       @Override
       public void appendTo(Appendable appendable) throws IOException {
@@ -156,7 +155,7 @@ public class Appenders {
    * Appender#appendTo(Appendable)} method is called. The iterable may not contain nulls or be null
    * itself..
    */
-  public static Appender concat(final Iterable<Appender> pAppenders) {
+  public static Appender concat(Iterable<Appender> pAppenders) {
     checkNotNull(pAppenders);
     return new AbstractAppender() {
       @Override
@@ -174,7 +173,7 @@ public class Appenders {
    *
    * @throws NullPointerException if any of the provided appendables is null
    */
-  public static Appender concat(final Appender... pAppenders) {
+  public static Appender concat(Appender... pAppenders) {
     return concat(ImmutableList.copyOf(pAppenders));
   }
 
@@ -212,9 +211,9 @@ public class Appenders {
    * @return a string representation of the passed object, with a maximum size of <code>truncateAt
    *     </code>
    */
-  public static String toStringWithTruncation(Appender a, final int truncateAt) {
+  public static String toStringWithTruncation(Appender a, int truncateAt) {
     checkArgument(truncateAt >= 0, "Maximum size of String cannot be negative");
-    final StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     Appendable limiter =
         new Appendable() {
 

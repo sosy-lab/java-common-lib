@@ -40,6 +40,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.Var;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
@@ -324,7 +325,7 @@ public final class Configuration {
   @Deprecated
   public String getProperty(String key) {
     checkNotNull(key);
-    String result = properties.get(prefix + key);
+    @Var String result = properties.get(prefix + key);
     unusedProperties.remove(prefix + key);
 
     if (result == null && !prefix.isEmpty()) {
@@ -408,28 +409,28 @@ public final class Configuration {
     checkNotNull(cls);
     checkArgument(cls.isAssignableFrom(obj.getClass()));
 
-    final Options options = cls.getAnnotation(Options.class);
+    Options options = cls.getAnnotation(Options.class);
     checkArgument(
         options != null,
         "Class %s must have @Options annotation. "
             + "If you used inject(Object), try inject(Object, Class) instead.",
         cls.getName());
 
-    final Field[] fields = cls.getDeclaredFields();
+    Field[] fields = cls.getDeclaredFields();
     AccessibleObject.setAccessible(fields, true);
 
-    final Method[] methods = cls.getDeclaredMethods();
+    Method[] methods = cls.getDeclaredMethods();
     AccessibleObject.setAccessible(methods, true);
 
     try {
-      for (final Field field : fields) {
+      for (Field field : fields) {
         // ignore all non-option fields
         if (field.isAnnotationPresent(Option.class)) {
           setOptionValueForField(obj, field, options);
         }
       }
 
-      for (final Method method : methods) {
+      for (Method method : methods) {
         // ignore all non-option methods
         if (method.isAnnotationPresent(Option.class)) {
           setOptionValueForMethod(obj, method, options);
@@ -450,7 +451,7 @@ public final class Configuration {
    * @throws InvalidConfigurationException If the user specified configuration is wrong.
    */
   public void recursiveInject(Object obj) throws InvalidConfigurationException {
-    Class<?> cls = obj.getClass();
+    @Var Class<?> cls = obj.getClass();
     checkArgument(
         cls.isAnnotationPresent(Options.class),
         "Class %s must have @Options annotation.",
@@ -473,8 +474,7 @@ public final class Configuration {
    * @param field the field of the value to be injected
    * @param options options-annotation of the class of the object
    */
-  private <T> void setOptionValueForField(
-      final Object obj, final Field field, final Options options)
+  private <T> void setOptionValueForField(Object obj, Field field, Options options)
       throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of field
@@ -488,7 +488,7 @@ public final class Configuration {
     }
 
     // try to read default value
-    Object defaultValue = null;
+    @Var Object defaultValue = null;
     try {
       defaultValue = field.get(obj);
     } catch (IllegalArgumentException e) {
@@ -496,16 +496,16 @@ public final class Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    final T typedDefaultValue = (T) defaultValue;
+    T typedDefaultValue = (T) defaultValue;
 
     // determine type of option
     @SuppressWarnings("unchecked")
-    final TypeToken<T> type = (TypeToken<T>) TypeToken.of(field.getGenericType());
+    TypeToken<T> type = (TypeToken<T>) TypeToken.of(field.getGenericType());
 
     // get value
-    final Option option = field.getAnnotation(Option.class);
-    final String name = getOptionName(options, field, option);
-    final Object value = getValue(options, field, typedDefaultValue, type, option, field);
+    Option option = field.getAnnotation(Option.class);
+    String name = getOptionName(options, field, option);
+    Object value = getValue(options, field, typedDefaultValue, type, option, field);
 
     // options which were not changed need not to be set
     if (value == defaultValue) {
@@ -548,7 +548,7 @@ public final class Configuration {
    * @param method the method of the value to be injected
    * @param options options-annotation of the class of the object
    */
-  private void setOptionValueForMethod(final Object obj, final Method method, final Options options)
+  private void setOptionValueForMethod(Object obj, Method method, Options options)
       throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of method
@@ -563,17 +563,17 @@ public final class Configuration {
     }
 
     // determine type of option
-    final Type[] parameters = method.getGenericParameterTypes();
+    Type[] parameters = method.getGenericParameterTypes();
     if (parameters.length != 1) {
       throw new UnsupportedOperationException(
           "Method with @Option must have exactly one parameter!");
     }
-    final TypeToken<?> type = TypeToken.of(parameters[0]);
+    TypeToken<?> type = TypeToken.of(parameters[0]);
 
     // get value
-    final Option option = method.getAnnotation(Option.class);
-    final String name = getOptionName(options, method, option);
-    final Object value = getValue(options, method, null, type, option, method);
+    Option option = method.getAnnotation(Option.class);
+    String name = getOptionName(options, method, option);
+    Object value = getValue(options, method, null, type, option, method);
 
     logger.logf(
         Level.CONFIG,
@@ -591,7 +591,7 @@ public final class Configuration {
     } catch (InvocationTargetException e) {
       // ITEs always have a wrapped exception which is the real one thrown by
       // the invoked method. We want to handle this exception.
-      final Throwable t = e.getCause();
+      Throwable t = e.getCause();
 
       if (t instanceof IllegalArgumentException) {
         // this is an expected exception if the value is wrong,
@@ -608,7 +608,7 @@ public final class Configuration {
     }
   }
 
-  static String getOptionName(final Options options, final Member member, final Option option) {
+  static String getOptionName(Options options, Member member, Option option) {
     return getOptionName(options, member, option, false);
   }
 
@@ -622,8 +622,8 @@ public final class Configuration {
    * @param isDeprecated flag specifying whether the deprecated prefix should be used.
    */
   private static String getOptionName(
-      final Options options, final Member member, final Option option, boolean isDeprecated) {
-    String name = "";
+      Options options, Member member, Option option, boolean isDeprecated) {
+    @Var String name = "";
     if (isDeprecated) {
       name = option.deprecatedName();
       if (name.isEmpty()) {
@@ -636,7 +636,7 @@ public final class Configuration {
       name = member.getName();
     }
 
-    String optsPrefix;
+    @Var String optsPrefix;
     if (isDeprecated) {
       optsPrefix = options.deprecatedPrefix();
       if (optsPrefix.isEmpty()) {
@@ -667,20 +667,20 @@ public final class Configuration {
    */
   @Nullable
   private <T> Object getValue(
-      final Options options,
-      final Member method,
-      @Nullable final T defaultValue,
-      final TypeToken<T> type,
-      final Option option,
-      final AnnotatedElement member)
+      Options options,
+      Member method,
+      @Nullable T defaultValue,
+      TypeToken<T> type,
+      Option option,
+      AnnotatedElement member)
       throws InvalidConfigurationException {
 
-    final boolean isEnum = type.getRawType().isEnum();
-    final String optionName = getOptionName(options, method, option);
-    String valueStr = getValueString(optionName, option, isEnum);
-    final Annotation secondaryOption = getSecondaryAnnotation(member);
+    boolean isEnum = type.getRawType().isEnum();
+    String optionName = getOptionName(options, method, option);
+    @Var String valueStr = getValueString(optionName, option, isEnum);
+    Annotation secondaryOption = getSecondaryAnnotation(member);
 
-    final Object value;
+    Object value;
     if (!options.deprecatedPrefix().equals(NO_DEPRECATED_PREFIX)) {
       String optionDeprecatedName = getOptionName(options, method, option, true);
       String deprecatedValueStr = getValueString(optionDeprecatedName, option, isEnum);
@@ -763,12 +763,11 @@ public final class Configuration {
    * @param alwaysUppercase how to write the value
    */
   @Nullable
-  private String getValueString(
-      final String name, final Option option, final boolean alwaysUppercase)
+  private String getValueString(String name, Option option, boolean alwaysUppercase)
       throws InvalidConfigurationException {
 
     // get value in String representation
-    String valueStr = trimToNull(getProperty(name));
+    @Var String valueStr = trimToNull(getProperty(name));
 
     if (valueStr == null) {
       return null;
@@ -779,7 +778,7 @@ public final class Configuration {
     }
 
     // check if it is included in the allowed values list
-    final String[] allowedValues = option.values();
+    String[] allowedValues = option.values();
     if (allowedValues.length > 0 && !Arrays.asList(allowedValues).contains(valueStr)) {
       throw new InvalidConfigurationException(
           String.format(
@@ -788,7 +787,7 @@ public final class Configuration {
     }
 
     // check if it matches the specification regexp
-    final String regexp = option.regexp();
+    String regexp = option.regexp();
     if (!regexp.isEmpty() && !valueStr.matches(regexp)) {
       throw new InvalidConfigurationException(
           String.format(
@@ -803,7 +802,7 @@ public final class Configuration {
    * Find any annotation which itself is annotated with {@link OptionDetailAnnotation} on a member.
    */
   private static @Nullable Annotation getSecondaryAnnotation(AnnotatedElement element) {
-    Annotation result = null;
+    @Var Annotation result = null;
     for (Annotation a : element.getDeclaredAnnotations()) {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
         if (result != null) {
@@ -822,7 +821,8 @@ public final class Configuration {
    *
    * @throws UnsupportedOperationException If the annotation is not applicable.
    */
-  private static void checkApplicability(@Nullable Annotation annotation, TypeToken<?> optionType) {
+  private static void checkApplicability(
+      @Nullable Annotation annotation, @Var TypeToken<?> optionType) {
     if (annotation == null) {
       return;
     }
@@ -843,12 +843,12 @@ public final class Configuration {
   }
 
   private void printOptionInfos(
-      final AnnotatedElement element,
-      final String name,
-      @Nullable final String valueStr,
-      @Nullable final Object defaultValue) {
+      AnnotatedElement element,
+      String name,
+      @Nullable String valueStr,
+      @Nullable Object defaultValue) {
 
-    final StringBuilder optionInfo = new StringBuilder();
+    StringBuilder optionInfo = new StringBuilder();
     optionInfo
         .append(OptionPlainTextWriter.getOptionDescription(element))
         .append(name)
@@ -883,10 +883,7 @@ public final class Configuration {
    * @param secondaryOption the optional second annotation of the option
    */
   private @Nullable <T> Object convertValue(
-      final String optionName,
-      final String valueStr,
-      final TypeToken<?> pType,
-      @Nullable final Annotation secondaryOption)
+      String optionName, String valueStr, TypeToken<?> pType, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
     // convert value to correct type
 
@@ -902,7 +899,7 @@ public final class Configuration {
     }
 
     // first get the real type of a single value (i.e., String[] => String)
-    TypeToken<?> componentType;
+    @Var TypeToken<?> componentType;
     if (pType.isArray()) {
       componentType = pType.getComponentType();
     } else {
@@ -960,14 +957,14 @@ public final class Configuration {
    * @param secondaryOption the optional second annotation of the option (needs to fit to the type)
    */
   private @Nullable Object convertSingleValue(
-      final String optionName,
-      String valueStr,
-      TypeToken<?> type,
-      @Nullable final Annotation secondaryOption)
+      String optionName,
+      @Var String valueStr,
+      @Var TypeToken<?> type,
+      @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    final boolean isAnnotated = type.getRawType() == AnnotatedValue.class;
-    String annotation = null;
+    boolean isAnnotated = type.getRawType() == AnnotatedValue.class;
+    @Var String annotation = null;
     if (isAnnotated) {
       type = Classes.getSingleTypeArgument(type);
       Iterator<String> parts = ANNOTATION_VALUE_SPLITTER.split(valueStr).iterator();
@@ -978,6 +975,7 @@ public final class Configuration {
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
+    @Var
     Object result =
         converter.convert(
             optionName,
@@ -1006,10 +1004,7 @@ public final class Configuration {
    * @throws InvalidConfigurationException if conversion fails
    */
   private List<?> convertMultipleValues(
-      final String optionName,
-      final String valueStr,
-      final TypeToken<?> type,
-      @Nullable final Annotation secondaryOption)
+      String optionName, String valueStr, TypeToken<?> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
 
     Iterable<String> values = ARRAY_SPLITTER.split(valueStr);
@@ -1024,13 +1019,13 @@ public final class Configuration {
   }
 
   private @Nullable <T> Object convertDefaultValue(
-      final String optionName,
-      @Nullable final T defaultValue,
-      final TypeToken<T> type,
-      @Nullable final Annotation secondaryOption)
+      String optionName,
+      @Nullable T defaultValue,
+      TypeToken<T> type,
+      @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
 
-    TypeToken<?> innerType;
+    @Var TypeToken<?> innerType;
     if (type.isArray()) {
       innerType = type.getComponentType();
     } else if (COLLECTIONS.containsKey(type.getRawType())) {
@@ -1060,9 +1055,8 @@ public final class Configuration {
    *
    * @return A type converter.
    */
-  private TypeConverter getConverter(
-      final TypeToken<?> type, @Nullable final Annotation secondaryOption) {
-    TypeConverter converter = null;
+  private TypeConverter getConverter(TypeToken<?> type, @Nullable Annotation secondaryOption) {
+    @Var TypeConverter converter = null;
     if (secondaryOption != null) {
       converter = converters.get(secondaryOption.annotationType());
     }
@@ -1120,7 +1114,7 @@ public final class Configuration {
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();
-    for (final String arg : args) {
+    for (String arg : args) {
       if (!arg.startsWith("--")) {
         throw new InvalidConfigurationException(
             "Invalid command-line argument '" + arg + "', --option=value syntax expected.");

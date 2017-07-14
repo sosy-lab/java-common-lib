@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
 import com.google.common.testing.EqualsTester;
+import com.google.errorprone.annotations.Var;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.LinearExpression;
 import org.sosy_lab.common.rationals.Rational;
@@ -38,7 +39,7 @@ public class LinearExpressionTest {
 
   @Test
   public void testAdd() {
-    LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
+    @Var LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
     x = x.add(LinearExpression.monomial("x", Rational.ofString("8")));
     x = x.add(LinearExpression.monomial("y", Rational.ofString("2")));
     x = x.add(LinearExpression.monomial("z", Rational.ofString("3")));
@@ -52,7 +53,7 @@ public class LinearExpressionTest {
 
   @Test
   public void testSub() {
-    LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
+    @Var LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
     x = x.add(LinearExpression.monomial("y", Rational.ofString("3")));
     x = x.sub(LinearExpression.monomial("x", Rational.ofString("5")));
     x = x.sub(LinearExpression.monomial("y", Rational.ofString("2")));
@@ -66,14 +67,14 @@ public class LinearExpressionTest {
 
   @Test
   public void testMultiplication1() {
-    LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
+    @Var LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
     x = x.multByConst(Rational.ZERO);
     assertThat(x.size()).isEqualTo(0);
   }
 
   @Test
   public void testMultiplication2() {
-    LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
+    @Var LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
     x = x.add(LinearExpression.monomial("y", Rational.ofString("3")));
     x = x.multByConst(Rational.ofString("2"));
     assertThat(x.size()).isEqualTo(2);
@@ -105,7 +106,7 @@ public class LinearExpressionTest {
 
   @Test
   public void testNegation() {
-    LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
+    @Var LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("5"));
     x = x.add(LinearExpression.monomial("y", Rational.ofString("3")));
     x = x.negate();
     assertThat(x.size()).isEqualTo(2);
@@ -116,7 +117,7 @@ public class LinearExpressionTest {
   @Test
   public void testEquality() {
     LinearExpression<String> x = LinearExpression.monomial("x", Rational.ofString("6"));
-    LinearExpression<String> y = LinearExpression.monomial("x", Rational.ofString("3"));
+    @Var LinearExpression<String> y = LinearExpression.monomial("x", Rational.ofString("3"));
     y = y.add(LinearExpression.monomial("x", Rational.ofString("3")));
     y = y.add(LinearExpression.monomial("z", Rational.ofString("3")));
     y = y.sub(LinearExpression.monomial("z", Rational.ofString("3")));

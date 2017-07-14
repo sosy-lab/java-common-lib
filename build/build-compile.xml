@@ -34,6 +34,10 @@
             <compilerarg value="-Xlint"/>
             <compilerarg value="-Xlint:-processing"/>
             <compilerarg value="-Werror"/>
+            <compilerarg value="-Xep:Var:WARN"/>
+            <compilerarg value="-XepPatchLocation:${basedir}"/>
+            <compilerarg value="-XepPatchChecks:"/>
+            <compilerarg value="-XepDisableWarningsInGeneratedCode"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
             <compilerclasspath refid="errorprone"/>
         </javac>

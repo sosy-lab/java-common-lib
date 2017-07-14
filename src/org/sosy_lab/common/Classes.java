@@ -38,6 +38,7 @@ import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Var;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -177,7 +178,7 @@ public final class Classes {
   public static <T, X extends Exception> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes,
+      @Var @Nullable Class<?>[] argumentTypes,
       Object[] argumentValues,
       Class<X> exceptionType)
       throws X, InvalidConfigurationException {
@@ -260,7 +261,8 @@ public final class Classes {
    * @throws ClassNotFoundException If none of the two classes can be found.
    * @throws SecurityException If a security manager denies access to the class loader
    */
-  private static Class<?> forName(String name, @Nullable String prefix, @Nullable ClassLoader cl)
+  private static Class<?> forName(
+      String name, @Nullable String prefix, @Var @Nullable ClassLoader cl)
       throws ClassNotFoundException {
     if (cl == null) {
       // use the class loader of this class to simulate the behaviour
@@ -332,7 +334,7 @@ public final class Classes {
   }
 
   /** @see #getSingleTypeArgument(Type) */
-  public static TypeToken<?> getSingleTypeArgument(final TypeToken<?> type) {
+  public static TypeToken<?> getSingleTypeArgument(TypeToken<?> type) {
     return TypeToken.of(getSingleTypeArgument(type.getType()));
   }
 
@@ -352,7 +354,7 @@ public final class Classes {
    * @param type The type (needs to be parameterized with exactly one parameter)
    * @return A Type object.
    */
-  public static Type getSingleTypeArgument(final Type type) {
+  public static Type getSingleTypeArgument(Type type) {
     checkNotNull(type);
     checkArgument(
         type instanceof ParameterizedType,
@@ -380,7 +382,7 @@ public final class Classes {
    * @param type A possibly generic type.
    * @return The type or its simplification.
    */
-  public static Type extractUpperBoundFromType(Type type) {
+  public static Type extractUpperBoundFromType(@Var Type type) {
     checkNotNull(type);
     if (type instanceof WildcardType) {
       WildcardType wcType = (WildcardType) type;
@@ -540,7 +542,7 @@ public final class Classes {
    * @throws UnsuitedClassException If the static method/constructor of {@code cls} does not fulfill
    *     the restrictions of the factory interface
    */
-  public static <I> I createFactory(final Class<I> factoryType, final Class<?> cls)
+  public static <I> I createFactory(Class<I> factoryType, Class<?> cls)
       throws UnsuitedClassException {
     return createFactory(TypeToken.of(factoryType), cls);
   }
@@ -561,9 +563,9 @@ public final class Classes {
    * @throws UnsuitedClassException If the static method/constructor of {@code cls} does not fulfill
    *     the restrictions of the factory interface
    */
-  public static <I> I createFactory(final TypeToken<I> factoryType, final Class<?> cls)
+  public static <I> I createFactory(TypeToken<I> factoryType, Class<?> cls)
       throws UnsuitedClassException {
-    final Class<? super I> factoryInterface = factoryType.getRawType();
+    Class<? super I> factoryInterface = factoryType.getRawType();
     checkNotNull(cls);
     checkArgument(factoryInterface.isInterface());
     checkArgument(
@@ -572,13 +574,13 @@ public final class Classes {
         factoryType);
 
     // Get the method we should implement and the relevant information from it.
-    final Method interfaceMethod = factoryInterface.getMethods()[0];
-    final TypeToken<?> returnType = factoryType.resolveType(interfaceMethod.getGenericReturnType());
-    final Class<?>[] allowedExceptions =
+    Method interfaceMethod = factoryInterface.getMethods()[0];
+    TypeToken<?> returnType = factoryType.resolveType(interfaceMethod.getGenericReturnType());
+    Class<?>[] allowedExceptions =
         resolve(factoryType, interfaceMethod.getGenericExceptionTypes())
             .map(TypeToken::getRawType)
             .toArray(Class[]::new);
-    final List<TypeToken<?>> formalParamTypes =
+    List<TypeToken<?>> formalParamTypes =
         resolve(factoryType, interfaceMethod.getGenericParameterTypes())
             .collect(Collectors.toList());
     for (Entry<TypeToken<?>> entry : ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
@@ -594,7 +596,7 @@ public final class Classes {
     if (!Modifier.isPublic(cls.getModifiers())) {
       throw new UnsuitedClassException("class is not public");
     }
-    final Invokable<?, ?> target = getInstantiationMethodForClass(cls);
+    Invokable<?, ?> target = getInstantiationMethodForClass(cls);
     if (!returnType.isSupertypeOf(target.getReturnType())) {
       throw new UnsuitedClassException("'%s' does not produce instances of %s", target, returnType);
     }
@@ -603,14 +605,13 @@ public final class Classes {
       throw new UnsuitedClassException(
           "'%s' declares illegal checked exception %s", target, exception);
     }
-    final List<Parameter> targetParameters = target.getParameters();
-    final List<TypeToken<?>> targetParamTypes =
-        Lists.transform(targetParameters, Parameter::getType);
+    List<Parameter> targetParameters = target.getParameters();
+    List<TypeToken<?>> targetParamTypes = Lists.transform(targetParameters, Parameter::getType);
 
     // For each parameter of the constructor, this array contains the position of the value
     // in the parameters of the interface method.
-    final int[] parameterMapping = new int[targetParamTypes.size()];
-    final boolean[] parameterNullability = new boolean[targetParamTypes.size()];
+    int[] parameterMapping = new int[targetParamTypes.size()];
+    boolean[] parameterNullability = new boolean[targetParamTypes.size()];
     for (int i = 0; i < targetParamTypes.size(); i++) {
       int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
       if (sourceIndex == -1) {
@@ -658,7 +659,7 @@ public final class Classes {
     }
 
     @SuppressWarnings("unchecked")
-    final I factory = (I) Reflection.newProxy(factoryInterface, new FactoryInvocationHandler());
+    I factory = (I) Reflection.newProxy(factoryInterface, new FactoryInvocationHandler());
     return factory;
   }
 

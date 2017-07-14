@@ -38,7 +38,7 @@ public class LazyFutureTaskTest {
 
   @Test
   public void testRunnable() throws InterruptedException, ExecutionException {
-    final AtomicBoolean test = new AtomicBoolean(false);
+    AtomicBoolean test = new AtomicBoolean(false);
 
     Future<Boolean> f = new LazyFutureTask<>(() -> test.set(true), true);
 
@@ -56,7 +56,7 @@ public class LazyFutureTaskTest {
 
   @Test
   public void testException() throws InterruptedException, ExecutionException {
-    final NullPointerException testException = new NullPointerException();
+    NullPointerException testException = new NullPointerException();
 
     Future<Boolean> f =
         new LazyFutureTask<>(
@@ -72,7 +72,7 @@ public class LazyFutureTaskTest {
   @Test
   @SuppressWarnings("unused")
   public void testNoExecution() {
-    final AtomicBoolean test = new AtomicBoolean(true);
+    AtomicBoolean test = new AtomicBoolean(true);
 
     new LazyFutureTask<Void>(() -> test.set(false), null);
 

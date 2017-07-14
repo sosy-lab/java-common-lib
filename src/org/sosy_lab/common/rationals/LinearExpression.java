@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.util.Iterator;
 import java.util.Map;
@@ -60,7 +61,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     ImmutableMap.Builder<T, Rational> resultData = ImmutableMap.builder();
     for (Entry<T, Rational> e : data.entrySet()) {
       T var = e.getKey();
-      Rational value = e.getValue();
+      @Var Rational value = e.getValue();
       Rational otherValue = other.data.get(var);
       if (otherValue != null) {
         value = value.plus(otherValue);
@@ -126,7 +127,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     if (other.size() != data.size()) {
       return Optional.empty();
     }
-    Rational multiplier = null;
+    @Var Rational multiplier = null;
     for (T key : data.keySet()) {
       Rational div = other.getCoeff(key).divides(data.get(key)).reciprocal();
       if (multiplier == null) {

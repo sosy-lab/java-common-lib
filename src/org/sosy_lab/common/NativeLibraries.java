@@ -24,6 +24,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
+import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -77,7 +78,7 @@ public final class NativeLibraries {
         return currentOS;
       }
 
-      String prop = StandardSystemProperty.OS_NAME.value();
+      @Var String prop = StandardSystemProperty.OS_NAME.value();
       if (isNullOrEmpty(prop)) {
         throw new UnsatisfiedLinkError(
             "No value for os.name, "
@@ -117,7 +118,7 @@ public final class NativeLibraries {
         return currentArch;
       }
 
-      String prop = System.getProperty("os.arch.data.model");
+      @Var String prop = System.getProperty("os.arch.data.model");
       if (isNullOrEmpty(prop)) {
         prop = System.getProperty("sun.arch.data.model");
       }
@@ -232,7 +233,7 @@ public final class NativeLibraries {
   @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
     String osLibName = System.mapLibraryName(libraryName);
-    Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
+    @Var Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
     if (Files.exists(p)) {
       return Optional.of(p);
     }

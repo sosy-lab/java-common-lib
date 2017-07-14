@@ -28,6 +28,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Sets;
+import com.google.errorprone.annotations.Var;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
@@ -269,7 +270,7 @@ public class ConfigurationTest {
   @SuppressWarnings("deprecation")
   @Test
   public void testCopyWithNewPrefix() throws Exception {
-    Configuration c = Configuration.builder().setOption("new-prefix.hello", "world").build();
+    @Var Configuration c = Configuration.builder().setOption("new-prefix.hello", "world").build();
     c = Configuration.copyWithNewPrefix(c, "new-prefix");
     assertThat(c.getProperty("hello")).isEqualTo("world");
   }

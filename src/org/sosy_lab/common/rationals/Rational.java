@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -55,7 +56,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   // Factory functions.
 
   /** Create a new rational from a numerator and a denominator. */
-  public static Rational of(BigInteger numerator, BigInteger denominator) {
+  public static Rational of(@Var BigInteger numerator, @Var BigInteger denominator) {
     checkNotNull(numerator);
     int denSignum = denominator.signum();
     if (denSignum == 0) {

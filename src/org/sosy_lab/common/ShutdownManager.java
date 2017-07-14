@@ -88,8 +88,8 @@ public final class ShutdownManager {
    *
    * @param parent A non-null ShutdownNotifier instance.
    */
-  public static ShutdownManager createWithParent(final ShutdownNotifier parent) {
-    final ShutdownManager child = new ShutdownManager(checkNotNull(parent));
+  public static ShutdownManager createWithParent(ShutdownNotifier parent) {
+    ShutdownManager child = new ShutdownManager(checkNotNull(parent));
     parent.registerAndCheckImmediately(child.ourListener);
     return child;
   }
@@ -108,7 +108,7 @@ public final class ShutdownManager {
    * @param pReason A non-null human-readable string that tells the user why a shutdown was
    *     requested.
    */
-  public void requestShutdown(final String pReason) {
+  public void requestShutdown(String pReason) {
     notifier.requestShutdown(pReason);
   }
 }
