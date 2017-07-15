@@ -34,7 +34,15 @@
             <compilerarg value="-Xlint"/>
             <compilerarg value="-Xlint:-processing"/>
             <compilerarg value="-Werror"/>
-            <compilerarg value="-Xep:Var:WARN"/>
+            <compilerarg value="-XepAllDisabledChecksAsWarnings"/>
+            <compilerarg value="-Xep:InconsistentOverloads:OFF"/>
+            <compilerarg value="-Xep:UngroupedOverloads:OFF"/>
+            <compilerarg value="-Xep:StaticOrDefaultInterfaceMethod:OFF"/>
+            <compilerarg value="-Xep:PrivateConstructorForUtilityClass:OFF"/>
+            <compilerarg value="-Xep:TestExceptionChecker:OFF"/>
+            <compilerarg value="-Xep:ParameterPackage:OFF"/>
+            <compilerarg value="-Xep:ConstructorInvokesOverridable:OFF"/>
+            <compilerarg value="-Xep:ConstructorLeaksThis:OFF"/>
             <compilerarg value="-XepPatchLocation:${basedir}"/>
             <compilerarg value="-XepPatchChecks:"/>
             <compilerarg value="-XepDisableWarningsInGeneratedCode"/>

@@ -45,5 +45,5 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   }
 
   @SuppressWarnings("unused")
-  private void defaultMethod() {}
+  private static void defaultMethod() {}
 }

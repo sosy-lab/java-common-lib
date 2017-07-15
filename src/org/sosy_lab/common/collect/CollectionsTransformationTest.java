@@ -97,7 +97,7 @@ public class CollectionsTransformationTest {
         (input, transformer) -> new TreeSet<>(Collections2.transform(input, transformer)));
   }
 
-  private void testMapTransformCalledOnlyOnce(
+  private static void testMapTransformCalledOnlyOnce(
       Function<Map<String, AtomicInteger>, Map<String, AtomicInteger>> inputSupplier,
       BiFunction<Map<String, AtomicInteger>, Function<AtomicInteger, String>, Map<String, String>>
           transformer) {

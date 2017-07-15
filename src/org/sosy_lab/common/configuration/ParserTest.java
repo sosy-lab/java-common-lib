@@ -270,7 +270,8 @@ public class ParserTest {
     test("[foo] \n bar=abc \n [] \n foo.bar=abc");
   }
 
-  private Path createTempFile(String prefix, String suffix, String content) throws IOException {
+  private static Path createTempFile(String prefix, String suffix, String content)
+      throws IOException {
     return TempFile.builder()
         .prefix(prefix)
         .suffix(suffix)

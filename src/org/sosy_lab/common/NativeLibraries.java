@@ -73,7 +73,7 @@ public final class NativeLibraries {
 
     private static @Nullable OS currentOS = null;
 
-    public static OS guessOperatingSystem() throws UnsatisfiedLinkError {
+    public static OS guessOperatingSystem() {
       if (currentOS != null) {
         return currentOS;
       }
@@ -113,7 +113,7 @@ public final class NativeLibraries {
 
     private static @Nullable Architecture currentArch = null;
 
-    public static Architecture guessVmArchitecture() throws UnsatisfiedLinkError {
+    public static Architecture guessVmArchitecture() {
       if (currentArch != null) {
         return currentArch;
       }
