@@ -9,9 +9,11 @@ if ! [ -f "$COVERAGE_FILE" ] ; then
 fi
 
 # From https://github.com/codacy/codacy-coverage-reporter#travis-ci
-wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
+CODACY_COVERAGE_REPORTER_URL="$(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)"
+echo "Downloading Codacy Coverage Reporter from $CODACY_COVERAGE_REPORTER_URL"
+wget -O codacy-coverage-reporter-assembly-latest.jar "$CODACY_COVERAGE_REPORTER_URL"
 
 # Show version
-java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter --help | head -n 1
+java -cp codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter --help | head -n 1
 
-java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r "$COVERAGE_FILE"
+java -cp codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r "$COVERAGE_FILE"
