@@ -5,6 +5,7 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+      - jq
 env:
   global:
     - GH_REF: github.com/sosy-lab/common-java.git
