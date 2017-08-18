@@ -8,18 +8,17 @@ addons:
 env:
   global:
     - GH_REF: github.com/sosy-lab/common-java.git
-  matrix:
-    - NAME='Build and run tests'
 install:
   - ant resolve-dependencies
-script:
-  - ant unit-tests-coverage
 matrix:
   include:
     - env: NAME='Build with ECJ'
       script:
         - ant build-project-ecj
       jdk: oraclejdk8
+    - env: NAME='Unit Tests'
+      script:
+        - ant unit-tests-coverage
     - env: NAME='Create Javadoc'
       script:
         - ant javadoc
@@ -46,7 +45,7 @@ deploy:
     provider: script
     script: build/deploy-coverage.sh
     on:
-      condition: $NAME = "Build and run tests"
+      condition: $NAME = "Unit Tests"
 notifications:
   email:
     - common-java-dev@googlegroups.com
