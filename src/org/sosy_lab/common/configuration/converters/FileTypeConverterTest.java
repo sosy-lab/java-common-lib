@@ -55,6 +55,8 @@ import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTy
 @SuiteClasses({FileTypeConverterSafeModeTest.class, FileTypeConverterUnsafeModeTest.class})
 public class FileTypeConverterTest {
 
+  private FileTypeConverterTest() {}
+
   @Options
   static class FileInjectionTestOptions {
     @FileOption(Type.OPTIONAL_INPUT_FILE)

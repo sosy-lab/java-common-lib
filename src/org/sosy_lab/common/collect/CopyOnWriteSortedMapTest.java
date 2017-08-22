@@ -46,6 +46,8 @@ import junit.framework.TestSuite;
 
 public class CopyOnWriteSortedMapTest {
 
+  private CopyOnWriteSortedMapTest() {}
+
   /** A delegating {@link FeatureSpecificTestSuiteBuilder} that overrides the set of features. */
   private static class FeatureOverrideTestSuiteBuilder<K, V>
       extends FeatureSpecificTestSuiteBuilder<

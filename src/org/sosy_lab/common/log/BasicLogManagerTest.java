@@ -55,6 +55,7 @@ public class BasicLogManagerTest {
     }
   }
 
+  @Test
   public void testSupplierIsLazy() {
     AtomicBoolean called = new AtomicBoolean();
     logger.log(
