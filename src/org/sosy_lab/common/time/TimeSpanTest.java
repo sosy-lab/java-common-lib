@@ -36,12 +36,12 @@ import org.junit.Test;
 @SuppressWarnings("CheckReturnValue")
 public class TimeSpanTest {
 
-  private static final long LARGE_VALUE = 1125899906842624L; //2^50
+  private static final long LARGE_VALUE = 1125899906842624L; // 2^50
   private static final TimeSpan LARGE_AS_HOURS = TimeSpan.of(LARGE_VALUE * 24, HOURS);
   private static final TimeSpan LARGE_AS_MINUTES = TimeSpan.of(LARGE_VALUE * 24 * 60, MINUTES);
   private static final TimeSpan LARGE = TimeSpan.of(LARGE_VALUE, DAYS); // 2^50 days
 
-  private static final long VERY_LARGE_VALUE = 4611686018427387905L; //2^62 + 1
+  private static final long VERY_LARGE_VALUE = 4611686018427387905L; // 2^62 + 1
 
   @Test
   public void testValueOfZero() {

@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 import org.sosy_lab.common.time.TimeSpan;
+
 /**
  * This is an annotation for all integer options that specify some sort of time duration (e.g., a
  * timeout). Values for options with this annotation can be given with units. Examples: 10s 5min 3h

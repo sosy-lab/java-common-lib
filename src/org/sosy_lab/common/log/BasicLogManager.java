@@ -270,17 +270,17 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    */
   private static void setupHandler(
       Logger logger, Handler handler, Formatter formatter, Level level, List<Level> excludeLevels) {
-    //build up list of Levels to exclude from logging
+    // build up list of Levels to exclude from logging
     if (!excludeLevels.isEmpty()) {
       handler.setFilter(new LogLevelFilter(excludeLevels));
     } else {
       handler.setFilter(null);
     }
 
-    //handler with format for the console logger
+    // handler with format for the console logger
     handler.setFormatter(formatter);
 
-    //log only records of priority equal to or greater than the level defined in the configuration
+    // log only records of priority equal to or greater than the level defined in the configuration
     handler.setLevel(level);
 
     logger.addHandler(handler);
@@ -330,8 +330,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   public void log(Level priority, Object... args) {
     checkNotNull(args);
 
-    //Since some toString() methods may be rather costly, only log if the level is
-    //sufficiently high.
+    // Since some toString() methods may be rather costly, only log if the level is
+    // sufficiently high.
     if (wouldBeLogged(priority)) {
 
       log0(priority, findCallingMethod(), buildMessageText(args));

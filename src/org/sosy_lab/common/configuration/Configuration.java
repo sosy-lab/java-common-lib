@@ -918,7 +918,7 @@ public final class Configuration {
       Class<T> arrayComponentType = (Class<T>) componentType.getRawType();
       T[] result = ObjectArrays.newArray(arrayComponentType, values.size());
 
-      //noinspection SuspiciousToArrayCall
+      // noinspection SuspiciousToArrayCall
       return values.toArray(result);
     }
     assert collectionClass != null;
