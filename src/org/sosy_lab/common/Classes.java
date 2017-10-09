@@ -580,6 +580,7 @@ public final class Classes {
         resolve(factoryType, interfaceMethod.getGenericExceptionTypes())
             .map(TypeToken::getRawType)
             .toArray(Class[]::new);
+    java.lang.reflect.Parameter[] formalParams = interfaceMethod.getParameters();
     List<TypeToken<?>> formalParamTypes =
         resolve(factoryType, interfaceMethod.getGenericParameterTypes())
             .collect(Collectors.toList());
@@ -613,16 +614,17 @@ public final class Classes {
     int[] parameterMapping = new int[targetParamTypes.size()];
     boolean[] parameterNullability = new boolean[targetParamTypes.size()];
     for (int i = 0; i < targetParamTypes.size(); i++) {
+      boolean targetNullability = targetParameters.get(i).isAnnotationPresent(Nullable.class);
       int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
-      if (sourceIndex == -1) {
-        if (targetParameters.get(i).isAnnotationPresent(Nullable.class)) {
-          parameterNullability[i] = true;
-        } else {
-          throw new UnsuitedClassException(
-              "'%s' requires parameter of type %s which is not present in factory interface",
-              target, targetParamTypes.get(i));
-        }
+      boolean sourceNullability =
+          (sourceIndex == -1) // parameter not present in interface
+              || formalParams[sourceIndex].isAnnotationPresent(Nullable.class);
+      if (sourceNullability && !targetNullability) {
+        throw new UnsuitedClassException(
+            "'%s' requires parameter of type %s which is not present in factory interface",
+            target, targetParamTypes.get(i));
       }
+      parameterNullability[i] = sourceNullability && targetNullability;
       parameterMapping[i] = sourceIndex;
     }
 

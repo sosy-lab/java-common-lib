@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
 
 import com.google.common.reflect.TypeToken;
 import java.io.IOException;
@@ -33,6 +34,10 @@ public class ClassesFactoryTest {
 
   public interface TestFactory {
     Object get(String s) throws Exception;
+  }
+
+  public interface TestFactory2 {
+    Object get(String s, @Nullable Integer i) throws Exception;
   }
 
   public static class SimpleTestClass {
@@ -144,18 +149,41 @@ public class ClassesFactoryTest {
     assertThat(generatedFactory.get("")).isInstanceOf(ExceptionTestClass.class);
   }
 
+  @Test
+  public void legalException() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), ExceptionTestClass.class);
+    assertThat(generatedFactory.get("", null)).isInstanceOf(ExceptionTestClass.class);
+  }
+
   @Test(expected = UnsuitedClassException.class)
   @SuppressWarnings("CheckReturnValue")
   public void missingParameter() throws UnsuitedClassException {
     Classes.createFactory(OBJECT_SUPPLIER, ParameterTestClass.class);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   @SuppressWarnings("CheckReturnValue")
   public void nullParameter() throws Exception {
     TestFactory generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory.class), ParameterTestClass.class);
-    generatedFactory.get(null);
+    try {
+      generatedFactory.get(null);
+      fail();
+    } catch (NullPointerException expected) {
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void nullParameter2() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
+    try {
+      generatedFactory.get(null, null);
+      fail();
+    } catch (NullPointerException expected) {
+    }
   }
 
   @Test
@@ -163,6 +191,24 @@ public class ClassesFactoryTest {
     TestFactory generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory.class), ParameterTestClass.class);
     ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST");
+    assertThat(instance.s).isEqualTo("TEST");
+    assertThat(instance.i).isNull();
+  }
+
+  @Test
+  public void withTwoParameters1() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
+    ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST", 1);
+    assertThat(instance.s).isEqualTo("TEST");
+    assertThat(instance.i).isEqualTo(1);
+  }
+
+  @Test
+  public void withTwoParameters2() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
+    ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST", null);
     assertThat(instance.s).isEqualTo("TEST");
     assertThat(instance.i).isNull();
   }
@@ -178,10 +224,30 @@ public class ClassesFactoryTest {
   }
 
   @Test
+  public void factoryMethod2() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), FactoryMethodTestClass.class);
+    ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST", null);
+    assertThat(instance.getClass()).isEqualTo(FactoryMethodTestClass.class);
+    assertThat(instance.s).isEqualTo("TEST");
+    assertThat(instance.i).isNull();
+  }
+
+  @Test
   public void subClassFactoryMethod() throws Exception {
     TestFactory generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory.class), FactoryMethodTestClass2.class);
     ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST");
+    assertThat(instance.getClass()).isEqualTo(FactoryMethodTestClass2.class);
+    assertThat(instance.s).isEqualTo("TEST");
+    assertThat(instance.i).isNull();
+  }
+
+  @Test
+  public void subClassFactoryMethod2() throws Exception {
+    TestFactory2 generatedFactory =
+        Classes.createFactory(TypeToken.of(TestFactory2.class), FactoryMethodTestClass2.class);
+    ParameterTestClass instance = (ParameterTestClass) generatedFactory.get("TEST", null);
     assertThat(instance.getClass()).isEqualTo(FactoryMethodTestClass2.class);
     assertThat(instance.s).isEqualTo("TEST");
     assertThat(instance.i).isNull();
