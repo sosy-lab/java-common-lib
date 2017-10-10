@@ -1,5 +1,5 @@
 <component name="CopyrightManager">
-  <settings default="CPAchecker">
+  <settings>
     <LanguageOptions name="__TEMPLATE__">
       <option name="addBlankAfter" value="false" />
     </LanguageOptions>
