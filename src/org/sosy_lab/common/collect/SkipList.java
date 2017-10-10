@@ -81,10 +81,6 @@ public class SkipList<T> implements OrderStatisticSet<T> {
       return value;
     }
 
-    void setValue(@Nullable T pValue) {
-      value = pValue;
-    }
-
     void setNext(@Nullable Node<T> pNext, int pLevel) {
       next.set(pLevel, pNext);
     }
@@ -127,19 +123,13 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   private Node<T> tail = head;
   private int size = 0;
 
-  private List<Node<T>> partialIndices = new ArrayList<>(MAX_LEVEL);
-
   public SkipList(Comparator<T> pComparator) {
+    Preconditions.checkNotNull(pComparator);
     comparator = pComparator;
   }
 
   public SkipList() {
     comparator = Comparator.comparingInt(Object::hashCode);
-  }
-
-  private SkipList(Node<T> pHead, Comparator<T> pComparator) {
-    this(pComparator);
-    head = pHead;
   }
 
   private Node<T> createHead() {
@@ -286,7 +276,6 @@ public class SkipList<T> implements OrderStatisticSet<T> {
       } else {
         currNode = currNode.getNext(LEVEL_ONE);
       }
-
     }
     return false;
   }
@@ -301,11 +290,11 @@ public class SkipList<T> implements OrderStatisticSet<T> {
     return size == 0;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean contains(Object pO) {
     Preconditions.checkNotNull(pO);
     @Var Node<T> currNode = head;
-    @SuppressWarnings("unchecked")
     T val = (T) pO;
     for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
       currNode = getClosestLessEqual(currNode, currLvl, val);
@@ -337,6 +326,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   @SuppressWarnings("unchecked")
   @Override
   public <T1> T1[] toArray(T1[] a) {
+    Preconditions.checkNotNull(a);
     List<T1> newList = new ArrayList<>(size());
 
     for (T v : this) {
@@ -348,6 +338,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public boolean containsAll(Collection<?> pC) {
+    Preconditions.checkNotNull(pC);
     for (Object o : pC) {
       if (!contains(o)) {
         return false;
@@ -358,6 +349,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public boolean addAll(Collection<? extends T> pC) {
+    Preconditions.checkNotNull(pC);
     @Var boolean changed = false;
     for (T o : pC) {
       changed = add(o) || changed;
@@ -367,6 +359,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public boolean removeAll(Collection<?> pC) {
+    Preconditions.checkNotNull(pC);
     @Var boolean changed = false;
     for (Object o : pC) {
       changed = remove(o) || changed;
@@ -376,6 +369,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public boolean retainAll(Collection<?> pC) {
+    Preconditions.checkNotNull(pC);
     @Var boolean changed = false;
     @Var Node<T> currNode = head;
     while (currNode != null) {
@@ -467,6 +461,8 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public int indexOf(Object pO) {
+    Preconditions.checkNotNull(pO);
+
     @SuppressWarnings("unchecked")
     T val = (T) pO;
     @Var Node<T> currNode = head;
@@ -504,18 +500,24 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public T first() {
-    Preconditions.checkState(size > 0);
+    if (size <= 0) {
+      throw new NoSuchElementException();
+    }
     return get(0);
   }
 
   @Override
   public T last() {
-    Preconditions.checkState(size > 0);
+    if (size <= 0) {
+      throw new NoSuchElementException();
+    }
     return tail.getValue();
   }
 
   @Override
   public SortedSet<T> subSet(T pFromElement, T pToElement) {
+    Preconditions.checkNotNull(pFromElement);
+    Preconditions.checkNotNull(pToElement);
     SkipList<T> subList = new SkipList<>(comparator);
 
     int start = indexOf(pFromElement);
@@ -542,11 +544,13 @@ public class SkipList<T> implements OrderStatisticSet<T> {
 
   @Override
   public SortedSet<T> headSet(T pToElement) {
+    Preconditions.checkNotNull(pToElement);
     return subSet(first(), pToElement);
   }
 
   @Override
   public SortedSet<T> tailSet(T pFromElement) {
+    Preconditions.checkNotNull(pFromElement);
     return subSet(pFromElement, last());
   }
 
