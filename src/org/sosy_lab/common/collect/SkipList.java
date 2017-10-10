@@ -1,0 +1,696 @@
+/*
+ * CPAchecker is a tool for configurable software verification.
+ *  This file is part of CPAchecker.
+ *
+ *  Copyright (C) 2007-2017  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+ *  CPAchecker web page:
+ *    http://cpachecker.sosy-lab.org
+ */
+package org.sosy_lab.common.collect;
+
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Var;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedSet;
+import javax.annotation.Nullable;
+
+/**
+ * A skip list implementation. Similar to ordered trees, but in list form. Achieves time complexity
+ * similar to ordered trees using a probabilistic approach.
+ *
+ * <p>Time Complexity:
+ *
+ * <ul>
+ *   <li>Insertion O(log n)
+ *   <li>Removal O(log n)
+ *   <li>Contains O(log n)
+ *   <li>Random-access O(n)
+ *   <li>Iteration O(n)
+ * </ul>
+ *
+ * <p>Based on William Pugh: Skip Lists. A Probabilistic Alternative to Balanced Trees, 1990.
+ *
+ * <p>By design, a skip list is a single linked list. To be able to implement a random-access add
+ * operation in a simple manner, we extended the skip list to be double linked.
+ *
+ * @param <T> type of the elements of this list
+ * @see java.util.concurrent.ConcurrentSkipListMap
+ */
+public class SkipList<T> implements OrderStatisticSet<T> {
+
+  private static final int LEVEL_ONE = 0;
+
+  private static class Node<T> {
+
+    private List<Node<T>> next;
+    private List<Node<T>> prev;
+    @Nullable private T value;
+    private final int maxLvl;
+
+    private List<Integer> inBetweenCount;
+
+    private Node(@Nullable T pValue, int pLevel) {
+      value = pValue;
+      next = new ArrayList<>(Collections.nCopies(pLevel + 1, null));
+      prev = new ArrayList<>(Collections.nCopies(pLevel + 1, null));
+      inBetweenCount = new ArrayList<>(Collections.nCopies(pLevel + 1, 0));
+      maxLvl = pLevel;
+    }
+
+    @Nullable
+    Node<T> getNext(int pLevel) {
+      if (pLevel >= next.size()) {
+        return null;
+      } else {
+        return next.get(pLevel);
+      }
+    }
+
+    @Nullable
+    Node<T> getPrevious(int pLevel) {
+      if (pLevel >= prev.size()) {
+        return null;
+      } else {
+        return prev.get(pLevel);
+      }
+    }
+
+    @Nullable
+    T getValue() {
+      return value;
+    }
+
+    void setValue(@Nullable T pValue) {
+      value = pValue;
+    }
+
+    void setNext(@Nullable Node<T> pNext, int pLevel) {
+      next.set(pLevel, pNext);
+    }
+
+    void setPrevious(@Nullable Node<T> pPrev, int pLevel) {
+      prev.set(pLevel, pPrev);
+    }
+
+    void setInBetweenCount(int pNewValue, int pLevel) {
+      if (pLevel > maxLvl) {
+        // DO NOTHING
+      } else {
+        inBetweenCount.set(pLevel, pNewValue);
+      }
+    }
+
+    void increaseInBetweenCount(int pLevel) {
+      inBetweenCount.set(pLevel, inBetweenCount.get(pLevel) + 1);
+    }
+
+    int getInBetweenCount(int pLevel) {
+      if (pLevel > maxLvl) {
+        return 0;
+      } else {
+        return inBetweenCount.get(pLevel);
+      }
+    }
+
+    int getMaxLvl() {
+      return maxLvl;
+    }
+  }
+
+  private static final int MAX_LEVEL = 31;
+  private static final double ONE_HALF_LOG = Math.log(0.5);
+  private static final Random randomGenerator = new Random();
+
+  private final Comparator<T> comparator;
+  private Node<T> head = createHead();
+  private Node<T> tail = head;
+  private int size = 0;
+
+  private List<Node<T>> partialIndices = new ArrayList<>(MAX_LEVEL);
+
+  public SkipList(Comparator<T> pComparator) {
+    comparator = pComparator;
+  }
+
+  public SkipList() {
+    comparator = Comparator.comparingInt(Object::hashCode);
+  }
+
+  private SkipList(Node<T> pHead, Comparator<T> pComparator) {
+    this(pComparator);
+    head = pHead;
+  }
+
+  private Node<T> createHead() {
+    return new Node<>(null, MAX_LEVEL);
+  }
+
+  /**
+   * Return a random level between 0 and the max level. The probability distribution is logarithmic
+   * (i.e., higher values are less likely).
+   */
+  private static int getRandomLevel() {
+    double r = randomGenerator.nextDouble();
+    if (r == 0) {
+      return MAX_LEVEL;
+    } else {
+      // change logarithmic base to 0.5
+      // to get log_{0.5}(r)
+      return ((int) Math.round(Math.log(r) / ONE_HALF_LOG));
+    }
+  }
+
+  @Override
+  public boolean add(T pT) {
+    Preconditions.checkNotNull(pT);
+
+    if (contains(pT)) {
+      return false;
+    }
+
+    int level = getRandomLevel();
+    Node<T> newNode = new Node<>(pT, level);
+
+    @Var Node<T> currNode = head;
+    @Var Node<T> closestGreater;
+    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+      // Get closest node that is less or equal to the new value, and track the number of steps
+      // necessary to get there on the current lvl.
+      @Var int inBetweenCount = 0;
+      @Var Node<T> next = currNode.getNext(currLvl);
+      while (next != null && comparator.compare(pT, next.getValue()) >= 0) {
+        inBetweenCount += next.getInBetweenCount(currLvl);
+        currNode = next;
+        next = currNode.getNext(currLvl);
+      }
+
+      // Intermediate storage, this is not the final value!
+      newNode.setInBetweenCount(inBetweenCount, currLvl);
+
+      closestGreater = currNode.getNext(currLvl);
+
+      if (currLvl <= level) {
+        if (closestGreater != null) {
+          newNode.setNext(closestGreater, currLvl);
+          closestGreater.setPrevious(newNode, currLvl);
+        }
+
+        newNode.setPrevious(currNode, currLvl);
+        currNode.setNext(newNode, currLvl);
+      }
+
+      if (closestGreater != null) {
+        closestGreater.increaseInBetweenCount(currLvl);
+      }
+
+      // We want to compare by identity here
+      if (currNode == tail) {
+        tail = newNode;
+      }
+    }
+
+    // Set final interval values
+    @Var int inBetweenCount = 1;
+    @Var int currCount;
+    for (int currLvl = LEVEL_ONE; currLvl <= level; currLvl++) {
+      currCount = newNode.getInBetweenCount(currLvl);
+      newNode.setInBetweenCount(inBetweenCount, currLvl);
+
+      closestGreater = newNode.getNext(currLvl);
+      if (closestGreater != null) {
+        closestGreater.setInBetweenCount(
+            closestGreater.getInBetweenCount(currLvl) - inBetweenCount, currLvl);
+      }
+
+      inBetweenCount += currCount;
+    }
+
+    size++;
+    return true;
+  }
+
+  private Node<T> getClosestLessEqual(Node<T> pStart, int pLvl, T pVal) {
+    @Var Node<T> currNode = pStart;
+    @Var Node<T> next = currNode.getNext(pLvl);
+    while (next != null && comparator.compare(pVal, next.getValue()) >= 0) {
+      currNode = next;
+      next = currNode.getNext(pLvl);
+    }
+    return currNode;
+  }
+
+  private void removeNode(Node<T> pNode) {
+    for (int currLvl = pNode.getMaxLvl(); currLvl >= LEVEL_ONE; currLvl--) {
+      @Var Node<T> previous = pNode.getPrevious(currLvl);
+      assert previous != null;
+      @Var Node<T> next = pNode.getNext(currLvl);
+      previous.setNext(next, currLvl);
+      if (next != null) {
+        next.setPrevious(previous, currLvl);
+        int inBetweenCount = next.getInBetweenCount(currLvl) + pNode.getInBetweenCount(currLvl);
+        next.setInBetweenCount(inBetweenCount, currLvl);
+      } else if (pNode == tail) {
+        tail = previous;
+      }
+    }
+    size--;
+  }
+
+  @Override
+  public boolean remove(Object pO) {
+    Preconditions.checkNotNull(pO);
+    if (!contains(pO)) {
+      return false;
+    }
+
+    @Var Node<T> currNode = head;
+    @SuppressWarnings("unchecked")
+    T val = (T) pO;
+    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+      @Var Node<T> next = getClosestLessEqual(currNode, currLvl, val);
+      currNode = next;
+      next = currNode.getNext(currLvl);
+      if (next != null) {
+        // One predecessor will be removed
+        next.setInBetweenCount(next.getInBetweenCount(currLvl) - 1, currLvl);
+      }
+      // do not store this next node, we stay at the closest less/equal node to find the equal
+      // node
+    }
+
+    while (currNode != head && comparator.compare(currNode.getValue(), val) == 0) {
+      if (currNode.getValue().equals(pO)) {
+        removeNode(currNode);
+        return true;
+      } else {
+        currNode = currNode.getNext(LEVEL_ONE);
+      }
+
+    }
+    return false;
+  }
+
+  @Override
+  public int size() {
+    return size;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size == 0;
+  }
+
+  @Override
+  public boolean contains(Object pO) {
+    Preconditions.checkNotNull(pO);
+    @Var Node<T> currNode = head;
+    @SuppressWarnings("unchecked")
+    T val = (T) pO;
+    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+      currNode = getClosestLessEqual(currNode, currLvl, val);
+    }
+
+    while (currNode != head
+        && currNode != null
+        && comparator.compare(currNode.getValue(), val) == 0) {
+      if (currNode.getValue().equals(pO)) {
+        return true;
+      } else {
+        currNode = currNode.getNext(LEVEL_ONE);
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public Object[] toArray() {
+    Object[] arr = new Object[size];
+    @Var int i = 0;
+    for (T v : this) {
+      arr[i] = v;
+      i++;
+    }
+    return arr;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T1> T1[] toArray(T1[] a) {
+    List<T1> newList = new ArrayList<>(size());
+
+    for (T v : this) {
+      newList.add((T1) v);
+    }
+
+    return newList.toArray(a);
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> pC) {
+    for (Object o : pC) {
+      if (!contains(o)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends T> pC) {
+    @Var boolean changed = false;
+    for (T o : pC) {
+      changed = add(o) || changed;
+    }
+    return changed;
+  }
+
+  @Override
+  public boolean removeAll(Collection<?> pC) {
+    @Var boolean changed = false;
+    for (Object o : pC) {
+      changed = remove(o) || changed;
+    }
+    return changed;
+  }
+
+  @Override
+  public boolean retainAll(Collection<?> pC) {
+    @Var boolean changed = false;
+    @Var Node<T> currNode = head;
+    while (currNode != null) {
+      @Var Node<T> next = currNode.getNext(LEVEL_ONE);
+      if (next != null && !pC.contains(next.getValue())) {
+        removeNode(next);
+        changed = true;
+      } else {
+        currNode = next;
+      }
+    }
+
+    return changed;
+  }
+
+  @Override
+  public void clear() {
+    head = createHead();
+    size = 0;
+  }
+
+  private Node<T> getNode(int pIndex) {
+    if (pIndex >= size) {
+      throw new IndexOutOfBoundsException("Index: " + pIndex + ", size: " + size);
+    }
+    @Var int currPos = -1;
+    @Var int currLvl = MAX_LEVEL;
+    @Var Node<T> currNode = head;
+    while (currPos != pIndex) {
+      assert currLvl >= LEVEL_ONE;
+      @Var Node<T> next = currNode.getNext(currLvl);
+
+      if (next == null) {
+        currLvl--;
+
+      } else {
+        int nextPos = currPos + next.getInBetweenCount(currLvl);
+
+        if (nextPos <= pIndex) {
+          currNode = next;
+          currPos = nextPos;
+        } else {
+          currLvl--;
+        }
+      }
+    }
+    return currNode;
+  }
+
+  @Override
+  public T get(int pIndex) {
+    if (pIndex >= size) {
+      throw new IndexOutOfBoundsException();
+    }
+
+    return getNode(pIndex).getValue();
+  }
+
+  @Override
+  public @Nullable T remove(int pIndex) {
+    @Var int currPos = -1;
+    @Var int currLvl = MAX_LEVEL;
+    @Var Node<T> currNode = head;
+    while (currLvl >= LEVEL_ONE) {
+      @Var Node<T> next = currNode.getNext(currLvl);
+
+      if (next == null) {
+        currLvl--;
+
+      } else {
+        int nextPos = currPos + next.getInBetweenCount(currLvl);
+
+        if (nextPos <= pIndex) {
+          // Run to highest less-or-equal node on this level
+          currNode = next;
+          currPos = nextPos;
+        } else {
+          // Reduce first bigger node on level by one
+          // and descend to next level
+          next.setInBetweenCount(next.getInBetweenCount(currLvl) - 1, currLvl);
+          currLvl--;
+        }
+      }
+    }
+
+    removeNode(currNode);
+    return currNode.getValue();
+  }
+
+  @Override
+  public int indexOf(Object pO) {
+    @SuppressWarnings("unchecked")
+    T val = (T) pO;
+    @Var Node<T> currNode = head;
+    @Var Node<T> next;
+    @Var int index = -1;
+    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+      next = currNode.getNext(currLvl);
+      while (next != null && comparator.compare(val, next.getValue()) >= 0) {
+        currNode = next;
+
+        int comp = comparator.compare(val, currNode.getValue());
+        if (comp >= 0) {
+          index += next.getInBetweenCount(currLvl);
+        }
+
+        if (comp == 0) {
+          break;
+        } else {
+          next = currNode.getNext(currLvl);
+        }
+      }
+    }
+
+    while (currNode != head && comparator.compare(val, currNode.getValue()) == 0) {
+      if (currNode.getValue().equals(pO)) {
+        return index;
+      } else {
+        currNode = currNode.getNext(LEVEL_ONE);
+        index++;
+      }
+    }
+
+    return -1;
+  }
+
+  @Override
+  public T first() {
+    Preconditions.checkState(size > 0);
+    return get(0);
+  }
+
+  @Override
+  public T last() {
+    Preconditions.checkState(size > 0);
+    return tail.getValue();
+  }
+
+  @Override
+  public SortedSet<T> subSet(T pFromElement, T pToElement) {
+    SkipList<T> subList = new SkipList<>(comparator);
+
+    int start = indexOf(pFromElement);
+    if (start < 0) {
+      throw new IllegalStateException("From-element doesn't exist in list: " + pFromElement);
+    }
+
+    int end = indexOf(pToElement);
+    if (end < 0) {
+      throw new IllegalStateException("To-element doesn't exist in list: " + pToElement);
+    }
+
+    Node<T> startNode = getNode(start);
+    Node<T> endNode = getNode(end);
+
+    for (Node<T> currNode = startNode; currNode != endNode; ) {
+      boolean existed = subList.add(currNode.getValue());
+      assert !existed;
+      currNode = currNode.getNext(LEVEL_ONE);
+    }
+
+    return subList;
+  }
+
+  @Override
+  public SortedSet<T> headSet(T pToElement) {
+    return subSet(first(), pToElement);
+  }
+
+  @Override
+  public SortedSet<T> tailSet(T pFromElement) {
+    return subSet(pFromElement, last());
+  }
+
+  @Override
+  public Comparator<? super T> comparator() {
+    return comparator;
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return new ListIterator<T>() {
+
+      private Node<T> currentNode = head;
+      private int idx = 0;
+      boolean removed = false;
+
+      @Override
+      public boolean hasNext() {
+        return currentNode.getNext(LEVEL_ONE) != null;
+      }
+
+      @Override
+      public @Nullable T next() {
+        if (!hasNext()) {
+          throw new NoSuchElementException();
+        }
+        // noinspection ConstantConditions
+        currentNode = currentNode.getNext(LEVEL_ONE);
+        assert currentNode != null;
+        idx++;
+        removed = false;
+        return currentNode.getValue();
+      }
+
+      @Override
+      public boolean hasPrevious() {
+        return currentNode.getPrevious(LEVEL_ONE) != null;
+      }
+
+      @Override
+      public @Nullable T previous() {
+        if (!hasPrevious()) {
+          throw new NoSuchElementException();
+        }
+        // noinspection ConstantConditions
+        currentNode = currentNode.getPrevious(LEVEL_ONE);
+        assert currentNode != null;
+        idx--;
+        return currentNode.getValue();
+      }
+
+      @Override
+      public int nextIndex() {
+        if (!hasNext()) {
+          throw new NoSuchElementException();
+        }
+        return idx + 1;
+      }
+
+      @Override
+      public int previousIndex() {
+        if (!hasPrevious()) {
+          throw new NoSuchElementException();
+        }
+        return idx - 1;
+      }
+
+      @Override
+      public void remove() {
+        if (currentNode == head || removed) {
+          throw new IllegalStateException();
+        } else {
+          removeNode(currentNode);
+          // noinspection ConstantConditions
+          currentNode = currentNode.getPrevious(LEVEL_ONE);
+          removed = true;
+        }
+      }
+
+      @Override
+      public void set(T pT) {
+        throw new UnsupportedOperationException(
+            "Setting the value at a specific position " + "doesn't make sense in a sorted list");
+      }
+
+      @Override
+      public void add(T pT) {
+        throw new UnsupportedOperationException(
+            "Adding a node at a specific position doesn't " + "make sense in a sorted list");
+      }
+    };
+  }
+
+  @Override
+  public String toString() {
+    return "SkipList: [" + "size: " + size + " ]";
+  }
+
+  @Override
+  public boolean equals(Object pObj) {
+    if (pObj == null) {
+      return false;
+    }
+
+    if (!(pObj instanceof Set)) {
+      return false;
+
+    } else {
+      @SuppressWarnings("unchecked")
+      Set<T> other = (Set<T>) pObj;
+      return other.containsAll(this) && containsAll(other);
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    @Var int hashCode = 0;
+    for (T val : this) {
+      hashCode += val.hashCode();
+    }
+
+    return hashCode;
+  }
+}
