@@ -21,6 +21,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,11 +57,15 @@ import javax.annotation.Nullable;
  * @param <T> type of the elements of this list
  * @see java.util.concurrent.ConcurrentSkipListMap
  */
-public class SkipList<T> implements OrderStatisticSet<T> {
+public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
+
+  private static final long serialVersionUID = 1001345121457565238L;
 
   private static final int LEVEL_ONE = 0;
 
-  private static class Node<T> {
+  private static class Node<T> implements Serializable {
+
+    private static final long serialVersionUID = 10045121457565238L;
 
     private List<Node<T>> next;
     private List<Node<T>> prev;

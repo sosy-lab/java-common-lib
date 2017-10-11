@@ -23,6 +23,7 @@ import com.google.common.collect.testing.SortedSetTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
+import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,5 +82,14 @@ public class SkipListTest {
     l2 = new SkipList<>();
     Collections.addAll(l2, 3, 4, 0, 5, 0, 5, 0);
     Assert.assertEquals(l1, l2);
+  }
+
+  @Test
+  public void testSerialize() {
+    SkipList<Integer> l = new SkipList<>();
+    SerializableTester.reserializeAndAssert(l);
+
+    Collections.addAll(l, 0, 5, 4, 3);
+    SerializableTester.reserializeAndAssert(l);
   }
 }
