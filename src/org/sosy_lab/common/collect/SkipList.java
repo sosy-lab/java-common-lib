@@ -456,7 +456,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   }
 
   @Override
-  public T get(int pIndex) {
+  public T getByRank(int pIndex) {
     if (pIndex >= size) {
       throw new IndexOutOfBoundsException();
     }
@@ -465,7 +465,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   }
 
   @Override
-  public @Nullable T remove(int pIndex) {
+  public @Nullable T removeByRank(int pIndex) {
     @Var int currPos = -1;
     @Var int currLvl = MAX_LEVEL;
     @Var Node<T> currNode = head;
@@ -496,7 +496,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   }
 
   @Override
-  public int indexOf(Object pO) {
+  public int rankOf(Object pO) {
     Preconditions.checkNotNull(pO);
 
     @SuppressWarnings("unchecked")
@@ -539,7 +539,7 @@ public class SkipList<T> implements OrderStatisticSet<T> {
     if (size <= 0) {
       throw new NoSuchElementException();
     }
-    return get(0);
+    return getByRank(0);
   }
 
   @Override
@@ -556,12 +556,12 @@ public class SkipList<T> implements OrderStatisticSet<T> {
     Preconditions.checkNotNull(pToElement);
     SkipList<T> subList = new SkipList<>(comparator);
 
-    int start = indexOf(pFromElement);
+    int start = rankOf(pFromElement);
     if (start < 0) {
       throw new IllegalStateException("From-element doesn't exist in list: " + pFromElement);
     }
 
-    int end = indexOf(pToElement);
+    int end = rankOf(pToElement);
     if (end < 0) {
       throw new IllegalStateException("To-element doesn't exist in list: " + pToElement);
     }
