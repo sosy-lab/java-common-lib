@@ -137,18 +137,35 @@ public class SkipList<T> implements OrderStatisticSet<T> {
   private static final double ONE_HALF_LOG = Math.log(0.5);
   private static final Random randomGenerator = new Random();
 
-  private final Comparator<T> comparator;
+  private final Comparator<? super T> comparator;
   private Node<T> head = createHead();
   private Node<T> tail = head;
   private int size = 0;
 
-  public SkipList(Comparator<T> pComparator) {
-    Preconditions.checkNotNull(pComparator);
-    comparator = pComparator;
+  @SuppressWarnings("unchecked")
+  public SkipList(@Nullable Comparator<? super T> pComparator) {
+    if (pComparator == null) {
+      comparator = (Comparator<? super T>) Comparator.naturalOrder();
+    } else {
+      comparator = pComparator;
+    }
   }
 
+  public SkipList(Collection<? extends T> pCollection) {
+    this();
+    boolean changed = addAll(pCollection);
+    assert changed;
+  }
+
+  public SkipList(SortedSet<T> pSortedSet) {
+    this(pSortedSet.comparator());
+    boolean changed = addAll(pSortedSet);
+    assert changed;
+  }
+
+  @SuppressWarnings("unchecked")
   public SkipList() {
-    comparator = Comparator.comparingInt(Object::hashCode);
+    comparator = (Comparator<? super T>) Comparator.naturalOrder();
   }
 
   private Node<T> createHead() {
