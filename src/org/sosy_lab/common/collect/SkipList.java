@@ -21,6 +21,9 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,9 +70,11 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     private static final long serialVersionUID = 10045121457565238L;
 
-    private List<Node<T>> next;
-    private List<Node<T>> prev;
-    @Nullable private T value;
+    // These lists are transient because they are manually serialized to prevent stack overflows due
+    // to recursive structure
+    private transient List<Node<T>> next;
+    private transient List<Node<T>> prev;
+    @Nullable private T value; // May be null, so be careful with serializing
     private final int maxLvl;
 
     private List<Integer> inBetweenCount;
@@ -135,6 +140,13 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     int getMaxLvl() {
       return maxLvl;
+    }
+
+    private void readObject(ObjectInputStream pIn) throws IOException, ClassNotFoundException {
+      pIn.defaultReadObject();
+
+      next = new ArrayList<>(getMaxLvl());
+      prev = new ArrayList<>(getMaxLvl());
     }
   }
 
@@ -714,5 +726,31 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
 
     return hashCode;
+  }
+
+  private void writeObject(ObjectOutputStream pOut) throws IOException {
+    pOut.defaultWriteObject(); // write all fields that are not transient
+
+    @Var Node<T> currNode = head;
+    pOut.writeObject(head);
+    while (currNode != null) {
+      pOut.writeObject(currNode.next);
+      pOut.writeObject(currNode.prev);
+
+      currNode = currNode.getNext(LEVEL_ONE);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void readObject(ObjectInputStream pIn) throws IOException, ClassNotFoundException {
+    pIn.defaultReadObject(); // read all fields that are not transient;
+
+    head = (Node<T>) pIn.readObject();
+    @Var Node<T> currNode = head;
+    while (currNode != null) {
+      currNode.next = (List<Node<T>>) pIn.readObject();
+      currNode.prev = (List<Node<T>>) pIn.readObject();
+      currNode = currNode.getNext(LEVEL_ONE);
+    }
   }
 }

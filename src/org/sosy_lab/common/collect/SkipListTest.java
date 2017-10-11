@@ -89,7 +89,10 @@ public class SkipListTest {
     SkipList<Integer> l = new SkipList<>();
     SerializableTester.reserializeAndAssert(l);
 
-    Collections.addAll(l, 0, 5, 4, 3);
+    for (int i = 100000; i >= 0; i--) {
+      boolean changed = l.add(i);
+      assert changed;
+    }
     SerializableTester.reserializeAndAssert(l);
   }
 }
