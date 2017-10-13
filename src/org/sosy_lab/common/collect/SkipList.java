@@ -189,9 +189,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     comparator = (Comparator<? super T>) Comparator.naturalOrder();
   }
 
-  /**
-   * Use the given {@link Random} object for future probabilistic computations.
-   */
+  /** Use the given {@link Random} object for future probabilistic computations. */
   public void reinitialize(Random pRandom) {
     Preconditions.checkNotNull(pRandom);
     randomGenerator = pRandom;
