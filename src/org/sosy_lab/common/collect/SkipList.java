@@ -91,6 +91,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Nullable
     Node<T> getNext(int pLevel) {
+      Preconditions.checkElementIndex(pLevel, MAX_LEVEL + 1);
       if (pLevel >= next.size()) {
         return null;
       } else {
@@ -100,6 +101,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Nullable
     Node<T> getPrevious(int pLevel) {
+      Preconditions.checkElementIndex(pLevel, MAX_LEVEL + 1);
       if (pLevel >= prev.size()) {
         return null;
       } else {
@@ -455,9 +457,8 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   }
 
   private Node<T> getNode(int pIndex) {
-    if (pIndex >= size) {
-      throw new IndexOutOfBoundsException("Index: " + pIndex + ", size: " + size);
-    }
+    Preconditions.checkElementIndex(pIndex, size);
+
     @Var int currPos = -1;
     @Var int currLvl = MAX_LEVEL;
     @Var Node<T> currNode = head;
@@ -484,15 +485,14 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public T getByRank(int pIndex) {
-    if (pIndex >= size) {
-      throw new IndexOutOfBoundsException();
-    }
+    Preconditions.checkElementIndex(pIndex, size);
 
     return getNode(pIndex).getValue();
   }
 
   @Override
   public @Nullable T removeByRank(int pIndex) {
+    Preconditions.checkElementIndex(pIndex, size);
     @Var int currPos = -1;
     @Var int currLvl = MAX_LEVEL;
     @Var Node<T> currNode = head;
