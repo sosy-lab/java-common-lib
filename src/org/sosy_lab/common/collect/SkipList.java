@@ -76,7 +76,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     // to recursive structure
     private transient List<Node<T>> next;
     private transient List<Node<T>> prev;
-    @Nullable private T value; // May be null, so be careful with serializing
+    private @Nullable T value;
     private final int maxLvl;
 
     private List<Integer> inBetweenCount;
