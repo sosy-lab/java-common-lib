@@ -42,6 +42,9 @@ import javax.annotation.Nullable;
  * A skip list implementation. Similar to ordered trees, but in list form. Achieves time complexity
  * similar to ordered trees using a probabilistic approach.
  *
+ * <p>Value <code>null</code> is not a valid element of this list. Adding it results in a {@link
+ * NullPointerException}.
+ *
  * <p>Time Complexity:
  *
  * <ul>
