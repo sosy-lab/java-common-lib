@@ -152,7 +152,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   private static final int MAX_LEVEL = 31;
   private static final double ONE_HALF_LOG = Math.log(0.5);
-  private static final Random randomGenerator = new Random();
+  private Random randomGenerator = new Random();
 
   private final Comparator<? super T> comparator;
   private Node<T> head = createHead();
@@ -185,6 +185,14 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     comparator = (Comparator<? super T>) Comparator.naturalOrder();
   }
 
+  /**
+   * Use the given {@link Random} object for future probabilistic computations.
+   */
+  public void reinitialize(Random pRandom) {
+    Preconditions.checkNotNull(pRandom);
+    randomGenerator = pRandom;
+  }
+
   private Node<T> createHead() {
     return new Node<>(null, MAX_LEVEL);
   }
@@ -193,7 +201,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
    * Return a random level between 0 and the max level. The probability distribution is logarithmic
    * (i.e., higher values are less likely).
    */
-  private static int getRandomLevel() {
+  private int getRandomLevel() {
     double r = randomGenerator.nextDouble();
     if (r == 0) {
       return MAX_LEVEL;
