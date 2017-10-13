@@ -23,6 +23,7 @@ import com.google.common.collect.testing.SortedSetTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
+import com.google.common.collect.testing.features.SetFeature;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
@@ -54,10 +55,9 @@ public class SkipListTest {
             .named("SkipList Test Suite")
             .withFeatures(
                 CollectionSize.ANY,
-                CollectionFeature.SUPPORTS_ADD,
-                CollectionFeature.SUPPORTS_REMOVE,
-                CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
-                CollectionFeature.NON_STANDARD_TOSTRING,
+                SetFeature.GENERAL_PURPOSE,
+                CollectionFeature.KNOWN_ORDER,
+                CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS,
                 CollectionFeature.SUBSET_VIEW)
             .createTestSuite();
 
