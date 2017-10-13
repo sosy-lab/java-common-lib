@@ -661,7 +661,18 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public String toString() {
-    return "SkipList: [" + "size: " + size + " ]";
+    StringBuilder sb = new StringBuilder("[");
+    @Var boolean isFirst = true;
+    for (T val : this) {
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        sb.append(", ");
+      }
+      sb.append(val);
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
   @Override
