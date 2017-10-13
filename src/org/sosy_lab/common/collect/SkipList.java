@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
@@ -625,10 +624,9 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public Iterator<T> iterator() {
-    return new ListIterator<T>() {
+    return new Iterator<T>() {
 
       private Node<T> currentNode = head;
-      private int idx = 0;
       boolean removed = false;
 
       @Override
@@ -641,45 +639,11 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
         if (!hasNext()) {
           throw new NoSuchElementException();
         }
-        // noinspection ConstantConditions
+
         currentNode = currentNode.getNext(LEVEL_ONE);
         assert currentNode != null;
-        idx++;
         removed = false;
         return currentNode.getValue();
-      }
-
-      @Override
-      public boolean hasPrevious() {
-        return currentNode.getPrevious(LEVEL_ONE) != null;
-      }
-
-      @Override
-      public @Nullable T previous() {
-        if (!hasPrevious()) {
-          throw new NoSuchElementException();
-        }
-        // noinspection ConstantConditions
-        currentNode = currentNode.getPrevious(LEVEL_ONE);
-        assert currentNode != null;
-        idx--;
-        return currentNode.getValue();
-      }
-
-      @Override
-      public int nextIndex() {
-        if (!hasNext()) {
-          throw new NoSuchElementException();
-        }
-        return idx + 1;
-      }
-
-      @Override
-      public int previousIndex() {
-        if (!hasPrevious()) {
-          throw new NoSuchElementException();
-        }
-        return idx - 1;
       }
 
       @Override
@@ -688,22 +652,9 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
           throw new IllegalStateException();
         } else {
           removeNode(currentNode);
-          // noinspection ConstantConditions
           currentNode = currentNode.getPrevious(LEVEL_ONE);
           removed = true;
         }
-      }
-
-      @Override
-      public void set(T pT) {
-        throw new UnsupportedOperationException(
-            "Setting the value at a specific position " + "doesn't make sense in a sorted list");
-      }
-
-      @Override
-      public void add(T pT) {
-        throw new UnsupportedOperationException(
-            "Adding a node at a specific position doesn't " + "make sense in a sorted list");
       }
     };
   }
