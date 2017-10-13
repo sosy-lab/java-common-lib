@@ -38,8 +38,7 @@ import java.util.SortedSet;
  *
  * In both cases, the used compare-method should be consistent with <code>equals</code>, i.e.,
  * <code>compare(a, b) == 0  =&gt;  a.equals(b)</code>, so that the contract provided by {@link
- * java.util.Set Set} is fulfilled. Implementations of this interface should still work if the used
- * compare-method is not consistent with <code>equals</code>.
+ * java.util.Set Set} is fulfilled. This is not a requirement for elements in this set, though.
  *
  * <p>If the used compare-method is not consistent with <code>equals</code>, unequal (i.e.,
  * different) elements that are equal according to the order can exist in a set. In this case,
