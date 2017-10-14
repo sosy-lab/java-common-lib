@@ -91,7 +91,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Nullable
     Node<T> getNext(int pLevel) {
-      Preconditions.checkElementIndex(pLevel, MAX_LEVEL + 1);
+      Preconditions.checkElementIndex(pLevel, LEVEL_MAX + 1);
       if (pLevel >= next.size()) {
         return null;
       } else {
@@ -101,7 +101,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Nullable
     Node<T> getPrevious(int pLevel) {
-      Preconditions.checkElementIndex(pLevel, MAX_LEVEL + 1);
+      Preconditions.checkElementIndex(pLevel, LEVEL_MAX + 1);
       if (pLevel >= prev.size()) {
         return null;
       } else {
@@ -154,7 +154,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
-  private static final int MAX_LEVEL = 31;
+  private static final int LEVEL_MAX = 31;
   private static final double ONE_HALF_LOG = Math.log(0.5);
   private Random randomGenerator = new Random();
 
@@ -196,7 +196,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   }
 
   private Node<T> createHead() {
-    return new Node<>(null, MAX_LEVEL);
+    return new Node<>(null, LEVEL_MAX);
   }
 
   /**
@@ -206,7 +206,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   private int getRandomLevel() {
     double r = randomGenerator.nextDouble();
     if (r == 0) {
-      return MAX_LEVEL;
+      return LEVEL_MAX;
     } else {
       // change logarithmic base to 0.5
       // to get log_{0.5}(r)
@@ -227,7 +227,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Var Node<T> currNode = head;
     @Var Node<T> closestGreater;
-    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+    for (int currLvl = LEVEL_MAX; currLvl >= LEVEL_ONE; currLvl--) {
       // Get closest node that is less or equal to the new value, and track the number of steps
       // necessary to get there on the current lvl.
       @Var int inBetweenCount = 0;
@@ -283,13 +283,22 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return true;
   }
 
-  private Node<T> getClosestLessEqual(Node<T> pStart, int pLvl, T pVal) {
+  private Node<T> getClosestLessEqual(Node<T> pStart, T pVal, int pLvl) {
     @Var Node<T> currNode = pStart;
     @Var Node<T> next = currNode.getNext(pLvl);
     while (next != null && comparator.compare(pVal, next.getValue()) >= 0) {
       currNode = next;
       next = currNode.getNext(pLvl);
     }
+    return currNode;
+  }
+
+  private Node<T> getClosestLessEqual(Node<T> pStart, T pVal) {
+    @Var Node<T> currNode = pStart;
+    for (int currLvl = LEVEL_MAX; currLvl >= LEVEL_ONE; currLvl--) {
+      currNode = getClosestLessEqual(currNode, pVal, currLvl);
+    }
+
     return currNode;
   }
 
@@ -320,8 +329,8 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     @Var Node<T> currNode = head;
     @SuppressWarnings("unchecked")
     T val = (T) pO;
-    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
-      @Var Node<T> next = getClosestLessEqual(currNode, currLvl, val);
+    for (int currLvl = LEVEL_MAX; currLvl >= LEVEL_ONE; currLvl--) {
+      @Var Node<T> next = getClosestLessEqual(currNode, val, currLvl);
       currNode = next;
       next = currNode.getNext(currLvl);
       if (next != null) {
@@ -359,9 +368,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     Preconditions.checkNotNull(pO);
     @Var Node<T> currNode = head;
     T val = (T) pO;
-    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
-      currNode = getClosestLessEqual(currNode, currLvl, val);
-    }
+    currNode = getClosestLessEqual(currNode, val);
 
     while (currNode != head
         && currNode != null
@@ -458,7 +465,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     Preconditions.checkElementIndex(pIndex, size);
 
     @Var int currPos = -1;
-    @Var int currLvl = MAX_LEVEL;
+    @Var int currLvl = LEVEL_MAX;
     @Var Node<T> currNode = head;
     while (currPos != pIndex) {
       assert currLvl >= LEVEL_ONE;
@@ -492,7 +499,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   public @Nullable T removeByRank(int pIndex) {
     Preconditions.checkElementIndex(pIndex, size);
     @Var int currPos = -1;
-    @Var int currLvl = MAX_LEVEL;
+    @Var int currLvl = LEVEL_MAX;
     @Var Node<T> currNode = head;
     while (currLvl >= LEVEL_ONE) {
       @Var Node<T> next = currNode.getNext(currLvl);
@@ -529,7 +536,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     @Var Node<T> currNode = head;
     @Var Node<T> next;
     @Var int index = -1;
-    for (int currLvl = MAX_LEVEL; currLvl >= LEVEL_ONE; currLvl--) {
+    for (int currLvl = LEVEL_MAX; currLvl >= LEVEL_ONE; currLvl--) {
       next = currNode.getNext(currLvl);
       while (next != null && comparator.compare(val, next.getValue()) >= 0) {
         currNode = next;
