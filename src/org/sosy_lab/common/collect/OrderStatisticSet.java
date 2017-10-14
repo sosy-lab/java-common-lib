@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.collect;
 
+import java.util.NavigableSet;
 import java.util.SortedSet;
 
 /**
@@ -47,7 +48,7 @@ import java.util.SortedSet;
  *
  * @param <T> the type of elements maintained by this set
  */
-public interface OrderStatisticSet<T> extends SortedSet<T> {
+public interface OrderStatisticSet<T> extends NavigableSet<T> {
 
   /**
    * Returns the element of this set with the given rank. The lowest element in the set has rank ==
@@ -60,20 +61,20 @@ public interface OrderStatisticSet<T> extends SortedSet<T> {
    * <p>Example:
    *
    * <pre>
-   *     * Element type T: Pair&lt;Integer, Integer&gt;
-   *     * Comparator: compare(a, b) = a.getFirst() - b.getFirst()
+   *     * Element type T: {@link java.awt.Point Point(x, y)}
+   *     * Comparator: compare(a, b) = a.x - b.x
    *
-   *     add(Pair.of(1, 1))
-   *     add(Pair.of(2, 2))
-   *     add(Pair.of(1, 3))
+   *     add(new Point(1, 1))
+   *     add(new Point(2, 2))
+   *     add(new Point(1, 3))
    *
    *     After these three operations, the set order will be:
    *     Pair.of(1, 3) - Pair.of(1, 1) - Pair.of(2, 2)
    *
    *     Thus:
-   *     getByRank(0) = Pair.of(1, 3)
-   *     getByRank(1) = Pair.of(1, 1)
-   *     getByRank(2) = Pair.of(2, 2)
+   *     getByRank(0) = Point(1, 3)
+   *     getByRank(1) = Point(1, 1)
+   *     getByRank(2) = Point(2, 2)
    *   </pre>
    *
    * @param pIndex the rank of the element to return

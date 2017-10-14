@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
@@ -77,7 +78,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     private transient List<Node<T>> next;
     private transient List<Node<T>> prev;
     private @Nullable T value;
-    private final int maxLvl;
 
     private List<Integer> inBetweenCount;
 
@@ -86,11 +86,9 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       next = new ArrayList<>(Collections.nCopies(pLevel + 1, null));
       prev = new ArrayList<>(Collections.nCopies(pLevel + 1, null));
       inBetweenCount = new ArrayList<>(Collections.nCopies(pLevel + 1, 0));
-      maxLvl = pLevel;
     }
 
-    @Nullable
-    Node<T> getNext(int pLevel) {
+    private @Nullable Node<T> getNext(int pLevel) {
       Preconditions.checkElementIndex(pLevel, LEVEL_MAX + 1);
       if (pLevel >= next.size()) {
         return null;
@@ -99,8 +97,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       }
     }
 
-    @Nullable
-    Node<T> getPrevious(int pLevel) {
+    private @Nullable Node<T> getPrevious(int pLevel) {
       Preconditions.checkElementIndex(pLevel, LEVEL_MAX + 1);
       if (pLevel >= prev.size()) {
         return null;
@@ -109,21 +106,20 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       }
     }
 
-    @Nullable
-    T getValue() {
+    private @Nullable T getValue() {
       return value;
     }
 
-    void setNext(@Nullable Node<T> pNext, int pLevel) {
+    private void setNext(@Nullable Node<T> pNext, int pLevel) {
       next.set(pLevel, pNext);
     }
 
-    void setPrevious(@Nullable Node<T> pPrev, int pLevel) {
+    private void setPrevious(@Nullable Node<T> pPrev, int pLevel) {
       prev.set(pLevel, pPrev);
     }
 
-    void setInBetweenCount(int pNewValue, int pLevel) {
-      if (pLevel > maxLvl) {
+    private void setInBetweenCount(int pNewValue, int pLevel) {
+      if (pLevel > getMaxLvl()) {
         // DO NOTHING
       } else {
         inBetweenCount.set(pLevel, pNewValue);
@@ -135,7 +131,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
 
     int getInBetweenCount(int pLevel) {
-      if (pLevel > maxLvl) {
+      if (pLevel > getMaxLvl()) {
         return 0;
       } else {
         return inBetweenCount.get(pLevel);
@@ -143,14 +139,23 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
 
     int getMaxLvl() {
-      return maxLvl;
+      assert next.size() == prev.size();
+      assert next.size() == inBetweenCount.size();
+      return next.size() - 1;
+    }
+
+    private void writeObject(ObjectOutputStream pOut) throws IOException {
+      pOut.defaultWriteObject();
+
+      pOut.writeInt(next.size());
     }
 
     private void readObject(ObjectInputStream pIn) throws IOException, ClassNotFoundException {
       pIn.defaultReadObject();
 
-      next = new ArrayList<>(getMaxLvl());
-      prev = new ArrayList<>(getMaxLvl());
+      int size = pIn.read();
+      next = new ArrayList<>(size);
+      prev = new ArrayList<>(size);
     }
   }
 
@@ -584,30 +589,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public SortedSet<T> subSet(T pFromElement, T pToElement) {
-    Preconditions.checkNotNull(pFromElement);
-    Preconditions.checkNotNull(pToElement);
-    SkipList<T> subList = new SkipList<>(comparator);
-
-    int start = rankOf(pFromElement);
-    if (start < 0) {
-      throw new IllegalStateException("From-element doesn't exist in list: " + pFromElement);
-    }
-
-    int end = rankOf(pToElement);
-    if (end < 0) {
-      throw new IllegalStateException("To-element doesn't exist in list: " + pToElement);
-    }
-
-    Node<T> startNode = getNode(start);
-    Node<T> endNode = getNode(end);
-
-    for (Node<T> currNode = startNode; currNode != endNode; ) {
-      boolean existed = subList.add(currNode.getValue());
-      assert !existed;
-      currNode = currNode.getNext(LEVEL_ONE);
-    }
-
-    return subList;
+    return subSet(pFromElement, true, pToElement, false);
   }
 
   @Override
@@ -625,6 +607,95 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   @Override
   public Comparator<? super T> comparator() {
     return comparator;
+  }
+
+  private @Nullable Node<T> floorNode(T pT) {
+    @Var Node<T> candidate = getClosestLessEqual(head, pT);
+    if (candidate == head) {
+      return null;
+    } else {
+      return candidate;
+    }
+  }
+
+  private @Nullable Node<T> ceilingNode(T pT) {
+    @Var Node<T> candidate = getClosestLessEqual(head, pT);
+
+    if (candidate == head || !candidate.getValue().equals(pT)) {
+      candidate = candidate.getNext(LEVEL_ONE);
+    }
+
+    if (candidate != null && candidate != head) {
+      return candidate;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public T lower(T pT) {
+    Preconditions.checkNotNull(pT);
+    @Var Node<T> candidate = getClosestLessEqual(head, pT);
+
+    if (candidate != head && candidate.getValue().equals(pT)) {
+      candidate = candidate.getPrevious(LEVEL_ONE);
+    }
+
+    if (candidate != head) {
+      return candidate.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public T floor(T pT) {
+    Node<T> n = floorNode(pT);
+    if (n == null) {
+      return null;
+    } else {
+      return n.getValue();
+    }
+  }
+
+  @Override
+  public T ceiling(T pT) {
+    Node<T> n = ceilingNode(pT);
+    if (n == null) {
+      return null;
+    } else {
+      return n.getValue();
+    }
+  }
+
+  @Override
+  public T higher(T pT) {
+    @Var Node<T> candidate = getClosestLessEqual(head, pT);
+    candidate = candidate.getNext(LEVEL_ONE);
+
+    if (candidate != null && candidate != head) {
+      return candidate.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public T pollFirst() {
+    if (size > 0) {
+      return removeByRank(0);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public T pollLast() {
+    if (size > 0) {
+      return removeByRank(size - 1);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -662,6 +733,32 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
         }
       }
     };
+  }
+
+  @Override
+  public NavigableSet<T> descendingSet() {
+    return null;
+  }
+
+  @Override
+  public Iterator<T> descendingIterator() {
+    return null;
+  }
+
+  @Override
+  public NavigableSet<T> subSet(
+      T pFromElement, boolean pFromInclusive, T pToElement, boolean pToInclusive) {
+    return new SubList(pFromElement, pFromInclusive, pToElement, pToInclusive);
+  }
+
+  @Override
+  public NavigableSet<T> headSet(T pToElement, boolean pInclusive) {
+    return subSet(first(), true, pToElement, pInclusive);
+  }
+
+  @Override
+  public NavigableSet<T> tailSet(T pFromElement, boolean pInclusive) {
+    return subSet(pFromElement, pInclusive, last(), true);
   }
 
   @Override
@@ -729,6 +826,514 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       currNode.next = (List<Node<T>>) pIn.readObject();
       currNode.prev = (List<Node<T>>) pIn.readObject();
       currNode = currNode.getNext(LEVEL_ONE);
+    }
+  }
+
+  private class SubList implements NavigableSet<T> {
+    private final T bottom;
+    private final boolean bottomInclusive;
+    private final T top;
+    private final boolean topInclusive;
+
+    SubList(
+        T pBottomElement, boolean pBottomInclusive, T pTopElement, boolean pTopInclusive) {
+
+      bottom = pBottomElement;
+      bottomInclusive = pBottomInclusive;
+      top = pTopElement;
+      topInclusive = pTopInclusive;
+    }
+
+    private boolean tooLow(T pVal) {
+      int comp = comparator.compare(pVal, bottom);
+
+      return comp < 0 || (comp == 0 && !bottomInclusive);
+    }
+
+    private boolean tooHigh(T pVal) {
+      int comp = comparator.compare(pVal, top);
+
+      return comp > 0 || (comp == 0 && !topInclusive);
+    }
+
+
+    private boolean outOfBounds(T pVal) {
+      return tooLow(pVal) || tooHigh(pVal);
+    }
+
+    @Override
+    public T lower(T pT) {
+      T l = SkipList.this.lower(pT);
+      if (l == null || outOfBounds(l)) {
+        return null;
+      } else {
+        return l;
+      }
+    }
+
+    @Override
+    public T floor(T pT) {
+      T f = SkipList.this.floor(pT);
+      if (f == null || outOfBounds(f)) {
+        return null;
+      } else {
+        return f;
+      }
+    }
+
+    @Override
+    public T ceiling(T pT) {
+      T c = SkipList.this.ceiling(pT);
+      if (c == null || outOfBounds(c)) {
+        return null;
+      } else {
+        return c;
+      }
+    }
+
+    @Override
+    public T higher(T pT) {
+      T h = SkipList.this.higher(pT);
+      if (h == null || outOfBounds(h)) {
+        return null;
+      } else {
+        return h;
+      }
+    }
+
+    @Override
+    public T pollFirst() {
+      return ceiling(bottom);
+    }
+
+    @Override
+    public T pollLast() {
+      return floor(top);
+    }
+
+    @Override
+    public int size() {
+      T ceiling = ceiling(bottom);
+      if (ceiling == null) {
+        return 0;
+      }
+
+      int start = rankOf(ceiling);
+      int end = rankOf(floor(top));
+
+      return end - start + 1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return pollFirst() != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean contains(Object pO) {
+      return SkipList.this.contains(pO) && !outOfBounds((T) pO);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+      return new Iterator<T>() {
+
+        // Get the first node that is in the list to start from
+        private Node<T> current = ceilingNode(bottom);
+
+        @Override
+        public boolean hasNext() {
+          return current != null && !outOfBounds(current.getValue());
+        }
+
+        @Override
+        public T next() {
+          Preconditions.checkState(hasNext());
+          T value = current.getValue();
+          assert value != null;
+          current = current.getNext(LEVEL_ONE);
+
+          return value;
+        }
+      };
+    }
+
+    @Override
+    public Object[] toArray() {
+      Object[] arr = new Object[size()];
+      int pos = 0;
+      for (T v : this) {
+        arr[pos] = v;
+      }
+      return arr;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T1> T1[] toArray(T1[] pA) {
+      Preconditions.checkNotNull(pA);
+      List<T1> newList = new ArrayList<>(size());
+
+      for (T v : this) {
+        newList.add((T1) v);
+      }
+
+      return newList.toArray(pA);
+    }
+
+    @Override
+    public boolean add(T pT) {
+      if (outOfBounds(pT)) {
+        throw new IllegalArgumentException("Value out of sub list range: " + pT);
+      } else {
+        return SkipList.this.add(pT);
+      }
+    }
+
+    @Override
+    public boolean remove(Object pO) {
+      if (!contains(pO)) {
+        return false;
+      } else {
+        return SkipList.this.remove(pO);
+      }
+
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> pCollection) {
+      for (Object o : pCollection) {
+        if (!contains(o)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> pCollection) {
+      @Var boolean existed = false;
+      for (T v : pCollection) {
+        existed = add(v) || existed;
+      }
+      return existed;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> pCollection) {
+      @Var boolean changed = false;
+      Iterator<T> it = iterator();
+      while (it.hasNext()) {
+        T v = it.next();
+        if (!pCollection.contains(v)) {
+          it.remove();
+          changed = true;
+        }
+      }
+
+      return changed;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> pCollection) {
+      @Var boolean changed = false;
+      for (Object o : pCollection) {
+        changed = remove(o) || changed;
+      }
+
+      return changed;
+    }
+
+    @Override
+    public void clear() {
+      Iterator<T> it = iterator();
+      while (it.hasNext()) {
+        it.next();
+        it.remove();
+      }
+    }
+
+    @Override
+    public NavigableSet<T> descendingSet() {
+      return new DescendingSubList(this);
+    }
+
+    @Override
+    public Iterator<T> descendingIterator() {
+      return new Iterator<T>() {
+
+        private @Nullable Node<T> current = floorNode(top);
+
+        @Override
+        public boolean hasNext() {
+          return current != null && !outOfBounds(current.getValue());
+        }
+
+        @Override
+        public T next() {
+          Preconditions.checkState(hasNext());
+
+          T value = current.getValue();
+          current = current.getPrevious(LEVEL_ONE);
+
+          return value;
+        }
+      };
+    }
+
+    @Override
+    public NavigableSet<T> subSet(
+        T pBottom, boolean pBottomInclusive, T pTop, boolean pTopInclusive) {
+
+      if (tooHigh(pBottom)) {
+        // bottom of new sublist is larger than top of old sublist -> empty
+        return Collections.emptyNavigableSet();
+      }
+
+      if (tooLow(pTop)) {
+        // top of new sublist is smaller than bottom of old sublist -> empty
+        return Collections.emptyNavigableSet();
+      }
+
+      T newBottom;
+      boolean newBottomInclusive;
+      @Var int comp = comparator.compare(pBottom, bottom);
+      if (comp > 0) {
+        newBottom = pBottom;
+        newBottomInclusive = pBottomInclusive;
+      } else {
+        newBottom = bottom;
+        if (comp == 0) {
+          // if old and new bottom value are the same, we have to respect the inclusive-flag
+          newBottomInclusive = bottomInclusive && pBottomInclusive;
+        } else {
+          // if the old bottom value is larger then the new one, use the inclusive-flag of the
+          // old one
+          newBottomInclusive = bottomInclusive;
+        }
+      }
+
+      T newTop;
+      boolean newTopInclusive;
+      comp = comparator.compare(pTop, top);
+      if (comp < 0) {
+        newTop = pTop;
+        newTopInclusive = pTopInclusive;
+      } else {
+        newTop = top;
+        if (comp == 0) {
+          // if old and new bottom value are the same, we have to respect the inclusive-flag
+          newTopInclusive = topInclusive && pTopInclusive;
+        } else {
+          // if the old bottom value is larger then the new one, use the inclusive-flag of the
+          // old one
+          newTopInclusive = topInclusive;
+        }
+      }
+
+      return SkipList.this.subSet(newBottom, newBottomInclusive, newTop, newTopInclusive);
+    }
+
+    @Override
+    public NavigableSet<T> headSet(T pT, boolean pTopInclusive) {
+      return subSet(bottom, bottomInclusive, pT, pTopInclusive);
+    }
+
+    @Override
+    public NavigableSet<T> tailSet(T pT, boolean pBottomInclusive) {
+      return subSet(pT, pBottomInclusive, top, topInclusive);
+    }
+
+    @Override
+    public Comparator<? super T> comparator() {
+      return comparator;
+    }
+
+    @Override
+    public SortedSet<T> subSet(T pBottom, T pTop) {
+      return subSet(pBottom, true, pTop, false);
+    }
+
+    @Override
+    public SortedSet<T> headSet(T pT) {
+      return subSet(bottom, pT);
+    }
+
+    @Override
+    public SortedSet<T> tailSet(T pT) {
+      return subSet(pT, top);
+    }
+
+    @Override
+    public T first() {
+      return pollFirst();
+    }
+
+    @Override
+    public T last() {
+      return pollLast();
+    }
+  }
+
+  private class DescendingSubList implements NavigableSet<T> {
+
+    private final SubList delegate;
+
+    DescendingSubList(SubList pDelegate) {
+      delegate = pDelegate;
+    }
+
+    @Override
+    public T first() {
+      return delegate.last();
+    }
+
+    @Override
+    public T last() {
+      return delegate.first();
+    }
+
+    @Override
+    public T lower(T pT) {
+      return delegate.higher(pT);
+    }
+
+    @Override
+    public T floor(T pT) {
+      return delegate.ceiling(pT);
+    }
+
+    @Override
+    public T ceiling(T pT) {
+      return delegate.floor(pT);
+    }
+
+    @Override
+    public T higher(T pT) {
+      return delegate.lower(pT);
+    }
+
+    @Override
+    public T pollFirst() {
+      return delegate.pollLast();
+    }
+
+    @Override
+    public T pollLast() {
+      return delegate.pollFirst();
+    }
+
+    @Override
+    public int size() {
+      return delegate.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return delegate.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object pO) {
+      return delegate.contains(pO);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+      return delegate.descendingIterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+      return delegate.toArray();
+    }
+
+    @Override
+    public <T1> T1[] toArray(T1[] pT1s) {
+      return delegate.toArray(pT1s);
+    }
+
+    @Override
+    public boolean add(T pT) {
+      return delegate.add(pT);
+    }
+
+    @Override
+    public boolean remove(Object pO) {
+      return delegate.remove(pO);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> pCollection) {
+      return delegate.containsAll(pCollection);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> pCollection) {
+      return delegate.addAll(pCollection);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> pCollection) {
+      return delegate.retainAll(pCollection);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> pCollection) {
+      return delegate.removeAll(pCollection);
+    }
+
+    @Override
+    public void clear() {
+      delegate.clear();
+    }
+
+    @Override
+    public NavigableSet<T> descendingSet() {
+      return delegate;
+    }
+
+    @Override
+    public Iterator<T> descendingIterator() {
+      return delegate.iterator();
+    }
+
+    @Override
+    public NavigableSet<T> subSet(
+        T pBottom, boolean pBottomInclusive, T pTop, boolean pTopInclusive) {
+      return new DescendingSubList(
+          (SubList) delegate.subSet(pBottom, pBottomInclusive, pTop, pTopInclusive));
+    }
+
+    @Override
+    public NavigableSet<T> headSet(T pT, boolean pTopInclusive) {
+      return new DescendingSubList((SubList) delegate.headSet(pT, pTopInclusive));
+    }
+
+    @Override
+    public NavigableSet<T> tailSet(T pT, boolean pBottomInclusive) {
+      return new DescendingSubList((SubList) delegate.tailSet(pT, pBottomInclusive));
+    }
+
+    @Override
+    public Comparator<? super T> comparator() {
+      return delegate.comparator();
+    }
+
+    @Override
+    public SortedSet<T> subSet(T pBottom, T pTop) {
+      return new DescendingSubList((SubList) delegate.subSet(pBottom, pTop));
+    }
+
+    @Override
+    public SortedSet<T> headSet(T pT) {
+      return new DescendingSubList((SubList) delegate.headSet(pT));
+    }
+
+    @Override
+    public SortedSet<T> tailSet(T pT) {
+      return new DescendingSubList((SubList) delegate.tailSet(pT));
     }
   }
 }

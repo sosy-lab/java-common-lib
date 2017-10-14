@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.common.collect;
 
-import com.google.common.collect.testing.SortedSetTestSuiteBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.testing.NavigableSetTestSuiteBuilder;
+import com.google.common.collect.testing.TestSortedSetGenerator;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
@@ -27,7 +29,9 @@ import com.google.common.collect.testing.features.SetFeature;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.NavigableSet;
 import java.util.SortedSet;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
@@ -39,10 +43,10 @@ public class SkipListTest {
   private static class TestSkipListGenerator extends TestStringSortedSetGenerator {
 
     @Override
-    protected SortedSet<String> create(String[] pIntegers) {
+    protected SortedSet<String> create(String[] pStrings) {
       SkipList<String> list = new SkipList<>();
       // noinspection ResultOfMethodCallIgnored
-      boolean changed = list.addAll(Arrays.asList(pIntegers));
+      boolean changed = list.addAll(Arrays.asList(pStrings));
       assert list.isEmpty() || changed;
 
       return list;
@@ -50,8 +54,10 @@ public class SkipListTest {
   }
 
   public static junit.framework.Test suite() {
+    TestSortedSetGenerator<String> testSetGenerator = new TestSkipListGenerator();
+
     TestSuite suite =
-        SortedSetTestSuiteBuilder.using(new TestSkipListGenerator())
+        NavigableSetTestSuiteBuilder.using(testSetGenerator)
             .named("SkipList Test Suite")
             .withFeatures(
                 CollectionSize.ANY,
@@ -62,6 +68,7 @@ public class SkipListTest {
             .createTestSuite();
 
     suite.addTest(new JUnit4TestAdapter(SkipListTest.class));
+
 
     return suite;
   }
@@ -94,5 +101,129 @@ public class SkipListTest {
       assert changed;
     }
     SerializableTester.reserializeAndAssert(l);
+  }
+
+  @Test
+  public void testSubsetView_mutation() {
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
+
+    Integer toAdd = 50;
+
+    subSet.add(toAdd);
+    Assert.assertTrue(subSet.contains(toAdd));
+    Assert.assertTrue(set.contains(toAdd));
+
+    subSet.remove(toAdd);
+    Assert.assertFalse(set.contains(toAdd));
+    Assert.assertFalse(subSet.contains(toAdd));
+
+    set.add(toAdd);
+    Assert.assertTrue(subSet.contains(toAdd));
+
+    set.remove(toAdd);
+    Assert.assertFalse(subSet.contains(toAdd));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testSubsetView_outOfBounds_add() {
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
+
+    try {
+      subSet.add(9);
+    } catch (IllegalArgumentException e1) {
+      try {
+        subSet.add(101);
+      } catch (IllegalArgumentException e2) {
+        Collection<Integer> toAdd = ImmutableList.of(20, 30, 101, 50);
+        subSet.addAll(toAdd);
+      }
+    }
+  }
+
+  @Test
+  public void testSubsetView_outOfBounds_remove() {
+    Integer toRemove1 = 20;
+    Integer toRemove2 = 30;
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, toRemove1, toRemove2, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
+
+    subSet.remove(9);
+    subSet.remove(999);
+
+    Assert.assertTrue(set.contains(9));
+    Assert.assertTrue(set.contains(999));
+
+    Collection<Integer> toRemove = ImmutableList.of(toRemove1, toRemove2, 9);
+    subSet.removeAll(toRemove);
+
+    Assert.assertTrue(set.contains(9));
+    Assert.assertFalse(set.contains(toRemove1));
+    Assert.assertFalse(set.contains(toRemove2));
+
+  }
+
+  @Test
+  public void testSubsetView_outOfBounds_contains() {
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    @Var NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
+
+    Assert.assertFalse(subSet.contains(9));
+    Assert.assertFalse(subSet.contains(999));
+
+    subSet = set.subSet(9, false, 99, false);
+
+    Assert.assertFalse(subSet.contains(9));
+    Assert.assertFalse(subSet.contains(99));
+
+
+    subSet = set.subSet(9, true, 99, true);
+
+    Assert.assertTrue(subSet.contains(9));
+    Assert.assertTrue(subSet.contains(99));
+  }
+
+  @Test
+  public void testSubsetView_descending() {
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    @Var NavigableSet<Integer> subSet = set.subSet(9, true, 99, true).descendingSet();
+
+    Assert.assertEquals(subSet.pollFirst(), Integer.valueOf(99));
+    Assert.assertEquals(subSet.pollLast(), Integer.valueOf(9));
+
+    subSet = subSet.descendingSet();
+    Assert.assertEquals(subSet.pollFirst(), Integer.valueOf(9));
+    Assert.assertEquals(subSet.pollLast(), Integer.valueOf(99));
+
+  }
+
+  @Test
+  public void testSubsetView_subsetOfSubset() {
+    Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
+    NavigableSet<Integer> set = new SkipList<>(testCollection);
+    NavigableSet<Integer> subSet = set.subSet(1, true, 99, true);
+    @Var NavigableSet<Integer> subSubSet = subSet.subSet(9, true, 1000, true);
+
+    Assert.assertFalse(subSubSet.contains(1));
+    Assert.assertTrue(subSubSet.contains(9));
+    Assert.assertTrue(subSubSet.contains(99));
+    Assert.assertFalse(subSubSet.contains(999));
+
+    subSubSet = subSet.subSet(1, false, 99, false);
+    Assert.assertFalse(subSubSet.contains(1));
+    Assert.assertTrue(subSubSet.contains(9));
+    Assert.assertFalse(subSubSet.contains(99));
+
+    // make sure that the inclusive-flags are respected
+    subSubSet = subSubSet.subSet(1, true, 99, true);
+    Assert.assertFalse(subSubSet.contains(1));
+    Assert.assertTrue(subSubSet.contains(9));
+    Assert.assertFalse(subSubSet.contains(99));
   }
 }
