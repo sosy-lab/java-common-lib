@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
@@ -176,13 +177,13 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   public SkipList(Collection<? extends T> pCollection) {
     this();
     boolean changed = addAll(pCollection);
-    assert changed;
+    assert changed || pCollection.isEmpty();
   }
 
   public SkipList(SortedSet<T> pSortedSet) {
     this(pSortedSet.comparator());
     boolean changed = addAll(pSortedSet);
-    assert changed;
+    assert changed || pSortedSet.isEmpty();
   }
 
   @SuppressWarnings("unchecked")
@@ -313,6 +314,10 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   }
 
   private void removeNode(Node<T> pNode) {
+    if (pNode == tail) {
+      tail = pNode.getPrevious(LEVEL_ONE);
+      assert tail != null;
+    }
     for (int currLvl = pNode.getMaxLvl(); currLvl >= LEVEL_ONE; currLvl--) {
       @Var Node<T> previous = pNode.getPrevious(currLvl);
       assert previous != null;
@@ -706,55 +711,23 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public Iterator<T> iterator() {
-    return new Iterator<T>() {
-
-      private Node<T> currentNode = head;
-      boolean removed = false;
-
-      @Override
-      public boolean hasNext() {
-        return currentNode.getNext(LEVEL_ONE) != null;
-      }
-
-      @Override
-      public @Nullable T next() {
-        if (!hasNext()) {
-          throw new NoSuchElementException();
-        }
-
-        currentNode = currentNode.getNext(LEVEL_ONE);
-        assert currentNode != null;
-        removed = false;
-        return currentNode.getValue();
-      }
-
-      @Override
-      public void remove() {
-        if (currentNode == head || removed) {
-          throw new IllegalStateException();
-        } else {
-          removeNode(currentNode);
-          currentNode = currentNode.getPrevious(LEVEL_ONE);
-          removed = true;
-        }
-      }
-    };
+    return new SkipListIterator<>(this);
   }
 
   @Override
   public NavigableSet<T> descendingSet() {
-    return null;
+    return new DescendingList<>(this);
   }
 
   @Override
   public Iterator<T> descendingIterator() {
-    return null;
+    return new SkipListDescendingIterator<>(this);
   }
 
   @Override
   public NavigableSet<T> subSet(
       T pFromElement, boolean pFromInclusive, T pToElement, boolean pToInclusive) {
-    return new SubList(pFromElement, pFromInclusive, pToElement, pToInclusive);
+    return new SubList<>(this, pFromElement, pFromInclusive, pToElement, pToInclusive);
   }
 
   @Override
@@ -835,29 +808,134 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
-  private class SubList implements NavigableSet<T> {
+  private static class SkipListIterator<T> implements Iterator<T> {
+
+    private SkipList<T> list;
+    Node<T> currentNode;
+    private boolean removed = false;
+
+    private SkipListIterator(SkipList<T> pList) {
+      list = pList;
+      currentNode = list.head;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return currentNode.getNext(LEVEL_ONE) != null;
+    }
+
+    @Override
+    public T next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      currentNode = currentNode.getNext(LEVEL_ONE);
+      assert currentNode != null;
+      removed = false;
+      return Preconditions.checkNotNull(currentNode.getValue());
+    }
+
+    @Override
+    public void remove() {
+      if (currentNode == list.head || removed) {
+        throw new IllegalStateException();
+      } else {
+        list.removeNode(currentNode);
+        currentNode = currentNode.getPrevious(LEVEL_ONE);
+        removed = true;
+      }
+    }
+  }
+
+  private static class SkipListDescendingIterator<T> implements Iterator<T> {
+
+    @Nullable Node<T> currentNode = null;
+    private boolean removed = false;
+
+    private SkipList<T> list;
+
+    private SkipListDescendingIterator(SkipList<T> pList) {
+      list = pList;
+    }
+
+    @Override
+    public boolean hasNext() {
+      assert currentNode != list.head;
+      return (currentNode == null && list.head != list.tail)
+          || (currentNode != null && currentNode.getPrevious(LEVEL_ONE) != list.head);
+    }
+
+    @Override
+    public @Nullable T next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      if (currentNode == null) {
+        currentNode = list.tail;
+      } else {
+        currentNode = currentNode.getPrevious(LEVEL_ONE);
+      }
+      assert currentNode != null;
+      removed = false;
+      return currentNode.getValue();
+    }
+
+    @Override
+    public void remove() {
+      assert currentNode != list.head;
+      if (currentNode == null || removed) {
+        throw new IllegalStateException();
+      } else {
+        Node<T> previous;
+        if (currentNode == list.tail) {
+          previous = null;
+        } else {
+          previous = currentNode.getNext(LEVEL_ONE);
+        }
+        list.removeNode(currentNode);
+        removed = true;
+        currentNode = previous;
+      }
+    }
+  }
+
+
+  private static class SubList<T> implements NavigableSet<T>, Serializable {
+
+    private static final long serialVersionUID = -5138563350624662800L;
+
     private final T bottom;
     private final boolean bottomInclusive;
     private final T top;
     private final boolean topInclusive;
 
+    private final SkipList<T> delegate;
+
     SubList(
-        T pBottomElement, boolean pBottomInclusive, T pTopElement, boolean pTopInclusive) {
+        SkipList<T> pDelegate,
+        T pBottomElement,
+        boolean pBottomInclusive,
+        T pTopElement,
+        boolean pTopInclusive) {
 
       bottom = pBottomElement;
       bottomInclusive = pBottomInclusive;
       top = pTopElement;
       topInclusive = pTopInclusive;
+
+      delegate = pDelegate;
     }
 
     private boolean tooLow(T pVal) {
-      int comp = compare(pVal, bottom);
+      int comp = delegate.compare(pVal, bottom);
 
       return comp < 0 || (comp == 0 && !bottomInclusive);
     }
 
     private boolean tooHigh(T pVal) {
-      int comp = compare(pVal, top);
+      int comp = delegate.compare(pVal, top);
 
       return comp > 0 || (comp == 0 && !topInclusive);
     }
@@ -869,7 +947,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public T lower(T pT) {
-      T l = SkipList.this.lower(pT);
+      T l = delegate.lower(pT);
       if (l == null || outOfBounds(l)) {
         return null;
       } else {
@@ -879,7 +957,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public T floor(T pT) {
-      T f = SkipList.this.floor(pT);
+      T f = delegate.floor(pT);
       if (f == null || outOfBounds(f)) {
         return null;
       } else {
@@ -889,7 +967,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public T ceiling(T pT) {
-      T c = SkipList.this.ceiling(pT);
+      T c = delegate.ceiling(pT);
       if (c == null || outOfBounds(c)) {
         return null;
       } else {
@@ -899,7 +977,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public T higher(T pT) {
-      T h = SkipList.this.higher(pT);
+      T h = delegate.higher(pT);
       if (h == null || outOfBounds(h)) {
         return null;
       } else {
@@ -924,8 +1002,8 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
         return 0;
       }
 
-      int start = rankOf(ceiling);
-      int end = rankOf(floor(top));
+      int start = delegate.rankOf(ceiling);
+      int end = delegate.rankOf(floor(top));
 
       return end - start + 1;
     }
@@ -938,31 +1016,12 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object pO) {
-      return SkipList.this.contains(pO) && !outOfBounds((T) pO);
+      return delegate.contains(pO) && !outOfBounds((T) pO);
     }
 
     @Override
     public Iterator<T> iterator() {
-      return new Iterator<T>() {
-
-        // Get the first node that is in the list to start from
-        private Node<T> current = ceilingNode(bottom);
-
-        @Override
-        public boolean hasNext() {
-          return current != null && !outOfBounds(current.getValue());
-        }
-
-        @Override
-        public T next() {
-          Preconditions.checkState(hasNext());
-          T value = current.getValue();
-          assert value != null;
-          current = current.getNext(LEVEL_ONE);
-
-          return value;
-        }
-      };
+      return new SubListIterator<>(this);
     }
 
     @Override
@@ -993,7 +1052,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       if (outOfBounds(pT)) {
         throw new IllegalArgumentException("Value out of sub list range: " + pT);
       } else {
-        return SkipList.this.add(pT);
+        return delegate.add(pT);
       }
     }
 
@@ -1002,7 +1061,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       if (!contains(pO)) {
         return false;
       } else {
-        return SkipList.this.remove(pO);
+        return delegate.remove(pO);
       }
 
     }
@@ -1062,30 +1121,12 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public NavigableSet<T> descendingSet() {
-      return new DescendingSubList(this);
+      return new DescendingList<>(this);
     }
 
     @Override
     public Iterator<T> descendingIterator() {
-      return new Iterator<T>() {
-
-        private @Nullable Node<T> current = floorNode(top);
-
-        @Override
-        public boolean hasNext() {
-          return current != null && !outOfBounds(current.getValue());
-        }
-
-        @Override
-        public T next() {
-          Preconditions.checkState(hasNext());
-
-          T value = current.getValue();
-          current = current.getPrevious(LEVEL_ONE);
-
-          return value;
-        }
-      };
+      return new SubListDescendingIterator<>(this);
     }
 
     @Override
@@ -1104,7 +1145,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
       T newBottom;
       boolean newBottomInclusive;
-      @Var int comp = compare(pBottom, bottom);
+      @Var int comp = delegate.compare(pBottom, bottom);
       if (comp > 0) {
         newBottom = pBottom;
         newBottomInclusive = pBottomInclusive;
@@ -1122,7 +1163,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
       T newTop;
       boolean newTopInclusive;
-      comp = compare(pTop, top);
+      comp = delegate.compare(pTop, top);
       if (comp < 0) {
         newTop = pTop;
         newTopInclusive = pTopInclusive;
@@ -1138,7 +1179,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
         }
       }
 
-      return SkipList.this.subSet(newBottom, newBottomInclusive, newTop, newTopInclusive);
+      return delegate.subSet(newBottom, newBottomInclusive, newTop, newTopInclusive);
     }
 
     @Override
@@ -1153,7 +1194,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public Comparator<? super T> comparator() {
-      return comparator;
+      return delegate.comparator;
     }
 
     @Override
@@ -1180,13 +1221,103 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     public T last() {
       return pollLast();
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object pO) {
+      if (pO instanceof Set) {
+        Set<T> s = ((Set<T>) pO);
+        return s.containsAll(this) && containsAll(s);
+
+      } else {
+        return true;
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      @Var int hashCode = 0;
+      for (T v : this) {
+        hashCode += Objects.hashCode(v);
+      }
+      return hashCode;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("[");
+      @Var boolean isFirst = true;
+      for (T val : this) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(", ");
+        }
+        sb.append(val);
+      }
+      sb.append("]");
+      return sb.toString();
+    }
+
+    private static class SubListIterator<T> extends SkipListIterator<T> {
+
+      private SubList<T> subList;
+      private SkipList<T> list;
+
+      private SubListIterator(SubList<T> pList) {
+        super(pList.delegate);
+        list = pList.delegate;
+        subList = pList;
+        currentNode = getStartNode();
+      }
+
+      private Node<T> getStartNode() {
+        @Var Node<T> candidate = list.floorNode(subList.bottom);
+
+        if (candidate == null) {
+          candidate = list.head;
+        }
+
+        return candidate;
+      }
+
+      @Override
+      public boolean hasNext() {
+        return super.hasNext() && !subList.outOfBounds(currentNode.getNext(LEVEL_ONE).getValue());
+      }
+    }
+
+    private static class SubListDescendingIterator<T> extends SkipListDescendingIterator<T> {
+
+      private SubList<T> subList;
+      private SkipList<T> skipList;
+
+      private SubListDescendingIterator(SubList<T> pList) {
+        super(pList.delegate);
+        subList = pList;
+        skipList = subList.delegate;
+        currentNode = getStartNode();
+      }
+
+      private @Nullable Node<T> getStartNode() {
+        return skipList.ceilingNode(subList.top);
+      }
+
+      @Override
+      public boolean hasNext() {
+        return super.hasNext()
+            && !subList.outOfBounds(currentNode.getPrevious(LEVEL_ONE).getValue());
+      }
+    }
   }
 
-  private class DescendingSubList implements NavigableSet<T> {
+  private static class DescendingList<T> implements NavigableSet<T>, Serializable {
 
-    private final SubList delegate;
+    private static final long serialVersionUID = 5419305617773341059L;
 
-    DescendingSubList(SubList pDelegate) {
+    private final NavigableSet<T> delegate;
+
+    private DescendingList(NavigableSet<T> pDelegate) {
       delegate = pDelegate;
     }
 
@@ -1252,12 +1383,26 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public Object[] toArray() {
-      return delegate.toArray();
+      Object[] arr = new Object[size()];
+      @Var int pos = 0;
+      for (T v : this) {
+        arr[pos] = v;
+        pos++;
+      }
+      return arr;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T1> T1[] toArray(T1[] pT1s) {
-      return delegate.toArray(pT1s);
+    public <T1> T1[] toArray(T1[] pA) {
+      Preconditions.checkNotNull(pA);
+      List<T1> newList = new ArrayList<>(size());
+
+      for (T v : this) {
+        newList.add((T1) v);
+      }
+
+      return newList.toArray(pA);
     }
 
     @Override
@@ -1308,18 +1453,17 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     @Override
     public NavigableSet<T> subSet(
         T pBottom, boolean pBottomInclusive, T pTop, boolean pTopInclusive) {
-      return new DescendingSubList(
-          (SubList) delegate.subSet(pBottom, pBottomInclusive, pTop, pTopInclusive));
+      return new DescendingList<>(delegate.subSet(pBottom, pBottomInclusive, pTop, pTopInclusive));
     }
 
     @Override
     public NavigableSet<T> headSet(T pT, boolean pTopInclusive) {
-      return new DescendingSubList((SubList) delegate.headSet(pT, pTopInclusive));
+      return new DescendingList<>(delegate.headSet(pT, pTopInclusive));
     }
 
     @Override
     public NavigableSet<T> tailSet(T pT, boolean pBottomInclusive) {
-      return new DescendingSubList((SubList) delegate.tailSet(pT, pBottomInclusive));
+      return new DescendingList<>(delegate.tailSet(pT, pBottomInclusive));
     }
 
     @SuppressWarnings("unchecked")
@@ -1336,17 +1480,43 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public SortedSet<T> subSet(T pBottom, T pTop) {
-      return new DescendingSubList((SubList) delegate.subSet(pBottom, pTop));
+      return new DescendingList<>(delegate.subSet(pBottom, true, pTop, false));
     }
 
     @Override
     public SortedSet<T> headSet(T pT) {
-      return new DescendingSubList((SubList) delegate.headSet(pT));
+      return new DescendingList<>(delegate.headSet(pT, false));
     }
 
     @Override
     public SortedSet<T> tailSet(T pT) {
-      return new DescendingSubList((SubList) delegate.tailSet(pT));
+      return new DescendingList<>(delegate.tailSet(pT, true));
+    }
+
+    @Override
+    public boolean equals(Object pO) {
+      return delegate.equals(pO);
+    }
+
+    @Override
+    public int hashCode() {
+      return delegate.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("[");
+      @Var boolean isFirst = true;
+      for (T val : this) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(", ");
+        }
+        sb.append(val);
+      }
+      sb.append("]");
+      return sb.toString();
     }
   }
 }
