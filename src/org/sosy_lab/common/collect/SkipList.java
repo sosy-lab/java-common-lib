@@ -267,11 +267,12 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       if (closestGreater != null) {
         closestGreater.increaseInBetweenCount(currLvl);
       }
+    }
 
-      // We want to compare by identity here
-      if (currNode == tail) {
-        tail = newNode;
-      }
+    assert newNode.getPrevious(LEVEL_ONE) == currNode;
+    // Adjust tail node
+    if (currNode == tail) {
+      tail = newNode;
     }
 
     // Set final interval values
@@ -327,8 +328,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
         next.setPrevious(previous, currLvl);
         int inBetweenCount = next.getInBetweenCount(currLvl) + pNode.getInBetweenCount(currLvl);
         next.setInBetweenCount(inBetweenCount, currLvl);
-      } else if (pNode == tail) {
-        tail = previous;
       }
     }
     size--;
@@ -474,6 +473,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   @Override
   public void clear() {
     head = createHead();
+    tail = head;
     size = 0;
   }
 
@@ -646,6 +646,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   @Override
   public T lower(T pT) {
     Preconditions.checkNotNull(pT);
+    Preconditions.checkNotNull(pT);
     @Var Node<T> candidate = getClosestLessEqual(head, pT);
 
     if (candidate != head && candidate.getValue().equals(pT)) {
@@ -661,6 +662,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public T floor(T pT) {
+    Preconditions.checkNotNull(pT);
     Node<T> n = floorNode(pT);
     if (n == null) {
       return null;
@@ -671,6 +673,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public T ceiling(T pT) {
+    Preconditions.checkNotNull(pT);
     Node<T> n = ceilingNode(pT);
     if (n == null) {
       return null;
@@ -681,6 +684,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @Override
   public T higher(T pT) {
+    Preconditions.checkNotNull(pT);
     @Var Node<T> candidate = getClosestLessEqual(head, pT);
     candidate = candidate.getNext(LEVEL_ONE);
 
@@ -727,16 +731,20 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   @Override
   public NavigableSet<T> subSet(
       T pFromElement, boolean pFromInclusive, T pToElement, boolean pToInclusive) {
+    Preconditions.checkNotNull(pFromElement);
+    Preconditions.checkNotNull(pToElement);
     return new SubList<>(this, pFromElement, pFromInclusive, pToElement, pToInclusive);
   }
 
   @Override
   public NavigableSet<T> headSet(T pToElement, boolean pInclusive) {
+    Preconditions.checkNotNull(pToElement);
     return subSet(first(), true, pToElement, pInclusive);
   }
 
   @Override
   public NavigableSet<T> tailSet(T pFromElement, boolean pInclusive) {
+    Preconditions.checkNotNull(pFromElement);
     return subSet(pFromElement, pInclusive, last(), true);
   }
 
@@ -1049,6 +1057,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public boolean add(T pT) {
+      Preconditions.checkNotNull(pT);
       if (outOfBounds(pT)) {
         throw new IllegalArgumentException("Value out of sub list range: " + pT);
       } else {
@@ -1058,6 +1067,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
     @Override
     public boolean remove(Object pO) {
+      Preconditions.checkNotNull(pO);
       if (!contains(pO)) {
         return false;
       } else {
