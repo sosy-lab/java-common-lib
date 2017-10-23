@@ -20,6 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -169,27 +171,80 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   private Node<T> tail = head;
   private int size = 0;
 
-  @SuppressWarnings("unchecked")
-  public SkipList(@Nullable Comparator<? super T> pComparator) {
+  private SkipList(Comparator<? super T> pComparator) {
+    Preconditions.checkNotNull(pComparator);
     comparator = pComparator;
   }
 
-  public SkipList(Collection<? extends T> pCollection) {
+  private SkipList(Iterable<? extends T> pCollection) {
     this();
-    boolean changed = addAll(pCollection);
-    assert changed || pCollection.isEmpty();
+    addAll0(pCollection);
   }
 
-  public SkipList(SortedSet<T> pSortedSet) {
-    this(pSortedSet.comparator());
-    boolean changed = addAll(pSortedSet);
-    assert changed || pSortedSet.isEmpty();
+  private SkipList(Iterable<? extends T> pCollection, Comparator<? super T> pComparator) {
+    this(pComparator);
+    addAll0(pCollection);
   }
 
-  @SuppressWarnings("unchecked")
-  public SkipList() {
+  private SkipList() {
     comparator = null;
   }
+
+  public static <T extends Comparable<T>> SkipList<T> of(T p1) {
+    SkipList<T> list = new SkipList<>();
+    list.add(p1);
+    return list;
+  }
+
+  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2) {
+    SkipList<T> list = new SkipList<>();
+    list.addAll(Lists.newArrayList(p1, p2));
+    return list;
+  }
+
+  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2, T p3) {
+    SkipList<T> list = new SkipList<>();
+    list.addAll(Lists.newArrayList(p1, p2, p3));
+    return list;
+  }
+
+  @SafeVarargs
+  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2, T p3, T... pOtherElements) {
+    SkipList<T> list = new SkipList<>();
+    list.addAll(Lists.newArrayList(p1, p2, p3));
+    for (T v : pOtherElements) {
+      list.add(v);
+    }
+    return list;
+  }
+
+  public static <T extends Comparable<T>> SkipList<T> create() {
+    return new SkipList<>();
+  }
+
+  public static <T> SkipList<T> create(Comparator<? super T> pComparator) {
+    return new SkipList<>(pComparator);
+  }
+
+  public static <T> SkipList<T> create(
+      Iterable<? extends T> pCollection, Comparator<? super T> pComparator) {
+    return new SkipList<>(pCollection, pComparator);
+  }
+
+  public static <T extends Comparable<T>> SkipList<T> createWithNaturalOrder(
+      Iterable<? extends T> pCollection) {
+    return new SkipList<>(pCollection);
+  }
+
+  public static <T> SkipList<T> copyOf(SortedSet<T> pSortedSet) {
+    Comparator<? super T> comparator = pSortedSet.comparator();
+    if (comparator == null) {
+      return new SkipList<>(pSortedSet);
+    } else {
+      return new SkipList<>(pSortedSet, comparator);
+    }
+  }
+
 
   /** Use the given {@link Random} object for future probabilistic computations. */
   public void reinitialize(Random pRandom) {
@@ -225,6 +280,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean add(T pT) {
     Preconditions.checkNotNull(pT);
@@ -333,6 +389,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     size--;
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean remove(Object pO) {
     Preconditions.checkNotNull(pO);
@@ -424,8 +481,14 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return true;
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean addAll(Collection<? extends T> pC) {
+    return addAll0(pC);
+  }
+
+  @CanIgnoreReturnValue
+  private boolean addAll0(Iterable<? extends T> pC) {
     Preconditions.checkNotNull(pC);
     @Var boolean changed = false;
     for (T o : pC) {
@@ -434,6 +497,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return changed;
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean removeAll(Collection<?> pC) {
     Preconditions.checkNotNull(pC);
@@ -444,6 +508,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return changed;
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean retainAll(Collection<?> pC) {
     Preconditions.checkNotNull(pC);
@@ -503,6 +568,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return getNode(pIndex).getValue();
   }
 
+  @CanIgnoreReturnValue
   @Override
   public @Nullable T removeByRank(int pIndex) {
     Preconditions.checkElementIndex(pIndex, size);
@@ -1041,6 +1107,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return newList.toArray(pA);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean add(T pT) {
       Preconditions.checkNotNull(pT);
@@ -1051,6 +1118,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       }
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean remove(Object pO) {
       Preconditions.checkNotNull(pO);
@@ -1072,6 +1140,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return true;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean addAll(Collection<? extends T> pCollection) {
       @Var boolean existed = false;
@@ -1081,6 +1150,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return existed;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean retainAll(Collection<?> pCollection) {
       @Var boolean changed = false;
@@ -1096,6 +1166,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return changed;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean removeAll(Collection<?> pCollection) {
       @Var boolean changed = false;
@@ -1401,11 +1472,13 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return newList.toArray(pA);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean add(T pT) {
       return delegate.add(pT);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean remove(Object pO) {
       return delegate.remove(pO);
@@ -1416,16 +1489,19 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return delegate.containsAll(pCollection);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean addAll(Collection<? extends T> pCollection) {
       return delegate.addAll(pCollection);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean retainAll(Collection<?> pCollection) {
       return delegate.retainAll(pCollection);
     }
 
+    @CanIgnoreReturnValue
     @Override
     public boolean removeAll(Collection<?> pCollection) {
       return delegate.removeAll(pCollection);
