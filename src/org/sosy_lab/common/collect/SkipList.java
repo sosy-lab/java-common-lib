@@ -163,18 +163,14 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   private static final double ONE_HALF_LOG = Math.log(0.5);
   private Random randomGenerator = new Random();
 
-  private final Comparator<? super T> comparator;
+  private final @Nullable Comparator<? super T> comparator;
   private Node<T> head = createHead();
   private Node<T> tail = head;
   private int size = 0;
 
   @SuppressWarnings("unchecked")
   public SkipList(@Nullable Comparator<? super T> pComparator) {
-    if (pComparator == null) {
-      comparator = (Comparator<? super T>) Comparator.naturalOrder();
-    } else {
-      comparator = pComparator;
-    }
+    comparator = pComparator;
   }
 
   public SkipList(Collection<? extends T> pCollection) {
@@ -191,7 +187,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   @SuppressWarnings("unchecked")
   public SkipList() {
-    comparator = (Comparator<? super T>) Comparator.naturalOrder();
+    comparator = null;
   }
 
   /** Use the given {@link Random} object for future probabilistic computations. */
@@ -219,6 +215,15 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private int compare(T pF, T pS) {
+    if (comparator == null) {
+      return ((Comparable<T>) pF).compareTo(pS);
+    } else {
+      return comparator.compare(pF, pS);
+    }
+  }
+
   @Override
   public boolean add(T pT) {
     Preconditions.checkNotNull(pT);
@@ -237,7 +242,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       // necessary to get there on the current lvl.
       @Var int inBetweenCount = 0;
       @Var Node<T> next = currNode.getNext(currLvl);
-      while (next != null && comparator.compare(pT, next.getValue()) >= 0) {
+      while (next != null && compare(pT, next.getValue()) >= 0) {
         inBetweenCount += next.getInBetweenCount(currLvl);
         currNode = next;
         next = currNode.getNext(currLvl);
@@ -291,7 +296,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   private Node<T> getClosestLessEqual(Node<T> pStart, T pVal, int pLvl) {
     @Var Node<T> currNode = pStart;
     @Var Node<T> next = currNode.getNext(pLvl);
-    while (next != null && comparator.compare(pVal, next.getValue()) >= 0) {
+    while (next != null && compare(pVal, next.getValue()) >= 0) {
       currNode = next;
       next = currNode.getNext(pLvl);
     }
@@ -346,7 +351,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       // node
     }
 
-    while (currNode != head && comparator.compare(currNode.getValue(), val) == 0) {
+    while (currNode != head && compare(currNode.getValue(), val) == 0) {
       if (currNode.getValue().equals(pO)) {
         removeNode(currNode);
         return true;
@@ -371,13 +376,14 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
   @Override
   public boolean contains(Object pO) {
     Preconditions.checkNotNull(pO);
+
     @Var Node<T> currNode = head;
     T val = (T) pO;
     currNode = getClosestLessEqual(currNode, val);
 
     while (currNode != head
         && currNode != null
-        && comparator.compare(currNode.getValue(), val) == 0) {
+        && compare(currNode.getValue(), val) == 0) {
       if (currNode.getValue().equals(pO)) {
         return true;
       } else {
@@ -543,10 +549,10 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     @Var int index = -1;
     for (int currLvl = LEVEL_MAX; currLvl >= LEVEL_ONE; currLvl--) {
       next = currNode.getNext(currLvl);
-      while (next != null && comparator.compare(val, next.getValue()) >= 0) {
+      while (next != null && compare(val, next.getValue()) >= 0) {
         currNode = next;
 
-        int comp = comparator.compare(val, currNode.getValue());
+        int comp = compare(val, currNode.getValue());
         if (comp >= 0) {
           index += next.getInBetweenCount(currLvl);
         }
@@ -559,7 +565,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       }
     }
 
-    while (currNode != head && comparator.compare(val, currNode.getValue()) == 0) {
+    while (currNode != head && compare(val, currNode.getValue()) == 0) {
       if (currNode.getValue().equals(pO)) {
         return index;
       } else {
@@ -845,13 +851,13 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
 
     private boolean tooLow(T pVal) {
-      int comp = comparator.compare(pVal, bottom);
+      int comp = compare(pVal, bottom);
 
       return comp < 0 || (comp == 0 && !bottomInclusive);
     }
 
     private boolean tooHigh(T pVal) {
-      int comp = comparator.compare(pVal, top);
+      int comp = compare(pVal, top);
 
       return comp > 0 || (comp == 0 && !topInclusive);
     }
@@ -1098,7 +1104,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
       T newBottom;
       boolean newBottomInclusive;
-      @Var int comp = comparator.compare(pBottom, bottom);
+      @Var int comp = compare(pBottom, bottom);
       if (comp > 0) {
         newBottom = pBottom;
         newBottomInclusive = pBottomInclusive;
@@ -1116,7 +1122,7 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
       T newTop;
       boolean newTopInclusive;
-      comp = comparator.compare(pTop, top);
+      comp = compare(pTop, top);
       if (comp < 0) {
         newTop = pTop;
         newTopInclusive = pTopInclusive;
@@ -1316,9 +1322,16 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       return new DescendingSubList((SubList) delegate.tailSet(pT, pBottomInclusive));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Comparator<? super T> comparator() {
-      return delegate.comparator();
+      @Var Comparator<? super T> reversedComparator = delegate.comparator();
+
+      if (reversedComparator == null) {
+        reversedComparator = (Comparator<? super T>) Comparator.naturalOrder();
+      }
+
+      return reversedComparator.reversed();
     }
 
     @Override
