@@ -42,6 +42,8 @@ public class TimeSpanTypeConverter implements TypeConverter {
           "min", TimeUnit.MINUTES,
           "h", TimeUnit.HOURS);
 
+  private static final CharMatcher LETTER_MATCHER = CharMatcher.inRange('a', 'z');
+
   @Override
   public Object convert(
       String optionName,
@@ -61,8 +63,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
 
     // find unit in input string
     @Var int i = valueStr.length() - 1;
-    CharMatcher letterMatcher = CharMatcher.javaLetter();
-    while (i >= 0 && letterMatcher.matches(valueStr.charAt(i))) {
+    while (i >= 0 && LETTER_MATCHER.matches(valueStr.charAt(i))) {
       i--;
     }
     if (i < 0) {
@@ -70,13 +71,20 @@ public class TimeSpanTypeConverter implements TypeConverter {
     }
 
     // convert unit string to TimeUnit
-    @Var TimeUnit userUnit = TIME_UNITS.get(valueStr.substring(i + 1));
+    String userUnitStr = valueStr.substring(i + 1).trim();
+    TimeUnit userUnit =
+        userUnitStr.isEmpty() ? option.defaultUserUnit() : TIME_UNITS.get(userUnitStr);
     if (userUnit == null) {
-      userUnit = option.defaultUserUnit();
+      throw new InvalidConfigurationException("Option " + optionName + " contains invalid unit");
     }
 
     // Parse string without unit
-    long rawValue = Long.parseLong(valueStr.substring(0, i + 1).trim());
+    long rawValue;
+    try {
+      rawValue = Long.parseLong(valueStr.substring(0, i + 1).trim());
+    } catch (NumberFormatException e) {
+      throw new InvalidConfigurationException("Option " + optionName + " contains invalid number");
+    }
 
     // convert value from user unit to code unit
     TimeUnit codeUnit = option.codeUnit();
