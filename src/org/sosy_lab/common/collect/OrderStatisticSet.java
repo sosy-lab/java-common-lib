@@ -39,8 +39,8 @@ import java.util.SortedSet;
  *
  * In both cases, the used compare-method should be consistent with <code>equals</code>, i.e.,
  * <code>compare(a, b) == 0  =&gt;  a.equals(b)</code>, so that the contract provided by {@link
- * java.util.Set Set} is fulfilled. If the used compare-method is not consistent with
- * <code>equals</code>, the Set contract is not fulfilled.
+ * java.util.Set Set} is fulfilled. If the used compare-method is not consistent with <code>equals
+ * </code>, the Set contract is not fulfilled.
  *
  * @param <T> the type of elements maintained by this set
  */
