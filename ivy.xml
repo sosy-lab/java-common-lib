@@ -36,10 +36,10 @@
     <dependencies>
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="23.1-jre" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="23.2-jre" conf="runtime->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="23.1-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="23.2-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build.xml for upgrading. -->
@@ -51,7 +51,7 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.5" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.5.2" conf="build->default"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -68,7 +68,7 @@
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="2.10.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-core" rev="2.11.0" conf="test->default; contrib->sources"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -77,8 +77,8 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.1.1" transitive="false" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.1.1" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.1.2" transitive="false" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.1.2" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -86,7 +86,7 @@
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.4" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.5" conf="format-source->default"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.24.2" conf="checkstyle->default"/>
@@ -97,6 +97,6 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="runtime->default"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.1.1"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.1.2"/>
     </dependencies>
 </ivy-module>

@@ -34,6 +34,7 @@ public class FileLogFormatter extends Formatter {
 
   @Override
   public String format(LogRecord lr) {
+    @SuppressWarnings("JdkObsolete") // required by SimpleDateFormat
     StringBuffer sb = new StringBuffer();
 
     dateFormat.format(new Date(lr.getMillis()), sb, new FieldPosition(0));

@@ -70,6 +70,7 @@ public class CollectionsTransformationTest {
   }
 
   @Test
+  @SuppressWarnings("JdkObsolete")
   public void testTransformedListCopy() {
     testTransformCalledOnlyOnce(ImmutableList::copyOf, Collections3::transformedImmutableListCopy);
     testTransformCalledOnlyOnce(Lists::newArrayList, Collections3::transformedImmutableListCopy);
