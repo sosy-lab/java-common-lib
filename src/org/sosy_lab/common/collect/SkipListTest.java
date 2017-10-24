@@ -69,7 +69,6 @@ public class SkipListTest {
 
     suite.addTest(new JUnit4TestAdapter(SkipListTest.class));
 
-
     return suite;
   }
 
@@ -164,7 +163,6 @@ public class SkipListTest {
     Assert.assertTrue(set.contains(9));
     Assert.assertFalse(set.contains(toRemove1));
     Assert.assertFalse(set.contains(toRemove2));
-
   }
 
   @Test
@@ -180,7 +178,6 @@ public class SkipListTest {
 
     Assert.assertFalse(subSet.contains(9));
     Assert.assertFalse(subSet.contains(99));
-
 
     subSet = set.subSet(9, true, 99, true);
 
@@ -200,7 +197,6 @@ public class SkipListTest {
     subSet = subSet.descendingSet();
     Assert.assertEquals(subSet.pollFirst(), Integer.valueOf(9));
     Assert.assertEquals(subSet.pollLast(), Integer.valueOf(99));
-
   }
 
   @Test

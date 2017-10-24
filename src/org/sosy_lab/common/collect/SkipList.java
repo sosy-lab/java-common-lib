@@ -245,7 +245,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
-
   /** Use the given {@link Random} object for future probabilistic computations. */
   public void reinitialize(Random pRandom) {
     Preconditions.checkNotNull(pRandom);
@@ -961,7 +960,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     }
   }
 
-
   private static class SubList<T> implements NavigableSet<T>, Serializable {
 
     private static final long serialVersionUID = -5138563350624662800L;
@@ -999,7 +997,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
       return comp > 0 || (comp == 0 && !topInclusive);
     }
-
 
     private boolean outOfBounds(T pVal) {
       return tooLow(pVal) || tooHigh(pVal);
@@ -1127,7 +1124,6 @@ public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
       } else {
         return delegate.remove(pO);
       }
-
     }
 
     @Override
