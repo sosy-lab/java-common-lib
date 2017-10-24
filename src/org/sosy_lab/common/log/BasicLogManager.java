@@ -95,13 +95,13 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     }
   }
 
-  private static class LimitingStringBufferAppendable implements Appendable {
+  private static class LimitingStringBuilderAppendable implements Appendable {
 
     private final int truncateSize;
 
     private final StringBuilder sb = new StringBuilder();
 
-    LimitingStringBufferAppendable(int pTruncateSize) {
+    LimitingStringBuilderAppendable(int pTruncateSize) {
       truncateSize = pTruncateSize;
     }
 
@@ -364,8 +364,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       java.util.Formatter formatter =
           new java.util.Formatter(
               truncateSize > 0
-                  ? new LimitingStringBufferAppendable(truncateSize)
-                  : new StringBuffer());
+                  ? new LimitingStringBuilderAppendable(truncateSize)
+                  : new StringBuilder());
       log0(priority, findCallingMethod(), formatter.format(format, args).toString());
     }
   }

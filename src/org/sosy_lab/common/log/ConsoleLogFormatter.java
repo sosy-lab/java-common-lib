@@ -58,7 +58,7 @@ public class ConsoleLogFormatter extends Formatter {
 
   @Override
   public String format(LogRecord lr) {
-    StringBuffer sb = new StringBuffer(200);
+    StringBuilder sb = new StringBuilder(200);
 
     if (useColors) {
       if (lr.getLevel().equals(Level.WARNING)) {
