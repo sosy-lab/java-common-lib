@@ -57,8 +57,18 @@ public abstract class ForwardingLogManager implements LogManager {
   }
 
   @Override
+  public void logfUserException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
+    delegate().logfUserException(pPriority, pE, pFormat, pArgs);
+  }
+
+  @Override
   public void logDebugException(Throwable pE, @Nullable String pAdditionalMessage) {
     delegate().logDebugException(pE, pAdditionalMessage);
+  }
+
+  @Override
+  public void logfDebugException(Throwable pE, String pFormat, Object... pArgs) {
+    delegate().logfDebugException(pE, pFormat, pArgs);
   }
 
   @Override
@@ -69,6 +79,11 @@ public abstract class ForwardingLogManager implements LogManager {
   @Override
   public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
     delegate().logException(pPriority, pE, pAdditionalMessage);
+  }
+
+  @Override
+  public void logfException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
+    delegate().logfException(pPriority, pE, pFormat, pArgs);
   }
 
   @Override
