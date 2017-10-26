@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /** {@link Filter} implementation for blacklisting log levels. */
-class LogLevelFilter implements Filter {
+public class LogLevelFilter implements Filter {
 
   private final Set<Level> excludeLevels;
 
