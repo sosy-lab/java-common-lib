@@ -19,7 +19,7 @@
 
         <conf name="checkstyle" visibility="private" description="for running CheckStyle"/>
 
-        <conf name="findbugs" visibility="private" description="for running FindBugs"/>
+        <conf name="spotbugs" visibility="private" description="for running SpotBugs"/>
 
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
@@ -91,10 +91,11 @@
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.24.2" conf="checkstyle->default"/>
 
-        <!-- FindBugs -->
-        <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
+        <!-- SpotBugs -->
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.0" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="runtime->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.0" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.1.2"/>
