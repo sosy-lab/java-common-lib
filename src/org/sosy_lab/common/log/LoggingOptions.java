@@ -92,6 +92,12 @@ public class LoggingOptions {
     config.inject(this);
   }
 
+  /**
+   * This constructor is for inheritance, thus allowing users to use this class without sosy-lab's
+   * {@link Configuration}.
+   */
+  protected LoggingOptions() {}
+
   public Level getFileLevel() {
     return fileLevel;
   }
