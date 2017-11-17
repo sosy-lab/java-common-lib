@@ -66,7 +66,7 @@ import javax.annotation.Nullable;
  * @param <T> type of the elements of this list
  * @see java.util.concurrent.ConcurrentSkipListMap
  */
-public class SkipList<T> implements OrderStatisticSet<T>, Serializable {
+public final class SkipList<T> implements OrderStatisticSet<T>, Serializable {
 
   private static final long serialVersionUID = 1001345121457565238L;
 
