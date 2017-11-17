@@ -20,7 +20,6 @@
 package org.sosy_lab.common.collect;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
@@ -190,34 +189,6 @@ public final class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     comparator = null;
   }
 
-  public static <T extends Comparable<T>> SkipList<T> of(T p1) {
-    SkipList<T> list = new SkipList<>();
-    list.add(p1);
-    return list;
-  }
-
-  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2) {
-    SkipList<T> list = new SkipList<>();
-    list.addAll(Lists.newArrayList(p1, p2));
-    return list;
-  }
-
-  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2, T p3) {
-    SkipList<T> list = new SkipList<>();
-    list.addAll(Lists.newArrayList(p1, p2, p3));
-    return list;
-  }
-
-  @SafeVarargs
-  public static <T extends Comparable<T>> SkipList<T> of(T p1, T p2, T p3, T... pOtherElements) {
-    SkipList<T> list = new SkipList<>();
-    list.addAll(Lists.newArrayList(p1, p2, p3));
-    for (T v : pOtherElements) {
-      list.add(v);
-    }
-    return list;
-  }
-
   public static <T extends Comparable<T>> SkipList<T> create() {
     return new SkipList<>();
   }
@@ -231,12 +202,12 @@ public final class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return new SkipList<>(pCollection, pComparator);
   }
 
-  public static <T extends Comparable<T>> SkipList<T> createWithNaturalOrder(
+  public static <T extends Comparable<T>> SkipList<T> create(
       Iterable<? extends T> pCollection) {
     return new SkipList<>(pCollection);
   }
 
-  public static <T> SkipList<T> copyOf(SortedSet<T> pSortedSet) {
+  public static <T> SkipList<T> createOfSorted(SortedSet<T> pSortedSet) {
     Comparator<? super T> comparator = pSortedSet.comparator();
     if (comparator == null) {
       return new SkipList<>(pSortedSet);

@@ -105,7 +105,7 @@ public class SkipListTest {
   @Test
   public void testSubsetView_mutation() {
     Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
 
     Integer toAdd = 50;
@@ -128,7 +128,7 @@ public class SkipListTest {
   @Test(expected = IllegalArgumentException.class)
   public void testSubsetView_outOfBounds_add() {
     Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
 
     try {
@@ -148,7 +148,7 @@ public class SkipListTest {
     Integer toRemove1 = 20;
     Integer toRemove2 = 30;
     Collection<Integer> testCollection = ImmutableList.of(1, 9, toRemove1, toRemove2, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
 
     subSet.remove(9);
@@ -168,7 +168,7 @@ public class SkipListTest {
   @Test
   public void testSubsetView_outOfBounds_contains() {
     Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     @Var NavigableSet<Integer> subSet = set.subSet(10, true, 100, true);
 
     Assert.assertFalse(subSet.contains(9));
@@ -188,7 +188,7 @@ public class SkipListTest {
   @Test
   public void testSubsetView_descending() {
     Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     @Var NavigableSet<Integer> subSet = set.subSet(9, true, 99, true).descendingSet();
 
     Assert.assertEquals(subSet.pollFirst(), Integer.valueOf(99));
@@ -202,7 +202,7 @@ public class SkipListTest {
   @Test
   public void testSubsetView_subsetOfSubset() {
     Collection<Integer> testCollection = ImmutableList.of(1, 9, 99, 999);
-    NavigableSet<Integer> set = SkipList.createWithNaturalOrder(testCollection);
+    NavigableSet<Integer> set = SkipList.create(testCollection);
     NavigableSet<Integer> subSet = set.subSet(1, true, 99, true);
     @Var NavigableSet<Integer> subSubSet = subSet.subSet(9, true, 1000, true);
 
