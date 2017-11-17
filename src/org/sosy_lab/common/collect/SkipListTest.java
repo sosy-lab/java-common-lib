@@ -96,8 +96,7 @@ public class SkipListTest {
     SerializableTester.reserializeAndAssert(l);
 
     for (int i = 100000; i >= 0; i--) {
-      boolean changed = l.add(i);
-      assert changed;
+      l.add(i);
     }
     SerializableTester.reserializeAndAssert(l);
   }
