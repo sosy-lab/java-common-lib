@@ -202,8 +202,7 @@ public final class SkipList<T> implements OrderStatisticSet<T>, Serializable {
     return new SkipList<>(pCollection, pComparator);
   }
 
-  public static <T extends Comparable<T>> SkipList<T> create(
-      Iterable<? extends T> pCollection) {
+  public static <T extends Comparable<T>> SkipList<T> create(Iterable<? extends T> pCollection) {
     return new SkipList<>(pCollection);
   }
 
