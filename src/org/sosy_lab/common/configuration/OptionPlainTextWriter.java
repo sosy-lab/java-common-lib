@@ -149,7 +149,7 @@ class OptionPlainTextWriter {
    * before each line.
    */
   private static String formatText(String text) {
-    return formatText(text, "# ", true);
+    return formatText(text, "# ", /* useLineStartInFirstLine= */ true);
   }
 
   /** This function formats text and splits lines, if they are too long. */
@@ -220,7 +220,11 @@ class OptionPlainTextWriter {
         enumTitles[i] = ((Enum<?>) enums[i]).name();
       }
       str.append("  enum:     ")
-          .append(formatText(Arrays.toString(enumTitles), "             ", false));
+          .append(
+              formatText(
+                  Arrays.toString(enumTitles),
+                  "             ",
+                  /* useLineStartInFirstLine= */ false));
     }
 
     appendOptionValues(field, str);

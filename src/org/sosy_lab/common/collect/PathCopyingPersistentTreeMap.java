@@ -827,6 +827,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <V> The type of values.
    */
   @Immutable(containerOf = {"K", "V"})
+  @SuppressWarnings("JdkObsolete")
   private static final class EntrySet<K extends Comparable<? super K>, V>
       extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
 
@@ -1320,6 +1321,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
      * Entry set implementation. The lower bound (if present) needs to exist in the map and is
      * inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
      */
+    @SuppressWarnings("JdkObsolete")
     private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>>
         implements SortedSet<Map.Entry<K, V>> {
 

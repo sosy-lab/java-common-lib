@@ -31,6 +31,7 @@ import javax.annotation.CheckReturnValue;
  * @param <V> The type of values.
  */
 @Immutable(containerOf = {"K", "V"})
+@SuppressWarnings("JdkObsolete")
 public interface PersistentSortedMap<K, V>
     extends PersistentMap<K, V>, SortedMap<K, V>, OurSortedMap<K, V> {
 

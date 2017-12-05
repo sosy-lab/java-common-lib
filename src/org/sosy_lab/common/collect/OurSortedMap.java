@@ -32,6 +32,7 @@ import java.util.SortedSet;
  * Extension of {@link SortedMap} that specifies {@link SortedSet} as type of some collection views
  * (instead of {@link java.util.Set}).
  */
+@SuppressWarnings("JdkObsolete")
 interface OurSortedMap<K, V> extends SortedMap<K, V> {
 
   @Override

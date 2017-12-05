@@ -35,6 +35,7 @@ import java.util.SortedSet;
  *
  * @param <K> The type of keys.
  */
+@SuppressWarnings("JdkObsolete")
 class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
     implements SortedSet<K> {
 

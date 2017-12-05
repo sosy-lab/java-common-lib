@@ -609,7 +609,7 @@ public final class Configuration {
   }
 
   static String getOptionName(Options options, Member member, Option option) {
-    return getOptionName(options, member, option, false);
+    return getOptionName(options, member, option, /* isDeprecated= */ false);
   }
 
   /**
@@ -682,7 +682,8 @@ public final class Configuration {
 
     Object value;
     if (!options.deprecatedPrefix().equals(NO_DEPRECATED_PREFIX)) {
-      String optionDeprecatedName = getOptionName(options, method, option, true);
+      String optionDeprecatedName =
+          getOptionName(options, method, option, /* isDeprecated= */ true);
       String deprecatedValueStr = getValueString(optionDeprecatedName, option, isEnum);
       if (deprecatedValueStr != null && !deprecatedValueStr.equals(valueStr)) {
         if (valueStr == null) {
