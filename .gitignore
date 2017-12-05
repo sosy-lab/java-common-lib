@@ -12,10 +12,10 @@
 /Checkstyle.xml
 /Checkstyle.Test.html
 /Checkstyle.Test.xml
-/FindBugs.html
-/FindBugs.xml
-/FindBugs.diff.html
-/FindBugs.diff.xml
+/SpotBugs.html
+/SpotBugs.xml
+/SpotBugs.diff.html
+/SpotBugs.diff.xml
 /Javadoc
 /gh-pages
 /.factorypath
