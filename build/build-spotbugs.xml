@@ -17,7 +17,7 @@
         <spotbugs
                 output="${spotbugs.output}"
                 outputFile="SpotBugs.xml"
-                excludeFilter=".settings/SpotBugs.exclude.xml"
+                excludeFilter="build/SpotBugs.exclude.xml"
                 warningsProperty="spotbugs.warnings">
             <auxClasspath refid="classpath" />
             <sourcePath path="${source.dir}" />
@@ -41,7 +41,7 @@
         <spotbugs
                 output="${spotbugs.output}"
                 outputFile="SpotBugs.diff.xml"
-                excludeFilter=".settings/SpotBugs.exclude.xml"
+                excludeFilter="build/SpotBugs.exclude.xml"
                 warningsProperty="spotbugs.newwarnings"
                 baselineBugs="SpotBugs.known.xml">
             <auxClasspath refid="classpath" />
