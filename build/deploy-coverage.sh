@@ -15,7 +15,7 @@ CODACY_COVERAGE_REPORTER_URL="$(echo $CODACY_COVERAGE_REPORTER_RELEASE | jq -r .
 if [ "$CODACY_COVERAGE_REPORTER_URL" = "null" ]; then
   echo "Failed to get information about coday coverage reporter from GitHub:"
   echo "$CODACY_COVERAGE_REPORTER_RELEASE"
-  exit
+  exit 1
 fi
 
 echo "Downloading Codacy Coverage Reporter from $CODACY_COVERAGE_REPORTER_URL"
