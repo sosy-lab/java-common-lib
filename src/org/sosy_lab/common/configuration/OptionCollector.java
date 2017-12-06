@@ -450,8 +450,8 @@ public class OptionCollector {
   }
 
   /**
-   * If the string matches something like "<func>(<args>)" for a given <func>, return only the
-   * <args> part, otherwise the full string.
+   * If the string matches something like {@literal <func>(<args>)} for a given {@literal <func>},
+   * return only the {@literal <args>} part, otherwise the full string.
    */
   private static String stripSurroundingFunctionCall(String s, String partToBeStripped) {
     String toBeStripped = partToBeStripped + "(";

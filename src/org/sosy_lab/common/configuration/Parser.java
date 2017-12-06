@@ -66,11 +66,11 @@ import org.sosy_lab.common.io.IO;
  *   <li>Inside the value, put '\' at the line end to append the next line to the current value (not
  *       possible in other places like key or section start). Whitespace at the beginning and end of
  *       all lines will be removed, so indentation is possible.
- *   <li>Other files can be included (recursively) with '#include <FILE>'. If the file name is a
- *       relative one, it is considered relative to the directory of the current file. Directives in
- *       the current file will always overwrite included directives, no matter of their placement.
- *       Directives from an included file will overwrite directives from previously included files.
- *       Circular inclusions are now allowed.
+ *   <li>Other files can be included (recursively) with {@literal #include <FILE>}. If the file name
+ *       is a relative one, it is considered relative to the directory of the current file.
+ *       Directives in the current file will always overwrite included directives, no matter of
+ *       their placement. Directives from an included file will overwrite directives from previously
+ *       included files. Circular inclusions are now allowed.
  * </ul>
  */
 class Parser {

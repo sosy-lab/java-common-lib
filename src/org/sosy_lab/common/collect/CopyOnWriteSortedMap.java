@@ -97,9 +97,10 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
+   * This method is not starvation free, and thus not strictly guaranteed to terminate in presence
+   * of concurrent modifying operations.
+   *
    * @see Map#put(Object, Object)
-   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
-   *     presence of concurrent modifying operations.
    */
   @Override
   @CanIgnoreReturnValue
@@ -124,9 +125,10 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
+   * This method is not starvation free, and thus not strictly guaranteed to terminate in presence
+   * of concurrent modifying operations.
+   *
    * @see Map#remove(Object)
-   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
-   *     presence of concurrent modifying operations.
    */
   @Override
   @CanIgnoreReturnValue
@@ -147,11 +149,13 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
+   * This method is not atomic! It inserts all keys one after the other, and in between each
+   * operation arbitrary operations from other threads might get executed.
+   *
+   * <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
+   * presence of concurrent modifying operations.
+   *
    * @see Map#putAll(Map)
-   *     <p>This method is not atomic! It inserts all keys one after the other, and in between each
-   *     operation arbitrary operations from other threads might get executed.
-   *     <p>This method is not starvation free, and thus not strictly guaranteed to terminate in
-   *     presence of concurrent modifying operations.
    */
   @Override
   public void putAll(Map<? extends K, ? extends V> pMap) {

@@ -48,10 +48,11 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
   }
 
   /**
+   * This method returns a new LogManagerWithoutDuplicates, which does not share state with the
+   * current instance (i.e., it is possible to log the same message both through the old and the new
+   * instance once).
+   *
    * @see LogManager#withComponentName(String)
-   *     <p>This method returns a new LogManagerWithoutDuplicates, which does not share state with
-   *     the current instance (i.e., it is possible to log the same message both through the old and
-   *     the new instance once).
    */
   @Override
   public LogManagerWithoutDuplicates withComponentName(String pName) {
