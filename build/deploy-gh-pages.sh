@@ -5,6 +5,7 @@ rm -rf gh-pages || true
 mkdir -p gh-pages/api
 cp -r website/* gh-pages
 cp -r Javadoc/* gh-pages/api
+find bin -name ConfigurationOptions.txt -exec cp {} gh-pages/ \;
 
 # we need to tell git who we are
 git config --global user.name "${GIT_NAME}"

@@ -14,6 +14,7 @@
         <fail unless="version.publishable"
             message="Cannot publish version ${version}, only unmodified working copies may be published." />
         <ivy:publish
+            conf="core, contrib, *(public)"
             pubrevision="${version}"
             resolver="Sosy-Lab-Publish"
             status="release"

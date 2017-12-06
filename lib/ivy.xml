@@ -23,7 +23,7 @@
 
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
-        <conf name="contrib" description="additional files like JavaDocs or source code of dependencies that will help developers"/>
+        <conf name="contrib" visibility="private" description="additional files like JavaDocs or source code of dependencies that will help developers"/>
 
         <conf name="sources" description="sources of JavaSMT"/>
     </configurations>
