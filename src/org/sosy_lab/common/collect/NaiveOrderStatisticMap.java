@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ForwardingNavigableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
@@ -89,8 +90,7 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
 
   @Override
   public K getKeyByRank(int pIndex) {
-    return NaiveOrderStatisticSet.createSetWithSameOrder(delegate.navigableKeySet())
-        .getByRank(pIndex);
+    return Iterables.get(delegate.navigableKeySet(), pIndex);
   }
 
   @Override
@@ -111,7 +111,17 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
   @Override
   public int rankOf(K pObj) {
     checkNotNull(pObj);
-    return NaiveOrderStatisticSet.createSetWithSameOrder(delegate.navigableKeySet()).rankOf(pObj);
+    return Iterables.indexOf(delegate.navigableKeySet(), o -> compareKey(o, pObj) == 0);
+  }
+
+  @SuppressWarnings("unchecked")
+  private int compareKey(K pFirst, K pSnd) {
+    Comparator<? super K> comparator = comparator();
+    if (comparator != null) {
+      return comparator.compare(pFirst, pSnd);
+    } else {
+      return ((Comparable<K>) pFirst).compareTo(pSnd);
+    }
   }
 
   @Override
