@@ -50,8 +50,8 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
 
   private final NavigableSet<E> delegate;
 
-  private NaiveOrderStatisticSet(NavigableSet<E> pNavigableSet) {
-    delegate = pNavigableSet;
+  private NaiveOrderStatisticSet(NavigableSet<E> pDelegate) {
+    delegate = pDelegate;
   }
 
   /** Creates a new empty OrderStatisticSet using natural ordering. */
@@ -83,6 +83,19 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
    */
   static <E> NaiveOrderStatisticSet<E> createSetWithSameOrder(NavigableSet<E> pNavigableSet) {
     return new NaiveOrderStatisticSet<>(new TreeSet<>(checkNotNull(pNavigableSet)));
+  }
+
+  /**
+   * Creates a new OrderStatisticSet that is backed by the given {@link NavigableSet}.
+   * Any change to the given navigable set will be reflected by the returned OrderStatisticSet,
+   * and any change to the OrderStatisticSet will be reflected by the navigable set.
+   *
+   * @param pNavigableSet backing navigable set
+   * @param <E> type of the elements of the given set
+   * @return a new OrderStatisticSet view on the given navigable set
+   */
+  static <E> NaiveOrderStatisticSet<E> createView(NavigableSet<E> pNavigableSet) {
+    return new NaiveOrderStatisticSet<>(checkNotNull(pNavigableSet));
   }
 
   @Override

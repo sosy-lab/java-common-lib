@@ -51,8 +51,8 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
 
   private final NavigableMap<K, V> delegate;
 
-  private NaiveOrderStatisticMap(NavigableMap<K, ? extends V> pNavigableMap) {
-    delegate = new TreeMap<>(pNavigableMap);
+  private NaiveOrderStatisticMap(NavigableMap<K, V> pNavigableMap) {
+    delegate = pNavigableMap;
   }
 
   /** Creates a new empty OrderStatisticMap using natural ordering. */
@@ -80,7 +80,7 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
    */
   static <K, V> NaiveOrderStatisticMap<K, V> createMapWithSameOrder(
       NavigableMap<K, ? extends V> pNavigableMap) {
-    return new NaiveOrderStatisticMap<>(checkNotNull(pNavigableMap));
+    return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pNavigableMap)));
   }
 
   @Override
@@ -126,12 +126,12 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
 
   @Override
   public OrderStatisticSet<K> navigableKeySet() {
-    return NaiveOrderStatisticSet.createSetWithSameOrder(super.navigableKeySet());
+    return NaiveOrderStatisticSet.createView(super.navigableKeySet());
   }
 
   @Override
   public OrderStatisticSet<K> descendingKeySet() {
-    return NaiveOrderStatisticSet.createSetWithSameOrder(super.descendingKeySet());
+    return NaiveOrderStatisticSet.createView(super.descendingKeySet());
   }
 
   @Override
