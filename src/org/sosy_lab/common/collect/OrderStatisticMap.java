@@ -23,6 +23,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.SortedMap;
 
 /**
  * A {@link NavigableMap} that allows two additional operations: receiving (and deleting) an entry
@@ -159,17 +160,16 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
 
   /**
    * Creates a new OrderStatisticMap containing the same entries and using the same order over keys
-   * as the given {@link NavigableMap}. The returned map guarantees performance only in O(n) for the
+   * as the given {@link SortedMap}. The returned map guarantees performance only in O(n) for the
    * operations specific to the OrderStatisticMap interface.
    *
-   * @param pNavigableMap map to use entries and ordering of
+   * @param pSortedMap map to use entries and ordering of
    * @param <K> type of the keys of the given and new map
    * @param <V> type of the values of the given and new map
    * @return a new OrderStatisticMap containing the same entries and using the same order over keys
    *     as the given map
    */
-  static <K, V> OrderStatisticMap<K, V> createWithSameOrder(
-      NavigableMap<K, ? extends V> pNavigableMap) {
-    return NaiveOrderStatisticMap.createMapWithSameOrder(pNavigableMap);
+  static <K, V> OrderStatisticMap<K, V> createWithSameOrder(SortedMap<K, ? extends V> pSortedMap) {
+    return NaiveOrderStatisticMap.createMapWithSameOrder(pSortedMap);
   }
 }

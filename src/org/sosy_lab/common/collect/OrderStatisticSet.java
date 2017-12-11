@@ -23,6 +23,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.NavigableSet;
+import java.util.SortedSet;
 
 /**
  * A {@link NavigableSet} that allows two additional operations: receiving (and deleting) an element
@@ -136,15 +137,15 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
 
   /**
    * Creates a new OrderStatisticSet containing the same elements and using the same order as the
-   * given {@link NavigableSet}. The returned map guarantees performance only in O(n) for the
+   * given {@link SortedSet}. The returned map guarantees performance only in O(n) for the
    * operations specific to the OrderStatisticSet interface.
    *
-   * @param pNavigableSet set to use elements and ordering of
+   * @param pSortedSet set to use elements and ordering of
    * @param <E> type of the elements of the given and new set
    * @return a new OrderStatisticSet containing the same elements and using the same order as the
    *     given set
    */
-  static <E> OrderStatisticSet<E> createWithSameOrder(NavigableSet<E> pNavigableSet) {
-    return NaiveOrderStatisticSet.createSetWithSameOrder(pNavigableSet);
+  static <E> OrderStatisticSet<E> createWithSameOrder(SortedSet<E> pSortedSet) {
+    return NaiveOrderStatisticSet.createSetWithSameOrder(pSortedSet);
   }
 }

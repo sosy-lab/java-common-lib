@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -79,8 +80,8 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
    * same ordering over its keys as the given map.
    */
   static <K, V> NaiveOrderStatisticMap<K, V> createMapWithSameOrder(
-      NavigableMap<K, ? extends V> pNavigableMap) {
-    return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pNavigableMap)));
+      SortedMap<K, ? extends V> pSortedMap) {
+    return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pSortedMap)));
   }
 
   @Override
