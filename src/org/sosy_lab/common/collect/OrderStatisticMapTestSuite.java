@@ -35,7 +35,6 @@ import org.junit.Test;
 
 public abstract class OrderStatisticMapTestSuite {
 
-  @SuppressWarnings("unchecked")
   private static final ImmutableList<Entry<String, String>> ELEMS =
       ImmutableList.<Entry<String, String>>builder()
           .add(Maps.immutableEntry("aaa", "Vzza"))
@@ -44,7 +43,6 @@ public abstract class OrderStatisticMapTestSuite {
           .add(Maps.immutableEntry("zza", "Vaaa"))
           .build();
 
-  @SuppressWarnings("unchecked")
   private static final ImmutableList<Entry<String, String>> ELEMS_ABOVE =
       ImmutableList.<Entry<String, String>>builder()
           .add(Maps.immutableEntry("aab", "Vzzb"))
@@ -53,7 +51,6 @@ public abstract class OrderStatisticMapTestSuite {
           .add(Maps.immutableEntry("zzb", "Vaab"))
           .build();
 
-  @SuppressWarnings("unchecked")
   private static final ImmutableList<Entry<String, String>> ELEMS_BELOW =
       ImmutableList.<Entry<String, String>>builder()
           .add(Maps.immutableEntry("aa", "Vzz"))
@@ -77,12 +74,10 @@ public abstract class OrderStatisticMapTestSuite {
     factory = pFactory;
   }
 
-  @SuppressWarnings("unchecked")
   private OrderStatisticMap<String, String> createMap() {
     return factory.create(Collections.emptyList());
   }
 
-  @SuppressWarnings("unchecked")
   private OrderStatisticMap<String, String> createMap(List<Entry<String, String>> pEntries) {
     return factory.create(pEntries);
   }
