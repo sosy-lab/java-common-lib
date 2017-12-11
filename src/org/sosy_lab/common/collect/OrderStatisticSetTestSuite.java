@@ -21,6 +21,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
+import com.google.common.testing.EqualsTester;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
@@ -58,20 +59,22 @@ public abstract class OrderStatisticSetTestSuite {
 
   @Test
   public void testEquals() {
-    OrderStatisticSet<String> l1 = createSet();
+    EqualsTester setEqualsTester = new EqualsTester();
+
+    @Var OrderStatisticSet<String> l1 = createSet();
     @Var OrderStatisticSet<String> l2 = createSet();
 
-    Assert.assertEquals(l1, l2);
+    setEqualsTester.addEqualityGroup(l1, l2);
 
-    Collections.addAll(l1, "a", "b", "c", "d");
-    Assert.assertNotEquals(l1, l2);
-
-    Collections.addAll(l2, "d", "c", "a", "b");
-    Assert.assertEquals(l1, l2);
-
+    l1 = createSet();
     l2 = createSet();
-    Collections.addAll(l2, "d", "c", "a", "b", "a", "b", "a");
-    Assert.assertEquals(l1, l2);
+    Collections.addAll(l1, "a", "b", "c", "d");
+    Collections.addAll(l2, "d", "c", "a", "b");
+
+    OrderStatisticSet<String> l3 = createSet();
+    Collections.addAll(l3, "d", "c", "a", "b", "a", "b", "a");
+    setEqualsTester.addEqualityGroup(l1, l2, l3);
+    setEqualsTester.testEquals();
   }
 
   @Test

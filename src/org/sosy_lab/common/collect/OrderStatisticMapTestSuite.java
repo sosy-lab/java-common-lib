@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
+import com.google.common.testing.EqualsTester;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Collections;
@@ -96,28 +97,33 @@ public abstract class OrderStatisticMapTestSuite {
 
   @Test
   public void testEquals() {
-    OrderStatisticMap<String, String> l1 = createMap();
+    EqualsTester mapEqualsTester = new EqualsTester();
+    @Var OrderStatisticMap<String, String> l1 = createMap();
     @Var OrderStatisticMap<String, String> l2 = createMap();
 
+    mapEqualsTester.addEqualityGroup(l1, l2);
+
+    l1 = createMap();
+    l2 = createMap();
     // Check that the map sorts its elements
-    Assert.assertEquals(l1, l2);
     for (int i = ELEMS.size() - 1; i >= 0; i--) {
       l2.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
     }
     for (int i = 0; i < ELEMS.size(); i++) {
       l1.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
     }
-    Assert.assertEquals(l1, l2);
 
     // Check the map property
-    l2 = createMap();
+    @Var OrderStatisticMap<String, String> l3 = createMap();
     for (int i = ELEMS.size() - 1; i >= 0; i--) {
-      l2.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
+      l3.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
     }
     for (int i = 0; i < ELEMS.size(); i++) {
-      l2.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
+      l3.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
     }
-    Assert.assertEquals(l1, l2);
+    mapEqualsTester.addEqualityGroup(l1, l2, l3);
+
+    mapEqualsTester.testEquals();
   }
 
   @Test
