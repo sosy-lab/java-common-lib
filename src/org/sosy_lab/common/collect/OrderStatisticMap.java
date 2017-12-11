@@ -61,7 +61,9 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
    * @throws IndexOutOfBoundsException if the given rank is out of the range of this set (i.e.,
    *     pRank &lt; 0 || pRank &gt;= size)
    */
-  K getKeyByRank(int pIndex);
+  default K getKeyByRank(int pIndex) {
+    return getEntryByRank(pIndex).getKey();
+  }
 
   /**
    * Returns the entry of this map with the given rank. The lowest entry in the set has rank == 0,
