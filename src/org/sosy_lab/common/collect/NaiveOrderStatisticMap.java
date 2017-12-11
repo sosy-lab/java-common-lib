@@ -35,8 +35,8 @@ import java.util.TreeMap;
  *
  * <p>The class wraps a {@link NavigableMap} object and delegates all methods inherited from the
  * <code>NavigableMap</code> interface to that. For the methods particular to the <code>
- * OrderStatisticMap</code> interface, it provides naive implementations that do not guarantee any
- * specific performance.
+ * OrderStatisticMap</code> interface, it provides naive implementations that do guarantee
+ * performance only in O(n).
  *
  * @param <K> type of the keys of this map. See the Javadoc of {@link OrderStatisticMap} for
  *     possible constraints on this type

@@ -36,8 +36,8 @@ import java.util.TreeSet;
  *
  * <p>The class wraps a {@link NavigableSet} object and delegates all methods inherited from the
  * <code>NavigableSet</code> interface to that. For the methods particular to the <code>
- * OrderStatisticSet</code> interface, it provides naive implementations that do not guarantee any
- * specific performance.
+ * OrderStatisticSet</code> interface, it provides naive implementations that guarantee
+ * performance only in O(n).
  *
  * @param <E> type of the elements of this set. See the Javadoc of {@link OrderStatisticSet} for
  *     possible constraints on this type

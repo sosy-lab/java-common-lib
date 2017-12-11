@@ -109,19 +109,26 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
   @Override
   OrderStatisticSet<E> tailSet(E pFromElement);
 
-  /** Creates a new empty OrderStatisticSet using natural ordering. */
+  /**
+   * Creates a new empty OrderStatisticSet using natural ordering. The returned map guarantees
+   * performance only in O(n) for the operations specific to the OrderStatisticSet interface.
+   */
   static <E> OrderStatisticSet<E> create() {
     return NaiveOrderStatisticSet.createSet();
   }
 
-  /** Creates a new empty OrderStatisticSet using the given comparator. */
+  /**
+   * Creates a new empty OrderStatisticSet using the given comparator. The returned map guarantees
+   * performance only in O(n) for the operations specific to the OrderStatisticSet interface.
+   */
   static <E> OrderStatisticSet<E> create(Comparator<? super E> pComparator) {
     return NaiveOrderStatisticSet.createSet(pComparator);
   }
 
   /**
    * Creates a new OrderStatisticSet containing the same elements as the given collection, using
-   * natural ordering.
+   * natural ordering. The returned map guarantees performance only in O(n) for the operations
+   * specific to the OrderStatisticSet interface.
    */
   static <E> OrderStatisticSet<E> createWithNaturalOrder(Collection<E> pCollection) {
     return NaiveOrderStatisticSet.createSetWithNaturalOrder(pCollection);
@@ -129,7 +136,8 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
 
   /**
    * Creates a new OrderStatisticSet containing the same elements and using the same order as the
-   * given {@link NavigableSet}.
+   * given {@link NavigableSet}. The returned map guarantees performance only in O(n) for the
+   * operations specific to the OrderStatisticSet interface.
    *
    * @param pNavigableSet set to use elements and ordering of
    * @param <E> type of the elements of the given and new set

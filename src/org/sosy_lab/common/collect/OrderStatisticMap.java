@@ -24,6 +24,32 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 
+/**
+ * A {@link NavigableMap} that allows two additional operations: receiving (and deleting) an entry
+ * by its <i>rank</i>, and getting the rank of an entry.
+ *
+ * <p>Implementations should adhere to all contracts of the <code>NavigableMap</code> interface.
+ *
+ * <p>Implementing classes should provide two means for comparing elements:
+ *
+ * <ol>
+ *   <li>Using the natural ordering over the keys. In this case, all keys of the map have to
+ *       implement the {@link Comparable} interface.
+ *   <li>Using a {@link java.util.Comparator Comparator} to create an order over the keys of the
+ *       map.
+ * </ol>
+ *
+ * <p>In both cases, the used compare-method should be consistent with <code>equals</code>, i.e.,
+ * <code>compare(k, l) == 0  =&gt;  k.equals(l)</code>, so that the {@link java.util.Map Map}
+ * interface is correctly implemented. If the used compare-method is not consistent with <code>
+ * equals</code>, the Map contract is not fulfilled (See the {@link java.util.SortedMap SortedMap}
+ * interface for a more detailed description).
+ *
+ * @param <K> the type of the keys of this map
+ * @param <V> the type of the values of this map
+ * @see java.util.Map
+ * @see java.util.SortedMap
+ */
 public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
 
   /**
@@ -103,19 +129,27 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
   @Override
   OrderStatisticMap<K, V> tailMap(K fromKey);
 
-  /** Creates a new empty OrderStatisticMap using natural ordering. */
+  /**
+   * Creates a new empty OrderStatisticMap using natural ordering. The returned map guarantees
+   * performance only in O(n) for the operations specific to the OrderStatisticMap interface.
+   */
   static <K, V> OrderStatisticMap<K, V> create() {
     return NaiveOrderStatisticMap.createMap();
   }
 
-  /** Creates a new empty OrderStatisticMap using the given comparator over its keys. */
+  /**
+   * Creates a new empty OrderStatisticMap using the given comparator over its keys. The returned
+   * map guarantees performance only in O(n) for the operations specific to the OrderStatisticMap
+   * interface.
+   */
   static <K, V> OrderStatisticMap<K, V> create(Comparator<? super K> pComparator) {
     return NaiveOrderStatisticMap.createMap(pComparator);
   }
 
   /**
    * Creates a new OrderStatisticSet containing the same entries as the given map, using natural
-   * ordering over its keys.
+   * ordering over its keys. The returned map guarantees performance only in O(n) for the operations
+   * specific to the OrderStatisticMap interface.
    */
   static <K, V> OrderStatisticMap<K, V> createWithNaturalOrder(Map<? extends K, ? extends V> pMap) {
     return NaiveOrderStatisticMap.createMapWithNaturalOrder(pMap);
@@ -123,7 +157,8 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
 
   /**
    * Creates a new OrderStatisticMap containing the same entries and using the same order over keys
-   * as the given {@link NavigableMap}.
+   * as the given {@link NavigableMap}. The returned map guarantees performance only in O(n) for the
+   * operations specific to the OrderStatisticMap interface.
    *
    * @param pNavigableMap map to use entries and ordering of
    * @param <K> type of the keys of the given and new map
