@@ -37,8 +37,8 @@ import java.util.TreeSet;
  *
  * <p>The class wraps a {@link NavigableSet} object and delegates all methods inherited from the
  * <code>NavigableSet</code> interface to that. For the methods particular to the <code>
- * OrderStatisticSet</code> interface, it provides naive implementations that guarantee
- * performance only in O(n).
+ * OrderStatisticSet</code> interface, it provides naive implementations that guarantee performance
+ * only in O(n).
  *
  * @param <E> type of the elements of this set. See the Javadoc of {@link OrderStatisticSet} for
  *     possible constraints on this type
@@ -75,21 +75,21 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
 
   /**
    * Creates a new OrderStatisticSet containing the same elements and using the same order as the
-   * given {@link NavigableSet}.
+   * given {@link SortedSet}.
    *
-   * @param pNavigableSet set to use elements and ordering of
+   * @param pSortedSet set to use elements and ordering of
    * @param <E> type of the elements of the given and new set
    * @return a new OrderStatisticSet containing the same elements and using the same order as the
    *     given set
    */
-  static <E> NaiveOrderStatisticSet<E> createSetWithSameOrder(NavigableSet<E> pNavigableSet) {
-    return new NaiveOrderStatisticSet<>(new TreeSet<>(checkNotNull(pNavigableSet)));
+  static <E> NaiveOrderStatisticSet<E> createSetWithSameOrder(SortedSet<E> pSortedSet) {
+    return new NaiveOrderStatisticSet<>(new TreeSet<>(checkNotNull(pSortedSet)));
   }
 
   /**
-   * Creates a new OrderStatisticSet that is backed by the given {@link NavigableSet}.
-   * Any change to the given navigable set will be reflected by the returned OrderStatisticSet,
-   * and any change to the OrderStatisticSet will be reflected by the navigable set.
+   * Creates a new OrderStatisticSet that is backed by the given {@link NavigableSet}. Any change to
+   * the given navigable set will be reflected by the returned OrderStatisticSet, and any change to
+   * the OrderStatisticSet will be reflected by the navigable set.
    *
    * @param pNavigableSet backing navigable set
    * @param <E> type of the elements of the given set
