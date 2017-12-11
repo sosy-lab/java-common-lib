@@ -74,13 +74,14 @@ public class NaiveOrderStatisticMapTest extends OrderStatisticMapTestSuite {
                 CollectionFeature.SERIALIZABLE,
                 CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
                 CollectionFeature.SUBSET_VIEW,
+                CollectionFeature.DESCENDING_VIEW,
                 MapFeature.GENERAL_PURPOSE,
                 MapFeature.SUPPORTS_REMOVE,
                 MapFeature.SUPPORTS_PUT,
                 MapFeature.ALLOWS_NULL_VALUES)
             .createTestSuite();
 
-    suite.addTest(new JUnit4TestAdapter(NaiveOrderStatisticSetTest.class));
+    suite.addTest(new JUnit4TestAdapter(NaiveOrderStatisticMapTest.class));
 
     return suite;
   }

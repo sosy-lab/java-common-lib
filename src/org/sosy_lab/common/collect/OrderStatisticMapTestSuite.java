@@ -257,6 +257,15 @@ public abstract class OrderStatisticMapTestSuite {
   }
 
   @Test
+  public void testKeyset_mutation() {
+    OrderStatisticMap<String, String> map = createMap(ELEMS);
+    OrderStatisticSet<String> keySet = map.navigableKeySet();
+
+    keySet.removeByRank(0);
+    Assert.assertFalse(map.containsKey(ELEMS.get(0).getKey()));
+  }
+
+  @Test
   public void testSubmapView_submapOfSubmap() {
     OrderStatisticMap<String, String> map = createMap(ELEMS);
     NavigableMap<String, String> subMap =
