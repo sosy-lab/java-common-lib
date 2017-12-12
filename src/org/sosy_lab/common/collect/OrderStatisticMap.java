@@ -54,12 +54,18 @@ import java.util.SortedMap;
 public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
 
   /**
-   * Returns the element of this set with the given rank. The lowest element in the set has rank ==
-   * 0, the largest element in the set has rank == size - 1.
+   * Returns the key of this map with the given rank. The lowest key in the map has rank == 0, the
+   * largest key in the set has rank == size - 1.
    *
-   * @param pIndex the rank of the element to return
-   * @return the element of this set with the given rank
-   * @throws IndexOutOfBoundsException if the given rank is out of the range of this set (i.e.,
+   * <p>If this OrderStatisticMap is a view on some backing OrderStatisticMap (as created, e.g., by
+   * {@link #descendingMap()} or {@link #headMap(Object)}), the returned rank is in relation to the
+   * keys in the view, not in relation to the keys in the backing set. Thus, one can always expect
+   * that key of rank 0 is the first key in this map, and key of rank <code>{@link #size()} - 1
+   * </code> is the last.
+   *
+   * @param pIndex the rank of the key to return
+   * @return the key of this map with the given rank
+   * @throws IndexOutOfBoundsException if the given rank is out of the range of this map (i.e.,
    *     pRank &lt; 0 || pRank &gt;= size)
    */
   default K getKeyByRank(int pIndex) {
@@ -69,6 +75,12 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
   /**
    * Returns the entry of this map with the given rank. The lowest entry in the set has rank == 0,
    * the largest entry in the set has rank == size - 1.
+   *
+   * <p>If this OrderStatisticMap is a view on some backing OrderStatisticMap (as created, e.g., by
+   * {@link #descendingMap()} or {@link #headMap(Object)}), the returned rank is in relation to the
+   * entries in the view, not in relation to the entries in the backing set. Thus, one can always
+   * expect that entry of rank 0 is the first entry in this map, and entry of rank <code>
+   * {@link #size()} - 1</code> is the last.
    *
    * @param pIndex the rank of the entry to return
    * @return the entry of this map with the given rank
@@ -82,6 +94,12 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
    *
    * <p>The lowest entry in the map has rank == 0, the largest entry in the map has rank == size -
    * 1.
+   *
+   * <p>If this OrderStatisticMap is a view on some backing OrderStatisticMap (as created, e.g., by
+   * {@link #descendingMap()} or {@link #headMap(Object)}), the returned rank is in relation to the
+   * entries in the view, not in relation to the entries in the backing set. Thus, one can always
+   * expect that entry of rank 0 is the first entry in this map, and entry of rank <code>
+   * {@link #size()} - 1</code> is the last.
    *
    * @param pIndex the rank of the element to remove
    * @return the removed element
@@ -98,6 +116,12 @@ public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
    *
    * <p>The lowest entry in the set has rank == 0, the largest entry in the set has rank == size -
    * 1.
+   *
+   * <p>If this OrderStatisticMap is a view on some backing OrderStatisticMap (as created, e.g., by
+   * {@link #descendingMap()} or {@link #headMap(Object)}), the returned rank is in relation to the
+   * entries in the view, not in relation to the entries in the backing set. Thus, one can always
+   * expect that key of rank 0 is the first key in this map, and key of rank <code>
+   * {@link #size()} - 1</code> is the last.
    *
    * @param pObj the key of the entry to return the rank for
    * @return the rank of the entry with the given key in the map, or -1 if the key is not in the set

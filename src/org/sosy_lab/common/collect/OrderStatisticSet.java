@@ -52,6 +52,12 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
    * Returns the element of this set with the given rank. The lowest element in the set has rank ==
    * 0, the largest element in the set has rank == size - 1.
    *
+   * <p>If this OrderStatisticSet is a view on some backing OrderStatisticSet (as created, e.g., by
+   * {@link #descendingSet()} or {@link #headSet(Object)}), the returned rank is in relation to the
+   * elements in the view, not in relation to the elements in the backing set. Thus, one can always
+   * expect that element of rank 0 is the first element in this set, and element of rank <code>
+   * {@link #size()} - 1</code> is the last.
+   *
    * @param pIndex the rank of the element to return
    * @return the element of this set with the given rank
    * @throws IndexOutOfBoundsException if the given rank is out of the range of this set (i.e.,
@@ -64,6 +70,12 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
    *
    * <p>The lowest element in the set has rank == 0, the largest element in the set has rank == size
    * - 1.
+   *
+   * <p>If this OrderStatisticSet is a view on some backing OrderStatisticSet (as created, e.g., by
+   * {@link #descendingSet()} or {@link #headSet(Object)}), the returned rank is in relation to the
+   * elements in the view, not in relation to the elements in the backing set. Thus, one can always
+   * expect that element of rank 0 is the first element in this set, and element of rank <code>
+   * {@link #size()} - 1</code> is the last.
    *
    * @param pIndex the rank of the element to remove
    * @return the removed element
@@ -80,6 +92,12 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
    *
    * <p>The lowest element in the set has rank == 0, the largest element in the set has rank == size
    * - 1.
+   *
+   * <p>If this OrderStatisticSet is a view on some backing OrderStatisticSet (as created, e.g., by
+   * {@link #descendingSet()} or {@link #headSet(Object)}), the returned rank is in relation to the
+   * elements in the view, not in relation to the elements in the backing set. Thus, one can always
+   * expect that element of rank 0 is the first element in this set, and element of rank <code>
+   * {@link #size()} - 1</code> is the last.
    *
    * @param pObj the element to return the rank for
    * @return the rank of the given element in the set, or -1 if the element is not in the set
