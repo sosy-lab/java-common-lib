@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.testing.NavigableSetTestSuiteBuilder;
 import com.google.common.collect.testing.TestSortedSetGenerator;
@@ -30,7 +32,6 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
-import org.junit.Assert;
 import org.junit.Test;
 
 public final class NaiveOrderStatisticSetTest extends OrderStatisticSetTestSuite {
@@ -81,10 +82,10 @@ public final class NaiveOrderStatisticSetTest extends OrderStatisticSetTestSuite
     OrderStatisticSet<String> set = NaiveOrderStatisticSet.createSetWithSameOrder(testCollection);
 
     testCollection.remove("a");
-    Assert.assertFalse(testCollection.contains("a"));
-    Assert.assertTrue(set.contains("a"));
+    assertThat(testCollection).doesNotContain("a");
+    assertThat(set).contains("a");
     set.remove("bc");
-    Assert.assertTrue(testCollection.contains("bc"));
-    Assert.assertFalse(set.contains("bc"));
+    assertThat(testCollection).contains("bc");
+    assertThat(set).doesNotContain("bc");
   }
 }

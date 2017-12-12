@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
 import com.google.common.testing.EqualsTester;
@@ -27,7 +30,6 @@ import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.NavigableSet;
-import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class OrderStatisticSetTestSuite {
@@ -96,35 +98,41 @@ public abstract class OrderStatisticSetTestSuite {
     String toAdd = ELEMS_BELOW[2];
 
     subSet.add(toAdd);
-    Assert.assertTrue(subSet.contains(toAdd));
-    Assert.assertTrue(set.contains(toAdd));
+    assertThat(subSet).contains(toAdd);
+    assertThat(set).contains(toAdd);
 
     subSet.remove(toAdd);
-    Assert.assertFalse(set.contains(toAdd));
-    Assert.assertFalse(subSet.contains(toAdd));
+    assertThat(subSet).doesNotContain(toAdd);
+    assertThat(set).doesNotContain(toAdd);
 
     set.add(toAdd);
-    Assert.assertTrue(subSet.contains(toAdd));
+    assertThat(subSet).contains(toAdd);
 
     set.remove(toAdd);
-    Assert.assertFalse(subSet.contains(toAdd));
+    assertThat(subSet).doesNotContain(toAdd);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testSubsetView_outOfBounds_add() {
     NavigableSet<String> set = createSet(ELEMS);
     NavigableSet<String> subSet = set.subSet(ELEMS_ABOVE[0], true, ELEMS_ABOVE[2], true);
+    Collection<String> toAdd = ImmutableList.of(ELEMS[1], ELEMS_BELOW[2], ELEMS[2], ELEMS_ABOVE[3]);
 
     try {
       subSet.add(ELEMS[0]);
-    } catch (IllegalArgumentException e1) {
+      fail();
+    } catch (IllegalArgumentException expected) {
       try {
         subSet.add(ELEMS[3]);
-      } catch (IllegalArgumentException e2) {
-        // the first 3 elements are in the range of the sublist, but the last isn't
-        Collection<String> toAdd =
-            ImmutableList.of(ELEMS[1], ELEMS_BELOW[2], ELEMS[2], ELEMS_ABOVE[3]);
-        subSet.addAll(toAdd);
+        fail();
+      } catch (IllegalArgumentException expected2) {
+        try {
+          // the first 3 elements are in the range of the sublist, but the last isn't
+          subSet.addAll(toAdd);
+          fail();
+        } catch (IllegalArgumentException expected3) {
+          // expected outcome
+        }
       }
     }
   }
@@ -137,15 +145,15 @@ public abstract class OrderStatisticSetTestSuite {
     subSet.remove(ELEMS[1]);
     subSet.remove(ELEMS[3]);
 
-    Assert.assertTrue(set.contains(ELEMS[1]));
-    Assert.assertTrue(set.contains(ELEMS[3]));
+    assertThat(set).contains(ELEMS[1]);
+    assertThat(set).contains(ELEMS[3]);
 
     Collection<String> toRemove = ImmutableList.of(ELEMS_BELOW[2], ELEMS[2], ELEMS[1]);
     subSet.removeAll(toRemove);
 
-    Assert.assertTrue(set.contains(ELEMS[1]));
-    Assert.assertFalse(set.contains(ELEMS_BELOW[2]));
-    Assert.assertFalse(set.contains(ELEMS[2]));
+    assertThat(set).contains(ELEMS[1]);
+    assertThat(set).doesNotContain(ELEMS_BELOW[2]);
+    assertThat(set).doesNotContain(ELEMS[2]);
   }
 
   @Test
@@ -153,18 +161,18 @@ public abstract class OrderStatisticSetTestSuite {
     NavigableSet<String> set = createSet(ELEMS);
     @Var NavigableSet<String> subSet = set.subSet(ELEMS_ABOVE[1], true, ELEMS_ABOVE[2], true);
 
-    Assert.assertFalse(subSet.contains(ELEMS[1]));
-    Assert.assertFalse(subSet.contains(ELEMS[3]));
+    assertThat(subSet).doesNotContain(ELEMS[1]);
+    assertThat(subSet).doesNotContain(ELEMS[3]);
 
     subSet = set.subSet(ELEMS_ABOVE[1], false, ELEMS_ABOVE[2], false);
 
-    Assert.assertFalse(subSet.contains(ELEMS_ABOVE[1]));
-    Assert.assertFalse(subSet.contains(ELEMS_ABOVE[2]));
+    assertThat(subSet).doesNotContain(ELEMS_ABOVE[1]);
+    assertThat(subSet).doesNotContain(ELEMS_ABOVE[2]);
 
     subSet = set.subSet(ELEMS_ABOVE[0], true, ELEMS_ABOVE[2], true);
 
-    Assert.assertTrue(subSet.contains(ELEMS[1]));
-    Assert.assertTrue(subSet.contains(ELEMS[2]));
+    assertThat(subSet).contains(ELEMS[1]);
+    assertThat(subSet).contains(ELEMS[2]);
   }
 
   @Test
@@ -177,44 +185,42 @@ public abstract class OrderStatisticSetTestSuite {
                 ELEMS[2], /* toInclusive= */ true)
             .descendingSet();
 
-    Assert.assertEquals(ELEMS[2], subSet.first());
-    Assert.assertEquals(ELEMS[1], subSet.last());
+    assertThat(ELEMS[2]).isEqualTo(subSet.first());
+    assertThat(ELEMS[1]).isEqualTo(subSet.last());
 
     subSet = subSet.descendingSet();
-    Assert.assertEquals(ELEMS[1], subSet.first());
-    Assert.assertEquals(ELEMS[2], subSet.last());
+    assertThat(ELEMS[1]).isEqualTo(subSet.first());
+    assertThat(ELEMS[2]).isEqualTo(subSet.last());
   }
 
   @Test
   public void testSubsetView_subsetOfSubset() {
     OrderStatisticSet<String> set = createSet(ELEMS);
     NavigableSet<String> subSet =
-        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /*
-    toInclusive=
-    */ true);
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive=*/ true);
     @Var
     NavigableSet<String> subSubSet =
         subSet.subSet(
             ELEMS[1], /* fromInclusive= */ true,
             ELEMS_BELOW[3], /* toInclusive= */ true);
 
-    Assert.assertFalse(subSubSet.contains(ELEMS[0]));
-    Assert.assertTrue(subSubSet.contains(ELEMS[1]));
-    Assert.assertTrue(subSubSet.contains(ELEMS[2]));
-    Assert.assertFalse(subSubSet.contains(ELEMS[3]));
+    assertThat(subSubSet).doesNotContain(ELEMS[0]);
+    assertThat(subSubSet).contains(ELEMS[1]);
+    assertThat(subSubSet).contains(ELEMS[2]);
+    assertThat(subSubSet).doesNotContain(ELEMS[3]);
 
     // make sure that the inclusive-flags are respected
     subSubSet =
         subSet.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive=*/ true);
-    Assert.assertTrue(subSubSet.contains(ELEMS[1]));
-    Assert.assertTrue(subSubSet.contains(ELEMS[2]));
-    Assert.assertTrue(subSubSet.contains(ELEMS[3]));
+    assertThat(subSubSet).contains(ELEMS[1]);
+    assertThat(subSubSet).contains(ELEMS[2]);
+    assertThat(subSubSet).contains(ELEMS[3]);
 
     subSubSet =
         subSubSet.subSet(ELEMS[1], /* fromInclusive= */ false, ELEMS[3], /* toInclusive= */ false);
-    Assert.assertFalse(subSubSet.contains(ELEMS[1]));
-    Assert.assertTrue(subSubSet.contains(ELEMS[2]));
-    Assert.assertFalse(subSubSet.contains(ELEMS[3]));
+    assertThat(subSubSet).doesNotContain(ELEMS[1]);
+    assertThat(subSubSet).contains(ELEMS[2]);
+    assertThat(subSubSet).doesNotContain(ELEMS[3]);
   }
 
   @Test
@@ -222,23 +228,77 @@ public abstract class OrderStatisticSetTestSuite {
     OrderStatisticSet<String> set = createSet(ELEMS);
 
     for (int i = 0; i < ELEMS.length; i++) {
-      Assert.assertEquals(ELEMS[i], set.getByRank(i));
+      assertThat(ELEMS[i]).isEqualTo(set.getByRank(i));
     }
   }
 
-  @Test(expected = IndexOutOfBoundsException.class)
+  @Test
   public void testGetByRank_outOfBounds() {
     OrderStatisticSet<String> set = createSet(ELEMS);
 
     try {
-      String x = set.getByRank(-1);
-      Assert.assertFalse(x != null);
-      Assert.fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
-    } catch (IndexOutOfBoundsException e) {
-      String x = set.getByRank(ELEMS.length);
-      Assert.assertFalse(x != null);
-      Assert.fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      set.getByRank(-1);
+      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+    } catch (IndexOutOfBoundsException expected) {
+      try {
+        set.getByRank(ELEMS.length);
+        fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      } catch (IndexOutOfBoundsException expected2) {
+        // this is expected
+      }
     }
+  }
+
+  @Test
+  public void testGetByRank_subsetFirst() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> subSet =
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[2], /* toInclusive= */ true);
+
+    String firstSubSetElement = subSet.getByRank(0);
+
+    assertThat(firstSubSetElement).isEqualTo(ELEMS[1]);
+  }
+
+  @Test
+  public void testGetByRank_subsetLast() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> subSet =
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[2], /* toInclusive= */ true);
+
+    String lastSubSetElement = subSet.getByRank(subSet.size() - 1);
+
+    assertThat(lastSubSetElement).isEqualTo(ELEMS[2]);
+  }
+
+  @Test
+  public void testGetByRank_descendingSetFirstElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> descendingSet = set.descendingSet();
+
+    String firstElementDescending = descendingSet.getByRank(0);
+
+    assertThat(firstElementDescending).isEqualTo(ELEMS[ELEMS.length - 1]);
+  }
+
+  @Test
+  public void testGetByRank_descendingSetSecondElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> descendingSet = set.descendingSet();
+
+    String firstElementDescending = descendingSet.getByRank(1);
+
+    assertThat(firstElementDescending).isEqualTo(ELEMS[ELEMS.length - 2]);
+  }
+
+  @Test
+  public void testGetByRank_descendingSetLastElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> descendingSet = set.descendingSet();
+
+    String lastElementDescending = descendingSet.getByRank(descendingSet.size() - 1);
+
+    assertThat(lastElementDescending).isEqualTo(ELEMS[0]);
   }
 
   @Test
@@ -247,39 +307,204 @@ public abstract class OrderStatisticSetTestSuite {
 
     set.removeByRank(2);
 
-    Assert.assertFalse(set.contains(ELEMS[2]));
-    Assert.assertTrue(set.contains(ELEMS[0]));
-    Assert.assertTrue(set.contains(ELEMS[1]));
-    Assert.assertTrue(set.contains(ELEMS[3]));
+    assertThat(set).doesNotContain(ELEMS[2]);
+    assertThat(set).contains(ELEMS[0]);
+    assertThat(set).contains(ELEMS[1]);
+    assertThat(set).contains(ELEMS[3]);
 
     set.removeByRank(0);
 
-    Assert.assertFalse(set.contains(ELEMS[0]));
-    Assert.assertTrue(set.contains(ELEMS[1]));
-    Assert.assertTrue(set.contains(ELEMS[3]));
+    assertThat(set).doesNotContain(ELEMS[0]);
+    assertThat(set).contains(ELEMS[1]);
+    assertThat(set).contains(ELEMS[3]);
 
     set.removeByRank(set.size() - 1);
-    Assert.assertFalse(set.contains(ELEMS[3]));
-    Assert.assertTrue(set.contains(ELEMS[1]));
+    assertThat(set).doesNotContain(ELEMS[3]);
+    assertThat(set).contains(ELEMS[1]);
 
     set.removeByRank(0);
-    Assert.assertTrue(set.isEmpty());
+    assertThat(set).isEmpty();
   }
 
-  @Test(expected = IndexOutOfBoundsException.class)
+  @Test
   public void testRemoveByRank_invalid() {
     OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> emptySet = createSet();
 
     try {
       set.removeByRank(-1);
-    } catch (IndexOutOfBoundsException e1) {
+      fail();
+    } catch (IndexOutOfBoundsException expected) {
       try {
         set.removeByRank(set.size());
-
-      } catch (IndexOutOfBoundsException e2) {
-        OrderStatisticSet<String> emptySet = createSet();
-        emptySet.removeByRank(0);
+        fail();
+      } catch (IndexOutOfBoundsException expected2) {
+        try {
+          emptySet.removeByRank(0);
+          fail();
+        } catch (IndexOutOfBoundsException expected3) {
+          // expected outcome
+        }
       }
     }
+  }
+
+  @Test
+  public void testRemoveByRank_subsetFirst() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> subSet =
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[2], /* toInclusive= */ true);
+
+    String firstSubSetElement = subSet.removeByRank(0);
+
+    assertThat(firstSubSetElement).isEqualTo(ELEMS[1]);
+    assertThat(subSet).doesNotContain(ELEMS[1]);
+    assertThat(set).doesNotContain(ELEMS[1]);
+  }
+
+  @Test
+  public void testRemoveByRank_subsetLast() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> subSet =
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[2], /* toInclusive= */ true);
+
+    String lastSubSetElement = subSet.removeByRank(subSet.size() - 1);
+
+    assertThat(lastSubSetElement).isEqualTo(ELEMS[2]);
+    assertThat(subSet).doesNotContain(ELEMS[2]);
+    assertThat(set).doesNotContain(ELEMS[2]);
+  }
+
+  @Test
+  public void testRemoveByRank_descendingSetFirstElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> descendingSet = set.descendingSet();
+    String expectedRemove = ELEMS[ELEMS.length - 1];
+
+    String firstElementDescending = descendingSet.removeByRank(0);
+
+    assertThat(firstElementDescending).isEqualTo(expectedRemove);
+    assertThat(descendingSet).doesNotContain(expectedRemove);
+    assertThat(set).doesNotContain(expectedRemove);
+  }
+
+  @Test
+  public void testRemoveByRank_descendingSetLastElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    OrderStatisticSet<String> descendingSet = set.descendingSet();
+    String expectedRemove = ELEMS[0];
+
+    String lastElementDescending = descendingSet.removeByRank(descendingSet.size() - 1);
+
+    assertThat(lastElementDescending).isEqualTo(expectedRemove);
+    assertThat(descendingSet).doesNotContain(expectedRemove);
+    assertThat(set).doesNotContain(expectedRemove);
+  }
+
+  private static <E> void assertRankOf(E pElement, int pExpectedRank, OrderStatisticSet<E> pSet) {
+    int actualRank = pSet.rankOf(pElement);
+
+    assertThat(actualRank).isEqualTo(pExpectedRank);
+  }
+
+  @Test
+  public void testRankOf_firstElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+
+    assertRankOf(ELEMS[0], 0, set);
+  }
+
+  @Test
+  public void testRankOf_secondElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+
+    assertRankOf(ELEMS[1], 1, set);
+  }
+
+  @Test
+  public void testRankOf_lastElement() {
+    OrderStatisticSet<String> set = createSet(ELEMS);
+    String element = ELEMS[ELEMS.length - 1];
+    int expectedRank = ELEMS.length - 1;
+
+    assertRankOf(element, expectedRank, set);
+  }
+
+  @Test
+  public void testRankOf_descendingSetFirstElement() {
+    OrderStatisticSet<String> descendingSet = createSet(ELEMS).descendingSet();
+    String element = ELEMS[ELEMS.length - 1];
+    int expectedRank = 0;
+
+    assertRankOf(element, expectedRank, descendingSet);
+  }
+
+  @Test
+  public void testRankOf_descendingSetSecondElement() {
+    OrderStatisticSet<String> descendingSet = createSet(ELEMS).descendingSet();
+    String element = ELEMS[ELEMS.length - 2];
+    int expectedRank = 1;
+
+    assertRankOf(element, expectedRank, descendingSet);
+  }
+
+  @Test
+  public void testRankOf_descendingSetLastElement() {
+    OrderStatisticSet<String> descendingSet = createSet(ELEMS).descendingSet();
+    String element = ELEMS[0];
+    int expectedRank = ELEMS.length - 1;
+
+    assertRankOf(element, expectedRank, descendingSet);
+  }
+
+  @Test
+  public void testRankOf_subSetFirstElement() {
+    String firstSubsetElement = ELEMS[1];
+    String lastSubsetElement = ELEMS[3];
+    OrderStatisticSet<String> subSet =
+        createSet(ELEMS)
+            .subSet(
+                firstSubsetElement,
+                /* fromInclusive= */ true,
+                lastSubsetElement,
+                /* toInclusive= */ true);
+    String element = firstSubsetElement;
+    int expectedRank = 0;
+
+    assertRankOf(element, expectedRank, subSet);
+  }
+
+  @Test
+  public void testRankOf_subSetLastElement() {
+    String firstSubsetElement = ELEMS[1];
+    String lastSubsetElement = ELEMS[3];
+    OrderStatisticSet<String> subSet =
+        createSet(ELEMS)
+            .subSet(
+                firstSubsetElement,
+                /* fromInclusive= */ true,
+                lastSubsetElement,
+                /* toInclusive= */ true);
+    String element = lastSubsetElement;
+    int expectedRank = subSet.size() - 1;
+
+    assertRankOf(element, expectedRank, subSet);
+  }
+
+  @Test
+  public void testRankOf_subSetSecondElement() {
+    String firstSubsetElement = ELEMS[1];
+    String lastSubsetElement = ELEMS[3];
+    OrderStatisticSet<String> subSet =
+        createSet(ELEMS)
+            .subSet(
+                firstSubsetElement,
+                /* fromInclusive= */ true,
+                lastSubsetElement,
+                /* toInclusive= */ true);
+    String element = ELEMS[2];
+    int expectedRank = 1;
+
+    assertRankOf(element, expectedRank, subSet);
   }
 }

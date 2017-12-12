@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.common.collect;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestSortedMapGenerator;
@@ -32,7 +34,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class NaiveOrderStatisticMapTest extends OrderStatisticMapTestSuite {
@@ -93,10 +94,10 @@ public class NaiveOrderStatisticMapTest extends OrderStatisticMapTestSuite {
     OrderStatisticMap<String, String> map = NaiveOrderStatisticMap.createMapWithSameOrder(testMap);
 
     testMap.remove("a");
-    Assert.assertFalse(testMap.containsKey("a"));
-    Assert.assertTrue(map.containsKey("a"));
+    assertThat(testMap).doesNotContainKey("a");
+    assertThat(map).containsKey("a");
     map.remove("bc");
-    Assert.assertTrue(testMap.containsKey("bc"));
-    Assert.assertFalse(map.containsKey("bc"));
+    assertThat(testMap).containsKey("bc");
+    assertThat(map).doesNotContainKey("bc");
   }
 }
