@@ -122,18 +122,22 @@ public abstract class OrderStatisticSetTestSuite {
       subSet.add(ELEMS[0]);
       fail();
     } catch (IllegalArgumentException expected) {
-      try {
-        subSet.add(ELEMS[3]);
-        fail();
-      } catch (IllegalArgumentException expected2) {
-        try {
-          // the first 3 elements are in the range of the sublist, but the last isn't
-          subSet.addAll(toAdd);
-          fail();
-        } catch (IllegalArgumentException expected3) {
-          // expected outcome
-        }
-      }
+      // expected outcome
+    }
+
+    try {
+      subSet.add(ELEMS[3]);
+      fail();
+    } catch (IllegalArgumentException expected) {
+      // expected outcome
+    }
+
+    try {
+      // the first 3 elements are in the range of the sublist, but the last isn't
+      subSet.addAll(toAdd);
+      fail();
+    } catch (IllegalArgumentException expected) {
+      // expected outcome
     }
   }
 
@@ -240,12 +244,13 @@ public abstract class OrderStatisticSetTestSuite {
       set.getByRank(-1);
       fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
     } catch (IndexOutOfBoundsException expected) {
-      try {
-        set.getByRank(ELEMS.length);
-        fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
-      } catch (IndexOutOfBoundsException expected2) {
-        // this is expected
-      }
+      // expected outcome
+    }
+    try {
+      set.getByRank(ELEMS.length);
+      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
     }
   }
 
@@ -335,17 +340,19 @@ public abstract class OrderStatisticSetTestSuite {
       set.removeByRank(-1);
       fail();
     } catch (IndexOutOfBoundsException expected) {
-      try {
-        set.removeByRank(set.size());
-        fail();
-      } catch (IndexOutOfBoundsException expected2) {
-        try {
-          emptySet.removeByRank(0);
-          fail();
-        } catch (IndexOutOfBoundsException expected3) {
-          // expected outcome
-        }
-      }
+      // expected outcome
+    }
+    try {
+      set.removeByRank(set.size());
+      fail();
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
+    }
+    try {
+      emptySet.removeByRank(0);
+      fail();
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
     }
   }
 

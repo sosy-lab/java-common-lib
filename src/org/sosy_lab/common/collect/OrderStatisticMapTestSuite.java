@@ -177,18 +177,20 @@ public abstract class OrderStatisticMapTestSuite {
       putEntry(subMap, ELEMS.get(0));
       fail();
     } catch (IllegalArgumentException expected) {
-      try {
-        putEntry(subMap, ELEMS.get(3));
-        fail();
-      } catch (IllegalArgumentException expected2) {
-        try {
-          // the first 3 elements are in the range of the sublist, but the last isn't
-          subMap.putAll(toAdd);
-          fail();
-        } catch (IllegalArgumentException expected3) {
-          // expected outcome
-        }
-      }
+      // expected outcome
+    }
+    try {
+      putEntry(subMap, ELEMS.get(3));
+      fail();
+    } catch (IllegalArgumentException expected) {
+      // expected outcome
+    }
+    try {
+      // the first 3 elements are in the range of the sublist, but the last isn't
+      subMap.putAll(toAdd);
+      fail();
+    } catch (IllegalArgumentException expected) {
+      // expected outcome
     }
   }
 
@@ -326,12 +328,13 @@ public abstract class OrderStatisticMapTestSuite {
       map.getEntryByRank(-1);
       fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
     } catch (IndexOutOfBoundsException expected) {
-      try {
-        map.getEntryByRank(ELEMS.size());
-        fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
-      } catch (IndexOutOfBoundsException expected2) {
-        // expected outcome
-      }
+      // expected outcome
+    }
+    try {
+      map.getEntryByRank(ELEMS.size());
+      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
     }
   }
 
@@ -413,12 +416,13 @@ public abstract class OrderStatisticMapTestSuite {
       map.getKeyByRank(-1);
       fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
     } catch (IndexOutOfBoundsException expected) {
-      try {
-        map.getKeyByRank(ELEMS.size());
-        fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
-      } catch (IndexOutOfBoundsException expected2) {
-        // expected outcome
-      }
+      // expected outcome
+    }
+    try {
+      map.getKeyByRank(ELEMS.size());
+      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
     }
   }
 
@@ -518,17 +522,20 @@ public abstract class OrderStatisticMapTestSuite {
       map.removeByRank(-1);
       fail();
     } catch (IndexOutOfBoundsException expected) {
-      try {
-        map.removeByRank(map.size());
-        fail();
-      } catch (IndexOutOfBoundsException expected2) {
-        try {
-          emptyMap.removeByRank(0);
-          fail();
-        } catch (IndexOutOfBoundsException expected3) {
-          // expected outcome
-        }
-      }
+      // expected outcome
+    }
+    try {
+      map.removeByRank(map.size());
+      fail();
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
+    }
+    try {
+      emptyMap.removeByRank(0);
+      fail();
+    } catch (IndexOutOfBoundsException expected) {
+      // expected outcome
+
     }
   }
 
