@@ -20,7 +20,6 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.SortedSet;
@@ -127,11 +126,11 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
   }
 
   /**
-   * Creates a new OrderStatisticSet containing the same elements as the given collection, using
+   * Creates a new OrderStatisticSet containing the same elements as the given Iterable, using
    * natural ordering. The returned map guarantees performance only in O(n) for the operations
    * specific to the OrderStatisticSet interface.
    */
-  static <E> OrderStatisticSet<E> createWithNaturalOrder(Collection<E> pCollection) {
+  static <E> OrderStatisticSet<E> createWithNaturalOrder(Iterable<E> pCollection) {
     return NaiveOrderStatisticSet.createSetWithNaturalOrder(pCollection);
   }
 

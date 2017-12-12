@@ -26,7 +26,6 @@ import com.google.common.collect.ForwardingNavigableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.SortedSet;
@@ -66,11 +65,13 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
   }
 
   /**
-   * Creates a new OrderStatisticSet containing the same elements as the given collection, using
+   * Creates a new OrderStatisticSet containing the same elements as the given Iterable, using
    * natural ordering.
    */
-  static <E> NaiveOrderStatisticSet<E> createSetWithNaturalOrder(Collection<E> pSet) {
-    return new NaiveOrderStatisticSet<>(new TreeSet<>(checkNotNull(pSet)));
+  static <E> NaiveOrderStatisticSet<E> createSetWithNaturalOrder(Iterable<E> pSet) {
+    NavigableSet<E> delegate = new TreeSet<>();
+    Iterables.addAll(delegate, pSet);
+    return new NaiveOrderStatisticSet<>(delegate);
   }
 
   /**
