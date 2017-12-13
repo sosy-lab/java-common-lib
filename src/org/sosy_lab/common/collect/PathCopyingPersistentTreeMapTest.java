@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
@@ -380,5 +381,41 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(set.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
     assertThat(set).hasSize(comparison.size());
     assertThat(set).containsExactlyElementsIn(comparison).inOrder();
+  }
+
+  @Test
+  public void testSubmapSubmap() {
+    map = map.putAndCopy("a", "a").putAndCopy("b", "b").putAndCopy("c", "c");
+
+    SortedMap<String, String> submap = map.subMap("aa", "c");
+    assertThat(submap).containsExactly("b", "b");
+
+    // The bounds of further submap calls may be at most those of the original call
+    @Var SortedMap<String, String> subsubmap = submap.subMap("aaa", "c");
+    assertThat(subsubmap).containsExactly("b", "b");
+
+    subsubmap = submap.subMap("aa", "bb");
+    assertThat(subsubmap).containsExactly("b", "b");
+
+    subsubmap = submap.subMap("aaa", "bb");
+    assertThat(subsubmap).containsExactly("b", "b");
+
+    try {
+      submap.subMap("a", "c");
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      submap.subMap("aa", "d");
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      submap.subMap("a", "d");
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
   }
 }

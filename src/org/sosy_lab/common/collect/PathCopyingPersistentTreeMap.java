@@ -1076,7 +1076,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     /**
      * Create a new iterator with an optional lower and upper bound.
      *
-     * @param pFromKey null or inclusive lower bound that needs to exist in the map
+     * @param pFromKey null or inclusive lower bound
      * @param pToKey null or exclusive lower bound
      */
     static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>> createWithBounds(
@@ -1095,7 +1095,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (pLowKey == null) {
         pushLeftMostNodesOnStack(root);
       } else {
-        pushNodesToKeyOnStack(root, pLowKey);
+        // TODO: optimize: this iterates twice through the tree
+        pushNodesToKeyOnStack(
+            root, findNextGreaterNode(pLowKey, root, /*inclusive=*/ true).getKey());
       }
       stopFurtherIterationIfOutOfRange();
     }
@@ -1160,8 +1162,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Partial map implementation for {@link SortedMap#subMap(Object, Object)} etc. At least one bound
-   * (upper/lower) needs to be present. The lower bound (if present) needs to exist in the map and
-   * is inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
+   * (upper/lower) needs to be present. The lower bound (if present) is inclusive, the upper bound
+   * is exclusive. The range needs to contain at least one mapping.
    *
    * @param <K> The type of keys.
    * @param <V> The type of values.
@@ -1187,14 +1189,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         return EmptyImmutableOurSortedMap.<K, V>of();
       }
 
-      @Var K fromKey = pFromKey;
       @Var Node<K, V> lowestNode = null;
       if (pFromKey != null) {
         lowestNode = findNextGreaterNode(pFromKey, root, /*inclusive=*/ true);
         if (lowestNode == null) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
-        fromKey = lowestNode.getKey();
       }
 
       @Var Node<K, V> highestNode = null;
@@ -1215,7 +1215,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
       }
 
-      return new PartialSortedMap<>(root, fromKey, pToKey);
+      return new PartialSortedMap<>(root, pFromKey, pToKey);
     }
 
     // Find the best root for a given set of bounds
@@ -1259,35 +1259,37 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       // check non-emptiness invariant
       assert root != null;
-      assert pLowKey == null || containsKey(pLowKey);
+      assert pLowKey == null
+          || containsKey(findNextGreaterNode(pLowKey, pRoot, /*inclusive=*/ true).getKey());
       assert pHighKey == null
           || containsKey(findNextSmallerNode(pHighKey, pRoot, /*inclusive=*/ false).getKey());
     }
 
-    private boolean inRange(K key) {
-      return !tooLow(key) && !tooHigh(key);
+    private boolean inRange(K key, boolean inclusiveBounds) {
+      return !tooLow(key) && !tooHigh(key, inclusiveBounds);
     }
 
     private boolean tooLow(K key) {
       return fromKey != null && key.compareTo(fromKey) < 0;
     }
 
-    private boolean tooHigh(K key) {
-      return toKey != null && key.compareTo(toKey) >= 0;
+    private boolean tooHigh(K key, boolean inclusiveBounds) {
+      return toKey != null
+          && (inclusiveBounds ? key.compareTo(toKey) > 0 : key.compareTo(toKey) >= 0);
     }
 
     @Override
     public boolean containsKey(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
-      return inRange(key) && findNode(key, root) != null;
+      return inRange(key, /*inclusiveBounds=*/ false) && findNode(key, root) != null;
     }
 
     @Override
     public V get(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
-      if (!inRange(key)) {
+      if (!inRange(key, /*inclusiveBounds=*/ false)) {
         return null;
       }
       Node<K, V> node = findNode(key, root);
@@ -1312,8 +1314,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       checkNotNull(pFromKey);
       checkNotNull(pToKey);
 
-      checkArgument(inRange(pFromKey));
-      checkArgument(inRange(pToKey));
+      checkArgument(inRange(pFromKey, /*inclusiveBounds=*/ true));
+      checkArgument(inRange(pToKey, /*inclusiveBounds=*/ true));
 
       return PartialSortedMap.create(root, pFromKey, pToKey);
     }
@@ -1321,7 +1323,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public OurSortedMap<K, V> headMap(K pToKey) {
       checkNotNull(pToKey);
-      checkArgument(inRange(pToKey));
+      checkArgument(inRange(pToKey, /*inclusiveBounds=*/ true));
 
       return PartialSortedMap.create(root, fromKey, pToKey);
     }
@@ -1329,14 +1331,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     @Override
     public OurSortedMap<K, V> tailMap(K pFromKey) {
       checkNotNull(pFromKey);
-      checkArgument(inRange(pFromKey));
+      checkArgument(inRange(pFromKey, /*inclusiveBounds=*/ true));
 
       return PartialSortedMap.create(root, pFromKey, toKey);
     }
 
     /**
-     * Entry set implementation. The lower bound (if present) needs to exist in the map and is
-     * inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
+     * Entry set implementation. The lower bound (if present) is inclusive, the upper bound is
+     * exclusive. The range needs to contain at least one mapping.
      */
     @SuppressWarnings("JdkObsolete")
     @Immutable
@@ -1358,7 +1360,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
         // pO is not null here
         Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
-        if (!inRange((K) other.getKey())) {
+        if (!inRange((K) other.getKey(), /*inclusiveBounds=*/ false)) {
           return false;
         }
         Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
