@@ -22,27 +22,56 @@ package org.sosy_lab.common.collect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.annotations.Immutable;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
 
 /**
- * Extension of {@link SortedMap} that specifies {@link SortedSet} as type of some collection views
- * (instead of {@link java.util.Set}).
+ * Extension of {@link NavigableMap} that specifies {@link NavigableSet} as type of some collection
+ * views (instead of {@link java.util.Set}).
  */
-@SuppressWarnings("JdkObsolete")
-interface OurSortedMap<K, V> extends SortedMap<K, V> {
+interface OurSortedMap<K, V> extends NavigableMap<K, V> {
+
+  Iterator<Entry<K, V>> entryIterator();
+
+  Iterator<Entry<K, V>> descendingEntryIterator();
+
+  @Nullable
+  Entry<K, V> getEntry(Object pKey);
 
   @Override
-  SortedSet<K> keySet();
+  NavigableSet<K> keySet();
 
   @Override
-  SortedSet<Map.Entry<K, V>> entrySet();
+  NavigableSet<Map.Entry<K, V>> entrySet();
+
+  @Override
+  OurSortedMap<K, V> descendingMap();
+
+  @Override
+  OurSortedMap<K, V> subMap(K pFromKey, K pToKey);
+
+  @Override
+  OurSortedMap<K, V> subMap(K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive);
+
+  @Override
+  OurSortedMap<K, V> headMap(K pToKey);
+
+  @Override
+  OurSortedMap<K, V> headMap(K pToKey, boolean pInclusive);
+
+  @Override
+  OurSortedMap<K, V> tailMap(K pFromKey);
+
+  @Override
+  OurSortedMap<K, V> tailMap(K pFromKey, boolean pInclusive);
 
   @Immutable(containerOf = {"K", "V"})
-  class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
+  final class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> {
 
     private static final OurSortedMap<?, ?> INSTANCE = new EmptyImmutableOurSortedMap<>();
@@ -53,38 +82,84 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
     }
 
     @Override
-    public OurSortedMap<K, V> subMap(K pFromKey, K pToKey) {
+    public Comparator<? super K> comparator() {
+      return null;
+    }
+
+    @Override
+    public Iterator<Entry<K, V>> entryIterator() {
+      return Collections.emptyIterator();
+    }
+
+    @Override
+    public Iterator<Entry<K, V>> descendingEntryIterator() {
+      return Collections.emptyIterator();
+    }
+
+    @Override
+    public @Nullable Entry<K, V> getEntry(Object pKey) {
+      return null;
+    }
+
+    @Override
+    public OurSortedMap<K, V> subMap(
+        K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive) {
       return this;
     }
 
     @Override
-    public OurSortedMap<K, V> headMap(K pToKey) {
+    public OurSortedMap<K, V> headMap(K pToKey, boolean pInclusive) {
       return this;
     }
 
     @Override
-    public OurSortedMap<K, V> tailMap(K pFromKey) {
+    public OurSortedMap<K, V> tailMap(K pFromKey, boolean pInclusive) {
       return this;
     }
 
     @Override
-    public K firstKey() {
-      throw new NoSuchElementException();
+    public Entry<K, V> firstEntry() {
+      return null;
     }
 
     @Override
-    public K lastKey() {
-      throw new NoSuchElementException();
+    public Entry<K, V> lastEntry() {
+      return null;
     }
 
     @Override
-    public SortedSet<K> keySet() {
+    public Entry<K, V> ceilingEntry(K pKey) {
+      return null;
+    }
+
+    @Override
+    public Entry<K, V> floorEntry(K pKey) {
+      return null;
+    }
+
+    @Override
+    public Entry<K, V> higherEntry(K pKey) {
+      return null;
+    }
+
+    @Override
+    public Entry<K, V> lowerEntry(K pKey) {
+      return null;
+    }
+
+    @Override
+    public ImmutableSortedSet<K> navigableKeySet() {
       return ImmutableSortedSet.of();
     }
 
     @Override
-    public Collection<V> values() {
+    public ImmutableList<V> values() {
       return ImmutableList.of();
+    }
+
+    @Override
+    public OurSortedMap<K, V> descendingMap() {
+      return this;
     }
 
     @Override
@@ -123,7 +198,7 @@ interface OurSortedMap<K, V> extends SortedMap<K, V> {
     }
 
     @Override
-    public SortedSet<Map.Entry<K, V>> entrySet() {
+    public ImmutableSortedSet<Map.Entry<K, V>> entrySet() {
       return ImmutableSortedSet.of();
     }
 

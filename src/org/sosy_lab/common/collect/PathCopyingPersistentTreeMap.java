@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.annotations.Immutable;
@@ -34,19 +33,15 @@ import com.google.errorprone.annotations.concurrent.LazyInit;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.AbstractSet;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.NavigableSet;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -244,7 +239,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   private final @Nullable Node<K, V> root;
 
-  private transient @LazyInit @Nullable EntrySet<K, V> entrySet;
+  @SuppressWarnings("Immutable")
+  private transient @LazyInit @Nullable NavigableSet<Entry<K, V>> entrySet;
+
+  private transient @LazyInit int size;
 
   private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
@@ -798,6 +796,21 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   // read operations
 
   @Override
+  public @Nullable Entry<K, V> getEntry(Object pKey) {
+    return findNode(pKey, root);
+  }
+
+  @Override
+  public Iterator<Entry<K, V>> entryIterator() {
+    return EntryInOrderIterator.create(root);
+  }
+
+  @Override
+  public Iterator<Entry<K, V>> descendingEntryIterator() {
+    return DescendingEntryInOrderIterator.create(root);
+  }
+
+  @Override
   public PersistentSortedMap<K, V> empty() {
     return of();
   }
@@ -825,190 +838,92 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public SortedSet<Entry<K, V>> entrySet() {
+  public int size() {
+    if (size <= 0) {
+      size = Node.countNodes(root);
+    }
+    return size;
+  }
+
+  @Override
+  public Entry<K, V> firstEntry() {
+    if (isEmpty()) {
+      return null;
+    }
+
+    return findSmallestNode(root);
+  }
+
+  @Override
+  public Entry<K, V> lastEntry() {
+    if (isEmpty()) {
+      return null;
+    }
+
+    return findLargestNode(root);
+  }
+
+  @Override
+  public Entry<K, V> ceilingEntry(K pKey) {
+    return findNextGreaterNode(pKey, root, /*inclusive=*/ true);
+  }
+
+  @Override
+  public Entry<K, V> floorEntry(K pKey) {
+    return findNextSmallerNode(pKey, root, /*inclusive=*/ true);
+  }
+
+  @Override
+  public Entry<K, V> higherEntry(K pKey) {
+    return findNextGreaterNode(pKey, root, /*inclusive=*/ false);
+  }
+
+  @Override
+  public Entry<K, V> lowerEntry(K pKey) {
+    return findNextSmallerNode(pKey, root, /*inclusive=*/ false);
+  }
+
+  @Override
+  public Comparator<? super K> comparator() {
+    return null;
+  }
+
+  @Override
+  public OurSortedMap<K, V> descendingMap() {
+    return new DescendingSortedMap<>(this);
+  }
+
+  @Override
+  public NavigableSet<Entry<K, V>> entrySet() {
     if (entrySet == null) {
-      entrySet = new EntrySet<>(root);
+      entrySet = new SortedMapEntrySet<>(this);
     }
     return entrySet;
   }
 
   @Override
-  public SortedMap<K, V> subMap(K pFromKey, K pToKey) {
+  public OurSortedMap<K, V> subMap(
+      K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive) {
     checkNotNull(pFromKey);
     checkNotNull(pToKey);
 
-    return PartialSortedMap.create(
-        root, pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+    return PartialSortedMap.create(root, pFromKey, pFromInclusive, pToKey, pToInclusive);
   }
 
   @Override
-  public SortedMap<K, V> headMap(K pToKey) {
+  public OurSortedMap<K, V> headMap(K pToKey, boolean pToInclusive) {
     checkNotNull(pToKey);
 
     return PartialSortedMap.create(
-        root, null, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+        root, null, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ pToInclusive);
   }
 
   @Override
-  public SortedMap<K, V> tailMap(K pFromKey) {
+  public OurSortedMap<K, V> tailMap(K pFromKey, boolean pFromInclusive) {
     checkNotNull(pFromKey);
 
     return PartialSortedMap.create(
-        root, pFromKey, /*pFromInclusive=*/ true, null, /*pToInclusive=*/ false);
-  }
-
-  /**
-   * Entry set implementation. All methods are implemented by this class, none are delegated to
-   * other collections.
-   *
-   * @param <K> The type of keys.
-   * @param <V> The type of values.
-   */
-  @Immutable(containerOf = {"K", "V"})
-  @SuppressWarnings("JdkObsolete")
-  private static final class EntrySet<K extends Comparable<? super K>, V>
-      extends AbstractSet<Map.Entry<K, V>> implements SortedSet<Map.Entry<K, V>> {
-
-    private final @Nullable Node<K, V> root;
-
-    // Cache size
-    private transient @LazyInit int size = -1;
-
-    private EntrySet(Node<K, V> pRoot) {
-      root = pRoot;
-    }
-
-    @Override
-    public Iterator<Map.Entry<K, V>> iterator() {
-      return EntryInOrderIterator.create(root);
-    }
-
-    @Override
-    public boolean contains(Object pO) {
-      if (!(pO instanceof Map.Entry<?, ?>)) {
-        return false;
-      }
-      // pO is not null here
-      Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
-      Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
-
-      return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
-    }
-
-    @Override
-    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
-    public boolean containsAll(Collection<?> pC) {
-      if (pC instanceof EntrySet<?, ?>) {
-        // We can rely on sorted-set semantics here and optimize.
-        EntrySet<?, ?> other = (EntrySet<?, ?>) pC;
-        if (this.root == other.root) {
-          return true;
-        }
-
-        if (pC.size() > this.size()) {
-          return false;
-        }
-      }
-
-      // Arbitrary collection, delegate to AbstractSet
-      return super.containsAll(pC);
-    }
-
-    @Override
-    public int size() {
-      if (size < 0) {
-        size = Node.countNodes(root);
-      }
-      return size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return root == null;
-    }
-
-    @Override
-    public Entry<K, V> first() {
-      if (isEmpty()) {
-        throw new NoSuchElementException();
-      }
-
-      return findSmallestNode(root);
-    }
-
-    @Override
-    public Entry<K, V> last() {
-      if (isEmpty()) {
-        throw new NoSuchElementException();
-      }
-
-      return findLargestNode(root);
-    }
-
-    @Override
-    @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
-    public boolean equals(Object pO) {
-      if (pO instanceof EntrySet<?, ?>) {
-        EntrySet<?, ?> other = (EntrySet<?, ?>) pO;
-        if (this.root == other.root) {
-          return true;
-        }
-
-        if (this.size() != other.size()) {
-          return false;
-        }
-
-        // this is faster than the fallback check because it's O(n)
-        return Iterables.elementsEqual(this, other);
-      }
-      return super.equals(pO); // delegate to AbstractSet
-    }
-
-    @Override
-    public int hashCode() {
-      // hashCode() delegates to AbstractSet
-      return super.hashCode();
-    }
-
-    @Override
-    public Comparator<? super Entry<K, V>> comparator() {
-      return Entry.comparingByKey();
-    }
-
-    @Override
-    public SortedSet<Entry<K, V>> subSet(Entry<K, V> pFromElement, Entry<K, V> pToElement) {
-      K fromKey = pFromElement.getKey();
-      K toKey = pToElement.getKey();
-
-      checkNotNull(fromKey);
-      checkNotNull(toKey);
-
-      return PartialSortedMap.create(
-              root, fromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false)
-          .entrySet();
-    }
-
-    @Override
-    public SortedSet<Entry<K, V>> headSet(Entry<K, V> pToElement) {
-      K toKey = pToElement.getKey();
-
-      checkNotNull(toKey);
-
-      return PartialSortedMap.create(
-              root, null, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false)
-          .entrySet();
-    }
-
-    @Override
-    public SortedSet<Entry<K, V>> tailSet(Entry<K, V> pFromElement) {
-      K fromKey = pFromElement.getKey();
-
-      checkNotNull(fromKey);
-
-      return PartialSortedMap.create(
-              root, fromKey, /*pFromInclusive=*/ true, null, /*pToInclusive=*/ false)
-          .entrySet();
-    }
+        root, pFromKey, /*pFromInclusive=*/ pFromInclusive, null, /*pToInclusive=*/ false);
   }
 
   /**
@@ -1146,7 +1061,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  @SuppressWarnings("unused")
   private static class DescendingEntryInOrderIterator<K extends Comparable<? super K>, V>
       extends UnmodifiableIterator<Map.Entry<K, V>> {
 
@@ -1277,7 +1191,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <V> The type of values.
    */
   @Immutable(containerOf = {"K", "V"})
-  private static class PartialSortedMap<K extends Comparable<? super K>, V>
+  private static final class PartialSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V> {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> create(
@@ -1368,7 +1282,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K toKey;
     private final boolean toInclusive;
 
-    private transient @LazyInit @Nullable PartialEntrySet entrySet;
+    private transient @LazyInit int size;
+
+    @SuppressWarnings("Immutable")
+    private transient @LazyInit @Nullable NavigableSet<Entry<K, V>> entrySet;
 
     private PartialSortedMap(
         Node<K, V> pRoot,
@@ -1404,6 +1321,18 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
+    public Iterator<Entry<K, V>> entryIterator() {
+      return EntryInOrderIterator.createWithBounds(
+          root, fromKey, fromInclusive, toKey, toInclusive);
+    }
+
+    @Override
+    public Iterator<Entry<K, V>> descendingEntryIterator() {
+      return DescendingEntryInOrderIterator.createWithBounds(
+          root, fromKey, fromInclusive, toKey, toInclusive);
+    }
+
+    @Override
     public boolean containsKey(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
@@ -1411,13 +1340,19 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public V get(Object pKey) {
+    public Node<K, V> getEntry(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
       if (!inRange(key, /*treatBoundsAsInclusive=*/ false)) {
         return null;
       }
       Node<K, V> node = findNode(key, root);
+      return node;
+    }
+
+    @Override
+    public V get(Object pKey) {
+      Node<K, V> node = getEntry(pKey);
       return node == null ? null : node.getValue();
     }
 
@@ -1427,19 +1362,87 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public SortedSet<Entry<K, V>> entrySet() {
+    public int size() {
+      if (size == 0) {
+        size = Iterators.size(entryIterator());
+      }
+      return size;
+    }
+
+    @Override
+    public Entry<K, V> firstEntry() {
+      if (fromKey == null) {
+        return findSmallestNode(root);
+      } else {
+        return findNextGreaterNode(fromKey, root, fromInclusive);
+      }
+    }
+
+    @Override
+    public Entry<K, V> lastEntry() {
+      if (toKey == null) {
+        return findLargestNode(root);
+      } else {
+        return findNextSmallerNode(toKey, root, toInclusive);
+      }
+    }
+
+    @Override
+    public Entry<K, V> ceilingEntry(K pKey) {
+      Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ true);
+      if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
+        return null;
+      }
+      return result;
+    }
+
+    @Override
+    public Entry<K, V> floorEntry(K pKey) {
+      Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ true);
+      if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
+        return null;
+      }
+      return result;
+    }
+
+    @Override
+    public Entry<K, V> higherEntry(K pKey) {
+      Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ false);
+      if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
+        return null;
+      }
+      return result;
+    }
+
+    @Override
+    public Entry<K, V> lowerEntry(K pKey) {
+      Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ false);
+      if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
+        return null;
+      }
+      return result;
+    }
+
+    @Override
+    public Comparator<? super K> comparator() {
+      return null;
+    }
+
+    @Override
+    public OurSortedMap<K, V> descendingMap() {
+      return new DescendingSortedMap<>(this);
+    }
+
+    @Override
+    public NavigableSet<Entry<K, V>> entrySet() {
       if (entrySet == null) {
-        entrySet = new PartialEntrySet();
+        entrySet = new SortedMapEntrySet<>(this);
       }
       return entrySet;
     }
 
     @Override
-    public OurSortedMap<K, V> subMap(K pFromKey, K pToKey) {
-      return subMap(pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
-    }
-
-    private OurSortedMap<K, V> subMap(
+    public OurSortedMap<K, V> subMap(
         K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive) {
       checkNotNull(pFromKey);
       checkNotNull(pToKey);
@@ -1457,103 +1460,21 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public OurSortedMap<K, V> headMap(K pToKey) {
+    public OurSortedMap<K, V> headMap(K pToKey, boolean pInclusive) {
       checkNotNull(pToKey);
-      checkArgument(inRange(pToKey, /*treatBoundsAsInclusive=*/ false));
+      checkArgument(inRange(pToKey, /*treatBoundsAsInclusive=*/ !pInclusive));
 
       return PartialSortedMap.create(
-          root, fromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+          root, fromKey, /*pFromInclusive=*/ fromInclusive, pToKey, /*pToInclusive=*/ pInclusive);
     }
 
     @Override
-    public OurSortedMap<K, V> tailMap(K pFromKey) {
+    public OurSortedMap<K, V> tailMap(K pFromKey, boolean pInclusive) {
       checkNotNull(pFromKey);
-      checkArgument(inRange(pFromKey, /*treatBoundsAsInclusive=*/ true));
+      checkArgument(inRange(pFromKey, /*treatBoundsAsInclusive=*/ !pInclusive));
 
       return PartialSortedMap.create(
-          root, pFromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false);
-    }
-
-    /** Entry set implementation. The range needs to contain at least one mapping. */
-    @SuppressWarnings("JdkObsolete")
-    @Immutable
-    private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>>
-        implements SortedSet<Map.Entry<K, V>> {
-
-      private transient @LazyInit int size;
-
-      @Override
-      public Iterator<Map.Entry<K, V>> iterator() {
-        return EntryInOrderIterator.createWithBounds(
-            root, fromKey, fromInclusive, toKey, toInclusive);
-      }
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public boolean contains(Object pO) {
-        if (!(pO instanceof Map.Entry<?, ?>)) {
-          return false;
-        }
-        // pO is not null here
-        Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
-        if (!inRange((K) other.getKey(), /*treatBoundsAsInclusive=*/ false)) {
-          return false;
-        }
-        Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
-
-        return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
-      }
-
-      @Override
-      public boolean isEmpty() {
-        return false;
-      }
-
-      @Override
-      public int size() {
-        if (size == 0) {
-          size = Iterators.size(iterator());
-        }
-        return size;
-      }
-
-      @Override
-      public Map.Entry<K, V> first() {
-        if (fromKey == null) {
-          return findSmallestNode(root);
-        } else {
-          return findNextGreaterNode(fromKey, root, fromInclusive);
-        }
-      }
-
-      @Override
-      public Map.Entry<K, V> last() {
-        if (toKey == null) {
-          return findLargestNode(root);
-        } else {
-          return findNextSmallerNode(toKey, root, toInclusive);
-        }
-      }
-
-      @Override
-      public Comparator<? super Entry<K, V>> comparator() {
-        return Entry.comparingByKey();
-      }
-
-      @Override
-      public SortedSet<Entry<K, V>> subSet(Entry<K, V> pFromElement, Entry<K, V> pToElement) {
-        return subMap(pFromElement.getKey(), pToElement.getKey()).entrySet();
-      }
-
-      @Override
-      public SortedSet<Entry<K, V>> headSet(Entry<K, V> pToElement) {
-        return headMap(pToElement.getKey()).entrySet();
-      }
-
-      @Override
-      public SortedSet<Entry<K, V>> tailSet(Entry<K, V> pFromElement) {
-        return tailMap(pFromElement.getKey()).entrySet();
-      }
+          root, pFromKey, /*pFromInclusive=*/ pInclusive, toKey, /*pToInclusive=*/ toInclusive);
     }
   }
 }

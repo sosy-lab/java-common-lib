@@ -21,37 +21,40 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Iterators;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
 
 /**
- * Implementation of {@link SortedSet} to be used as the key set of a {@link SortedMap}.
+ * Implementation of {@link NavigableSet} to be used as the key set of a {@link NavigableMap}.
  *
  * <p>This implementation forwards all methods to the underlying map.
- *
- * @param <K> The type of keys.
  */
-@SuppressWarnings("JdkObsolete")
-class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
-    implements SortedSet<K> {
+@SuppressFBWarnings(
+  value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+  justification = "nullability depends on underlying map"
+)
+final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K> {
 
-  private final SortedMap<K, ?> map;
+  private final OurSortedMap<K, ?> map;
 
-  SortedMapKeySet(SortedMap<K, ?> pMap) {
+  SortedMapKeySet(OurSortedMap<K, ?> pMap) {
     map = checkNotNull(pMap);
   }
 
   @Override
   public Iterator<K> iterator() {
-    return map.entrySet().stream().map(Map.Entry::getKey).iterator();
+    return Iterators.transform(map.entryIterator(), Map.Entry::getKey);
   }
 
   @Override
-  public boolean contains(Object pO) {
+  public boolean contains(@Nullable Object pO) {
     return map.containsKey(pO);
   }
 
@@ -71,6 +74,20 @@ class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
   }
 
   @Override
+  public void clear() {
+    map.clear();
+  }
+
+  @Override
+  public boolean remove(@Nullable Object pO) {
+    if (map.containsKey(pO)) {
+      map.remove(pO);
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public K first() {
     return map.firstKey();
   }
@@ -81,17 +98,77 @@ class SortedMapKeySet<K extends Comparable<? super K>> extends AbstractSet<K>
   }
 
   @Override
-  public SortedSet<K> subSet(K pFromElement, K pToElement) {
+  public NavigableSet<K> subSet(@Nullable K pFromElement, @Nullable K pToElement) {
     return new SortedMapKeySet<>(map.subMap(pFromElement, pToElement));
   }
 
   @Override
-  public SortedSet<K> headSet(K pToElement) {
+  public NavigableSet<K> headSet(@Nullable K pToElement) {
     return new SortedMapKeySet<>(map.headMap(pToElement));
   }
 
   @Override
-  public SortedSet<K> tailSet(K pFromElement) {
+  public NavigableSet<K> tailSet(@Nullable K pFromElement) {
     return new SortedMapKeySet<>(map.tailMap(pFromElement));
+  }
+
+  @Override
+  public K lower(@Nullable K pE) {
+    return map.lowerKey(pE);
+  }
+
+  @Override
+  public K floor(@Nullable K pE) {
+    return map.floorKey(pE);
+  }
+
+  @Override
+  public K ceiling(@Nullable K pE) {
+    return map.ceilingKey(pE);
+  }
+
+  @Override
+  public K higher(@Nullable K pE) {
+    return map.higherKey(pE);
+  }
+
+  @Override
+  public K pollFirst() {
+    return map.pollFirstEntry().getKey();
+  }
+
+  @Override
+  public K pollLast() {
+    return map.pollLastEntry().getKey();
+  }
+
+  @Override
+  public NavigableSet<K> descendingSet() {
+    return map.descendingKeySet();
+  }
+
+  @Override
+  public Iterator<K> descendingIterator() {
+    return map.descendingKeySet().iterator();
+  }
+
+  @Override
+  public NavigableSet<K> subSet(
+      @Nullable K pFromElement,
+      boolean pFromInclusive,
+      @Nullable K pToElement,
+      boolean pToInclusive) {
+    return new SortedMapKeySet<>(
+        map.subMap(pFromElement, pFromInclusive, pToElement, pToInclusive));
+  }
+
+  @Override
+  public NavigableSet<K> headSet(@Nullable K pToElement, boolean pInclusive) {
+    return new SortedMapKeySet<>(map.headMap(pToElement, pInclusive));
+  }
+
+  @Override
+  public NavigableSet<K> tailSet(@Nullable K pFromElement, boolean pInclusive) {
+    return new SortedMapKeySet<>(map.tailMap(pFromElement, pInclusive));
   }
 }

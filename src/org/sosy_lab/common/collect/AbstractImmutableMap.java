@@ -116,11 +116,6 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
   }
 
   @Override
-  public int size() {
-    return entrySet().size();
-  }
-
-  @Override
   public Collection<V> values() {
     return Collections2.transform(entrySet(), Entry::getValue);
   }

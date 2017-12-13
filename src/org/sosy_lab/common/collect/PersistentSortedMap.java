@@ -20,20 +20,19 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import javax.annotation.CheckReturnValue;
 
 /**
- * Sub-interface of {@link PersistentMap} analog to {@link SortedMap}.
+ * Sub-interface of {@link PersistentMap} analog to {@link NavigableMap}.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
 @Immutable(containerOf = {"K", "V"})
-@SuppressWarnings("JdkObsolete")
 public interface PersistentSortedMap<K, V>
-    extends PersistentMap<K, V>, SortedMap<K, V>, OurSortedMap<K, V> {
+    extends PersistentSortedMapBridge<K, V>, NavigableMap<K, V> {
 
   @Override
   @CheckReturnValue
@@ -48,8 +47,45 @@ public interface PersistentSortedMap<K, V>
   PersistentSortedMap<K, V> empty();
 
   @Override
-  SortedSet<Entry<K, V>> entrySet();
+  NavigableSet<Entry<K, V>> entrySet();
 
   @Override
-  SortedSet<K> keySet();
+  NavigableSet<K> keySet();
+
+  @Override
+  NavigableMap<K, V> descendingMap();
+
+  @Override
+  NavigableMap<K, V> subMap(K pFromKey, K pToKey);
+
+  @Override
+  NavigableMap<K, V> subMap(K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive);
+
+  @Override
+  NavigableMap<K, V> headMap(K pToKey);
+
+  @Override
+  NavigableMap<K, V> headMap(K pToKey, boolean pInclusive);
+
+  @Override
+  NavigableMap<K, V> tailMap(K pFromKey);
+
+  @Override
+  NavigableMap<K, V> tailMap(K pFromKey, boolean pInclusive);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  Entry<K, V> pollFirstEntry();
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  Entry<K, V> pollLastEntry();
 }

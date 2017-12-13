@@ -2,7 +2,7 @@
  *  SoSy-Lab Common is a library of useful utilities.
  *  This file is part of SoSy-Lab Common.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,20 +19,21 @@
  */
 package org.sosy_lab.common.collect;
 
-import com.google.common.testing.AbstractPackageSanityTests;
-import org.sosy_lab.common.Classes;
+import com.google.errorprone.annotations.Immutable;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {
+/**
+ * Interface that forces generation of bridge methods that return {@link SortedSet} for binary
+ * backwards compatibility.
+ */
+@SuppressWarnings("JdkObsolete")
+@Immutable(containerOf = {"K", "V"})
+interface PersistentSortedMapBridge<K, V> extends PersistentMap<K, V>, SortedMap<K, V> {
+  @Override
+  SortedSet<K> keySet();
 
-  {
-    setDistinctValues(
-        PersistentLinkedList.class, PersistentLinkedList.of(), PersistentLinkedList.of("test"));
-    @SuppressWarnings("unchecked")
-    OurSortedMap<String, String> singletonMap =
-        (OurSortedMap<String, String>)
-            PathCopyingPersistentTreeMap.<String, String>of().putAndCopy("test", "test");
-    setDistinctValues(
-        OurSortedMap.class, OurSortedMap.EmptyImmutableOurSortedMap.of(), singletonMap);
-    ignoreClasses(Classes.IS_GENERATED);
-  }
+  @Override
+  SortedSet<Map.Entry<K, V>> entrySet();
 }

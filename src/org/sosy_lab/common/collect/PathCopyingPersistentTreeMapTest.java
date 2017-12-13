@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.Ordering;
-import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
+import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
@@ -65,7 +65,7 @@ public class PathCopyingPersistentTreeMapTest {
     suite.addTest(new JUnit4TestAdapter(PathCopyingPersistentTreeMapTest.class));
 
     suite.addTest(
-        SortedMapTestSuiteBuilder.using(mapGenerator)
+        NavigableMapTestSuiteBuilder.using(mapGenerator)
             .named("PathCopyingPersistentTreeMap")
             .withFeatures(
                 MapFeature.ALLOWS_NULL_VALUES, CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
