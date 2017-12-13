@@ -41,6 +41,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -316,21 +317,21 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Given a key and a tree, find the node in the tree with the given key, or (if there is no such
-   * node) the node with the smallest key that is still greater than the key to look for. In terms
-   * of SortedMap operations, this returns the node for map.tailMap(key).first() (tailMap() has an
-   * inclusive bound). Returns null if the tree is empty or there is no node that matches (i.e., key
-   * is larger than the largest key in the map).
+   * Given a key and a tree, find the node in the tree with the given key, or (if {@code inclusive}
+   * is false or there is no such node) the node with the smallest key that is still greater than
+   * the key to look for. In terms of {@link NavigableMap} operations, this returns the node for
+   * {@code map.tailMap(key, inclusive).first()}. Returns null if the tree is empty or there is no
+   * node that matches (i.e., key is larger than the largest key in the map).
    *
    * @param key The key to search for.
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V>
-      Node<K, V> findNextGreaterOrEqualNode(K key, Node<K, V> root) {
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextGreaterNode(
+      K key, Node<K, V> root, boolean inclusive) {
     checkNotNull(key);
 
-    @Var Node<K, V> result = null; // this is always greater than or equal to key
+    @Var Node<K, V> result = null; // this is always greater than key
 
     @Var Node<K, V> current = root;
     while (current != null) {
@@ -355,7 +356,19 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       } else {
         // key == current.data
 
-        return current;
+        if (inclusive) {
+          return current;
+        } else {
+          // All nodes to the left of current are irrelevant because they are too small.
+          // current itself is too small, too.
+          // The left-most node in the right subtree of child is the result.
+          if (current.right == null) {
+            // no node smaller than key in this subtree
+            return result;
+          } else {
+            return findSmallestNode(current.right);
+          }
+        }
       }
 
       if (current == null) {
@@ -367,18 +380,18 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   /**
-   * Given a key and a tree, find the node with the largest key that is still strictly smaller than
-   * the key to look for. In terms of SortedMap operations, this returns the node for
-   * map.headMap(key).last() (heapMap() has an exclusive bound). Returns null if the tree is empty
-   * or there is no node that matches (i.e., key is smaller than or equal to the smallest key in the
-   * map).
+   * Given a key and a tree, find the node in the tree with the given key, or (if {@code inclusive}
+   * is false or there is no such node) the node with the largest key that is still smaller than the
+   * key to look for. In terms of {@link NavigableMap} operations, this returns the node for {@code
+   * map.headMap(key, inclusive).last()}. Returns null if the tree is empty or there is no node that
+   * matches (i.e., key is smaller than or equal to the smallest key in the map).
    *
    * @param key The key to search for.
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V>
-      Node<K, V> findNextStrictlySmallerNode(K key, Node<K, V> root) {
+  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextSmallerNode(
+      K key, Node<K, V> root, boolean inclusive) {
     checkNotNull(key);
 
     @Var Node<K, V> result = null; // this is always smaller than key
@@ -405,15 +418,19 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       } else {
         // key == current.data
-        // All nodes to the right of current are irrelevant because they are too big.
-        // current itself is too big, too.
-        // The right-most node in the left subtree of child is the result.
 
-        if (current.left == null) {
-          // no node smaller than key in this subtree
-          return result;
+        if (inclusive) {
+          return current;
         } else {
-          return findLargestNode(current.left);
+          // All nodes to the right of current are irrelevant because they are too big.
+          // current itself is too big, too.
+          // The right-most node in the left subtree of child is the result.
+          if (current.left == null) {
+            // no node smaller than key in this subtree
+            return result;
+          } else {
+            return findLargestNode(current.left);
+          }
         }
       }
 
@@ -1173,7 +1190,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       @Var K fromKey = pFromKey;
       @Var Node<K, V> lowestNode = null;
       if (pFromKey != null) {
-        lowestNode = findNextGreaterOrEqualNode(pFromKey, root);
+        lowestNode = findNextGreaterNode(pFromKey, root, /*inclusive=*/ true);
         if (lowestNode == null) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
@@ -1182,7 +1199,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Var Node<K, V> highestNode = null;
       if (pToKey != null) {
-        highestNode = findNextStrictlySmallerNode(pToKey, root);
+        highestNode = findNextSmallerNode(pToKey, root, /*inclusive=*/ false);
         if (highestNode == null) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
@@ -1243,7 +1260,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       // check non-emptiness invariant
       assert root != null;
       assert pLowKey == null || containsKey(pLowKey);
-      assert pHighKey == null || containsKey(findNextStrictlySmallerNode(pHighKey, pRoot).getKey());
+      assert pHighKey == null
+          || containsKey(findNextSmallerNode(pHighKey, pRoot, /*inclusive=*/ false).getKey());
     }
 
     private boolean inRange(K key) {
@@ -1366,7 +1384,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (fromKey == null) {
           return findSmallestNode(root);
         } else {
-          return findNextGreaterOrEqualNode(fromKey, root);
+          return findNextGreaterNode(fromKey, root, /*inclusive=*/ true);
         }
       }
 
@@ -1375,7 +1393,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (toKey == null) {
           return findLargestNode(root);
         } else {
-          return findNextStrictlySmallerNode(toKey, root);
+          return findNextSmallerNode(toKey, root, /*inclusive=*/ false);
         }
       }
 
