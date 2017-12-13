@@ -442,6 +442,15 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
+  private static <K extends Comparable<? super K>> boolean exceedsUpperBound(
+      K pKey, K pUpperBound, boolean pUpperInclusive) {
+    if (pUpperInclusive) {
+      return pKey.compareTo(pUpperBound) > 0;
+    } else {
+      return pKey.compareTo(pUpperBound) >= 0;
+    }
+  }
+
   private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) {
     if (current == null) {
       return 0;
@@ -1046,8 +1055,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Tree iterator with in-order iteration returning node objects, with possibility for lower and
-   * upper bound. The lower bound (if present) needs to exist in the set and is inclusive, the upper
-   * bound is exclusive.
+   * upper bound.
    *
    * @param <K> The type of keys.
    * @param <V> The type of values.
@@ -1062,14 +1070,16 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final Deque<Node<K, V>> stack;
 
     // If not null, iteration stops at this key.
-    private final @Nullable K highKey; // exclusive
+    private final @Nullable K highKey;
+    private final boolean highInclusive; // only relevant if highKey != null
 
     static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>> create(
         @Nullable Node<K, V> root) {
       if (root == null) {
         return Collections.emptyIterator();
       } else {
-        return new EntryInOrderIterator<>(root, null, null);
+        return new EntryInOrderIterator<>(
+            root, null, /*pLowInclusive=*/ false, null, /*pHighInclusive=*/ false);
       }
     }
 
@@ -1080,24 +1090,33 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
      * @param pToKey null or exclusive lower bound
      */
     static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>> createWithBounds(
-        @Nullable Node<K, V> root, @Nullable K pFromKey, @Nullable K pToKey) {
+        @Nullable Node<K, V> root,
+        @Nullable K pFromKey,
+        boolean pFromInclusive,
+        @Nullable K pToKey,
+        boolean pToInclusive) {
       if (root == null) {
         return Collections.emptyIterator();
       } else {
-        return new EntryInOrderIterator<>(root, pFromKey, pToKey);
+        return new EntryInOrderIterator<>(root, pFromKey, pFromInclusive, pToKey, pToInclusive);
       }
     }
 
-    private EntryInOrderIterator(Node<K, V> root, @Nullable K pLowKey, @Nullable K pHighKey) {
+    private EntryInOrderIterator(
+        Node<K, V> root,
+        @Nullable K pLowKey,
+        boolean pLowInclusive,
+        @Nullable K pHighKey,
+        boolean pHighInclusive) {
       stack = new ArrayDeque<>();
       highKey = pHighKey;
+      highInclusive = pHighInclusive;
 
       if (pLowKey == null) {
         pushLeftMostNodesOnStack(root);
       } else {
         // TODO: optimize: this iterates twice through the tree
-        pushNodesToKeyOnStack(
-            root, findNextGreaterNode(pLowKey, root, /*inclusive=*/ true).getKey());
+        pushNodesToKeyOnStack(root, findNextGreaterNode(pLowKey, root, pLowInclusive).getKey());
       }
       stopFurtherIterationIfOutOfRange();
     }
@@ -1137,7 +1156,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     private void stopFurtherIterationIfOutOfRange() {
-      if (highKey != null && !stack.isEmpty() && stack.peek().getKey().compareTo(highKey) >= 0) {
+      if (highKey != null
+          && !stack.isEmpty()
+          && exceedsUpperBound(stack.peek().getKey(), highKey, highInclusive)) {
         // We have reached the end, next element would already be too large
         stack.clear();
       }
@@ -1349,7 +1370,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Override
       public Iterator<Map.Entry<K, V>> iterator() {
-        return EntryInOrderIterator.createWithBounds(root, fromKey, toKey);
+        return EntryInOrderIterator.createWithBounds(
+            root, fromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false);
       }
 
       @SuppressWarnings("unchecked")
