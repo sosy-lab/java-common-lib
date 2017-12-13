@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
@@ -836,21 +837,24 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     checkNotNull(pFromKey);
     checkNotNull(pToKey);
 
-    return PartialSortedMap.create(root, pFromKey, pToKey);
+    return PartialSortedMap.create(
+        root, pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
   }
 
   @Override
   public SortedMap<K, V> headMap(K pToKey) {
     checkNotNull(pToKey);
 
-    return PartialSortedMap.create(root, null, pToKey);
+    return PartialSortedMap.create(
+        root, null, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
   }
 
   @Override
   public SortedMap<K, V> tailMap(K pFromKey) {
     checkNotNull(pFromKey);
 
-    return PartialSortedMap.create(root, pFromKey, null);
+    return PartialSortedMap.create(
+        root, pFromKey, /*pFromInclusive=*/ true, null, /*pToInclusive=*/ false);
   }
 
   /**
@@ -1040,7 +1044,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       checkNotNull(fromKey);
       checkNotNull(toKey);
 
-      return PartialSortedMap.create(root, fromKey, toKey).entrySet();
+      return PartialSortedMap.create(
+              root, fromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false)
+          .entrySet();
     }
 
     @Override
@@ -1049,7 +1055,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       checkNotNull(toKey);
 
-      return PartialSortedMap.create(root, null, toKey).entrySet();
+      return PartialSortedMap.create(
+              root, null, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false)
+          .entrySet();
     }
 
     @Override
@@ -1058,7 +1066,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       checkNotNull(fromKey);
 
-      return PartialSortedMap.create(root, fromKey, null).entrySet();
+      return PartialSortedMap.create(
+              root, fromKey, /*pFromInclusive=*/ true, null, /*pToInclusive=*/ false)
+          .entrySet();
     }
   }
 
@@ -1322,8 +1332,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   /**
    * Partial map implementation for {@link SortedMap#subMap(Object, Object)} etc. At least one bound
-   * (upper/lower) needs to be present. The lower bound (if present) is inclusive, the upper bound
-   * is exclusive. The range needs to contain at least one mapping.
+   * (upper/lower) needs to be present. The range needs to contain at least one mapping.
    *
    * @param <K> The type of keys.
    * @param <V> The type of values.
@@ -1333,25 +1342,29 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V> {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> create(
-        Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
+        Node<K, V> pRoot,
+        @Nullable K pFromKey,
+        boolean pFromInclusive,
+        @Nullable K pToKey,
+        boolean pToInclusive) {
       checkArgument(pFromKey != null || pToKey != null);
 
       if (pFromKey != null && pToKey != null) {
         int comp = pFromKey.compareTo(pToKey);
-        if (comp == 0) {
+        if (comp == 0 && (!pFromInclusive || !pToInclusive)) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
-        checkArgument(comp < 0, "fromKey > toKey");
+        checkArgument(comp <= 0, "fromKey > toKey");
       }
 
-      Node<K, V> root = findBestRoot(pRoot, pFromKey, pToKey);
+      Node<K, V> root = findBestRoot(pRoot, pFromKey, pFromInclusive, pToKey, pToInclusive);
       if (root == null) {
         return EmptyImmutableOurSortedMap.<K, V>of();
       }
 
       @Var Node<K, V> lowestNode = null;
       if (pFromKey != null) {
-        lowestNode = findNextGreaterNode(pFromKey, root, /*inclusive=*/ true);
+        lowestNode = findNextGreaterNode(pFromKey, root, pFromInclusive);
         if (lowestNode == null) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
@@ -1359,7 +1372,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Var Node<K, V> highestNode = null;
       if (pToKey != null) {
-        highestNode = findNextSmallerNode(pToKey, root, /*inclusive=*/ false);
+        highestNode = findNextSmallerNode(pToKey, root, pToInclusive);
         if (highestNode == null) {
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
@@ -1367,31 +1380,35 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       if (pFromKey != null && pToKey != null) {
         assert lowestNode != null && highestNode != null;
-        // [pFromKey; pToKey[ == [lowestNode; pToKey[ == [lowestNode; highestNode]
+        if (exceedsUpperBound(lowestNode.getKey(), pToKey, pToInclusive)) {
+          verify(exceedsLowerBound(highestNode.getKey(), pFromKey, pFromInclusive));
 
-        if (lowestNode.getKey().compareTo(highestNode.getKey()) > 0) {
-          // no mappings in [pFromKey; pToKey[
+          // no mappings in in range
           return EmptyImmutableOurSortedMap.<K, V>of();
         }
       }
 
-      return new PartialSortedMap<>(root, pFromKey, pToKey);
+      return new PartialSortedMap<>(root, pFromKey, pFromInclusive, pToKey, pToInclusive);
     }
 
     // Find the best root for a given set of bounds
     // (the lowest node in the tree that represents the complete range).
     // Not using root directly but potentially only a subtree is more efficient.
     private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findBestRoot(
-        @Nullable Node<K, V> pRoot, @Nullable K pFromKey, @Nullable K pToKey) {
+        @Nullable Node<K, V> pRoot,
+        @Nullable K pFromKey,
+        boolean pFromInclusive,
+        @Nullable K pToKey,
+        boolean pToInclusive) {
 
       @Var Node<K, V> current = pRoot;
       while (current != null) {
 
-        if (pFromKey != null && current.getKey().compareTo(pFromKey) < 0) {
-          // current < fromKey -> current and left subtree can be ignored
+        if (pFromKey != null && exceedsLowerBound(current.getKey(), pFromKey, pFromInclusive)) {
+          // current and left subtree can be ignored
           current = current.right;
-        } else if (pToKey != null && current.getKey().compareTo(pToKey) >= 0) {
-          // current -> toKey -> current and right subtree can be ignored
+        } else if (pToKey != null && exceedsUpperBound(current.getKey(), pToKey, pToInclusive)) {
+          // current and right subtree can be ignored
           current = current.left;
         } else {
           // current is in range
@@ -1406,50 +1423,59 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private final Node<K, V> root;
 
-    // null if there is no according bound
-    private final @Nullable K fromKey; // inclusive
-    private final @Nullable K toKey; // exclusive
+    // null if there is no according bound, in this case the "inclusive" boolean is irrelevant
+    private final @Nullable K fromKey;
+    private final boolean fromInclusive;
+    private final @Nullable K toKey;
+    private final boolean toInclusive;
 
     private transient @LazyInit @Nullable PartialEntrySet entrySet;
 
-    private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
+    private PartialSortedMap(
+        Node<K, V> pRoot,
+        @Nullable K pFromKey,
+        boolean pFromInclusive,
+        @Nullable K pToKey,
+        boolean pToInclusive) {
       root = pRoot;
-      fromKey = pLowKey;
-      toKey = pHighKey;
+      fromKey = pFromKey;
+      fromInclusive = pFromInclusive;
+      toKey = pToKey;
+      toInclusive = pToInclusive;
 
       // check non-emptiness invariant
       assert root != null;
-      assert pLowKey == null
-          || containsKey(findNextGreaterNode(pLowKey, pRoot, /*inclusive=*/ true).getKey());
-      assert pHighKey == null
-          || containsKey(findNextSmallerNode(pHighKey, pRoot, /*inclusive=*/ false).getKey());
+      assert pFromKey == null
+          || containsKey(findNextGreaterNode(pFromKey, pRoot, fromInclusive).getKey());
+      assert pToKey == null
+          || containsKey(findNextSmallerNode(pToKey, pRoot, toInclusive).getKey());
     }
 
-    private boolean inRange(K key, boolean inclusiveBounds) {
-      return !tooLow(key) && !tooHigh(key, inclusiveBounds);
+    private boolean inRange(K key, boolean treatBoundsAsInclusive) {
+      return !tooLow(key, treatBoundsAsInclusive) && !tooHigh(key, treatBoundsAsInclusive);
     }
 
-    private boolean tooLow(K key) {
-      return fromKey != null && key.compareTo(fromKey) < 0;
+    private boolean tooLow(K key, boolean treatBoundAsInclusive) {
+      return fromKey != null
+          && exceedsLowerBound(key, fromKey, treatBoundAsInclusive || fromInclusive);
     }
 
-    private boolean tooHigh(K key, boolean inclusiveBounds) {
-      return toKey != null
-          && (inclusiveBounds ? key.compareTo(toKey) > 0 : key.compareTo(toKey) >= 0);
+    private boolean tooHigh(K key, boolean treatBoundAsInclusive) {
+      return toKey != null && exceedsUpperBound(key, toKey, treatBoundAsInclusive || toInclusive);
     }
 
     @Override
     public boolean containsKey(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
-      return inRange(key, /*inclusiveBounds=*/ false) && findNode(key, root) != null;
+      return inRange(key, /*treatBoundsAsInclusive=*/ false) && findNode(key, root) != null;
     }
 
     @Override
     public V get(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
-      if (!inRange(key, /*inclusiveBounds=*/ false)) {
+      if (!inRange(key, /*treatBoundsAsInclusive=*/ false)) {
         return null;
       }
       Node<K, V> node = findNode(key, root);
@@ -1471,35 +1497,45 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public OurSortedMap<K, V> subMap(K pFromKey, K pToKey) {
+      return subMap(pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+    }
+
+    private OurSortedMap<K, V> subMap(
+        K pFromKey, boolean pFromInclusive, K pToKey, boolean pToInclusive) {
       checkNotNull(pFromKey);
       checkNotNull(pToKey);
 
-      checkArgument(inRange(pFromKey, /*inclusiveBounds=*/ true));
-      checkArgument(inRange(pToKey, /*inclusiveBounds=*/ true));
+      // If fromKey==pFromKey, we must forbid the combination of fromInclusive==false and
+      // pFromInclusive==true, because this would mean that the new range exceeds the old range.
+      // All other combinations of fromInclusive and pFromInclusive are allowed.
+      // So we accept equal keys if (!pFromInclusive || fromInclusive) holds,
+      // the latter being handled by inRange().
+      checkArgument(inRange(pFromKey, !pFromInclusive));
+      // Similarly for the upper bound.
+      checkArgument(inRange(pToKey, !pToInclusive));
 
-      return PartialSortedMap.create(root, pFromKey, pToKey);
+      return PartialSortedMap.create(root, pFromKey, pFromInclusive, pToKey, pToInclusive);
     }
 
     @Override
     public OurSortedMap<K, V> headMap(K pToKey) {
       checkNotNull(pToKey);
-      checkArgument(inRange(pToKey, /*inclusiveBounds=*/ true));
+      checkArgument(inRange(pToKey, /*treatBoundsAsInclusive=*/ false));
 
-      return PartialSortedMap.create(root, fromKey, pToKey);
+      return PartialSortedMap.create(
+          root, fromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
     }
 
     @Override
     public OurSortedMap<K, V> tailMap(K pFromKey) {
       checkNotNull(pFromKey);
-      checkArgument(inRange(pFromKey, /*inclusiveBounds=*/ true));
+      checkArgument(inRange(pFromKey, /*treatBoundsAsInclusive=*/ true));
 
-      return PartialSortedMap.create(root, pFromKey, toKey);
+      return PartialSortedMap.create(
+          root, pFromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false);
     }
 
-    /**
-     * Entry set implementation. The lower bound (if present) is inclusive, the upper bound is
-     * exclusive. The range needs to contain at least one mapping.
-     */
+    /** Entry set implementation. The range needs to contain at least one mapping. */
     @SuppressWarnings("JdkObsolete")
     @Immutable
     private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>>
@@ -1510,7 +1546,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       @Override
       public Iterator<Map.Entry<K, V>> iterator() {
         return EntryInOrderIterator.createWithBounds(
-            root, fromKey, /*pFromInclusive=*/ true, toKey, /*pToInclusive=*/ false);
+            root, fromKey, fromInclusive, toKey, toInclusive);
       }
 
       @SuppressWarnings("unchecked")
@@ -1521,7 +1557,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         }
         // pO is not null here
         Map.Entry<?, ?> other = (Map.Entry<?, ?>) pO;
-        if (!inRange((K) other.getKey(), /*inclusiveBounds=*/ false)) {
+        if (!inRange((K) other.getKey(), /*treatBoundsAsInclusive=*/ false)) {
           return false;
         }
         Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
@@ -1547,7 +1583,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (fromKey == null) {
           return findSmallestNode(root);
         } else {
-          return findNextGreaterNode(fromKey, root, /*inclusive=*/ true);
+          return findNextGreaterNode(fromKey, root, fromInclusive);
         }
       }
 
@@ -1556,7 +1592,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (toKey == null) {
           return findLargestNode(root);
         } else {
-          return findNextSmallerNode(toKey, root, /*inclusive=*/ false);
+          return findNextSmallerNode(toKey, root, toInclusive);
         }
       }
 
