@@ -39,6 +39,7 @@ import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -533,8 +534,9 @@ public final class Classes {
    * <p>The factory interface needs to have exactly one method. The target class needs to have
    * either a single public static method name {@code create}, or a single public constructor. The
    * declared exceptions of the static method/constructor need to be a subset of those of the method
-   * of the factory interface, and the same holds for the parameters. Parameters that are declared
-   * {@link Nullable} may be missing in the factory interface.
+   * of the factory interface, and the same holds for the parameters. Parameters that are annotated
+   * with an annotation named {@code Nullable} or {@code NullableDecl} may be missing in the factory
+   * interface.
    *
    * @param factoryType The factory interface
    * @param cls The class which should be instantiated by the returned factory
@@ -554,8 +556,9 @@ public final class Classes {
    * <p>The factory interface needs to have exactly one method. The target class needs to have
    * either a single public static method name {@code create}, or a single public constructor. The
    * declared exceptions of the static method/constructor need to be a subset of those of the method
-   * of the factory interface, and the same holds for the parameters. Parameters that are declared
-   * {@link Nullable} may be missing in the factory interface.
+   * of the factory interface, and the same holds for the parameters. Parameters that are annotated
+   * with an annotation named {@code Nullable} or {@code NullableDecl} may be missing in the factory
+   * interface.
    *
    * @param factoryType A type token that represents the factory interface
    * @param cls The class which should be instantiated by the returned factory
@@ -614,11 +617,11 @@ public final class Classes {
     int[] parameterMapping = new int[targetParamTypes.size()];
     boolean[] parameterNullability = new boolean[targetParamTypes.size()];
     for (int i = 0; i < targetParamTypes.size(); i++) {
-      boolean targetNullability = targetParameters.get(i).isAnnotationPresent(Nullable.class);
+      boolean targetNullability = isNullable(targetParameters.get(i));
       int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
       boolean sourceNullability =
           (sourceIndex == -1) // parameter not present in interface
-              || formalParams[sourceIndex].isAnnotationPresent(Nullable.class);
+              || isNullable(formalParams[sourceIndex]);
       if (sourceNullability && !targetNullability) {
         throw new UnsuitedClassException(
             "'%s' requires parameter of type %s which is not present in factory interface",
@@ -667,6 +670,16 @@ public final class Classes {
 
   private static Stream<TypeToken<?>> resolve(TypeToken<?> context, Type[] types) {
     return Arrays.stream(types).<TypeToken<?>>map(type -> context.resolveType(type));
+  }
+
+  private static boolean isNullable(AnnotatedElement elem) {
+    for (java.lang.annotation.Annotation annotation : elem.getAnnotations()) {
+      String name = annotation.annotationType().getSimpleName();
+      if (name.equals("Nullable") || name.equals("NullableDecl")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
