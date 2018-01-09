@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.errorprone.annotations.Var;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -159,12 +160,9 @@ class OptionPlainTextWriter {
       return text;
     }
 
-    // split description into lines
-    String[] lines = text.split("\n");
-
     // split lines into more lines, if they are too long
     List<String> splittedLines = new ArrayList<>();
-    for (String fullLine : lines) {
+    for (String fullLine : Splitter.on('\n').split(text)) {
       @Var String remainingLine = fullLine;
       while (remainingLine.length() > CHARS_PER_LINE) {
 

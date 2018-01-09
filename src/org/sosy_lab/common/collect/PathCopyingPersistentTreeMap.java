@@ -1234,7 +1234,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K fromKey; // inclusive
     private final @Nullable K toKey; // exclusive
 
-    private transient @LazyInit @Nullable SortedSet<Map.Entry<K, V>> entrySet;
+    private transient @LazyInit @Nullable PartialEntrySet entrySet;
 
     private PartialSortedMap(Node<K, V> pRoot, @Nullable K pLowKey, @Nullable K pHighKey) {
       root = pRoot;
@@ -1322,10 +1322,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
      * inclusive, the upper bound is exclusive. The range needs to contain at least one mapping.
      */
     @SuppressWarnings("JdkObsolete")
+    @Immutable
     private class PartialEntrySet extends AbstractSet<Map.Entry<K, V>>
         implements SortedSet<Map.Entry<K, V>> {
 
-      private transient int size;
+      private transient @LazyInit int size;
 
       @Override
       public Iterator<Map.Entry<K, V>> iterator() {

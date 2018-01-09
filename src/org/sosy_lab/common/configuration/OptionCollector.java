@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration;
 import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -384,9 +385,9 @@ public class OptionCollector {
     // search for fieldString and get the whole content after it (=rest),
     // in 'rest' search for ';' and return all before it (=defaultValue)
     @Var String defaultValue = "";
-    String[] splitted = content.split(fieldPattern);
-    if (splitted.length > 1) { // first part is before fieldString, second part is after it
-      String rest = splitted[1];
+    List<String> splitted = Splitter.onPattern(fieldPattern).splitToList(content);
+    if (splitted.size() > 1) { // first part is before fieldString, second part is after it
+      String rest = splitted.get(1);
       defaultValue = rest.substring(0, rest.indexOf(';')).trim();
 
       // remove unnecessary parts of field
