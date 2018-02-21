@@ -328,13 +328,12 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    */
   @Override
   public void log(Level priority, Object... args) {
-    checkNotNull(args);
-
+    checkBuildAdditionalMessageParams(args);
     // Since some toString() methods may be rather costly, only log if the level is
     // sufficiently high.
     if (wouldBeLogged(priority)) {
 
-      log0(priority, findCallingMethod(), buildMessageText(args));
+      log0(priority, findCallingMethod(), buildAdditionalMessageText(args));
     }
   }
 
@@ -357,17 +356,73 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    */
   @Override
   public void logf(Level priority, String format, Object... args) {
+    checkFormatStringParameters(format, args);
+    if (wouldBeLogged(priority)) {
+      log0(priority, findCallingMethod(), formatAdditionalMessage(format, args));
+    }
+  }
+
+  /**
+   * Builds the additionalMessage using the format string parameters and the defined truncate size.
+   *
+   * @param format The format string.
+   * @param args The arguments for the format string.
+   * @return Additional message as string
+   */
+  private String formatAdditionalMessage(String format, Object... args) {
+    checkFormatStringParameters(format, args);
+
+    @SuppressWarnings("resource") // Nothing to close for StringBuilder
+    java.util.Formatter formatter =
+        new java.util.Formatter(
+            truncateSize > 0
+                ? new LimitingStringBuilderAppendable(truncateSize)
+                : new StringBuilder());
+    return formatter.format(format, args).toString();
+  }
+
+  private static void checkFormatStringParameters(String format, Object... args) {
     checkNotNull(format);
     checkNotNull(args);
-    if (wouldBeLogged(priority)) {
-      @SuppressWarnings("resource") // Nothing to close for StringBuilder
-      java.util.Formatter formatter =
-          new java.util.Formatter(
-              truncateSize > 0
-                  ? new LimitingStringBuilderAppendable(truncateSize)
-                  : new StringBuilder());
-      log0(priority, findCallingMethod(), formatter.format(format, args).toString());
+  }
+
+  /**
+   * Builds the additionalMessage by concatenating the arguments with " ".
+   *
+   * @param args The arguments to get concatenated
+   * @return The additonalMessage string, "" if <code>args.length == 0</code>
+   */
+  private String buildAdditionalMessageText(Object... args) {
+    checkBuildAdditionalMessageParams(args);
+
+    String[] argsStr = new String[args.length];
+    for (int i = 0; i < args.length; i++) {
+      Object o = firstNonNull(args[i], "null");
+      @Var String arg;
+      if (o instanceof Appender && (truncateSize > 0)) {
+        arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
+      } else {
+        arg = o.toString();
+      }
+      arg = firstNonNull(arg, "null"); // may happen if toString() returns null
+      if ((truncateSize > 0) && (arg.length() > truncateSize)) {
+        String length =
+            (o instanceof Appender) ? ">= " + truncateSize : Integer.toString(arg.length());
+        StringBuilder sb = new StringBuilder(TRUNCATE_REMAINING_SIZE + 70);
+        sb.append(arg.substring(0, TRUNCATE_REMAINING_SIZE));
+        appendTruncationMessage(sb, length);
+        argsStr[i] = sb.toString();
+      } else {
+        argsStr[i] = arg;
+      }
     }
+
+    String messageText = MESSAGE_FORMAT.join(argsStr);
+    return messageText;
+  }
+
+  private static void checkBuildAdditionalMessageParams(Object... args) {
+    checkNotNull(args);
   }
 
   /**
@@ -414,168 +469,153 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     logger.log(record);
   }
 
-  private String buildMessageText(Object... args) {
-    String[] argsStr = new String[args.length];
-    for (int i = 0; i < args.length; i++) {
-      Object o = firstNonNull(args[i], "null");
-      @Var String arg;
-      if (o instanceof Appender && (truncateSize > 0)) {
-        arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
-      } else {
-        arg = o.toString();
-      }
-      arg = firstNonNull(arg, "null"); // may happen if toString() returns null
-      if ((truncateSize > 0) && (arg.length() > truncateSize)) {
-        String length =
-            (o instanceof Appender) ? ">= " + truncateSize : Integer.toString(arg.length());
-        StringBuilder sb = new StringBuilder(TRUNCATE_REMAINING_SIZE + 70);
-        sb.append(arg.substring(0, TRUNCATE_REMAINING_SIZE));
-        appendTruncationMessage(sb, length);
-        argsStr[i] = sb.toString();
-      } else {
-        argsStr[i] = arg;
-      }
-    }
-
-    String messageText = MESSAGE_FORMAT.join(argsStr);
-    return messageText;
+  /** {@inheritDoc} */
+  @Override
+  public void logUserException(Level priority, Throwable e, @Nullable String pAdditionalMessage) {
+    checkNotNull(e);
+    Supplier<String> additinalMessageSupplier = () -> Strings.nullToEmpty(pAdditionalMessage);
+    log0UserException(priority, e, additinalMessageSupplier);
   }
 
-  /**
-   * Log a message by printing its message to the user. The details (e.g., stack trace) are hidden
-   * from the user and logged with a lower log level.
-   *
-   * <p>Use this method in cases where an expected exception with a useful error message is thrown,
-   * e.g. an InvalidConfigurationException.
-   *
-   * <p>If you want to log an IOException because of a write error, it is recommended to write the
-   * message like "Could not write FOO to file". The final message will then be "Could not write FOO
-   * to file FOO.txt (REASON)".
-   *
-   * @param priority the log level for the message
-   * @param e the occurred exception
-   * @param additionalMessage an optional message
-   */
+  /** {@inheritDoc} */
   @Override
-  public void logUserException(Level priority, Throwable e, @Nullable String additionalMessage) {
-    if (wouldBeLogged(priority)) {
-      StringBuilder logMessage = new StringBuilder();
-      if (priority.equals(Level.SEVERE)) {
-        logMessage.append("Error: ");
-      } else if (priority.equals(Level.WARNING)) {
-        logMessage.append("Warning: ");
+  public void logfUserException(Level priority, Throwable e, String format, Object... args) {
+    checkNotNull(e);
+    checkFormatStringParameters(format, args);
+    Supplier<String> additionalMessageSupplier = () -> formatAdditionalMessage(format, args);
+    log0UserException(priority, e, additionalMessageSupplier);
+  }
+
+  private void log0UserException(
+      Level priority, Throwable e, Supplier<String> additionalMessageSupplier) {
+
+    if (wouldBeLogged(priority) || wouldBeLogged(EXCEPTION_DEBUG_LEVEL)) {
+      // build additionalMessage only if actually logged
+      String additionalMessage = additionalMessageSupplier.get();
+      if (wouldBeLogged(priority)) {
+        StringBuilder logMessage = buildUserExceptionLogMessage(priority, e, additionalMessage);
+        @Var StackTraceElement frame = locateStackTraceElement(e);
+        log0(priority, frame, logMessage.toString());
+      }
+      logDebugException(e, additionalMessage);
+    }
+  }
+
+  private static StringBuilder buildUserExceptionLogMessage(
+      Level priority, Throwable e, String additionalMessage) {
+
+    StringBuilder logMessage = new StringBuilder();
+    if (priority.equals(Level.SEVERE)) {
+      logMessage.append("Error: ");
+    } else if (priority.equals(Level.WARNING)) {
+      logMessage.append("Warning: ");
+    }
+
+    String exceptionMessage = Strings.nullToEmpty(e.getMessage());
+
+    if (Strings.isNullOrEmpty(additionalMessage)) {
+
+      if (!exceptionMessage.isEmpty()) {
+        logMessage.append(exceptionMessage);
+      } else {
+        // No message at all, this shoudn't happen as its not nice for the user
+        // Create a default message
+        logMessage.append(e.getClass().getSimpleName()).append(" in ").append(e.getStackTrace()[0]);
       }
 
-      String exceptionMessage = Strings.nullToEmpty(e.getMessage());
+    } else {
+      logMessage.append(additionalMessage);
 
-      if (Strings.isNullOrEmpty(additionalMessage)) {
-
-        if (!exceptionMessage.isEmpty()) {
-          logMessage.append(exceptionMessage);
+      if (!exceptionMessage.isEmpty()) {
+        if ((e instanceof IOException)
+            && additionalMessage.endsWith("file")
+            && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
+          // nicer error message, so that we have something like
+          // "could not write to file /FOO.txt (Permission denied)"
+          logMessage.append(' ').append(exceptionMessage);
         } else {
-          // No message at all, this shoudn't happen as its not nice for the user
-          // Create a default message
-          logMessage
-              .append(e.getClass().getSimpleName())
-              .append(" in ")
-              .append(e.getStackTrace()[0]);
-        }
-
-      } else {
-        logMessage.append(additionalMessage);
-
-        if (!exceptionMessage.isEmpty()) {
-          if ((e instanceof IOException)
-              && additionalMessage.endsWith("file")
-              && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
-            // nicer error message, so that we have something like
-            // "could not write to file /FOO.txt (Permission denied)"
-            logMessage.append(' ').append(exceptionMessage);
-          } else {
-            logMessage.append(" (").append(exceptionMessage).append(')');
-          }
+          logMessage.append(" (").append(exceptionMessage).append(')');
         }
       }
-
-      // use exception stack trace here so that the location where the exception
-      // occurred appears in the message
-      List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
-      @Var StackTraceElement frame = trace.get(0);
-
-      if (e instanceof InvalidConfigurationException) {
-        // find first method outside of the Configuration class,
-        // this is probably the most interesting trace element
-        String confPackage = Configuration.class.getPackage().getName();
-        @Var int traceIndex = 0;
-        while (frame.getClassName().startsWith(confPackage)) {
-          traceIndex++;
-          frame = trace.get(traceIndex);
-        }
-      }
-
-      log0(priority, frame, logMessage.toString());
     }
-
-    logDebugException(e, additionalMessage);
+    return logMessage;
   }
 
-  /**
-   * Log an exception solely for the purpose of debugging. In default configuration, this exception
-   * is not shown to the user!
-   *
-   * <p>Use this method when you want to log an exception that was handled by the catching site, but
-   * you don't want to forget the information completely.
-   *
-   * @param e the occurred exception
-   * @param additionalMessage an optional message
-   */
+  private static StackTraceElement locateStackTraceElement(Throwable e) {
+    // use exception stack trace here so that the location where the exception
+    // occurred appears in the message
+    List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
+    @Var StackTraceElement frame = trace.get(0);
+
+    if (e instanceof InvalidConfigurationException) {
+      // find first method outside of the Configuration class,
+      // this is probably the most interesting trace element
+      String confPackage = Configuration.class.getPackage().getName();
+      @Var int traceIndex = 0;
+      while (frame.getClassName().startsWith(confPackage)) {
+        traceIndex++;
+        frame = trace.get(traceIndex);
+      }
+    }
+    return frame;
+  }
+
+  /** {@inheritDoc} */
   @Override
-  public void logDebugException(Throwable e, @Nullable String additionalMessage) {
-    logException(EXCEPTION_DEBUG_LEVEL, e, additionalMessage);
+  public void logDebugException(Throwable pE, @Nullable String pAdditionalMessage) {
+    logException(EXCEPTION_DEBUG_LEVEL, pE, pAdditionalMessage);
   }
 
-  /**
-   * Log an exception solely for the purpose of debugging. In default configuration, this exception
-   * is not shown to the user!
-   *
-   * <p>Use this method when you want to log an exception that was handled by the catching site, but
-   * you don't want to forget the information completely.
-   *
-   * @param e the occurred exception
-   */
+  /** {@inheritDoc} */
   @Override
   public void logDebugException(Throwable e) {
-    logDebugException(e, null);
+    logException(EXCEPTION_DEBUG_LEVEL, e, null);
   }
 
-  /**
-   * Log an exception by printing the full details to the user.
-   *
-   * <p>This method should only be used in cases where logUserException and logDebugException are
-   * not acceptable.
-   *
-   * @param priority the log level for the message
-   * @param e the occurred exception
-   * @param additionalMessage an optional message
-   */
+  /** {@inheritDoc} */
   @Override
-  public void logException(Level priority, Throwable e, @Nullable String additionalMessage) {
+  public void logfDebugException(Throwable e, String format, Object... args) {
+    logfException(EXCEPTION_DEBUG_LEVEL, e, format, args);
+  }
+
+  @Override
+  public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
+    checkNotNull(pE);
+    Supplier<String> additionalMessageSupplier = () -> Strings.emptyToNull(pAdditionalMessage);
+    log0Exception(pPriority, pE, additionalMessageSupplier);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void logfException(Level priority, Throwable e, String format, Object... args) {
     checkNotNull(e);
+    checkFormatStringParameters(format, args);
+    Supplier<String> additionalMessageSupplier = () -> formatAdditionalMessage(format, args);
+    log0Exception(priority, e, additionalMessageSupplier);
+  }
+
+  private void log0Exception(
+      Level priority, Throwable e, Supplier<String> additionalMessageSupplier) {
     if (wouldBeLogged(priority)) {
-      StringBuilder logMessage = new StringBuilder();
-
-      if (!Strings.isNullOrEmpty(additionalMessage)) {
-        logMessage.append(additionalMessage).append('\n');
-      }
-
-      logMessage
-          .append("Exception in thread \"")
-          .append(Thread.currentThread().getName())
-          .append("\" ");
-      e.printStackTrace(new PrintWriter(CharStreams.asWriter(logMessage)));
-
+      String additionalMessage = additionalMessageSupplier.get();
+      StringBuilder logMessage = buildExceptionLogMessage(e, additionalMessage);
       log0(priority, findCallingMethod(), logMessage.toString());
     }
+  }
+
+  private static StringBuilder buildExceptionLogMessage(Throwable e, String additionalMessage) {
+    StringBuilder logMessage = new StringBuilder();
+
+    if (!Strings.isNullOrEmpty(additionalMessage)) {
+      logMessage.append(additionalMessage).append('\n');
+    }
+
+    logMessage
+        .append("Exception in thread \"")
+        .append(Thread.currentThread().getName())
+        .append("\" ");
+    e.printStackTrace(new PrintWriter(CharStreams.asWriter(logMessage)));
+    return logMessage;
   }
 
   @Override

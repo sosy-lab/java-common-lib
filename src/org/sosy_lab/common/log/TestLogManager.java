@@ -61,47 +61,88 @@ public enum TestLogManager implements LogManager {
 
   @Override
   public void log(Level pPriority, Object... pArgs) {
-    checkNotNull(pPriority);
-    checkNotNull(pArgs);
-    checkArgument(pArgs.length != 0);
-    // Convert arguments array to string to check that no toString() method throws an exception.
-    checkArgument(!Arrays.deepToString(pArgs).isEmpty());
+    checkLogBaseParam(pPriority);
+    checkObjectArgsConcatenationParams(pArgs);
   }
 
   @Override
   public void log(Level pPriority, Supplier<String> pMsgSupplier) {
-    checkNotNull(pPriority);
+    checkLogBaseParam(pPriority);
     checkNotNull(pMsgSupplier.get());
   }
 
   @Override
   public void logf(Level pPriority, String pFormat, Object... pArgs) {
+    checkLogBaseParam(pPriority);
+    checkFormatParamsNotNull(pFormat, pArgs);
+  }
+
+  private static void checkLogBaseParam(Level pPriority) {
     checkNotNull(pPriority);
-    checkNotNull(pFormat);
-    checkNotNull(pArgs);
-    checkArgument(!String.format(pFormat, pArgs).isEmpty());
   }
 
   @Override
   public void logUserException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
+    checkUserExceptionBaseParams(pPriority, pE);
+  }
+
+  @Override
+  public void logfUserException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
+    checkUserExceptionBaseParams(pPriority, pE);
+    checkFormatParamsNotNull(pFormat, pArgs);
+  }
+
+  private static void checkUserExceptionBaseParams(Level pPriority, Throwable pE) {
     checkNotNull(pPriority);
     checkNotNull(pE);
   }
 
   @Override
   public void logDebugException(Throwable pE, @Nullable String pAdditionalMessage) {
-    checkNotNull(pE);
+    checkLogDebugExceptionBaseParams(pE);
+  }
+
+  @Override
+  public void logfDebugException(Throwable pE, String pFormat, Object... pArgs) {
+    checkLogDebugExceptionBaseParams(pE);
+    checkFormatParamsNotNull(pFormat, pArgs);
   }
 
   @Override
   public void logDebugException(Throwable pE) {
+    checkLogDebugExceptionBaseParams(pE);
+  }
+
+  private static void checkLogDebugExceptionBaseParams(Throwable pE) {
     checkNotNull(pE);
   }
 
   @Override
   public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
+    checkLogExceptionBaseParams(pPriority, pE);
+  }
+
+  @Override
+  public void logfException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
+    checkLogExceptionBaseParams(pPriority, pE);
+    checkFormatParamsNotNull(pFormat, pArgs);
+  }
+
+  private static void checkLogExceptionBaseParams(Level pPriority, Throwable pE) {
     checkNotNull(pPriority);
     checkNotNull(pE);
+  }
+
+  private static void checkFormatParamsNotNull(String pFormat, Object... pArgs) {
+    checkNotNull(pArgs);
+    checkArgument(!String.format(pFormat, pArgs).isEmpty());
+  }
+
+  private static void checkObjectArgsConcatenationParams(Object... pArgs) {
+    checkNotNull(pArgs);
+    checkArgument(pArgs.length != 0);
+    // Convert arguments array to string to check that no toString() method throws an exception.
+    checkArgument(!Arrays.deepToString(pArgs).isEmpty());
   }
 
   @Override

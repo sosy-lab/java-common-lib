@@ -105,6 +105,27 @@ public interface LogManager {
   void logUserException(Level priority, Throwable e, @Nullable String additionalMessage);
 
   /**
+   * Log a message by printing its message to the user. The details (e.g., stack trace) are hidden
+   * from the user and logged with a lower log level.
+   *
+   * <p>Use this method in cases where an expected exception with a useful error message is thrown,
+   * e.g. an InvalidConfigurationException.
+   *
+   * <p>The message is constructed lazily from <code>String.format(format, args)</code>. To make
+   * individual arguments lazy, use {@link MoreStrings#lazyString(Supplier)}.
+   *
+   * <p>If you want to log an IOException because of a write error, it is recommended to write the
+   * message like "Could not write FOO to file". The final message will then be "Could not write FOO
+   * to file FOO.txt (REASON)".
+   *
+   * @param priority the log level for the message
+   * @param e the occurred exception
+   * @param format The format string.
+   * @param args The arguments for the format string.
+   */
+  void logfUserException(Level priority, Throwable e, String format, Object... args);
+
+  /**
    * Log an exception solely for the purpose of debugging. In default configuration, this exception
    * is not shown to the user!
    *
@@ -115,6 +136,22 @@ public interface LogManager {
    * @param additionalMessage an optional message
    */
   void logDebugException(Throwable e, @Nullable String additionalMessage);
+
+  /**
+   * Log an exception solely for the purpose of debugging. In default configuration, this exception
+   * is not shown to the user!
+   *
+   * <p>Use this method when you want to log an exception that was handled by the catching site, but
+   * you don't want to forget the information completely.
+   *
+   * <p>The message is constructed lazily from <code>String.format(format, args)</code>. To make
+   * individual arguments lazy, use {@link MoreStrings#lazyString(Supplier)}.
+   *
+   * @param e the occurred exception
+   * @param format The format string.
+   * @param args The arguments for the format string.
+   */
+  void logfDebugException(Throwable e, String format, Object... args);
 
   /**
    * Log an exception solely for the purpose of debugging. In default configuration, this exception
@@ -138,6 +175,22 @@ public interface LogManager {
    * @param additionalMessage an optional message
    */
   void logException(Level priority, Throwable e, @Nullable String additionalMessage);
+
+  /**
+   * Log an exception by printing the full details to the user.
+   *
+   * <p>This method should only be used in cases where logUserException and logDebugException are
+   * not acceptable.
+   *
+   * <p>The message is constructed lazily from <code>String.format(format, args)</code>. To make
+   * individual arguments lazy, use {@link MoreStrings#lazyString(Supplier)}.
+   *
+   * @param priority the log level for the message
+   * @param e the occurred exception
+   * @param format The format string.
+   * @param args The arguments for the format string.
+   */
+  void logfException(Level priority, Throwable e, String format, Object... args);
 
   /** Flush all handlers of this logger. */
   void flush();

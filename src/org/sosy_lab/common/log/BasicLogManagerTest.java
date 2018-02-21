@@ -139,6 +139,7 @@ public class BasicLogManagerTest {
         Level.SEVERE,
         "|",
         new AbstractAppender() {
+
           @Override
           public void appendTo(Appendable pAppendable) throws IOException {
             pAppendable.append(LONG_STRING);

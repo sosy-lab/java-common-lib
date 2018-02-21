@@ -61,13 +61,22 @@ public enum NullLogManager implements LogManager {
   public void logUserException(Level pPriority, Throwable pE, String pAdditionalMessage) {}
 
   @Override
+  public void logfUserException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {}
+
+  @Override
   public void logDebugException(Throwable pE, String pAdditionalMessage) {}
+
+  @Override
+  public void logfDebugException(Throwable pE, String pFormat, Object... pArgs) {}
 
   @Override
   public void logDebugException(Throwable pE) {}
 
   @Override
   public void logException(Level pPriority, Throwable pE, String pAdditionalMessage) {}
+
+  @Override
+  public void logfException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {}
 
   @Override
   public void flush() {}
