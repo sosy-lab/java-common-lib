@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import com.google.common.collect.Ordering;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Optional;
@@ -32,6 +33,7 @@ import javax.annotation.Nonnull;
  * {@link Comparator} implementations for {@link Optional}, {@link OptionalInt}, {@link
  * OptionalLong}, and {@link OptionalDouble}.
  */
+@SuppressFBWarnings("NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION")
 final class OptionalComparators {
 
   private OptionalComparators() {}

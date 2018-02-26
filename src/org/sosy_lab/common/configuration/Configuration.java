@@ -903,7 +903,7 @@ public final class Configuration {
     // first get the real type of a single value (i.e., String[] => String)
     @Var TypeToken<?> componentType;
     if (pType.isArray()) {
-      componentType = pType.getComponentType();
+      componentType = checkNotNull(pType.getComponentType());
     } else {
       componentType = Classes.getSingleTypeArgument(pType);
     }
@@ -1029,7 +1029,7 @@ public final class Configuration {
 
     @Var TypeToken<?> innerType;
     if (type.isArray()) {
-      innerType = type.getComponentType();
+      innerType = checkNotNull(type.getComponentType());
     } else if (COLLECTIONS.containsKey(type.getRawType())) {
       innerType = Classes.getSingleTypeArgument(type);
     } else {

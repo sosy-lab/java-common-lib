@@ -26,6 +26,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -47,6 +48,7 @@ public final class Optionals {
    * @deprecated use {@link com.google.common.base.Optional#fromJavaUtil(Optional)}
    */
   @Deprecated
+  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static <T> com.google.common.base.Optional<T> toGuavaOptional(Optional<T> optional) {
     return com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional));
   }
