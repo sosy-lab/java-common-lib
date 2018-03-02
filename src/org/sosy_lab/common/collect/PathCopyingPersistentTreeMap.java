@@ -865,10 +865,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         if (this.root == other.root) {
           return true;
         }
-      }
 
-      if (pC.size() > this.size()) {
-        return false;
+        if (pC.size() > this.size()) {
+          return false;
+        }
       }
 
       // Arbitrary collection, delegate to AbstractSet
@@ -1346,15 +1346,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         Map.Entry<?, ?> thisNode = findNode(other.getKey(), root);
 
         return (thisNode != null) && Objects.equals(thisNode.getValue(), other.getValue());
-      }
-
-      @Override
-      public boolean containsAll(Collection<?> pC) {
-        if (pC.size() > this.size()) {
-          return false;
-        }
-
-        return super.containsAll(pC);
       }
 
       @Override
