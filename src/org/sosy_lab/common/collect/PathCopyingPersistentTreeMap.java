@@ -442,6 +442,15 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return null;
   }
 
+  private static <K extends Comparable<? super K>> boolean exceedsLowerBound(
+      K pKey, K pLowerBound, boolean pLowerInclusive) {
+    if (pLowerInclusive) {
+      return pKey.compareTo(pLowerBound) < 0;
+    } else {
+      return pKey.compareTo(pLowerBound) <= 0;
+    }
+  }
+
   private static <K extends Comparable<? super K>> boolean exceedsUpperBound(
       K pKey, K pUpperBound, boolean pUpperInclusive) {
     if (pUpperInclusive) {
@@ -1173,6 +1182,136 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       // push it on stack so that it will be handled next
       if (current.right != null) {
         pushLeftMostNodesOnStack(current.right);
+      }
+
+      stopFurtherIterationIfOutOfRange();
+
+      return current;
+    }
+  }
+
+  /**
+   * Reverse tree iterator with in-order iteration returning node objects, with possibility for
+   * lower and upper bound. The iteration starts at the upper bound and goes to the lower bound.
+   *
+   * @param <K> The type of keys.
+   * @param <V> The type of values.
+   */
+  @SuppressWarnings("unused")
+  private static class DescendingEntryInOrderIterator<K extends Comparable<? super K>, V>
+      extends UnmodifiableIterator<Map.Entry<K, V>> {
+
+    // invariants:
+    // stack.top is always the next element to be returned
+    // (i.e., its right subtree has already been handled)
+
+    private final Deque<Node<K, V>> stack;
+
+    // If not null, iteration stops at this key.
+    private final @Nullable K lowKey;
+    private final boolean lowInclusive; // only relevant if lowKey != null
+
+    static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>> create(
+        @Nullable Node<K, V> root) {
+      if (root == null) {
+        return Collections.emptyIterator();
+      } else {
+        return new DescendingEntryInOrderIterator<>(
+            root, null, /*pLowInclusive=*/ false, null, /*pHighInclusive=*/ false);
+      }
+    }
+
+    /**
+     * Create a new iterator with an optional lower and upper bound.
+     *
+     * @param pFromKey null or inclusive lower bound
+     * @param pToKey null or exclusive lower bound
+     */
+    static <K extends Comparable<? super K>, V> Iterator<Map.Entry<K, V>> createWithBounds(
+        @Nullable Node<K, V> root,
+        @Nullable K pFromKey,
+        boolean pFromInclusive,
+        @Nullable K pToKey,
+        boolean pToInclusive) {
+      if (root == null) {
+        return Collections.emptyIterator();
+      } else {
+        return new DescendingEntryInOrderIterator<>(
+            root, pFromKey, pFromInclusive, pToKey, pToInclusive);
+      }
+    }
+
+    private DescendingEntryInOrderIterator(
+        Node<K, V> root,
+        @Nullable K pLowKey,
+        boolean pLowInclusive,
+        @Nullable K pHighKey,
+        boolean pHighInclusive) {
+      stack = new ArrayDeque<>();
+      lowKey = pLowKey;
+      lowInclusive = pLowInclusive;
+
+      if (pHighKey == null) {
+        pushRightMostNodesOnStack(root);
+      } else {
+        // TODO: optimize: this iterates twice through the tree
+        pushNodesToKeyOnStack(root, findNextSmallerNode(pHighKey, root, pHighInclusive).getKey());
+      }
+      stopFurtherIterationIfOutOfRange();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return !stack.isEmpty();
+    }
+
+    private void pushRightMostNodesOnStack(@Var Node<K, V> current) {
+      while (current.right != null) {
+        stack.push(current);
+        current = current.right;
+      }
+      stack.push(current);
+    }
+
+    private void pushNodesToKeyOnStack(@Var Node<K, V> current, K key) {
+      while (current != null) {
+        int comp = key.compareTo(current.getKey());
+
+        if (comp > 0) {
+          stack.push(current);
+          current = current.right;
+
+        } else if (comp < 0) {
+          // This node and it's right subtree can be ignored completely.
+          current = current.left;
+
+        } else {
+          stack.push(current);
+          return;
+        }
+      }
+      throw new AssertionError(
+          "PartialEntryInOrderIterator created with upper bound that is not in map");
+    }
+
+    private void stopFurtherIterationIfOutOfRange() {
+      if (lowKey != null
+          && !stack.isEmpty()
+          && exceedsLowerBound(stack.peek().getKey(), lowKey, lowInclusive)) {
+        // We have reached the end, next element would already be too small
+        stack.clear();
+      }
+    }
+
+    @Override
+    public Map.Entry<K, V> next() {
+      Node<K, V> current = stack.pop();
+      // this is the element to be returned
+
+      // if it has a left subtree,
+      // push it on stack so that it will be handled next
+      if (current.left != null) {
+        pushRightMostNodesOnStack(current.left);
       }
 
       stopFurtherIterationIfOutOfRange();
