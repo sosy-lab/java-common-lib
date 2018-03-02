@@ -26,7 +26,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
@@ -995,7 +994,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     @Override
     public Comparator<? super Entry<K, V>> comparator() {
-      return Ordering.natural().onResultOf(Entry::getKey);
+      return Entry.comparingByKey();
     }
 
     @Override
@@ -1391,7 +1390,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       @Override
       public Comparator<? super Entry<K, V>> comparator() {
-        return Ordering.natural().onResultOf(Entry::getKey);
+        return Entry.comparingByKey();
       }
 
       @Override
