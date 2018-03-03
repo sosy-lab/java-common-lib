@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.annotations.Immutable;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -72,7 +73,9 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
 
   @Immutable(containerOf = {"K", "V"})
   final class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
-      extends AbstractImmutableSortedMap<K, V> {
+      extends AbstractImmutableSortedMap<K, V> implements Serializable {
+
+    private static final long serialVersionUID = -4621218089650593459L;
 
     private static final OurSortedMap<?, ?> INSTANCE = new EmptyImmutableOurSortedMap<>();
 

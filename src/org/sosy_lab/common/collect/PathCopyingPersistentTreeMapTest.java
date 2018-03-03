@@ -68,7 +68,10 @@ public class PathCopyingPersistentTreeMapTest {
         NavigableMapTestSuiteBuilder.using(mapGenerator)
             .named("PathCopyingPersistentTreeMap")
             .withFeatures(
-                MapFeature.ALLOWS_NULL_VALUES, CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
+                MapFeature.ALLOWS_NULL_VALUES,
+                CollectionFeature.KNOWN_ORDER,
+                CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS,
+                CollectionSize.ANY)
 
             // We throw ClassCastException as allowed by the JavaDoc of SortedMap
             .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))

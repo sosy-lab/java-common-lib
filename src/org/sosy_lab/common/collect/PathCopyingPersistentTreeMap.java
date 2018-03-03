@@ -1192,7 +1192,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    */
   @Immutable(containerOf = {"K", "V"})
   private static final class PartialSortedMap<K extends Comparable<? super K>, V>
-      extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V> {
+      extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V>, Serializable {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> create(
         Node<K, V> pRoot,
@@ -1271,6 +1271,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
       return null; // no mapping in range
     }
+
+    private static final long serialVersionUID = 5354023186935889223L;
 
     // Invariant: This map is never empty.
 

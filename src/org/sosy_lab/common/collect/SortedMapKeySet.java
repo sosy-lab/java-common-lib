@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Iterators;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -40,7 +41,9 @@ import javax.annotation.Nullable;
   value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
   justification = "nullability depends on underlying map"
 )
-final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K> {
+final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>, Serializable {
+
+  private static final long serialVersionUID = 8196534519512074110L;
 
   private final OurSortedMap<K, ?> map;
 

@@ -21,9 +21,9 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ForwardingNavigableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +37,9 @@ import javax.annotation.Nullable;
   justification = "nullability depends on underlying map"
 )
 final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
-    implements OurSortedMap<K, V> {
+    implements OurSortedMap<K, V>, Serializable {
+
+  private static final long serialVersionUID = -3499934696704295393L;
 
   private final OurSortedMap<K, V> map;
 
@@ -107,7 +109,7 @@ final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
 
   @Override
   public Collection<V> values() {
-    return Collections2.transform(entrySet(), Entry::getValue);
+    return new MapValues<>(this);
   }
 
   @Override

@@ -51,7 +51,10 @@ public class SortedMapKeySetTest {
     TestSuite suite =
         NavigableSetTestSuiteBuilder.using(testSetGenerator)
             .named("SortedMapKeySet")
-            .withFeatures(CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
+            .withFeatures(
+                CollectionFeature.KNOWN_ORDER,
+                CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS,
+                CollectionSize.ANY)
             .createTestSuite();
 
     return suite;

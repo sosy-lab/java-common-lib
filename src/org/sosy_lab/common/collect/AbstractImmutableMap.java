@@ -20,7 +20,6 @@
 package org.sosy_lab.common.collect;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Collection;
 import java.util.Map;
@@ -117,7 +116,7 @@ abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
 
   @Override
   public Collection<V> values() {
-    return Collections2.transform(entrySet(), Entry::getValue);
+    return new MapValues<>(this);
   }
 
   @Override

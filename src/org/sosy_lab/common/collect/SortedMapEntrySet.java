@@ -21,6 +21,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,7 +38,9 @@ import javax.annotation.Nullable;
  * <p>This implementation forwards all methods to the underlying map.
  */
 final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
-    implements NavigableSet<Entry<K, V>> {
+    implements NavigableSet<Entry<K, V>>, Serializable {
+
+  private static final long serialVersionUID = 2891466632825409479L;
 
   private final OurSortedMap<K, V> map;
 
