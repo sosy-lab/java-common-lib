@@ -23,8 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.testing.AbstractTester;
 import com.google.common.collect.testing.FeatureSpecificTestSuiteBuilder;
 import com.google.common.collect.testing.MapTestSuiteBuilder;
+import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
 import com.google.common.collect.testing.OneSizeTestContainerGenerator;
-import com.google.common.collect.testing.SortedMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestMapGenerator;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
@@ -96,11 +96,11 @@ public class CopyOnWriteSortedMapTest {
   }
 
   /**
-   * A {@link SortedMapTestSuiteBuilder} that ensures that submaps, entry set etc. are not tested
+   * A {@link NavigableMapTestSuiteBuilder} that ensures that submaps, entry set etc. are not tested
    * for mutability.
    */
   private static class UnmodifiableViewSortedMapTestSuiteBuilder<K, V>
-      extends SortedMapTestSuiteBuilder<K, V> {
+      extends NavigableMapTestSuiteBuilder<K, V> {
 
     @Override
     protected MapTestSuiteBuilder<K, V> usingGenerator(TestMapGenerator<K, V> pSubjectGenerator) {

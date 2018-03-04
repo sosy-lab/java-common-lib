@@ -22,15 +22,15 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ForwardingCollection;
-import com.google.common.collect.ForwardingSortedMap;
-import com.google.common.collect.ForwardingSortedSet;
+import com.google.common.collect.ForwardingNavigableMap;
+import com.google.common.collect.ForwardingNavigableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 
@@ -58,7 +58,7 @@ import javax.annotation.Nullable;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
-public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> {
+public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, V> {
 
   private final AtomicReference<PersistentSortedMap<K, V>> map;
 
@@ -87,7 +87,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   @Override
-  protected SortedMap<K, V> delegate() {
+  protected NavigableMap<K, V> delegate() {
     return map.get();
   }
 
@@ -149,6 +149,56 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   /**
+   * This method is not starvation free, and thus not strictly guaranteed to terminate in presence
+   * of concurrent modifying operations.
+   *
+   * @see NavigableMap#pollFirstEntry()
+   */
+  @Override
+  @CanIgnoreReturnValue
+  public Entry<K, V> pollFirstEntry() {
+    @Var PersistentSortedMap<K, V> oldMap;
+    @Var PersistentSortedMap<K, V> newMap;
+    @Var Entry<K, V> firstEntry;
+
+    do {
+      oldMap = map.get();
+      firstEntry = oldMap.firstEntry();
+      if (firstEntry == null) {
+        return null;
+      }
+      newMap = oldMap.removeAndCopy(firstEntry.getKey());
+    } while (!map.compareAndSet(oldMap, newMap));
+
+    return firstEntry;
+  }
+
+  /**
+   * This method is not starvation free, and thus not strictly guaranteed to terminate in presence
+   * of concurrent modifying operations.
+   *
+   * @see NavigableMap#pollLastEntry()
+   */
+  @Override
+  @CanIgnoreReturnValue
+  public Entry<K, V> pollLastEntry() {
+    @Var PersistentSortedMap<K, V> oldMap;
+    @Var PersistentSortedMap<K, V> newMap;
+    @Var Entry<K, V> lastEntry;
+
+    do {
+      oldMap = map.get();
+      lastEntry = oldMap.lastEntry();
+      if (lastEntry == null) {
+        return null;
+      }
+      newMap = oldMap.removeAndCopy(lastEntry.getKey());
+    } while (!map.compareAndSet(oldMap, newMap));
+
+    return lastEntry;
+  }
+
+  /**
    * This method is not atomic! It inserts all keys one after the other, and in between each
    * operation arbitrary operations from other threads might get executed.
    *
@@ -172,22 +222,22 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   // so that they return also live views and not immutable snapshots.
 
   @Override
-  public SortedSet<Map.Entry<K, V>> entrySet() {
-    return new ForwardingSortedSet<Map.Entry<K, V>>() {
+  public NavigableSet<Map.Entry<K, V>> entrySet() {
+    return new ForwardingNavigableSet<Map.Entry<K, V>>() {
 
       @Override
-      protected SortedSet<Map.Entry<K, V>> delegate() {
+      protected NavigableSet<Map.Entry<K, V>> delegate() {
         return map.get().entrySet();
       }
     };
   }
 
   @Override
-  public SortedSet<K> keySet() {
-    return new ForwardingSortedSet<K>() {
+  public NavigableSet<K> keySet() {
+    return new ForwardingNavigableSet<K>() {
 
       @Override
-      protected SortedSet<K> delegate() {
+      protected NavigableSet<K> delegate() {
         return map.get().keySet();
       }
     };
@@ -205,37 +255,37 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingSortedMap<K, V> 
   }
 
   @Override
-  public SortedMap<K, V> headMap(K pToKey) {
+  public NavigableMap<K, V> headMap(K pToKey) {
     checkNotNull(pToKey);
-    return new ForwardingSortedMap<K, V>() {
+    return new ForwardingNavigableMap<K, V>() {
 
       @Override
-      protected SortedMap<K, V> delegate() {
+      protected NavigableMap<K, V> delegate() {
         return map.get().headMap(pToKey);
       }
     };
   }
 
   @Override
-  public SortedMap<K, V> tailMap(K pFromKey) {
+  public NavigableMap<K, V> tailMap(K pFromKey) {
     checkNotNull(pFromKey);
-    return new ForwardingSortedMap<K, V>() {
+    return new ForwardingNavigableMap<K, V>() {
 
       @Override
-      protected SortedMap<K, V> delegate() {
+      protected NavigableMap<K, V> delegate() {
         return map.get().tailMap(pFromKey);
       }
     };
   }
 
   @Override
-  public SortedMap<K, V> subMap(K pFromKey, K pToKey) {
+  public NavigableMap<K, V> subMap(K pFromKey, K pToKey) {
     checkNotNull(pFromKey);
     checkNotNull(pToKey);
-    return new ForwardingSortedMap<K, V>() {
+    return new ForwardingNavigableMap<K, V>() {
 
       @Override
-      protected SortedMap<K, V> delegate() {
+      protected NavigableMap<K, V> delegate() {
         return map.get().subMap(pFromKey, pToKey);
       }
     };
