@@ -27,11 +27,11 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /** {@link Filter} implementation for blacklisting log levels. */
-class LogLevelFilter implements Filter {
+public class LogLevelFilter implements Filter {
 
   private final Set<Level> excludeLevels;
 
-  LogLevelFilter(List<Level> excludeLevels) {
+  public LogLevelFilter(List<Level> excludeLevels) {
     this.excludeLevels = ImmutableSet.copyOf(excludeLevels);
   }
 
