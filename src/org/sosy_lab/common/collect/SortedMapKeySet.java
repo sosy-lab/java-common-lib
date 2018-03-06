@@ -25,6 +25,7 @@ import com.google.common.collect.Iterators;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,8 +58,23 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
   }
 
   @Override
+  public boolean equals(Object pO) {
+    return Collections3.sortedSetEquals(this, pO);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
   public boolean contains(@Nullable Object pO) {
     return map.containsKey(pO);
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> pC) {
+    return Collections3.sortedSetContainsAll(this, pC, null);
   }
 
   @Override

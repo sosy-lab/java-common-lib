@@ -21,8 +21,10 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Equivalence;
 import java.io.Serializable;
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -49,6 +51,22 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
+  public boolean equals(Object pO) {
+    if (pO instanceof SortedMapEntrySet<?, ?>
+        && Collections3.guaranteedSameOrder(
+            this.map.comparator(), ((SortedMapEntrySet<?, ?>) pO).map.comparator())) {
+      // Map has a linear comparison for this case
+      return map.equals(((SortedMapEntrySet<?, ?>) pO).map);
+    }
+    return super.equals(pO);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
   public boolean isEmpty() {
     return map.isEmpty();
   }
@@ -66,6 +84,16 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
     Entry<?, ?> other = (Entry<?, ?>) pO;
     Entry<?, ?> entry = map.getEntry(other.getKey());
     return entry != null && Objects.equals(entry.getValue(), other.getValue());
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> pC) {
+    // This set is somewhat inconsistent: its order is based only on the entry keys,
+    // but for equality (and contains) we need to check the keys and values of entries.
+    // Because we know that this set and the Entry objects are well-behaved,
+    // we can do the linear comparator-based comparison anyway
+    // if we additionally compare equality of entries.
+    return Collections3.sortedSetContainsAll(this, pC, Equivalence.equals());
   }
 
   @Override

@@ -22,6 +22,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Equivalence;
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Collections2;
@@ -39,7 +40,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.function.BiFunction;
@@ -160,8 +163,56 @@ public final class Collections3 {
         || (guaranteesNaturalOrder(comp1) && guaranteesNaturalOrder(comp2));
   }
 
+  /** An implementation of {@link SortedSet#equals(Object)}. */
+  static boolean sortedSetEquals(SortedSet<?> coll1, @Nullable Object pColl2) {
+    checkNotNull(coll1);
+    if (coll1 == pColl2) {
+      return true;
+    }
+    if (!(pColl2 instanceof Set)) {
+      return false;
+    }
+    Set<?> coll2 = (Set<?>) pColl2;
+    if (coll1.size() != coll2.size()) {
+      return false;
+    }
+
+    if (pColl2 instanceof SortedSet<?>) {
+      if (Collections3.guaranteedSameOrder(
+          coll1.comparator(), ((SortedSet<?>) coll2).comparator())) {
+        @SuppressWarnings("unchecked")
+        Comparator<Object> comp =
+            (Comparator<Object>)
+                MoreObjects.firstNonNull(coll1.comparator(), Comparator.naturalOrder());
+        Iterator<?> it1 = coll1.iterator();
+        Iterator<?> it2 = coll2.iterator();
+        try {
+          while (it1.hasNext()) {
+            Object element = it1.next();
+            Object otherElement = it2.next();
+            if (otherElement == null || comp.compare(element, otherElement) != 0) {
+              return false;
+            }
+          }
+          return true;
+        } catch (ClassCastException e) {
+          return false;
+        } catch (NoSuchElementException e) {
+          return false; // concurrent change to other set
+        }
+      }
+    }
+
+    try {
+      return coll1.containsAll(coll2);
+    } catch (ClassCastException | NullPointerException e) {
+      return false;
+    }
+  }
+
   /* This method implements {@link SortedSet#containsAll} */
-  static boolean sortedSetContainsAll(SortedSet<?> coll1, Collection<?> pColl2) {
+  static boolean sortedSetContainsAll(
+      SortedSet<?> coll1, Collection<?> pColl2, @Nullable Equivalence<Object> pAdditionalEquality) {
     checkNotNull(coll1);
     if (pColl2.isEmpty()) {
       return true;
@@ -227,6 +278,9 @@ public final class Collections3 {
 
         } else {
           // val1 = val2
+          if (pAdditionalEquality != null && !pAdditionalEquality.equivalent(val1, val2)) {
+            return false;
+          }
           if (!it2.hasNext()) {
             return true;
           }

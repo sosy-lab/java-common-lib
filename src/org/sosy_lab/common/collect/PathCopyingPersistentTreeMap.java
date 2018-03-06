@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.BinaryOperator;
@@ -796,6 +797,21 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   // read operations
 
   @Override
+  @SuppressWarnings("ReferenceEquality") // comparing nodes with equals would not suffice
+  public boolean equals(Object pObj) {
+    if (pObj instanceof PathCopyingPersistentTreeMap<?, ?>
+        && ((PathCopyingPersistentTreeMap<?, ?>) pObj).root == root) {
+      return true;
+    }
+    return super.equals(pObj);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
   public @Nullable Entry<K, V> getEntry(Object pKey) {
     return findNode(pKey, root);
   }
@@ -1332,6 +1348,27 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     public Iterator<Entry<K, V>> descendingEntryIterator() {
       return DescendingEntryInOrderIterator.createWithBounds(
           root, fromKey, fromInclusive, toKey, toInclusive);
+    }
+
+    @Override
+    @SuppressWarnings("ReferenceEquality") // comparing nodes with equals would not suffice
+    public boolean equals(@Nullable Object pObj) {
+      if (pObj instanceof PartialSortedMap<?, ?>) {
+        PartialSortedMap<?, ?> other = (PartialSortedMap<?, ?>) pObj;
+        if (root == other.root
+            && Objects.equals(fromKey, other.fromKey)
+            && fromInclusive == other.fromInclusive
+            && Objects.equals(toKey, other.toKey)
+            && toInclusive == other.toInclusive) {
+          return true;
+        }
+      }
+      return super.equals(pObj);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override

@@ -19,12 +19,70 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.Var;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
+import java.util.SortedMap;
 import javax.annotation.Nullable;
 
 abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, V>
     implements OurSortedMap<K, V> {
+
+  @Override
+  public boolean equals(@Nullable Object pObj) {
+    if (this == pObj) {
+      return true;
+    }
+    if (!(pObj instanceof Map)) {
+      return false;
+    }
+    @Var Map<?, ?> other = (Map<?, ?>) pObj;
+    if (this.size() != other.size()) {
+      return false;
+    }
+
+    // Order is irrelevant for the comparison, but if the order is the same
+    // (or the same as ours, but reversed), we can do a linear comparison
+    @Var boolean hasSameOrder = false;
+    if (other instanceof SortedMap<?, ?>) {
+      if (Collections3.guaranteedSameOrder(
+          this.comparator(), ((SortedMap<?, ?>) other).comparator())) {
+        hasSameOrder = true;
+      } else if (other instanceof NavigableMap<?, ?>) {
+        NavigableMap<?, ?> descendingOther = ((NavigableMap<?, ?>) other).descendingMap();
+
+        if (Collections3.guaranteedSameOrder(this.comparator(), descendingOther.comparator())) {
+          hasSameOrder = true;
+          other = descendingOther;
+        }
+      }
+    }
+
+    if (hasSameOrder) {
+      Iterator<?> it1 = this.entrySet().iterator();
+      Iterator<?> it2 = other.entrySet().iterator();
+      try {
+        while (it1.hasNext()) {
+          if (!it1.next().equals(it2.next())) {
+            return false;
+          }
+        }
+        return true;
+      } catch (NoSuchElementException e) {
+        return false; // concurrent change to other map
+      }
+    }
+
+    return this.entrySet().equals(other.entrySet());
+  }
+
+  @Override
+  public int hashCode() {
+    return entrySet().hashCode();
+  }
 
   private @Nullable K keyOrNull(@Nullable Entry<K, V> entry) {
     return entry == null ? null : entry.getKey();
