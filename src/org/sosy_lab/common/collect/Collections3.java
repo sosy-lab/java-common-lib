@@ -23,20 +23,28 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Ordering;
 import com.google.common.primitives.Chars;
+import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /** Utility class similar to {@link Collections} and {@link Collections2}. */
 public final class Collections3 {
@@ -133,5 +141,105 @@ public final class Collections3 {
     end.setCharAt(lastPos, Chars.checkedCast((end.charAt(lastPos) + 1)));
 
     return end.toString();
+  }
+
+  private static boolean guaranteesNaturalOrder(Comparator<?> comp) {
+    return comp == null
+        || comp.equals(Comparator.naturalOrder())
+        || comp.equals(Ordering.natural());
+  }
+
+  /**
+   * Check whether two comparators define the same order. If this method returns {@code false}
+   * nothing is known, but if it returns {@code true}, the comparators can be treated as equal. This
+   * method accepts {@code null} and interprets this as natural order, like for example {@link
+   * SortedSet#comparator()} does.
+   */
+  static boolean guaranteedSameOrder(@Nullable Comparator<?> comp1, @Nullable Comparator<?> comp2) {
+    return Objects.equals(comp1, comp2)
+        || (guaranteesNaturalOrder(comp1) && guaranteesNaturalOrder(comp2));
+  }
+
+  /* This method implements {@link SortedSet#containsAll} */
+  static boolean sortedSetContainsAll(SortedSet<?> coll1, Collection<?> pColl2) {
+    checkNotNull(coll1);
+    if (pColl2.isEmpty()) {
+      return true;
+    }
+    if (coll1.isEmpty()) {
+      return false;
+    }
+    Collection<?> coll2;
+    if (pColl2 instanceof Multiset<?>) {
+      // Multiset is irrelevant for containsAll
+      coll2 = ((Multiset<?>) pColl2).elementSet();
+    } else {
+      coll2 = pColl2;
+    }
+
+    if (coll2 instanceof SortedSet<?>
+        && guaranteedSameOrder(coll1.comparator(), ((SortedSet<?>) coll2).comparator())) {
+
+      if (coll2.size() > coll1.size()) {
+        return false;
+      }
+
+      // There are two strategies for containsAll of two sorted sets with the same order:
+      // 1) iterate through both sets simultaneously
+      // 2) iterate through the other set and check for containment each time
+      // Assuming this set has n elements and the other has k, the time is as follows:
+      // 1) O(n)              (because k < n)
+      // 2) O(k * log(n))     (lookup is logarithmic)
+      // Here we implement method 1)
+
+      @SuppressWarnings("unchecked")
+      Comparator<Object> comparator =
+          (Comparator<Object>)
+              MoreObjects.firstNonNull(coll1.comparator(), Comparator.naturalOrder());
+
+      Iterator<?> it1 = coll1.iterator();
+      Iterator<?> it2 = coll2.iterator();
+
+      // val2 is always the next value we have to find in this set.
+      // If its not there, we can return false.
+      @Var Object val2 = it2.next();
+
+      while (true) {
+        Object val1 = it1.next();
+
+        int comp;
+        try {
+          comp = comparator.compare(val1, val2);
+        } catch (ClassCastException | NullPointerException e) {
+          return false;
+        }
+        if (comp < 0) {
+          // val1 < val2
+          if (!it1.hasNext()) {
+            // There is no matching entry of val2 in coll1.
+            return false;
+          }
+
+        } else if (comp > 0) {
+          // val1 > val2
+          // There is no matching entry of val2 in coll1.
+          return false;
+
+        } else {
+          // val1 = val2
+          if (!it2.hasNext()) {
+            return true;
+          }
+          val2 = it2.next();
+        }
+      }
+    }
+
+    for (Object val2 : coll2) {
+      if (!coll1.contains(val2)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

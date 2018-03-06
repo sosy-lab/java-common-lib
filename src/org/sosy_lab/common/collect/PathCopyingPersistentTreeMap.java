@@ -914,67 +914,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return super.containsAll(pC);
     }
 
-    // This method is unused because we should benchmark whether it is actually
-    // faster.
-    @SuppressWarnings("unused")
-    private boolean containsAll(EntrySet<?, ?> other) {
-      // There are two strategies for containsAll:
-      // 1) iterate through both sets simultaneously
-      // 2) iterate through the other set and check for containment each time
-      // Assuming this set has n elements and the other has k, the time is as follows:
-      // 1) O(n)              (because k < n)
-      // 2) O(k * log(n))     (lookup is logarithmic)
-      // Thus 2) is better if (n >= k*log(n))
-      // <===> 2^n >= 2^(k*log(n))
-      // <===> 2^n >= n^k
-      if (Math.pow(2, this.size()) >= Math.pow(this.size(), other.size())) {
-        // AbstractSet implements method 2)
-        return super.containsAll(other);
-      }
-
-      // The rest of this method implements method 1)
-      Iterator<Map.Entry<K, V>> thisIt = this.iterator();
-      Iterator<? extends Map.Entry<?, ?>> otherIt = other.iterator();
-
-      // We iterate synchronously through the sets.
-      // otherEntry is always the next entry we have to find in this set.
-      // If its not there, we can return false.
-      @Var Map.Entry<?, ?> otherEntry = null;
-
-      while (thisIt.hasNext() && otherIt.hasNext()) {
-        Map.Entry<K, V> thisEntry = thisIt.next();
-
-        if (otherEntry == null) {
-          otherEntry = otherIt.next();
-        }
-
-        @SuppressWarnings("unchecked")
-        int comp = thisEntry.getKey().compareTo((K) otherEntry.getKey());
-
-        if (comp < 0) {
-          // thisEntry < otherEntry, just continue
-
-        } else if (comp > 0) {
-          // thisEntry > otherEntry
-          // There is no matching entry of otherEntry in this set.
-          return false;
-
-        } else {
-          // thisEntry == otherEntry
-          if (!Objects.equals(thisEntry.getKey(), otherEntry.getKey())) {
-            // value mis-match
-            return false;
-          }
-
-          // setting this to null forwards both iterators by one in the next loop iteration
-          otherEntry = null;
-        }
-      }
-
-      // If otherIt still has elements, they are unequal.
-      return !otherIt.hasNext();
-    }
-
     @Override
     public int size() {
       if (size < 0) {
