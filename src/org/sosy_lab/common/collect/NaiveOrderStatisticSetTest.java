@@ -66,9 +66,7 @@ public final class NaiveOrderStatisticSetTest extends OrderStatisticSetTestSuite
                 CollectionSize.ANY,
                 SetFeature.GENERAL_PURPOSE,
                 CollectionFeature.KNOWN_ORDER,
-                CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS,
-                CollectionFeature.SUBSET_VIEW,
-                CollectionFeature.DESCENDING_VIEW)
+                CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS)
             .createTestSuite();
 
     suite.addTest(new JUnit4TestAdapter(NaiveOrderStatisticSetTest.class));
