@@ -151,9 +151,6 @@ public class CopyOnWriteSortedMapTest {
             CollectionFeature.KNOWN_ORDER,
             CollectionSize.ANY)
 
-        // We throw ClassCastException as allowed by the JavaDoc of SortedMap
-        .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
-
         // We do not support Map.Entry.setValue()
         .suppressing(MapEntrySetTester.class.getMethod("testSetValue"))
         .suppressing(MapReplaceAllTester.class.getMethod("testReplaceAllPreservesOrder"))

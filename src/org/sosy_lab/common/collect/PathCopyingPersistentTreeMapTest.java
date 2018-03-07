@@ -30,7 +30,6 @@ import com.google.common.collect.testing.TestStringSortedMapGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
-import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
@@ -60,7 +59,7 @@ public class PathCopyingPersistentTreeMapTest {
         }
       };
 
-  public static junit.framework.Test suite() throws NoSuchMethodException {
+  public static junit.framework.Test suite() {
     TestSuite suite = new TestSuite();
     suite.addTest(new JUnit4TestAdapter(PathCopyingPersistentTreeMapTest.class));
 
@@ -72,9 +71,6 @@ public class PathCopyingPersistentTreeMapTest {
                 CollectionFeature.KNOWN_ORDER,
                 CollectionFeature.SERIALIZABLE_INCLUDING_VIEWS,
                 CollectionSize.ANY)
-
-            // We throw ClassCastException as allowed by the JavaDoc of SortedMap
-            .suppressing(MapEntrySetTester.class.getMethod("testContainsEntryWithIncomparableKey"))
             .createTestSuite());
 
     return suite;
