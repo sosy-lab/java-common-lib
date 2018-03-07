@@ -256,7 +256,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public NavigableMap<K, V> headMap(K pToKey) {
-    checkNotNull(pToKey);
+    map.get().headMap(pToKey); // for bounds check
     return new ForwardingNavigableMap<K, V>() {
 
       @Override
@@ -268,7 +268,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public NavigableMap<K, V> tailMap(K pFromKey) {
-    checkNotNull(pFromKey);
+    map.get().tailMap(pFromKey); // for bounds check
     return new ForwardingNavigableMap<K, V>() {
 
       @Override
@@ -280,8 +280,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public NavigableMap<K, V> subMap(K pFromKey, K pToKey) {
-    checkNotNull(pFromKey);
-    checkNotNull(pToKey);
+    map.get().subMap(pFromKey, pToKey); // for bounds check
     return new ForwardingNavigableMap<K, V>() {
 
       @Override

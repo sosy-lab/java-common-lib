@@ -33,7 +33,6 @@ import com.google.common.collect.testing.features.Feature;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.collect.testing.testers.MapEntrySetTester;
 import com.google.common.collect.testing.testers.MapReplaceAllTester;
-import com.google.common.collect.testing.testers.SortedMapNavigationTester;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -155,10 +154,6 @@ public class CopyOnWriteSortedMapTest {
         .suppressing(MapEntrySetTester.class.getMethod("testSetValue"))
         .suppressing(MapReplaceAllTester.class.getMethod("testReplaceAllPreservesOrder"))
         .suppressing(MapReplaceAllTester.class.getMethod("testReplaceAllRotate"))
-
-        // subMap is created lazily
-        // TODO change this and enable test
-        .suppressing(SortedMapNavigationTester.class.getMethod("testSubMapIllegal"))
         .createTestSuite();
   }
 }
