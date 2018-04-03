@@ -48,6 +48,7 @@
             <compilerarg value="-XepPatchChecks:"/>
             <compilerarg value="-XepDisableWarningsInGeneratedCode"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
+            <compilerarg value="-processorpath"/><compilerarg value="${ivy.lib.dir}/build/auto-service.jar:${ivy.lib.dir}/build/auto-value.jar"/>
             <compilerclasspath refid="errorprone"/>
         </javac>
     </target>
