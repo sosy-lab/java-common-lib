@@ -16,6 +16,9 @@
     <path id="errorprone">
         <pathelement location="${ivy.lib.dir}/build/error_prone_ant.jar"/>
     </path>
+    <path id="processorpath">
+        <fileset dir="${ivy.lib.dir}" includes="build/*.jar"/>
+    </path>
 
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
     <target name="build-project" depends="build-dependencies">
@@ -48,7 +51,7 @@
             <compilerarg value="-XepPatchChecks:"/>
             <compilerarg value="-XepDisableWarningsInGeneratedCode"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
-            <compilerarg value="-processorpath"/><compilerarg value="${ivy.lib.dir}/build/auto-service.jar:${ivy.lib.dir}/build/auto-value.jar"/>
+            <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
             <compilerclasspath refid="errorprone"/>
         </javac>
     </target>
@@ -83,6 +86,7 @@
             <compilerarg value="-properties"/>
             <compilerarg value="${ivy.lib.dir}/build/org.eclipse.jdt.core.prefs"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
+            <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
             <compilerclasspath refid="ecj"/>
         </javac>
     </target>
