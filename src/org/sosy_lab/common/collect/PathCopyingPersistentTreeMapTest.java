@@ -417,4 +417,17 @@ public class PathCopyingPersistentTreeMapTest {
     } catch (IllegalArgumentException expected) {
     }
   }
+
+  @Test
+  public void testEntrySetContains() {
+    PersistentMap<String, Integer> first =
+        PathCopyingPersistentTreeMap.<String, Integer>of().putAndCopy("c", 3).putAndCopy("d", 4);
+    PersistentMap<String, Integer> second =
+        PathCopyingPersistentTreeMap.<String, Integer>of().putAndCopy("b", 2).putAndCopy("c", 3);
+
+    // Here we want to test the containsAll method, does we call it explicitly
+    // instead of letting Truth check containment (which is not guaranteed to call containsAll).
+    assertThat(second.entrySet().containsAll(first.entrySet())).isFalse();
+    assertThat(first.entrySet().containsAll(second.entrySet())).isFalse();
+  }
 }

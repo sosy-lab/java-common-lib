@@ -282,7 +282,10 @@ public final class Collections3 {
             return false;
           }
           if (!it2.hasNext()) {
-            return true;
+            return true; // coll2 finished, all elements were in coll1.
+          }
+          if (!it1.hasNext()) {
+            return false; // No matching entry of it2.next in coll1.
           }
           val2 = it2.next();
         }
