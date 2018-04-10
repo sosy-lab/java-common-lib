@@ -69,7 +69,7 @@
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="2.17.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-core" rev="2.18.0" conf="test->default; contrib->sources"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -90,7 +90,7 @@
         <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.5" conf="format-source->default"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.28.0" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.29.0" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.2" conf="spotbugs->default"/>
