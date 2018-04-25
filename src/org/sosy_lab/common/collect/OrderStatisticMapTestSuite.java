@@ -62,7 +62,7 @@ public abstract class OrderStatisticMapTestSuite {
           .add(Maps.immutableEntry("zz", "Vaa"))
           .build();
 
-  public abstract static class OrderStatisticMapFactory extends TestStringSortedMapGenerator {
+  protected abstract static class OrderStatisticMapFactory extends TestStringSortedMapGenerator {
 
     @Override
     protected abstract OrderStatisticMap<String, String> create(Entry<String, String>[] pEntries);
@@ -71,7 +71,7 @@ public abstract class OrderStatisticMapTestSuite {
         List<Entry<String, String>> pEntries);
   }
 
-  private OrderStatisticMapFactory factory;
+  private final OrderStatisticMapFactory factory;
 
   public OrderStatisticMapTestSuite(OrderStatisticMapFactory pFactory) {
     factory = pFactory;

@@ -47,6 +47,7 @@
             <compilerarg value="-Xep:ConstructorLeaksThis:OFF"/> <!-- buggy -->
             <compilerarg value="-Xep:FieldMissingNullable:OFF"/> <!-- buggy -->
             <compilerarg value="-Xep:ReturnMissingNullable:OFF"/> <!-- buggy -->
+            <compilerarg value="-Xep:FieldCanBeFinal:OFF"/> <!-- not possible for our @Option fields -->
             <compilerarg value="-XepPatchLocation:${basedir}"/>
             <compilerarg value="-XepPatchChecks:"/>
             <compilerarg value="-XepDisableWarningsInGeneratedCode"/>

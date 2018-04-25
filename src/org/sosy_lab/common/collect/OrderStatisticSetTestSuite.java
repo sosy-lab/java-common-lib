@@ -38,13 +38,13 @@ public abstract class OrderStatisticSetTestSuite {
   private static final String[] ELEMS_ABOVE = {"aab", "hhb", "ppb", "zzb"};
   private static final String[] ELEMS_BELOW = {"aa", "hh", "pp", "zz"};
 
-  public abstract static class OrderStatisticSetFactory extends TestStringSortedSetGenerator {
+  protected abstract static class OrderStatisticSetFactory extends TestStringSortedSetGenerator {
 
     @Override
     protected abstract OrderStatisticSet<String> create(String[] pStrings);
   }
 
-  private OrderStatisticSetFactory factory;
+  private final OrderStatisticSetFactory factory;
 
   public OrderStatisticSetTestSuite(OrderStatisticSetFactory pFactory) {
     factory = pFactory;
