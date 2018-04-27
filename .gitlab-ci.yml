@@ -3,15 +3,12 @@ stages:
   - build
   - checks
 
-image: openjdk:8-jdk-slim
+image: registry.gitlab.com/sosy-lab/software/java-common-lib/test:latest
 
 variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
   ANT_PROPS_BUILD: "-Divy.disable=true"
   ANT_PROPS_CHECKS: "-Divy.disable=true -DskipBuild=true"
-
-before_script:
-  - apt-get update -qq && apt-get install -y -qq ant git
 
 
 # Download dependencies and provide them to later stages
