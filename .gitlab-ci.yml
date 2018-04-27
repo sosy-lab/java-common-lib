@@ -105,7 +105,7 @@ deploy-coverage:
     paths:
       - "codacy-coverage-reporter-assembly*.jar"
 
-deploy-coverage:
+deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   dependencies:
