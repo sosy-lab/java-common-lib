@@ -11,7 +11,7 @@ variables:
   ANT_PROPS_CHECKS: "-Divy.disable=true -DskipBuild=true"
 
 before_script:
-  - apt-get update -qq && apt-get install -y -qq ant
+  - apt-get update -qq && apt-get install -y -qq ant git
 
 
 # Download dependencies and provide them to later stages
