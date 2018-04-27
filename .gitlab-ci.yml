@@ -109,6 +109,7 @@ deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   dependencies:
+    - build
     - javadoc
   only:
     - master@sosy-lab/software/java-common-lib
