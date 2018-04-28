@@ -418,10 +418,10 @@ public final class Configuration {
         cls.getName());
 
     Field[] fields = cls.getDeclaredFields();
-    AccessibleObject.setAccessible(fields, true);
+    AccessibleObject.setAccessible(fields, /*flag=*/ true);
 
     Method[] methods = cls.getDeclaredMethods();
-    AccessibleObject.setAccessible(methods, true);
+    AccessibleObject.setAccessible(methods, /*flag=*/ true);
 
     try {
       for (Field field : fields) {

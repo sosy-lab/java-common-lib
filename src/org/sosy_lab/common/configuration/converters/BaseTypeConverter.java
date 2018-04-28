@@ -140,9 +140,7 @@ public enum BaseTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
     try {
       Method m = type.getMethod(method, paramType);
-      if (!m.isAccessible()) {
-        m.setAccessible(true);
-      }
+      m.setAccessible(true);
       return m.invoke(null, value);
 
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException e) {
