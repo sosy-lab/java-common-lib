@@ -683,6 +683,10 @@ public final class Classes {
     return Arrays.stream(types).<TypeToken<?>>map(type -> context.resolveType(type));
   }
 
+  private static boolean isNullable(Parameter elem) {
+    return isNullable((AnnotatedElement) elem) || isNullable(elem.getAnnotatedType());
+  }
+
   private static boolean isNullable(AnnotatedElement elem) {
     for (Annotation annotation : elem.getAnnotations()) {
       String name = annotation.annotationType().getSimpleName();
