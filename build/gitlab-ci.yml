@@ -4,7 +4,7 @@ stages:
   - checks
   - deploy
 
-image: registry.gitlab.com/sosy-lab/software/java-common-lib/test:latest
+image: ${CI_REGISTRY}/test:jdk-8
 
 variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
@@ -27,13 +27,20 @@ build-dependencies:
 
 
 # Build binaries and provide them to later stages
-build:
+.build: &build
   stage: build
   script: "ant $ANT_PROPS_BUILD jar"
   artifacts:
     paths:
       - "bin/"
       - "*.jar"
+
+build:jdk-8:
+  <<: *build
+
+build:jdk-9:
+  <<: *build
+  image: ${CI_REGISTRY}/test:jdk-9
 
 
 # For checks that need the binaries
@@ -77,12 +84,14 @@ spotbugs:
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'ant $ANT_PROPS_CHECKS run-spotbugs -Dspotbugs.output=text && cat SpotBugs.xml && test \! -s SpotBugs.xml'
+  dependencies:
+    - build:jdk-8
   artifacts:
     paths:
       - "SpotBugs.html"
     when: on_failure
 
-unit-tests:
+.unit-tests: &unit-tests
   <<: *binary_check
   script: "ant $ANT_PROPS_CHECKS unit-tests-coverage"
   artifacts:
@@ -92,12 +101,21 @@ unit-tests:
       - "junit/coverage.xml"
     when: always
 
+unit-tests:jdk-8:
+  <<: *unit-tests
+  dependencies:
+    - build:jdk-8
+
+unit-tests:jdk-9:
+  <<: *unit-tests
+  dependencies:
+    - build:jdk-9
 
 deploy-coverage:
   stage: deploy
   script: "build/deploy-coverage.sh"
   dependencies:
-    - unit-tests
+    - unit-tests:jdk-8
   only:
     refs:
       - master
@@ -113,7 +131,7 @@ deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   dependencies:
-    - build
+    - build:jdk-8
     - javadoc
   only:
     refs:
