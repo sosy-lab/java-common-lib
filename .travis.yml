@@ -1,24 +1,24 @@
 language: java
 jdk:
   - oraclejdk8
+  - oraclejdk9
 addons:
   apt:
     packages:
-      - oracle-java8-installer
       - jq
 env:
   global:
     - GH_REF: github.com/sosy-lab/common-java.git
+    - NAME: Unit Tests
 install:
   - ant resolve-dependencies
+script:
+  - ant unit-tests-coverage
 matrix:
   include:
     - env: NAME='Build with ECJ'
       script:
         - ant build-project-ecj
-    - env: NAME='Unit Tests'
-      script:
-        - ant unit-tests-coverage
     - env: NAME='Create Javadoc'
       script:
         - ant javadoc collect-options
