@@ -7,10 +7,7 @@ addons:
     packages:
       - jq
 env:
-  global:
-env:
   - NAME='Unit Tests'
-  - GH_REF='github.com/sosy-lab/common-java.git'
 install:
   - ant resolve-dependencies
 script:
@@ -20,7 +17,7 @@ matrix:
     - env: NAME='Build with ECJ'
       script:
         - ant build-project-ecj
-    - env: NAME='Create Javadoc'
+    - env: NAME='Create Javadoc' GH_REF='github.com/sosy-lab/common-java.git'
       script:
         - ant javadoc collect-options
     - env: NAME=Checkstyle
