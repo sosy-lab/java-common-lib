@@ -9,7 +9,8 @@ addons:
 env:
   global:
     - GH_REF: github.com/sosy-lab/common-java.git
-    - NAME: Unit Tests
+env:
+  - NAME='Unit Tests'
 install:
   - ant resolve-dependencies
 script:
