@@ -88,9 +88,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @SuppressWarnings("unused")
   @SuppressFBWarnings(
-    value = "EQ_DOESNT_OVERRIDE_EQUALS",
-    justification = "Inherits equals() according to specification."
-  )
+      value = "EQ_DOESNT_OVERRIDE_EQUALS",
+      justification = "Inherits equals() according to specification.")
   @Immutable(containerOf = {"K", "V"})
   private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
 

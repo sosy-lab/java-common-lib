@@ -36,8 +36,7 @@ import org.sosy_lab.common.io.PathTemplate;
  * for {@link FileOption}.
  */
 @OptionDetailAnnotation(
-  applicableTo = {File.class, Path.class, PathTemplate.class, PathCounterTemplate.class}
-)
+    applicableTo = {File.class, Path.class, PathTemplate.class, PathCounterTemplate.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

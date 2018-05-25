@@ -77,17 +77,15 @@ public final class FileTypeConverter implements TypeConverter {
   private final Path outputPath;
 
   @Option(
-    secure = true,
-    name = "output.disable",
-    description =
-        "disable all default output files\n(any explicitly given file will still be written)"
-  )
+      secure = true,
+      name = "output.disable",
+      description =
+          "disable all default output files\n(any explicitly given file will still be written)")
   private boolean disableOutput = false;
 
   @Option(
-    description =
-        "base directory for all input & output files\n(except for the configuration file itself)"
-  )
+      description =
+          "base directory for all input & output files\n(except for the configuration file itself)")
   private String rootDirectory = ".";
 
   private final Path rootPath;

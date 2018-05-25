@@ -39,9 +39,8 @@ import javax.annotation.Nullable;
  * <p>This implementation forwards all methods to the underlying map.
  */
 @SuppressFBWarnings(
-  value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
-  justification = "nullability depends on underlying map"
-)
+    value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+    justification = "nullability depends on underlying map")
 final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>, Serializable {
 
   private static final long serialVersionUID = 8196534519512074110L;

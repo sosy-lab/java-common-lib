@@ -189,9 +189,8 @@ class Parser {
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @SuppressFBWarnings(
-    value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
-    justification = "performance irrelevant compared to I/O, String much more convenient"
-  )
+      value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
+      justification = "performance irrelevant compared to I/O, String much more convenient")
   private void parse(BufferedReader r, Optional<Path> basePath, String source)
       throws IOException, InvalidConfigurationException {
     checkNotNull(basePath);

@@ -32,46 +32,42 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 
 @Options(
-  prefix = "log",
-  description =
-      "Possible log levels in descending order "
-          + "\n(lower levels include higher ones):"
-          + "\nOFF:      no logs published"
-          + "\nSEVERE:   error messages"
-          + "\nWARNING:  warnings"
-          + "\nINFO:     messages"
-          + "\nFINE:     logs on main application level"
-          + "\nFINER:    logs on central CPA algorithm level"
-          + "\nFINEST:   logs published by specific CPAs"
-          + "\nALL:      debugging information"
-          + "\nCare must be taken with levels of FINER or lower, as output files may "
-          + "become quite large and memory usage might become an issue."
-)
+    prefix = "log",
+    description =
+        "Possible log levels in descending order "
+            + "\n(lower levels include higher ones):"
+            + "\nOFF:      no logs published"
+            + "\nSEVERE:   error messages"
+            + "\nWARNING:  warnings"
+            + "\nINFO:     messages"
+            + "\nFINE:     logs on main application level"
+            + "\nFINER:    logs on central CPA algorithm level"
+            + "\nFINEST:   logs published by specific CPAs"
+            + "\nALL:      debugging information"
+            + "\nCare must be taken with levels of FINER or lower, as output files may "
+            + "become quite large and memory usage might become an issue.")
 public class LoggingOptions {
 
   @Option(
-    secure = true,
-    name = "level",
-    toUppercase = true,
-    description = "log level of file output"
-  )
+      secure = true,
+      name = "level",
+      toUppercase = true,
+      description = "log level of file output")
   private Level fileLevel = Level.OFF;
 
   @Option(secure = true, toUppercase = true, description = "log level of console output")
   private Level consoleLevel = Level.INFO;
 
   @Option(
-    secure = true,
-    toUppercase = true,
-    description = "single levels to be excluded from being logged"
-  )
+      secure = true,
+      toUppercase = true,
+      description = "single levels to be excluded from being logged")
   private List<Level> fileExclude = ImmutableList.of();
 
   @Option(
-    secure = true,
-    toUppercase = true,
-    description = "single levels to be excluded from being logged"
-  )
+      secure = true,
+      toUppercase = true,
+      description = "single levels to be excluded from being logged")
   private List<Level> consoleExclude = ImmutableList.of();
 
   @Option(secure = true, name = "file", description = "name of the log file")
@@ -79,9 +75,8 @@ public class LoggingOptions {
   private Path outputFile = Paths.get("CPALog.txt");
 
   @Option(
-    secure = true,
-    description = "maximum size of log output strings before they will be truncated"
-  )
+      secure = true,
+      description = "maximum size of log output strings before they will be truncated")
   @IntegerOption(min = 1)
   private int truncateSize = 10000;
 

@@ -33,9 +33,8 @@ import java.util.NavigableSet;
 import javax.annotation.Nullable;
 
 @SuppressFBWarnings(
-  value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
-  justification = "nullability depends on underlying map"
-)
+    value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+    justification = "nullability depends on underlying map")
 final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
     implements OurSortedMap<K, V>, Serializable {
 
