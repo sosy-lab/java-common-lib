@@ -24,27 +24,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.reflect.AbstractInvocationHandler;
 import com.google.common.reflect.Invokable;
-import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -56,7 +58,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -583,10 +584,9 @@ public final class Classes {
         resolve(factoryType, interfaceMethod.getGenericExceptionTypes())
             .map(TypeToken::getRawType)
             .toArray(Class[]::new);
-    java.lang.reflect.Parameter[] formalParams = interfaceMethod.getParameters();
+    Parameter[] formalParams = interfaceMethod.getParameters();
     List<TypeToken<?>> formalParamTypes =
-        resolve(factoryType, interfaceMethod.getGenericParameterTypes())
-            .collect(Collectors.toList());
+        resolve(factoryType, interfaceMethod.getGenericParameterTypes()).collect(toImmutableList());
     for (Entry<TypeToken<?>> entry : ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
       verify(
           entry.getCount() == 1,
@@ -600,8 +600,8 @@ public final class Classes {
     if (!Modifier.isPublic(cls.getModifiers())) {
       throw new UnsuitedClassException("class is not public");
     }
-    Invokable<?, ?> target = getInstantiationMethodForClass(cls);
-    if (!returnType.isSupertypeOf(target.getReturnType())) {
+    Executable target = getInstantiationMethodForClass(cls);
+    if (!returnType.isSupertypeOf(TypeToken.of(target.getAnnotatedReturnType().getType()))) {
       throw new UnsuitedClassException("'%s' does not produce instances of %s", target, returnType);
     }
     String exception = Classes.verifyDeclaredExceptions(target, allowedExceptions);
@@ -609,15 +609,20 @@ public final class Classes {
       throw new UnsuitedClassException(
           "'%s' declares illegal checked exception %s", target, exception);
     }
-    List<Parameter> targetParameters = target.getParameters();
-    List<TypeToken<?>> targetParamTypes = Lists.transform(targetParameters, Parameter::getType);
+    Parameter[] targetParameters = target.getParameters();
+    List<TypeToken<?>> targetParamTypes =
+        Arrays.stream(targetParameters)
+            .map(Parameter::getAnnotatedType)
+            .map(AnnotatedType::getType)
+            .map(TypeToken::of)
+            .collect(toImmutableList());
 
     // For each parameter of the constructor, this array contains the position of the value
     // in the parameters of the interface method.
     int[] parameterMapping = new int[targetParamTypes.size()];
     boolean[] parameterNullability = new boolean[targetParamTypes.size()];
     for (int i = 0; i < targetParamTypes.size(); i++) {
-      boolean targetNullability = isNullable(targetParameters.get(i));
+      boolean targetNullability = isNullable(targetParameters[i]);
       int sourceIndex = formalParamTypes.indexOf(targetParamTypes.get(i));
       boolean sourceNullability =
           (sourceIndex == -1) // parameter not present in interface
@@ -651,7 +656,13 @@ public final class Classes {
         }
 
         try {
-          return target.invoke(null, targetArgs);
+          if (target instanceof Method) {
+            return ((Method) target).invoke(null, targetArgs);
+          } else if (target instanceof Constructor<?>) {
+            return ((Constructor<?>) target).newInstance(targetArgs);
+          } else {
+            throw new AssertionError("Unknown Executable " + target);
+          }
         } catch (InvocationTargetException e) {
           throw e.getCause();
         }
@@ -673,7 +684,7 @@ public final class Classes {
   }
 
   private static boolean isNullable(AnnotatedElement elem) {
-    for (java.lang.annotation.Annotation annotation : elem.getAnnotations()) {
+    for (Annotation annotation : elem.getAnnotations()) {
       String name = annotation.annotationType().getSimpleName();
       if (name.equals("Nullable") || name.equals("NullableDecl")) {
         return true;
@@ -688,16 +699,15 @@ public final class Classes {
    *
    * @throws UnsuitedClassException if no matching method can be found
    */
-  private static Invokable<?, ?> getInstantiationMethodForClass(Class<?> cls)
+  private static Executable getInstantiationMethodForClass(Class<?> cls)
       throws UnsuitedClassException {
-    List<Invokable<?, ?>> factoryMethods =
+    List<Method> factoryMethods =
         Arrays.stream(cls.getDeclaredMethods())
             .filter(m -> m.getName().equals("create"))
-            .map(Invokable::from)
-            .filter(m -> m.isStatic())
-            .filter(m -> m.isPublic())
+            .filter(m -> Modifier.isStatic(m.getModifiers()))
+            .filter(m -> Modifier.isPublic(m.getModifiers()))
             .filter(m -> !m.isSynthetic())
-            .collect(Collectors.toList());
+            .collect(toImmutableList());
     switch (factoryMethods.size()) {
       case 0:
         if (Modifier.isAbstract(cls.getModifiers())) {
@@ -708,7 +718,7 @@ public final class Classes {
           throw new UnsuitedClassException(
               "class does not have a static method \"create\" nor exactly one public constructor");
         }
-        return Invokable.from(constructors[0]);
+        return constructors[0];
 
       case 1:
         return factoryMethods.get(0);
