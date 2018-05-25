@@ -4,7 +4,7 @@ stages:
   - checks
   - deploy
 
-image: ${CI_REGISTRY}/test:jdk-8
+image: ${CI_REGISTRY_IMAGE}/test:jdk-8
 
 variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
@@ -40,7 +40,7 @@ build:jdk-8:
 
 build:jdk-9:
   <<: *build
-  image: ${CI_REGISTRY}/test:jdk-9
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-9
 
 
 # For checks that need the binaries
