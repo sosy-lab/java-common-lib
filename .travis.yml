@@ -8,9 +8,9 @@ addons:
       - jq
 env:
   global:
-    - GH_REF: github.com/sosy-lab/common-java.git
 env:
   - NAME='Unit Tests'
+  - GH_REF='github.com/sosy-lab/common-java.git'
 install:
   - ant resolve-dependencies
 script:
@@ -42,6 +42,7 @@ deploy:
     provider: script
     script: build/deploy-coverage.sh
     on:
+      jdk: oraclejdk8
       condition: $NAME = "Unit Tests"
 notifications:
   email:
