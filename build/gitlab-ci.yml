@@ -85,6 +85,7 @@ spotbugs:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'ant $ANT_PROPS_CHECKS run-spotbugs -Dspotbugs.output=text && cat SpotBugs.xml && test \! -s SpotBugs.xml'
   dependencies:
+    - build-dependencies
     - build:jdk-8
   artifacts:
     paths:
@@ -104,11 +105,13 @@ spotbugs:
 unit-tests:jdk-8:
   <<: *unit-tests
   dependencies:
+    - build-dependencies
     - build:jdk-8
 
 unit-tests:jdk-9:
   <<: *unit-tests
   dependencies:
+    - build-dependencies
     - build:jdk-9
 
 deploy-coverage:
