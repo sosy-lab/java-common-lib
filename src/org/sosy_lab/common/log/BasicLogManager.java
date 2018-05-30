@@ -440,7 +440,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     @Var int traceIndex = 2;
 
     @Var StackTraceElement frame = trace.get(traceIndex);
-    while (frame.getMethodName().startsWith("log") || frame.getMethodName().startsWith("access$")) {
+    while (frame.getMethodName().startsWith("log")
+        || frame.getMethodName().startsWith("access$")
+        || frame.getMethodName().startsWith("lambda$log")) {
       traceIndex++;
       frame = trace.get(traceIndex);
     }
