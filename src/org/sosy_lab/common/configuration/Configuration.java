@@ -406,8 +406,33 @@ public final class Configuration {
    * @param cls The static class type of the object to inject.
    */
   public void inject(Object obj, Class<?> cls) throws InvalidConfigurationException {
+    inject(obj, cls, obj);
+  }
+
+  /**
+   * Same as {@link #inject(Object, Class)}, but if this Configuration instance does not contain a
+   * value for a requested configuration option, use the value that is set in the given {@code
+   * defaultsInstance} instead of the value that is set as default in the to-be-injected object.
+   * This can be used to create a copy of an object but with some options changed according to this
+   * Configuration instance.
+   *
+   * <p>Note that this only works for configuration options that are specified as fields, not for
+   * those specified as setters.
+   *
+   * @param obj The to-be-injected instance.
+   * @param cls The static class type of the object to inject.
+   * @param defaultsObject The instance from which default values should be read.
+   */
+  public <T> void injectWithDefaults(T obj, Class<T> cls, T defaultsObject)
+      throws InvalidConfigurationException {
+    inject(obj, cls, defaultsObject);
+  }
+
+  private void inject(Object obj, Class<?> cls, Object defaultsObject)
+      throws InvalidConfigurationException {
     checkNotNull(obj);
     checkNotNull(cls);
+    checkNotNull(defaultsObject);
     checkArgument(cls.isAssignableFrom(obj.getClass()));
 
     Options options = cls.getAnnotation(Options.class);
@@ -427,7 +452,7 @@ public final class Configuration {
       for (Field field : fields) {
         // ignore all non-option fields
         if (field.isAnnotationPresent(Option.class)) {
-          setOptionValueForField(obj, field, options);
+          setOptionValueForField(obj, field, options, defaultsObject);
         }
       }
 
@@ -474,8 +499,10 @@ public final class Configuration {
    * @param obj the object to be injected
    * @param field the field of the value to be injected
    * @param options options-annotation of the class of the object
+   * @param defaultsObject the object from which the default values of options should be read
    */
-  private <T> void setOptionValueForField(Object obj, Field field, Options options)
+  private <T> void setOptionValueForField(
+      Object obj, Field field, Options options, Object defaultsObject)
       throws InvalidConfigurationException, IllegalAccessException {
 
     // check validity of field
@@ -491,7 +518,7 @@ public final class Configuration {
     // try to read default value
     @Var Object defaultValue = null;
     try {
-      defaultValue = field.get(obj);
+      defaultValue = field.get(defaultsObject);
     } catch (IllegalArgumentException e) {
       throw new AssertionError("Type checks above were not successful apparently.", e);
     }
@@ -506,10 +533,18 @@ public final class Configuration {
     // get value
     Option option = field.getAnnotation(Option.class);
     String name = getOptionName(options, field, option);
-    Object value = getValue(options, field, typedDefaultValue, type, option, field);
+    Object value =
+        getValue(
+            options,
+            field,
+            typedDefaultValue,
+            type,
+            option,
+            field,
+            /*defaultIsFromOtherInstance=*/ obj != defaultsObject);
 
     // options which were not changed need not to be set
-    if (value == defaultValue) {
+    if (value == defaultValue && obj == defaultsObject) {
       logger.log(
           Level.CONFIG,
           "Option:",
@@ -574,7 +609,9 @@ public final class Configuration {
     // get value
     Option option = method.getAnnotation(Option.class);
     String name = getOptionName(options, method, option);
-    Object value = getValue(options, method, null, type, option, method);
+    Object value =
+        getValue(
+            options, method, null, type, option, method, /*defaultIsFromOtherInstance=*/ false);
 
     logger.logf(
         Level.CONFIG,
@@ -673,7 +710,8 @@ public final class Configuration {
       @Nullable T defaultValue,
       TypeToken<T> type,
       Option option,
-      AnnotatedElement member)
+      AnnotatedElement member,
+      boolean defaultIsFromOtherInstance)
       throws InvalidConfigurationException {
 
     boolean isEnum = type.getRawType().isEnum();
@@ -733,7 +771,9 @@ public final class Configuration {
             "Required configuration option " + optionName + " is missing.");
       }
 
-      value = convertDefaultValue(optionName, defaultValue, type, secondaryOption);
+      value =
+          convertDefaultValue(
+              optionName, defaultValue, type, secondaryOption, defaultIsFromOtherInstance);
     }
 
     if (printUsedOptions != null) {
@@ -1024,7 +1064,8 @@ public final class Configuration {
       String optionName,
       @Nullable T defaultValue,
       TypeToken<T> type,
-      @Nullable Annotation secondaryOption)
+      @Nullable Annotation secondaryOption,
+      boolean fromOtherInstance)
       throws InvalidConfigurationException {
 
     @Var TypeToken<?> innerType;
@@ -1046,7 +1087,12 @@ public final class Configuration {
       // TODO: Also pass default values inside a collection.
 
       TypeConverter converter = getConverter(type, secondaryOption);
-      return converter.convertDefaultValue(optionName, defaultValue, type, secondaryOption);
+      if (fromOtherInstance) {
+        return converter.convertDefaultValueFromOtherInstance(
+            optionName, defaultValue, type, secondaryOption);
+      } else {
+        return converter.convertDefaultValue(optionName, defaultValue, type, secondaryOption);
+      }
     }
 
     return defaultValue;

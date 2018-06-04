@@ -414,6 +414,33 @@ public class ConfigurationTest {
   }
 
   @Test
+  public void testWithDefaultsUsed() throws Exception {
+    String value = "newValue";
+    OptionsSubclass opts = new OptionsSubclass();
+    opts.test = value;
+
+    Configuration c = Configuration.defaultConfiguration();
+
+    OptionsSubclass opts2 = new OptionsSubclass();
+    c.injectWithDefaults(opts2, OptionsSuperclass.class, opts);
+    assertThat(opts2.test).isEqualTo(value);
+  }
+
+  @Test
+  public void testWithDefaultsUnused() throws Exception {
+    String value = "newValue";
+    OptionsSubclass opts = new OptionsSubclass();
+    opts.test = value;
+
+    Configuration c = Configuration.builder().setOption("test", value + "2").build();
+
+    OptionsSubclass opts2 = new OptionsSubclass();
+    c.injectWithDefaults(opts2, OptionsSuperclass.class, opts);
+    assertThat(opts2.test).isEqualTo(value + "2");
+    assertThat(opts.test).isEqualTo(value); // opts should not be changed
+  }
+
+  @Test
   public void testCallTypeConverterConvert() throws Exception {
     TypeConverter conv = mock(TypeConverter.class);
     when(conv.convert(any(), any(), any(), any(), any(), any())).thenReturn("newValue");
@@ -448,6 +475,28 @@ public class ConfigurationTest {
     assertThat(opts.test).isEqualTo("newValue");
 
     verify(conv).convertDefaultValue("test", "oldValue", TypeToken.of(String.class), null);
+    verifyNoMoreInteractions(conv);
+  }
+
+  @Test
+  public void testCallTypeConverterConvertDefaultValueFromOtherInstance() throws Exception {
+    TypeConverter conv = mock(TypeConverter.class);
+    when(conv.convertDefaultValueFromOtherInstance(any(), any(), any(), any()))
+        .thenReturn("newValue");
+
+    Configuration c = Configuration.builder().addConverter(String.class, conv).build();
+
+    OptionsSubclass opts = new OptionsSubclass();
+    OptionsSubclass opts2 = new OptionsSubclass();
+    opts.test = "otherValue";
+    c.injectWithDefaults(opts2, OptionsSuperclass.class, opts);
+
+    assertThat(opts2.test).isEqualTo("newValue");
+    assertThat(opts.test).isEqualTo("otherValue"); // opts should not be changed
+
+    verify(conv)
+        .convertDefaultValueFromOtherInstance(
+            "test", "otherValue", TypeToken.of(String.class), null);
     verifyNoMoreInteractions(conv);
   }
 

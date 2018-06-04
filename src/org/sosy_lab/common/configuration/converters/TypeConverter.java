@@ -92,4 +92,21 @@ public interface TypeConverter {
   <T> T convertDefaultValue(
       String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException;
+
+  /**
+   * Like {@link #convertDefaultValue(String, Object, TypeToken, Annotation)}, but called if the
+   * default value was not taken from the fresh instance, but from a different instance (cf. {@link
+   * Configuration#injectWithDefaults(Object, Class, Object)}.
+   *
+   * <p>Override this method if {@link #convertDefaultValue(String, Object, TypeToken, Annotation)}
+   * changes values and this should not be done twice if the value is injected again into another
+   * instance.
+   */
+  @Nullable
+  default <T> T convertDefaultValueFromOtherInstance(
+      String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
+      throws InvalidConfigurationException {
+    return convertDefaultValue(optionName, value, type, secondaryOption);
+  }
+
 }

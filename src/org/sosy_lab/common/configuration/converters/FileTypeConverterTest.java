@@ -274,5 +274,29 @@ public class FileTypeConverterTest {
       config.inject(options);
       assertThat((Comparable<?>) options.path).isEqualTo(Paths.get("config").resolve(testPath));
     }
+
+    @Test
+    public void testConvertDefaultValueFromOtherInstance() throws InvalidConfigurationException {
+      Configuration configForConverter =
+          Configuration.builder()
+              .setOption("rootDirectory", "root")
+              .setOption("output.path", "output")
+              .build();
+
+      Configuration config =
+          Configuration.builder()
+              .addConverter(FileOption.class, createFileTypeConverter(configForConverter))
+              .build();
+      FileInjectionTestOptions options = new FileInjectionTestOptions();
+      options.path = Paths.get(testPath);
+      FileInjectionTestOptions options2 = new FileInjectionTestOptions();
+
+      if (!isAllowed(false)) {
+        expectExceptionAbout("safe mode", "test.path");
+      }
+
+      config.injectWithDefaults(options2, FileInjectionTestOptions.class, options);
+      assertThat(options2.path).isEqualTo(Paths.get(testPath));
+    }
   }
 }

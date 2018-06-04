@@ -222,12 +222,29 @@ public final class FileTypeConverter implements TypeConverter {
     }
 
     return handleFileOption(
-        optionName, path, ((FileOption) secondaryOption).value(), type, pSource);
+        optionName,
+        path,
+        ((FileOption) secondaryOption).value(),
+        type,
+        pSource,
+        /*doResolve=*/ true);
   }
 
   @Override
   public <T> T convertDefaultValue(
       String optionName, T pDefaultValue, TypeToken<T> pType, Annotation secondaryOption)
+      throws InvalidConfigurationException {
+
+    return convertDefaultValue(
+        optionName, pDefaultValue, pType, secondaryOption, /*doResolve=*/ true);
+  }
+
+  private <T> T convertDefaultValue(
+      String optionName,
+      T pDefaultValue,
+      TypeToken<T> pType,
+      Annotation secondaryOption,
+      boolean doResolve)
       throws InvalidConfigurationException {
 
     Class<?> type = pType.getRawType();
@@ -265,8 +282,25 @@ public final class FileTypeConverter implements TypeConverter {
     }
 
     @SuppressWarnings("unchecked")
-    T value = (T) handleFileOption(optionName, defaultValue, typeInfo, type, null);
+    T value = (T) handleFileOption(optionName, defaultValue, typeInfo, type, null, doResolve);
     return value;
+  }
+
+  @Override
+  @Nullable
+  public <T> T convertDefaultValueFromOtherInstance(
+      String optionName,
+      @Nullable T pDefaultValue,
+      TypeToken<T> pType,
+      @Nullable Annotation secondaryOption)
+      throws InvalidConfigurationException {
+
+    // If we take the default value from an existing instance, it was already resolved, so we do not
+    // resolve it again.
+    // However, we must do all other sanity and safety checks,
+    // and we also must create new instances of e.g. PathCounterTemplate.
+    return convertDefaultValue(
+        optionName, pDefaultValue, pType, secondaryOption, /*doResolve=*/ false);
   }
 
   /**
@@ -276,18 +310,26 @@ public final class FileTypeConverter implements TypeConverter {
    * @param optionName name of option only for error handling
    * @param file the file name to adjust
    * @param typeInfo info about the type of the file (outputfile, inputfile)
+   * @param doResolve whether to resolve the file according to outputPath, rootPath, etc.
    */
   @SuppressWarnings("CheckReturnValue")
   private Object handleFileOption(
-      String optionName, @Var Path file, FileOption.Type typeInfo, Class<?> targetType, Path source)
+      String optionName,
+      @Var Path file,
+      FileOption.Type typeInfo,
+      Class<?> targetType,
+      Path source,
+      boolean doResolve)
       throws InvalidConfigurationException {
 
-    if (isOutputOption(typeInfo)) {
-      file = outputPath.resolve(file);
-    } else if (source != null) {
-      file = source.resolveSibling(file);
-    } else {
-      file = rootPath.resolve(file);
+    if (doResolve) {
+      if (isOutputOption(typeInfo)) {
+        file = outputPath.resolve(file);
+      } else if (source != null) {
+        file = source.resolveSibling(file);
+      } else {
+        file = rootPath.resolve(file);
+      }
     }
 
     checkSafePath(file, optionName); // throws exception if unsafe
