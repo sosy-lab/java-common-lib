@@ -26,8 +26,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.Var;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -408,6 +411,44 @@ public class ConfigurationTest {
     OptionsSubclass opts2 = new OptionsSubclass();
     c.recursiveInject(opts2);
     assertThat(opts2.test).isEqualTo("newValue");
+  }
+
+  @Test
+  public void testCallTypeConverterConvert() throws Exception {
+    TypeConverter conv = mock(TypeConverter.class);
+    when(conv.convert(any(), any(), any(), any(), any(), any())).thenReturn("newValue");
+
+    Configuration c =
+        Configuration.builder()
+            .setOption("test", "otherValue")
+            .addConverter(String.class, conv)
+            .build();
+
+    OptionsSubclass opts = new OptionsSubclass();
+    c.inject(opts, OptionsSuperclass.class);
+
+    assertThat(opts.test).isEqualTo("newValue");
+
+    verify(conv)
+        .convert(
+            eq("test"), eq("otherValue"), eq(TypeToken.of(String.class)), eq(null), any(), any());
+    verifyNoMoreInteractions(conv);
+  }
+
+  @Test
+  public void testCallTypeConverterConvertDefaultValue() throws Exception {
+    TypeConverter conv = mock(TypeConverter.class);
+    when(conv.convertDefaultValue(any(), any(), any(), any())).thenReturn("newValue");
+
+    Configuration c = Configuration.builder().addConverter(String.class, conv).build();
+
+    OptionsSubclass opts = new OptionsSubclass();
+    c.inject(opts, OptionsSuperclass.class);
+
+    assertThat(opts.test).isEqualTo("newValue");
+
+    verify(conv).convertDefaultValue("test", "oldValue", TypeToken.of(String.class), null);
+    verifyNoMoreInteractions(conv);
   }
 
   @SuppressWarnings("deprecation")
