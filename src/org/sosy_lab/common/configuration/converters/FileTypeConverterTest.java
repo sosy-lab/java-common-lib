@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration.converters;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
 
@@ -171,7 +172,7 @@ public class FileTypeConverterTest {
         expectExceptionAbout("safe mode", "dummy");
       }
 
-      assertThat((Comparable<?>) conv.checkSafePath(path, "dummy")).isEqualTo(path);
+      assertThat(conv.checkSafePath(path, "dummy")).isEqualTo(path);
     }
 
     @Test
@@ -213,14 +214,13 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get(testPath));
+      assertThat(options.path).isEqualTo(Paths.get(testPath));
     }
 
     @Test
     public void testConvert_DefaultPath() throws InvalidConfigurationException {
       Configuration config =
           Configuration.builder()
-              .setOption("test.path", testPath)
               .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
@@ -231,7 +231,30 @@ public class FileTypeConverterTest {
       }
 
       config.inject(options);
-      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get(testPath));
+      assertThat(options.path).isEqualTo(Paths.get(".").resolve(testPath));
+    }
+
+    @Test
+    public void testConvert_DefaultPathWithRootDirectory() throws InvalidConfigurationException {
+      Configuration configForConverter =
+          Configuration.builder()
+              .setOption("rootDirectory", "root")
+              .setOption("output.path", "output")
+              .build();
+
+      Configuration config =
+          Configuration.builder()
+              .addConverter(FileOption.class, createFileTypeConverter(configForConverter))
+              .build();
+      FileInjectionTestOptions options = new FileInjectionTestOptions();
+      options.path = Paths.get(testPath);
+
+      if (!isAllowed(true)) {
+        expectExceptionAbout("safe mode", "test.path");
+      }
+
+      config.inject(options);
+      assertThat(options.path).isEqualTo(Paths.get("root").resolve(testPath));
     }
 
     @Test
