@@ -106,6 +106,8 @@ public final class Configuration {
 
   /** Creates a configuration with all values set to default. */
   public static Configuration defaultConfiguration() {
+    // We do not call TypeConverter.getInstanceForNewConfiguration
+    // because the new Configuration instance has no values, which makes injection pointless.
     return new Configuration(
         ImmutableMap.of(),
         ImmutableMap.of(),
@@ -119,6 +121,8 @@ public final class Configuration {
 
   /** Creates a copy of a configuration with just the prefix set to a new value. */
   public static Configuration copyWithNewPrefix(Configuration oldConfig, String newPrefix) {
+    // We do not call TypeConverter.getInstanceForNewConfiguration
+    // because the new Configuration instance has exactly the same option values.
     return new Configuration(
         oldConfig.properties,
         oldConfig.sources,
@@ -188,6 +192,10 @@ public final class Configuration {
    * Get the map of registered default {@link TypeConverter}s. These type converters are used
    * whenever a new Configuration instance is created, except when the {@link
    * ConfigurationBuilder#copyFrom(Configuration)} method is used.
+   *
+   * <p>For all instances in this map the method {@link
+   * TypeConverter#getInstanceForNewConfiguration(Configuration)} will be called before the type
+   * converter is actually added to a {@link Configuration} instance.
    *
    * <p>The returned map is mutable and changes have immediate effect on this class! Callers are
    * free to add and remove mappings as they wish. However, as this is static state, this will

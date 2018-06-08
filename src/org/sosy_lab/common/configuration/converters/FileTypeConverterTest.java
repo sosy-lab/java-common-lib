@@ -49,14 +49,39 @@ import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterBasicTest;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterSafeModeTest;
 import org.sosy_lab.common.configuration.converters.FileTypeConverterTest.FileTypeConverterUnsafeModeTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({FileTypeConverterSafeModeTest.class, FileTypeConverterUnsafeModeTest.class})
+@SuiteClasses({
+  FileTypeConverterSafeModeTest.class,
+  FileTypeConverterUnsafeModeTest.class,
+  FileTypeConverterBasicTest.class
+})
 public class FileTypeConverterTest {
 
   private FileTypeConverterTest() {}
+
+  public static class FileTypeConverterBasicTest {
+
+    @Test
+    public void testgetInstanceForNewConfiguration() throws InvalidConfigurationException {
+      Configuration config1 =
+          Configuration.builder()
+              .setOption("rootDirectory", "root")
+              .setOption("output.path", "output")
+              .build();
+      FileTypeConverter conv1 = FileTypeConverter.createWithSafePathsOnly(config1);
+
+      Configuration config2 = Configuration.builder().setOption("output.path", "output2").build();
+      FileTypeConverter conv2 = conv1.getInstanceForNewConfiguration(config2);
+
+      assertThat(conv2.rootPath).isEqualTo(conv1.rootPath);
+      assertThat(conv2.safePathsOnly).isEqualTo(conv1.safePathsOnly);
+      assertThat(conv2.outputPath).isEqualTo(Paths.get("root", "output2"));
+    }
+  }
 
   @Options
   static class FileInjectionTestOptions {

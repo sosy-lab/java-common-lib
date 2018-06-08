@@ -70,7 +70,7 @@ public class ConfigurationTest {
     private EnumSet<? extends TestEnum> values = EnumSet.of(TestEnum.E1, TestEnum.E3);
   }
 
-  private static Configuration enumTestConfiguration() {
+  private static Configuration enumTestConfiguration() throws InvalidConfigurationException {
     return Configuration.builder().setOption("values", "E3, E2").build();
   }
 

@@ -109,4 +109,25 @@ public interface TypeConverter {
     return convertDefaultValue(optionName, value, type, secondaryOption);
   }
 
+  /**
+   * Return a (possibly) new instance of this converter that has new configuration values applied.
+   *
+   * <p>If this converter has configuration options itself, it may be desired to use new values for
+   * these options if the converter instance is used together with a new {@link Configuration}
+   * instance. This method is called whenever an existing converter instance will be used by a new
+   * {@link Configuration} instance, e.g., by {@link
+   * org.sosy_lab.common.configuration.ConfigurationBuilder#copyFrom(Configuration)} or if the
+   * converter instance is taken from {@link Configuration#getDefaultConverters()}. It can return a
+   * new converter instance according to the options in the new {@link Configuration} instance, or
+   * return the current converter instance. Note that this method should not change the existing
+   * instance.
+   *
+   * @param newConfiguration The new configuration instance which will use the returned converter
+   * @return A new instance of the same converter, or {@code this}
+   * @throws InvalidConfigurationException If applying the new configuration fails
+   */
+  default TypeConverter getInstanceForNewConfiguration(Configuration newConfiguration)
+      throws InvalidConfigurationException {
+    return this;
+  }
 }

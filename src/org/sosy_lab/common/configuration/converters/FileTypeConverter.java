@@ -74,7 +74,7 @@ public final class FileTypeConverter implements TypeConverter {
   @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";
 
-  private final Path outputPath;
+  @VisibleForTesting final Path outputPath;
 
   @Option(
       secure = true,
@@ -88,16 +88,25 @@ public final class FileTypeConverter implements TypeConverter {
           "base directory for all input & output files\n(except for the configuration file itself)")
   private String rootDirectory = ".";
 
-  private final Path rootPath;
+  @VisibleForTesting final Path rootPath;
 
   // Allow only paths below the current directory,
   // i.e., no absolute paths and no "../"
-  private final boolean safePathsOnly;
+  @VisibleForTesting final boolean safePathsOnly;
 
   private FileTypeConverter(Configuration config, boolean pSafePathsOnly)
       throws InvalidConfigurationException {
     safePathsOnly = pSafePathsOnly; // set before calls to checkSafePath
     config.inject(this, FileTypeConverter.class);
+
+    rootPath = checkSafePath(Paths.get(rootDirectory), "rootDirectory");
+    outputPath = checkSafePath(rootPath.resolve(outputDirectory), "output.path");
+  }
+
+  private FileTypeConverter(Configuration config, FileTypeConverter defaultsInstance)
+      throws InvalidConfigurationException {
+    safePathsOnly = defaultsInstance.safePathsOnly; // set before calls to checkSafePath
+    config.injectWithDefaults(this, FileTypeConverter.class, defaultsInstance);
 
     rootPath = checkSafePath(Paths.get(rootDirectory), "rootDirectory");
     outputPath = checkSafePath(rootPath.resolve(outputDirectory), "output.path");
@@ -115,6 +124,12 @@ public final class FileTypeConverter implements TypeConverter {
   public static FileTypeConverter createWithSafePathsOnly(Configuration config)
       throws InvalidConfigurationException {
     return new FileTypeConverter(config, true);
+  }
+
+  @Override
+  public FileTypeConverter getInstanceForNewConfiguration(Configuration pNewConfiguration)
+      throws InvalidConfigurationException {
+    return new FileTypeConverter(pNewConfiguration, this);
   }
 
   /**

@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +54,11 @@ public final class ConfigurationBuilder {
   @Nullable private Map<String, Path> sources = null;
   @Nullable private Configuration oldConfig = null;
   @Nullable private String prefix = null;
+
+  /**
+   * Map of to-be-used converters or null. If null, no converters have been explicitly set yet. If
+   * not null, only the converters that have been explicitly added to this builder are in the map.
+   */
   @Nullable private Map<Class<?>, TypeConverter> converters = null;
 
   ConfigurationBuilder() {}
@@ -120,6 +126,11 @@ public final class ConfigurationBuilder {
    * configuration instance passed to this class.
    *
    * <p>If this method is called, it has to be the first method call on this builder instance.
+   *
+   * <p>The converters registered on the given {@link Configuration} instance will have {@link
+   * TypeConverter#getInstanceForNewConfiguration(Configuration)} called on them and the result will
+   * be used as converter in the new configuration, except if overridden with {@link
+   * #addConverter(Class, TypeConverter)}.
    */
   public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
     checkNotNull(sourceConfig);
@@ -305,11 +316,6 @@ public final class ConfigurationBuilder {
 
     if (converters == null) {
       converters = Configuration.createConverterMap();
-      if (oldConfig != null) {
-        converters.putAll(oldConfig.converters);
-      } else {
-        converters.putAll(Configuration.DEFAULT_CONVERTERS);
-      }
     }
 
     converters.put(cls, converter);
@@ -323,9 +329,12 @@ public final class ConfigurationBuilder {
    *
    * <p>This method resets the builder instance, so that after this method has returned it is
    * exactly in the same state as directly after instantiation.
+   *
+   * @throws InvalidConfigurationException if calling {@link
+   *     TypeConverter#getInstanceForNewConfiguration(Configuration)} fails
    */
   @CheckReturnValue
-  public Configuration build() {
+  public Configuration build() throws InvalidConfigurationException {
     ImmutableMap<String, String> newProperties;
     if (properties == null) {
       // we can re-use the old properties instance because it is immutable
@@ -361,18 +370,6 @@ public final class ConfigurationBuilder {
       newPrefix = prefix;
     }
 
-    ImmutableMap<Class<?>, TypeConverter> newConverters;
-    if (converters == null) {
-      // we can re-use the old converters instance because it is immutable
-      if (oldConfig != null) {
-        newConverters = oldConfig.converters;
-      } else {
-        newConverters = ImmutableMap.copyOf(Configuration.DEFAULT_CONVERTERS);
-      }
-    } else {
-      newConverters = ImmutableMap.copyOf(converters);
-    }
-
     Set<String> newUnusedProperties;
     Set<String> newDeprecatedProperties;
     if (oldConfig != null) {
@@ -383,6 +380,10 @@ public final class ConfigurationBuilder {
       newUnusedProperties = new HashSet<>(newProperties.keySet());
       newDeprecatedProperties = new HashSet<>(0);
     }
+
+    ImmutableMap<Class<?>, TypeConverter> newConverters =
+        buildNewConverters(
+            newProperties, newSources, newPrefix, newUnusedProperties, newDeprecatedProperties);
 
     Configuration newConfig =
         new Configuration(
@@ -401,5 +402,54 @@ public final class ConfigurationBuilder {
     oldConfig = null;
 
     return newConfig;
+  }
+
+  private ImmutableMap<Class<?>, TypeConverter> buildNewConverters(
+      ImmutableMap<String, String> newProperties,
+      ImmutableMap<String, Path> newSources,
+      String newPrefix,
+      Set<String> newUnusedProperties,
+      Set<String> newDeprecatedProperties)
+      throws InvalidConfigurationException {
+    // For converters, we first create a map of all previously-existing converters
+    // and those explicitly set on this builder
+    Map<Class<?>, TypeConverter> oldConverters =
+        oldConfig != null ? oldConfig.converters : Configuration.DEFAULT_CONVERTERS;
+    Map<Class<?>, TypeConverter> newConverters = Configuration.createConverterMap();
+    newConverters.putAll(oldConverters);
+    if (converters != null) {
+      newConverters.putAll(converters);
+    }
+
+    // For the previously existing converters we need to call getInstanceForNewConfiguration,
+    // so we create a temp config and iterate over all previously existing and still used converters
+    Configuration tempConfig =
+        new Configuration(
+            newProperties,
+            newSources,
+            newPrefix,
+            ImmutableMap.copyOf(newConverters),
+            newUnusedProperties,
+            newDeprecatedProperties,
+            oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
+            oldConfig != null ? oldConfig.getLogger() : null);
+
+    // This map serves as a cache: if a single TypeConverter is used for multiple types,
+    // we call getInstanceForNewConfiguration only once and use the new instance several times.
+    Map<TypeConverter, TypeConverter> adjustedConverters =
+        new IdentityHashMap<>(oldConverters.size());
+    for (Map.Entry<Class<?>, TypeConverter> oldConverter : oldConverters.entrySet()) {
+      if (converters != null && converters.containsKey(oldConverter.getKey())) {
+        continue; // ignore this one
+      }
+      assert newConverters.get(oldConverter.getKey()) == oldConverter.getValue();
+      if (!adjustedConverters.containsKey(oldConverter.getValue())) {
+        TypeConverter adjustedConverter =
+            oldConverter.getValue().getInstanceForNewConfiguration(tempConfig);
+        adjustedConverters.put(oldConverter.getValue(), adjustedConverter);
+      }
+      newConverters.put(oldConverter.getKey(), adjustedConverters.get(oldConverter.getValue()));
+    }
+    return ImmutableMap.copyOf(newConverters);
   }
 }
