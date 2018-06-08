@@ -215,6 +215,7 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   @Override
+  @Nullable
   public Object convert(
       String optionName,
       String pValue,
@@ -246,6 +247,7 @@ public final class FileTypeConverter implements TypeConverter {
   }
 
   @Override
+  @Nullable
   public <T> T convertDefaultValue(
       String optionName, T pDefaultValue, TypeToken<T> pType, Annotation secondaryOption)
       throws InvalidConfigurationException {
@@ -254,6 +256,7 @@ public final class FileTypeConverter implements TypeConverter {
         optionName, pDefaultValue, pType, secondaryOption, /*doResolve=*/ true);
   }
 
+  @Nullable
   private <T> T convertDefaultValue(
       String optionName,
       T pDefaultValue,
