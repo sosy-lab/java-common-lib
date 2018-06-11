@@ -87,11 +87,19 @@
             </structure>
             <html destdir="JUnit-coverage"/>
             <xml destfile="${junit.dir}/coverage.xml"/>
+            <csv destfile="${junit.dir}/coverage.csv"/>
         </jacoco:report>
         <junitreport todir="${junit.dir}">
             <fileset dir="${junit.dir}" includes="TEST-*.xml"/>
             <report format="noframes"/>
         </junitreport>
+        <exec executable="awk" failifexecutionfails="false" failonerror="false">
+            <arg value="-F,"/>
+            <arg value='-v'/>
+            <arg value='OFS='/>
+            <arg value='{ instructions += $4 + $5; covered += $5 } END { print covered, " / ", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }'/>
+            <arg value="${junit.dir}/coverage.csv"/>
+        </exec>
         <move file="junit-noframes.html" tofile="JUnit.html"/>
         <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
     </target>
