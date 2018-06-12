@@ -27,7 +27,12 @@
         - FieldMissingNullable: buggy
         - ReturnMissingNullable: buggy
     -->
-    <property name="errorprone.options" value="
+    <!-- Temporarily disable the VarChecker on Java 10 until
+         https://github.com/google/error-prone/issues/1054 is fixed. -->
+    <condition property="java10">
+        <matches string="${ant.java.version}" pattern="10"/>
+    </condition>
+    <condition property="errorprone.options" value="
         -XepPatchLocation:${basedir}
         -XepPatchChecks:
         -XepAllDisabledChecksAsWarnings
@@ -41,7 +46,24 @@
         -Xep:ReturnMissingNullable:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
-        "/>
+        -Xep:Var:OFF
+        " else="
+        -XepPatchLocation:${basedir}
+        -XepPatchChecks:
+        -XepAllDisabledChecksAsWarnings
+        -Xep:StaticOrDefaultInterfaceMethod:OFF
+        -Xep:FieldCanBeFinal:OFF
+        -Xep:TestExceptionChecker:OFF
+        -Xep:ParameterPackage:OFF
+        -Xep:ConstructorInvokesOverridable:OFF
+        -Xep:ConstructorLeaksThis:OFF
+        -Xep:FieldMissingNullable:OFF
+        -Xep:ReturnMissingNullable:OFF
+        -Xep:InconsistentOverloads:OFF
+        -Xep:UngroupedOverloads:OFF
+        ">
+        <isset property="java10"/>
+    </condition>
 
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
