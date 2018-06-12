@@ -17,6 +17,32 @@
     <property name="ivy.pom.groupId" value="org.sosy-lab"/>
     <property name="ivy.pom.artifactId" value="common"/>
 
+    <!-- We activate even the experimental error-prone checks, with a few exceptions:
+        - StaticOrDefaultInterfaceMethod: only relevant for Android
+        - FieldCanBeFinal: not possible for our @Option fields
+        - TestExceptionChecker: TODO
+        - ParameterPackage: buggy
+        - ConstructorInvokesOverridable: buggy
+        - ConstructorLeaksThis: buggy
+        - FieldMissingNullable: buggy
+        - ReturnMissingNullable: buggy
+    -->
+    <property name="errorprone.options" value="
+        -XepPatchLocation:${basedir}
+        -XepPatchChecks:
+        -XepAllDisabledChecksAsWarnings
+        -Xep:StaticOrDefaultInterfaceMethod:OFF
+        -Xep:FieldCanBeFinal:OFF
+        -Xep:TestExceptionChecker:OFF
+        -Xep:ParameterPackage:OFF
+        -Xep:ConstructorInvokesOverridable:OFF
+        -Xep:ConstructorLeaksThis:OFF
+        -Xep:FieldMissingNullable:OFF
+        -Xep:ReturnMissingNullable:OFF
+        -Xep:InconsistentOverloads:OFF
+        -Xep:UngroupedOverloads:OFF
+        "/>
+
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
