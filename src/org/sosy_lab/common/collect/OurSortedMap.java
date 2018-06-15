@@ -72,6 +72,7 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
   OurSortedMap<K, V> tailMap(K pFromKey, boolean pInclusive);
 
   @Immutable(containerOf = {"K", "V"})
+  @SuppressWarnings("AvoidDefaultSerializableInInnerClasses") // class is (implicitly) static
   final class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
       extends AbstractImmutableSortedMap<K, V> implements Serializable {
 
