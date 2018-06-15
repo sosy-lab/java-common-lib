@@ -27,7 +27,7 @@
         <echo message="Options collected." level="info"/>
     </target>
 
-    <target name="javadoc" depends="resolve-dependencies">
+    <target name="javadoc" depends="build-project">
         <javadoc
             destdir="${documentation.javadoc.dir}"
             classpathref="classpath"
@@ -35,6 +35,7 @@
             encoding="utf-8"
             windowtitle="${ant.project.name}"
             failonerror="true"
+            failonwarning="true"
             >
 
             <fileset dir="${source.dir}" defaultexcludes="yes">
@@ -45,6 +46,9 @@
             <link href="https://google.github.io/truth/api/latest/"/>
             <link href="https://sosy-lab.github.io/java-common-lib/api/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
+            <tag name="apiNote" description="API Note:"/>
+            <tag name="implSpec" description="Implementation Requirements:"/>
+            <tag name="implNote" description="Implementation Note:"/>
         </javadoc>
     </target>
 

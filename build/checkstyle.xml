@@ -157,6 +157,7 @@
       <property name="annotationNames" value="Test"/>
       <property name="annotationTargets" value="METHOD_DEF"/>
     </module>
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClassesCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBooleanCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinallyBlockCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBooleanCheck"/>
