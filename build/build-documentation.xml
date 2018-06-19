@@ -9,6 +9,7 @@
     <!-- These properties can be overridden from including file. -->
     <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
     <property name="documentation.javadoc.dir" value="Javadoc"/>
+    <property name="documentation.javadoc.exclude" value=""/>
 
     <target name="collect-options" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
@@ -36,6 +37,8 @@
             windowtitle="${ant.project.name}"
             failonerror="true"
             failonwarning="true"
+            overview="doc/javadoc_overview.html"
+            excludepackagenames="${documentation.javadoc.exclude}"
             >
 
             <fileset dir="${source.dir}" defaultexcludes="yes">

@@ -21,6 +21,17 @@
         </java>
     </target>
 
+    <target name="format-selection" depends="resolve-dependencies"
+        description="Reformat the files in property format.selection">
+        <java fork="true" classname="com.google.googlejavaformat.java.Main">
+            <classpath>
+                <fileset dir="${ivy.lib.dir}" includes="format-source/*.jar"/>
+            </classpath>
+            <arg value="-i"/>
+            <arg line="'${format.selection}'"/>
+        </java>
+    </target>
+
     <target name="format-diff" depends="resolve-dependencies"
         description="Reformat all lines that are currently changed but not yet committed">
         <exec executable="svn"
