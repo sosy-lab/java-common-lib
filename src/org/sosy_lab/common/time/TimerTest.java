@@ -32,6 +32,7 @@ public class TimerTest {
     assert_().that(timer.getSumTime()).isEqualTo(TimeSpan.empty());
     assert_().that(timer.getLengthOfLastInterval()).isEqualTo(TimeSpan.empty());
     assert_().that(timer.getMaxTime()).isEqualTo(TimeSpan.empty());
+    assert_().that(timer.getMinTime()).isEqualTo(TimeSpan.empty());
   }
 
   @Test
