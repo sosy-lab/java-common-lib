@@ -29,8 +29,8 @@ import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 /**
  * This class represents a timer like a stop watch. It can be started and stopped several times. It
- * measures the sum, the average, the minimum, the maximum and the number of those intervals.
- * This class is similar to {@link com.google.common.base.Stopwatch} but has more features.
+ * measures the sum, the average, the minimum, the maximum and the number of those intervals. This
+ * class is similar to {@link com.google.common.base.Stopwatch} but has more features.
  *
  * <p>This class is not thread-safe and may be used only from within a single thread.
  */
@@ -86,9 +86,11 @@ public final class Timer {
   private long maxTime = 0;
 
   /**
-   * The minimal time of all intervals.
+   * The minimal time of all intervals. If no interval exists, this value is {@link Long#MAX_VALUE},
+   * but will be interpreted by method {@link #minTime()} as 0. Thus, method {@link #minTime()}
+   * should always be used to access this value in a meaningful way.
    */
-  private long minTime = 0;
+  private long minTime = Long.MAX_VALUE;
 
   /**
    * The number of intervals. This field should be accessed through {@link #getNumberOfIntervals()}
@@ -190,8 +192,8 @@ public final class Timer {
   }
 
   /**
-   * Return the minimal time of all intervals. If timer is running, the current interval is also
-   * counted (up to the current time). If the timer was never started, this method returns 0.
+   * Return the minimal time of all intervals. If the timer is running, the current interval is
+   * not considered. If the timer was never started, this method returns 0.
    */
   public TimeSpan getMinTime() {
     return export(minTime());
@@ -202,7 +204,12 @@ public final class Timer {
   }
 
   long minTime() {
-    return Math.min(minTime, currentInterval());
+    if (minTime == Long.MAX_VALUE) {
+      return 0;
+
+    } else {
+      return minTime;
+    }
   }
 
   /**
