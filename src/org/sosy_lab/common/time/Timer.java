@@ -192,8 +192,8 @@ public final class Timer {
   }
 
   /**
-   * Return the minimal time of all intervals. If the timer is running, the current interval is
-   * not considered. If the timer was never started, this method returns 0.
+   * Return the minimal time of all intervals. If the timer is running, the current interval is not
+   * considered. If the timer was never started, this method returns 0.
    */
   public TimeSpan getMinTime() {
     return export(minTime());
