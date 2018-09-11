@@ -123,6 +123,8 @@ spotbugs:
       - "JUnit-coverage/"
       - "junit/coverage.xml"
     when: always
+    reports:
+      junit: "junit/TESTS-TestSuites.xml"
 
 unit-tests:jdk-8:
   <<: *unit-tests
