@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.common.base.MoreObjects;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,5 +54,10 @@ public class FileLogFormatter extends Formatter {
         .append(lr.getMessage())
         .append("\n\n");
     return sb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).toString();
   }
 }

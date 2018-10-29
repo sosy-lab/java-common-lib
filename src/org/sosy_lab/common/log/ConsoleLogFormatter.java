@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Var;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -86,5 +87,10 @@ public class ConsoleLogFormatter extends Formatter {
     sb.append("\n\n");
 
     return sb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).add("useColors", useColors).toString();
   }
 }
