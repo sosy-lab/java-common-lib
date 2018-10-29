@@ -457,7 +457,6 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         || frame.getMethodName().startsWith("lambda$log"));
 
     return frame;
-
   }
 
   /**
