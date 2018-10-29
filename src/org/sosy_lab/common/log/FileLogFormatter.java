@@ -47,9 +47,9 @@ public class FileLogFormatter extends Formatter {
         sb.append(component).append(':');
       }
     }
-    sb.append(LogUtils.extractSimpleClassName(lr))
+    sb.append(MoreObjects.firstNonNull(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
         .append('.')
-        .append(lr.getSourceMethodName())
+        .append(MoreObjects.firstNonNull(lr.getSourceMethodName(), "$unknown$"))
         .append('\t')
         .append(lr.getMessage())
         .append("\n\n");

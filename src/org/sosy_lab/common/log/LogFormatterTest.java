@@ -93,4 +93,12 @@ public class LogFormatterTest {
     LogRecord record = createTestLogRecord(Level.WARNING, null);
     assertThat(formatter.format(record)).contains("sourceMethod");
   }
+
+  @Test
+  public void testNoSourceInformation() {
+    LogRecord record = new LogRecord(Level.WARNING, null);
+    record.setSourceClassName(null);
+    record.setSourceMethodName(null);
+    assertThat(formatter.format(record)).contains("$Unknown$.$unknown$");
+  }
 }

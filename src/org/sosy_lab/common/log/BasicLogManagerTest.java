@@ -107,6 +107,15 @@ public class BasicLogManagerTest {
     throw new RuntimeException();
   }
 
+  @Test
+  public void testWithoutSourceInformation() {
+    ((BasicLogManager) logger).log0(Level.SEVERE, null, "test without StackTraceElement");
+    List<LogRecord> records = testHandler.getStoredLogRecords();
+    assertThat(records).hasSize(1);
+    assertThat(records.get(0).getSourceClassName()).isNull();
+    assertThat(records.get(0).getSourceMethodName()).isNull();
+  }
+
   private void checkExpectedTruncatedMessage(boolean knownSize) {
     List<LogRecord> records = testHandler.getStoredLogRecords();
     assertThat(records).hasSize(1);

@@ -430,7 +430,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * with "log" are helper methods for logging and exclude them. Synthetic accessor methods are also
    * excluded.
    */
-  private static StackTraceElement findCallingMethod() {
+  private static @Nullable StackTraceElement findCallingMethod() {
     // We use lazy stack trace, because this exactly fits our use case:
     // Typically we need only one or two StackTraceElements from the top of the trace.
     List<StackTraceElement> trace = Throwables.lazyStackTrace(new Throwable());
@@ -439,15 +439,25 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     // So we can skip 2 stack trace elements in any case.
     @Var int traceIndex = 2;
 
-    @Var StackTraceElement frame = trace.get(traceIndex);
-    while (frame.getMethodName().startsWith("log")
-        || frame.getMethodName().startsWith("access$")
-        || frame.getMethodName().startsWith("lambda$log")) {
+    @Var
+    @Nullable
+    StackTraceElement frame = null;
+    do {
+      try {
+        frame = trace.get(traceIndex);
+      } catch (IndexOutOfBoundsException e) {
+        // end of stack reached or stack empty:
+        // https://plumbr.io/blog/java/on-a-quest-for-missing-stacktraces
+        // We avoid calling size() such that the JVM does not have to unroll the whole stack.
+        return frame;
+      }
       traceIndex++;
-      frame = trace.get(traceIndex);
-    }
+    } while (frame.getMethodName().startsWith("log")
+        || frame.getMethodName().startsWith("access$")
+        || frame.getMethodName().startsWith("lambda$log"));
 
     return frame;
+
   }
 
   /**
@@ -460,12 +470,19 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param stackElement the stack trace frame to use
    * @param msg the message
    */
-  private void log0(Level priority, StackTraceElement stackElement, String msg) {
+  @VisibleForTesting
+  void log0(Level priority, @Nullable StackTraceElement stackElement, @Nullable String msg) {
 
     ExtendedLogRecord record = new ExtendedLogRecord(priority, msg);
 
-    record.setSourceClassName(stackElement.getClassName());
-    record.setSourceMethodName(stackElement.getMethodName());
+    if (stackElement != null) {
+      record.setSourceClassName(stackElement.getClassName());
+      record.setSourceMethodName(stackElement.getMethodName());
+    } else {
+      // Explicitly set fields to null, otherwise LogRecord would attempt to guess them
+      record.setSourceClassName(null);
+      record.setSourceMethodName(null);
+    }
     record.setSourceComponentName(componentName);
 
     logger.log(record);
@@ -496,7 +513,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       String additionalMessage = additionalMessageSupplier.get();
       if (wouldBeLogged(priority)) {
         StringBuilder logMessage = buildUserExceptionLogMessage(priority, e, additionalMessage);
-        @Var StackTraceElement frame = locateStackTraceElement(e);
+        @Var
+        @Nullable
+        StackTraceElement frame = locateStackTraceElement(e);
         log0(priority, frame, logMessage.toString());
       }
       logDebugException(e, additionalMessage);
@@ -543,11 +562,18 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     return logMessage;
   }
 
-  private static StackTraceElement locateStackTraceElement(Throwable e) {
+  private static @Nullable StackTraceElement locateStackTraceElement(Throwable e) {
     // use exception stack trace here so that the location where the exception
     // occurred appears in the message
     List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
-    @Var StackTraceElement frame = trace.get(0);
+    @Var StackTraceElement frame;
+    try {
+      frame = trace.get(0);
+    } catch (IndexOutOfBoundsException stackEmptyException) {
+      // stack may be empty: https://plumbr.io/blog/java/on-a-quest-for-missing-stacktraces
+      // We avoid calling size() such that the JVM does not have to unroll the whole stack.
+      return null;
+    }
 
     if (e instanceof InvalidConfigurationException) {
       // find first method outside of the Configuration class,
@@ -556,7 +582,12 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       @Var int traceIndex = 0;
       while (frame.getClassName().startsWith(confPackage)) {
         traceIndex++;
-        frame = trace.get(traceIndex);
+        try {
+          frame = trace.get(traceIndex);
+        } catch (IndexOutOfBoundsException endOfStackException) {
+          // We avoid calling size() such that the JVM does not have to unroll the whole stack.
+          return frame;
+        }
       }
     }
     return frame;

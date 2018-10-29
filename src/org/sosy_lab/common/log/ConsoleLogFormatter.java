@@ -75,9 +75,10 @@ public class ConsoleLogFormatter extends Formatter {
         sb.append(component).append(':');
       }
     }
-    sb.append(LogUtils.extractSimpleClassName(lr))
+
+    sb.append(MoreObjects.firstNonNull(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
         .append('.')
-        .append(lr.getSourceMethodName())
+        .append(MoreObjects.firstNonNull(lr.getSourceMethodName(), "$unknown$"))
         .append(", ")
         .append(lr.getLevel().toString())
         .append(')');

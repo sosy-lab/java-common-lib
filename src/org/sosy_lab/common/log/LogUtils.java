@@ -20,14 +20,18 @@
 package org.sosy_lab.common.log;
 
 import java.util.logging.LogRecord;
+import javax.annotation.Nullable;
 
 final class LogUtils {
 
   private LogUtils() {}
 
   /** Get the simple name of the source class of a log record. */
-  static String extractSimpleClassName(LogRecord lr) {
+  static @Nullable String extractSimpleClassName(LogRecord lr) {
     String fullClassName = lr.getSourceClassName();
+    if (fullClassName == null) {
+      return null;
+    }
     int dotIndex = fullClassName.lastIndexOf('.');
     assert dotIndex < fullClassName.length() - 1 : "Last character in a class name cannot be a dot";
 
