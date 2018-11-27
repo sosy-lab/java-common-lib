@@ -69,7 +69,7 @@ public final class FileTypeConverter implements TypeConverter {
           File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
   private static final String TEMP_DIR =
-      StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;
+      Paths.get(StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator).toString();
 
   @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";

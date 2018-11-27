@@ -128,6 +128,8 @@ public class FileTypeConverterTest {
 
     @Parameters(name = "{0} (safe={1}, safeInFile={2})")
     public static List<Object[]> testPaths() {
+      String tmpDir =
+          Paths.get(StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator).toString();
       List<Object[]> tests =
           Lists.newArrayList(
               new Object[][] {
@@ -141,8 +143,8 @@ public class FileTypeConverterTest {
                 {"dir/../../file", false, true},
                 {"../../file", false, false},
                 {"dir/../../../file", false, false},
-                {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
-                {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
+                {tmpDir + "/file", true, true},
+                {tmpDir + "/../file", false, false},
               });
       if (!isWindows()) {
         tests.add(new Object[] {"file::name", false, false});
