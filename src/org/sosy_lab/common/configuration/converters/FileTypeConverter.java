@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.FluentIterable;
@@ -68,8 +71,9 @@ public final class FileTypeConverter implements TypeConverter {
       ImmutableSet.<Class<?>>of(
           File.class, Path.class, PathTemplate.class, PathCounterTemplate.class);
 
+  // temp dir with trailing separator to ensure path.startsWith(TEMP_DIR) is safe
   private static final String TEMP_DIR =
-      StandardSystemProperty.JAVA_IO_TMPDIR.value() + File.separator;
+      stripTrailingSeparator(StandardSystemProperty.JAVA_IO_TMPDIR.value()) + File.separator;
 
   @Option(secure = true, name = "output.path", description = "directory to put all output files in")
   private String outputDirectory = "output/";
@@ -387,5 +391,10 @@ public final class FileTypeConverter implements TypeConverter {
 
   private static boolean isOutputOption(FileOption.Type typeInfo) {
     return typeInfo == FileOption.Type.OUTPUT_FILE || typeInfo == FileOption.Type.OUTPUT_DIRECTORY;
+  }
+
+  static String stripTrailingSeparator(String input) {
+    checkArgument(!input.equals(File.separator), "result would be empty");
+    return CharMatcher.is(File.separatorChar).trimTrailingFrom(input);
   }
 }

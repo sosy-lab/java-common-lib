@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
+import static org.sosy_lab.common.configuration.converters.FileTypeConverter.stripTrailingSeparator;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
@@ -136,11 +137,20 @@ public class FileTypeConverterTest {
                 {"relative/dir" + File.pathSeparator + "/etc", false, false},
                 {"file", true, true},
                 {"dir/../file", true, true},
+                {"dir/./file", true, true},
+                {"dir/./../file", true, true},
+                {"dir//../file", true, true},
                 {"./dir/file", true, true},
                 {"../dir", false, true},
+                {"./../dir", false, true},
                 {"dir/../../file", false, true},
                 {"../../file", false, false},
                 {"dir/../../../file", false, false},
+                {
+                  stripTrailingSeparator(StandardSystemProperty.JAVA_IO_TMPDIR.value()) + "_/file",
+                  false,
+                  false,
+                },
                 {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/file", true, true},
                 {StandardSystemProperty.JAVA_IO_TMPDIR.value() + "/../file", false, false},
               });
