@@ -152,6 +152,7 @@ public class CopyOnWriteSortedMapTest {
 
         // We do not support Map.Entry.setValue()
         .suppressing(MapEntrySetTester.class.getMethod("testSetValue"))
+        .suppressing(MapEntrySetTester.class.getMethod("testSetValueWithNullValuesPresent"))
         .suppressing(MapReplaceAllTester.class.getMethod("testReplaceAllPreservesOrder"))
         .suppressing(MapReplaceAllTester.class.getMethod("testReplaceAllRotate"))
         .createTestSuite();
