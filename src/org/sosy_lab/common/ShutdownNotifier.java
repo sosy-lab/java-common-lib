@@ -92,6 +92,7 @@ public final class ShutdownNotifier {
   // and we would miss shutdown notifications
   // (in such a cascade we need references from child ShutdownManagers to parent ShutdownManagers,
   // and this field is part of this).
+  @SuppressWarnings("unused")
   private final @Nullable ShutdownManager manager;
 
   ShutdownNotifier(@Nullable ShutdownManager pManager) {

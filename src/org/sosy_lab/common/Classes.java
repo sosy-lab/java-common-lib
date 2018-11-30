@@ -509,6 +509,7 @@ public final class Classes {
       return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
     }
 
+    @SuppressWarnings("NoFunctionalReturnType")
     private static Predicate<String> matching(Pattern pattern) {
       return s -> pattern.matcher(s).matches();
     }

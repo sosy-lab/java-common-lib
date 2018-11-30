@@ -20,50 +20,34 @@
     <!-- We activate even the experimental error-prone checks, with a few exceptions:
         - StaticOrDefaultInterfaceMethod: only relevant for Android
         - FieldCanBeFinal: not possible for our @Option fields
-        - TestExceptionChecker: TODO
         - ParameterPackage: buggy
         - ConstructorInvokesOverridable: buggy
-        - ConstructorLeaksThis: buggy
+        - ConstructorLeaksThis: warns about config.inject()
+        - NullableDereference: buggy
         - FieldMissingNullable: buggy
         - ReturnMissingNullable: buggy
+        - BadImport: complains about commonly-used FluentIterable.from
+        - TestExceptionChecker, TryFailRefactoring, TestExceptionRefactoring, ExpectedExceptionRefactoring: will be fixed with newer JUnit
     -->
-    <!-- Temporarily disable the VarChecker on Java 10 until
-         https://github.com/google/error-prone/issues/1054 is fixed. -->
-    <condition property="java10">
-        <matches string="${ant.java.version}" pattern="10"/>
-    </condition>
-    <condition property="errorprone.options" value="
-        -XepPatchLocation:${basedir}
-        -XepPatchChecks:
+    <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
         -Xep:StaticOrDefaultInterfaceMethod:OFF
+        -Xep:AndroidJdkLibsChecker:OFF
+        -Xep:Java7ApiChecker:OFF
         -Xep:FieldCanBeFinal:OFF
-        -Xep:TestExceptionChecker:OFF
         -Xep:ParameterPackage:OFF
-        -Xep:ConstructorInvokesOverridable:OFF
         -Xep:ConstructorLeaksThis:OFF
+        -Xep:NullableDereference:OFF
         -Xep:FieldMissingNullable:OFF
         -Xep:ReturnMissingNullable:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
-        -Xep:Var:OFF
-        " else="
-        -XepPatchLocation:${basedir}
-        -XepPatchChecks:
-        -XepAllDisabledChecksAsWarnings
-        -Xep:StaticOrDefaultInterfaceMethod:OFF
-        -Xep:FieldCanBeFinal:OFF
+        -Xep:BadImport:OFF
         -Xep:TestExceptionChecker:OFF
-        -Xep:ParameterPackage:OFF
-        -Xep:ConstructorInvokesOverridable:OFF
-        -Xep:ConstructorLeaksThis:OFF
-        -Xep:FieldMissingNullable:OFF
-        -Xep:ReturnMissingNullable:OFF
-        -Xep:InconsistentOverloads:OFF
-        -Xep:UngroupedOverloads:OFF
-        ">
-        <isset property="java10"/>
-    </condition>
+        -Xep:TryFailRefactoring:OFF
+        -Xep:TestExceptionRefactoring:OFF
+        -Xep:ExpectedExceptionRefactoring:OFF
+        "/>
 
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>

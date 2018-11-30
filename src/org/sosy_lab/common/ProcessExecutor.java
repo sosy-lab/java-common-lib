@@ -113,6 +113,7 @@ public class ProcessExecutor<E extends Exception> {
    * @param cmd The command with arguments to execute.
    * @throws IOException If the process cannot be executed.
    */
+  @SuppressWarnings("ConstructorInvokesOverridable")
   public ProcessExecutor(
       LogManager logger,
       Class<E> exceptionClass,

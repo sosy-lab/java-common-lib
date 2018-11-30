@@ -46,6 +46,7 @@ public enum BaseTypeConverter implements TypeConverter {
   INSTANCE;
 
   @Override
+  @SuppressWarnings("UnusedException") // unchecked exceptions are expected, cause has no value
   public Object convert(
       String optionName,
       String valueStr,

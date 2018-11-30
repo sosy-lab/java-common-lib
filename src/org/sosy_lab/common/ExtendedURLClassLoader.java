@@ -47,6 +47,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
   }
 
   @AutoValue
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class ExtendedURLClassLoaderConfiguration {
     abstract Optional<ClassLoader> parent();
 

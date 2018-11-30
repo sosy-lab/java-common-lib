@@ -300,6 +300,7 @@ public class ConfigurationTest {
 
   @Options(prefix = "prefix")
   private static class SecureOptions {
+    @SuppressWarnings("unused")
     @Option(secure = false, description = "test")
     private String test = "test";
   }

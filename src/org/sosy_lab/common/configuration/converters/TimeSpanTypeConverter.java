@@ -45,6 +45,7 @@ public class TimeSpanTypeConverter implements TypeConverter {
   private static final CharMatcher LETTER_MATCHER = CharMatcher.inRange('a', 'z');
 
   @Override
+  @SuppressWarnings("UnusedException") // NumberFormatException is expected, cause has no value
   public Object convert(
       String optionName,
       String valueStr,

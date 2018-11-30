@@ -351,6 +351,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
    * streams.
    */
+  @SuppressWarnings("NoFunctionalReturnType")
   public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
     return new Collector<T, PersistentLinkedListBuilder<T>, PersistentLinkedList<T>>() {
 
