@@ -38,6 +38,7 @@ import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
+import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -740,6 +741,7 @@ public final class Classes {
 
     private static final long serialVersionUID = 5091662820905162461L;
 
+    @FormatMethod
     UnsuitedClassException(String msg, Object... args) {
       super(String.format(msg, args));
     }

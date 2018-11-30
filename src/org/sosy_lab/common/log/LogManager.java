@@ -123,6 +123,7 @@ public interface LogManager {
    * @param format The format string.
    * @param args The arguments for the format string.
    */
+  @FormatMethod
   void logfUserException(Level priority, Throwable e, String format, Object... args);
 
   /**
@@ -151,6 +152,7 @@ public interface LogManager {
    * @param format The format string.
    * @param args The arguments for the format string.
    */
+  @FormatMethod
   void logfDebugException(Throwable e, String format, Object... args);
 
   /**
@@ -190,6 +192,7 @@ public interface LogManager {
    * @param format The format string.
    * @param args The arguments for the format string.
    */
+  @FormatMethod
   void logfException(Level priority, Throwable e, String format, Object... args);
 
   /** Flush all handlers of this logger. */

@@ -22,6 +22,7 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.FormatMethod;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -72,6 +73,7 @@ public enum TestLogManager implements LogManager {
   }
 
   @Override
+  @FormatMethod
   public void logf(Level pPriority, String pFormat, Object... pArgs) {
     checkLogBaseParam(pPriority);
     checkFormatParamsNotNull(pFormat, pArgs);
@@ -87,6 +89,7 @@ public enum TestLogManager implements LogManager {
   }
 
   @Override
+  @FormatMethod
   public void logfUserException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
     checkUserExceptionBaseParams(pPriority, pE);
     checkFormatParamsNotNull(pFormat, pArgs);
@@ -103,6 +106,7 @@ public enum TestLogManager implements LogManager {
   }
 
   @Override
+  @FormatMethod
   public void logfDebugException(Throwable pE, String pFormat, Object... pArgs) {
     checkLogDebugExceptionBaseParams(pE);
     checkFormatParamsNotNull(pFormat, pArgs);
@@ -123,6 +127,7 @@ public enum TestLogManager implements LogManager {
   }
 
   @Override
+  @FormatMethod
   public void logfException(Level pPriority, Throwable pE, String pFormat, Object... pArgs) {
     checkLogExceptionBaseParams(pPriority, pE);
     checkFormatParamsNotNull(pFormat, pArgs);
@@ -133,6 +138,7 @@ public enum TestLogManager implements LogManager {
     checkNotNull(pE);
   }
 
+  @FormatMethod
   private static void checkFormatParamsNotNull(String pFormat, Object... pArgs) {
     checkNotNull(pArgs);
     checkArgument(!String.format(pFormat, pArgs).isEmpty());
