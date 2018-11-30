@@ -23,7 +23,7 @@
 
     <property name="errorprone" value="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
     <condition property="java8">
-        <equals arg1="${ant.java.version}" arg2="9"/>
+        <equals arg1="${ant.java.version}" arg2="1.8"/>
     </condition>
 
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
