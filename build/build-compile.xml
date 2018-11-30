@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
-<project name="compile" basedir="." xmlns:unless="ant:unless">
+<project name="compile" basedir="." xmlns:if="ant:if">
 
     <!-- Targets for compilation. -->
 
@@ -21,8 +21,9 @@
         <fileset dir="${ivy.lib.dir}" includes="build/*.jar"/>
     </path>
 
-    <condition property="jdk9orlater">
-        <javaversion atleast="9"/>
+    <property name="errorprone" value="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+    <condition property="java8">
+        <matches string="${ant.java.version}" pattern="8"/>
     </condition>
 
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
@@ -48,7 +49,7 @@
                fork="true"
                includeAntRuntime="false"
                encoding="UTF-8">
-            <compilerarg value="-J-Xbootclasspath/p:${ivy.lib.dir}/build/javac.jar" unless:set="jdk9orlater"/>
+            <compilerarg value="-J-Xbootclasspath/p:${ivy.lib.dir}/build/javac.jar" if:set="java8"/>
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
             <compilerarg value="-Xlint"/>
