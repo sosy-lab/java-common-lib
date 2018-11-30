@@ -38,8 +38,10 @@ final class OptionalComparators {
 
   private OptionalComparators() {}
 
-  static final Ordering<OptionalInt> INT_EMTPY_FIRST = new OptionalIntComparator(true);
-  static final Ordering<OptionalInt> INT_EMTPY_LAST = new OptionalIntComparator(false);
+  static final Ordering<OptionalInt> INT_EMTPY_FIRST =
+      new OptionalIntComparator(/*pEmptyFirst=*/ true);
+  static final Ordering<OptionalInt> INT_EMTPY_LAST =
+      new OptionalIntComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalIntComparator extends Ordering<OptionalInt>
       implements Serializable {
@@ -79,8 +81,10 @@ final class OptionalComparators {
     }
   }
 
-  static final Ordering<OptionalLong> LONG_EMTPY_FIRST = new OptionalLongComparator(true);
-  static final Ordering<OptionalLong> LONG_EMTPY_LAST = new OptionalLongComparator(false);
+  static final Ordering<OptionalLong> LONG_EMTPY_FIRST =
+      new OptionalLongComparator(/*pEmptyFirst=*/ true);
+  static final Ordering<OptionalLong> LONG_EMTPY_LAST =
+      new OptionalLongComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalLongComparator extends Ordering<OptionalLong>
       implements Serializable {
@@ -120,8 +124,10 @@ final class OptionalComparators {
     }
   }
 
-  static final Ordering<OptionalDouble> DOUBLE_EMTPY_FIRST = new OptionalDoubleComparator(true);
-  static final Ordering<OptionalDouble> DOUBLE_EMTPY_LAST = new OptionalDoubleComparator(false);
+  static final Ordering<OptionalDouble> DOUBLE_EMTPY_FIRST =
+      new OptionalDoubleComparator(/*pEmptyFirst=*/ true);
+  static final Ordering<OptionalDouble> DOUBLE_EMTPY_LAST =
+      new OptionalDoubleComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalDoubleComparator extends Ordering<OptionalDouble>
       implements Serializable {

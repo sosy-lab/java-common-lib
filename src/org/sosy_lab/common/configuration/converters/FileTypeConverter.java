@@ -120,7 +120,7 @@ public final class FileTypeConverter implements TypeConverter {
 
   public static FileTypeConverter create(Configuration config)
       throws InvalidConfigurationException {
-    return new FileTypeConverter(config, false);
+    return new FileTypeConverter(config, /*pSafePathsOnly=*/ false);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class FileTypeConverter implements TypeConverter {
    */
   public static FileTypeConverter createWithSafePathsOnly(Configuration config)
       throws InvalidConfigurationException {
-    return new FileTypeConverter(config, true);
+    return new FileTypeConverter(config, /*pSafePathsOnly=*/ true);
   }
 
   @Override

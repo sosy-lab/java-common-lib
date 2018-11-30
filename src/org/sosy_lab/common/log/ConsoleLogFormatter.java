@@ -50,11 +50,11 @@ public class ConsoleLogFormatter extends Formatter {
   }
 
   public static Formatter withoutColors() {
-    return new ConsoleLogFormatter(false);
+    return new ConsoleLogFormatter(/*pUseColors=*/ false);
   }
 
   public static Formatter withColorsIfPossible() {
-    return new ConsoleLogFormatter(true);
+    return new ConsoleLogFormatter(/*pUseColors=*/ true);
   }
 
   @Override
