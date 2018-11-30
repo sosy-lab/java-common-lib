@@ -34,7 +34,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   public static final Rational ONE = new Rational(B_ONE, B_ONE);
   public static final Rational NEG_ONE = new Rational(B_M_ONE, B_ONE);
 
-  private transient @LazyInit @Nullable String stringCache = null;
+  @LazyInit private transient @Nullable String stringCache = null;
 
   /**
    * Rationals are always stored in the normal form. That is:
@@ -195,7 +195,7 @@ public final class Rational extends Number implements Comparable<Rational> {
       return a;
     }
 
-    return of((a.num.multiply(b.den).add(b.num.multiply(a.den))), a.den.multiply(b.den));
+    return of(a.num.multiply(b.den).add(b.num.multiply(a.den)), a.den.multiply(b.den));
   }
 
   /** Return a new instance equal to {@code this - b}. */

@@ -37,6 +37,6 @@ class LogLevelFilter implements Filter {
 
   @Override
   public boolean isLoggable(LogRecord pRecord) {
-    return !(excludeLevels.contains(pRecord.getLevel()));
+    return !excludeLevels.contains(pRecord.getLevel());
   }
 }

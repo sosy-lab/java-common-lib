@@ -99,8 +99,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
     private static final long serialVersionUID = -7393505826652634501L;
 
-    private @Nullable final Node<K, V> left;
-    private @Nullable final Node<K, V> right;
+    private final @Nullable Node<K, V> left;
+    private final @Nullable Node<K, V> right;
     private final boolean isRed;
 
     // Leaf node
@@ -240,9 +240,10 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   private final @Nullable Node<K, V> root;
 
   @SuppressWarnings("Immutable")
-  private transient @LazyInit @Nullable NavigableSet<Entry<K, V>> entrySet;
+  @LazyInit
+  private transient @Nullable NavigableSet<Entry<K, V>> entrySet;
 
-  private transient @LazyInit int size;
+  @LazyInit private transient int size;
 
   private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
@@ -1299,10 +1300,11 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final @Nullable K toKey;
     private final boolean toInclusive;
 
-    private transient @LazyInit int size;
+    @LazyInit private transient int size;
 
     @SuppressWarnings("Immutable")
-    private transient @LazyInit @Nullable NavigableSet<Entry<K, V>> entrySet;
+    @LazyInit
+    private transient @Nullable NavigableSet<Entry<K, V>> entrySet;
 
     private PartialSortedMap(
         Node<K, V> pRoot,
