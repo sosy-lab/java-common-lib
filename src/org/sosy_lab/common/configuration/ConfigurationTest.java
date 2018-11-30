@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -56,6 +57,25 @@ import org.sosy_lab.common.rationals.Rational;
 public class ConfigurationTest {
 
   @Rule public final ExpectedException thrown = ExpectedException.none();
+
+  @Options
+  private static class TestStringOptions {
+    TestStringOptions() {}
+
+    @Option(secure = true, description = "basic string option")
+    private String s1;
+
+    @Option(secure = true, description = "basic string option with type annotation @Nullable")
+    private @Nullable String s2;
+  }
+
+  @Test
+  public void testString() throws InvalidConfigurationException {
+    TestStringOptions options = new TestStringOptions();
+    Configuration.builder().setOption("s1", "1").setOption("s2", "2").build().inject(options);
+    assertThat(options.s1).isEqualTo("1");
+    assertThat(options.s2).isEqualTo("2");
+  }
 
   private enum TestEnum {
     E1,

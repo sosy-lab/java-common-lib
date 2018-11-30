@@ -177,7 +177,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
                 .getParameters()
                 .stream()
                 .anyMatch(
-                    (param) -> param.asType().toString().equals(Configuration.class.getName()));
+                    (param) -> typeToString(param.asType()).equals(Configuration.class.getName()));
         if (!foundConfigurationParameter && warningsEnabled(constructor)) {
           message(
               WARNING,
@@ -386,11 +386,11 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       Set<String> acceptedTypeNames = new HashSet<>();
 
       for (Object listEntry : acceptedClasses) {
-        DeclaredType acceptedType = (DeclaredType) ((AnnotationValue) listEntry).getValue();
-        acceptedTypeNames.add(acceptedType.toString());
+        String acceptedType = typeToString((DeclaredType) ((AnnotationValue) listEntry).getValue());
+        acceptedTypeNames.add(acceptedType);
 
         // String comparison for type equality (cf. isSubtypeOf())
-        if (optionTypeName.equals(acceptedType.toString())) {
+        if (optionTypeName.equals(acceptedType)) {
           foundMatchingType = true;
           break;
         }
@@ -444,12 +444,21 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     // of it and all its super types.
     do {
       // String comparison for type equality as explained above
-      if (type.toString().equals(superType)) {
+      if (typeToString(type).equals(superType)) {
         return true;
       }
       type = ((TypeElement) ((DeclaredType) type).asElement()).getSuperclass();
     } while (type.getKind() != TypeKind.NONE);
     return false;
+  }
+
+  private static String typeToString(TypeMirror type) {
+    if (type.getKind() == TypeKind.DECLARED) {
+      // type.toString() can contain type annotations like @Nullable
+      return ((TypeElement) ((DeclaredType) type).asElement()).getQualifiedName().toString();
+    } else {
+      return type.toString();
+    }
   }
 
   /**
@@ -541,7 +550,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     if (type.getKind().isPrimitive()) {
       type = typeUtils().boxedClass((PrimitiveType) type).asType();
     }
-    @Var String typeName = type.toString();
+    @Var String typeName = typeToString(type);
 
     // Unfortunately, there is an Eclipse bug in the erasure() method called above:
     // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340635
