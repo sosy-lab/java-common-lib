@@ -59,7 +59,7 @@ public class ClassesFactoryTest {
 
   public static class ParameterTestClass {
     private final String s;
-    private final Integer i;
+    private final @Nullable Integer i;
 
     public ParameterTestClass(String s, @Nullable Integer i) {
       this.s = s;

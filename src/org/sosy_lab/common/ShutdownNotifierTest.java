@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,8 +40,8 @@ public class ShutdownNotifierTest {
 
   private static final String REASON = "Shutdown Request Reason";
 
-  private ShutdownManager manager = null;
-  private ShutdownNotifier instance = null;
+  private @Nullable ShutdownManager manager;
+  private @Nullable ShutdownNotifier instance;
 
   @Before
   public void setUp() {
