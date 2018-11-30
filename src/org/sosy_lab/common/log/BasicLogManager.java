@@ -238,7 +238,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       try {
         MoreFiles.createParentDirectories(outputFile);
 
-        Handler outfileHandler = new FileHandler(outputFile.toAbsolutePath().toString(), false);
+        Handler outfileHandler =
+            new FileHandler(outputFile.toAbsolutePath().toString(), /*append=*/ false);
         setupHandler(
             logger, outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
       } catch (IOException e) {
