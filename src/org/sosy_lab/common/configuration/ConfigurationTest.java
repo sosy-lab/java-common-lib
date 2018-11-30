@@ -354,6 +354,7 @@ public class ConfigurationTest {
     Configuration c = Configuration.builder().setOption("prefix.test", "myDeprecatedValue").build();
     OptionsWithDeprecatedOption opts = new OptionsWithDeprecatedOption();
     c.inject(opts);
+    assertThat(opts.test).isEqualTo("myDeprecatedValue");
     assertThat(c.getDeprecatedProperties()).contains("prefix.test");
   }
 

@@ -267,7 +267,8 @@ public class TimeSpanTest {
   public void testEquals() {
     new EqualsTester()
         .addEqualityGroup(TimeSpan.empty(), TimeSpan.of(0, SECONDS), TimeSpan.of(0, NANOSECONDS))
-        .addEqualityGroup(LARGE, LARGE_AS_HOURS, LARGE_AS_MINUTES);
+        .addEqualityGroup(LARGE, LARGE_AS_HOURS, LARGE_AS_MINUTES)
+        .testEquals();
   }
 
   @Test
