@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** An extension of {@link LogRecord} that stores additional information. */
 public class ExtendedLogRecord extends LogRecord {

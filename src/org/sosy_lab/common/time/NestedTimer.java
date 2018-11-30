@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.errorprone.annotations.Var;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class represents a timer similar to {@link Timer}, however it nests two timers.

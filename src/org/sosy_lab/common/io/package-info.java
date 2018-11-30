@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 /** This package contains utilities for I/O. */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

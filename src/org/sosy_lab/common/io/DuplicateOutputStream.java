@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class is an OutputStream implementation that sends everything to two other OutputStreams.

@@ -23,11 +23,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.log.LogManager;
 
 /**

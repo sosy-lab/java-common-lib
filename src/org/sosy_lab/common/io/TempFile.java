@@ -28,6 +28,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,7 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utilities for temporary files. */
 public class TempFile {
@@ -180,7 +181,7 @@ public class TempFile {
    * AutoCloseable#close()}.
    */
   @SuppressWarnings("deprecation")
-  @javax.annotation.concurrent.Immutable
+  @Immutable
   public static final class DeleteOnCloseFile extends MoreFiles.DeleteOnCloseFile
       implements AutoCloseable {
 

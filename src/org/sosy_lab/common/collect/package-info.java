@@ -21,7 +21,7 @@
  * This package contains additional interfaces and implementations for collections, as well as
  * further collection utilities.
  */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

@@ -19,12 +19,12 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.CompatibleWith;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import javax.annotation.CheckReturnValue;
 
 /**
  * Interface for persistent map. A persistent data structure is immutable, but provides cheap

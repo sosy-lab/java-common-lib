@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
-import javax.annotation.CheckReturnValue;
 
 /**
  * Sub-interface of {@link PersistentMap} analog to {@link NavigableMap}.

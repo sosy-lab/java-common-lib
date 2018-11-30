@@ -26,6 +26,7 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
@@ -43,7 +44,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A single-linked-list implementation of {@link PersistentList}. Null values are not supported
@@ -61,8 +62,11 @@ import javax.annotation.Nullable;
  * two new maps, each reflecting exactly the operation executed by the current thread, and not
  * reflecting the operation executed by the other thread.
  */
-@javax.annotation.concurrent.Immutable
-@SuppressWarnings("deprecation") // javac complains about deprecated methods from PersistentList
+@Immutable(containerOf = "T")
+@SuppressWarnings({
+  "deprecation", // javac complains about deprecated methods from PersistentList
+  "Immutable", // AbstractList.modCount is mutable but safe
+})
 public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {
 

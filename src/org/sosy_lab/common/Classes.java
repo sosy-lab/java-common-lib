@@ -37,6 +37,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -59,8 +60,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
 import org.sosy_lab.common.annotations.Unmaintained;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -122,8 +122,8 @@ public final class Classes {
   @Deprecated
   public static <T> T createInstance(
       Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes,
-      @Nullable Object[] argumentValues,
+      Class<?> @Nullable [] argumentTypes,
+      Object @Nullable [] argumentValues,
       Class<T> type)
       throws ClassInstantiationException, InvocationTargetException {
     checkNotNull(type);
@@ -156,7 +156,7 @@ public final class Classes {
   public static <T> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
-      @Nullable Class<?>[] argumentTypes,
+      Class<?> @Nullable [] argumentTypes,
       Object[] argumentValues)
       throws InvalidConfigurationException {
     return createInstance(type, cls, argumentTypes, argumentValues, RuntimeException.class);
@@ -180,7 +180,7 @@ public final class Classes {
   public static <T, X extends Exception> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
-      @Var @Nullable Class<?>[] argumentTypes,
+      @Var Class<?> @Nullable [] argumentTypes,
       Object[] argumentValues,
       Class<X> exceptionType)
       throws X, InvalidConfigurationException {

@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.common.log;
 
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import javax.annotation.concurrent.GuardedBy;
 
 /** This class may be used to read the log into a String. */
 public class StringBuildingLogHandler extends Handler {

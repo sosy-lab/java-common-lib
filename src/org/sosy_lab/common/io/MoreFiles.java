@@ -24,6 +24,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.io.TempFile.TempFileBuilder;
 
 /** Provides helper functions for file access. */
@@ -138,7 +139,7 @@ public final class MoreFiles {
    *
    * @deprecated Use {@link TempFile.DeleteOnCloseFile}.
    */
-  @javax.annotation.concurrent.Immutable
+  @Immutable
   @Deprecated
   public static class DeleteOnCloseFile implements AutoCloseable {
 

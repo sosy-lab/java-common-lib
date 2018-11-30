@@ -19,11 +19,11 @@
  */
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import javax.annotation.CheckReturnValue;
 
 /**
  * Interface for persistent lists. A persistent data structure is immutable, but provides cheap

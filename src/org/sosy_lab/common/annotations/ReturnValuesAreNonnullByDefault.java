@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault} that defines that
@@ -36,6 +37,7 @@ import javax.annotation.meta.TypeQualifierDefault;
  */
 @Documented
 @Nonnull
+@NonNull
 @TypeQualifierDefault(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReturnValuesAreNonnullByDefault {}

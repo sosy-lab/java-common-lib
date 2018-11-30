@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility class providing {@link Appender}s for various cases. */
 public class Appenders {

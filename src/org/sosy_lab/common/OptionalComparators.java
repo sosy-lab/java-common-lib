@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link Comparator} implementations for {@link Optional}, {@link OptionalInt}, {@link
@@ -52,7 +52,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@Nonnull OptionalInt left, @Nonnull OptionalInt right) {
+    public int compare(@NonNull OptionalInt left, @NonNull OptionalInt right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -93,7 +93,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@Nonnull OptionalLong left, @Nonnull OptionalLong right) {
+    public int compare(@NonNull OptionalLong left, @NonNull OptionalLong right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -134,7 +134,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@Nonnull OptionalDouble left, @Nonnull OptionalDouble right) {
+    public int compare(@NonNull OptionalDouble left, @NonNull OptionalDouble right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes

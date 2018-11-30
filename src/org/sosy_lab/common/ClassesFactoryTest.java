@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 import com.google.common.reflect.TypeToken;
 import java.io.IOException;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 import org.sosy_lab.common.Classes.UnsuitedClassException;
 

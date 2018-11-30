@@ -26,7 +26,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, V>
     implements OurSortedMap<K, V> {

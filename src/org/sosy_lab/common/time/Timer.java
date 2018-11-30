@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Ascii;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
 
 /**

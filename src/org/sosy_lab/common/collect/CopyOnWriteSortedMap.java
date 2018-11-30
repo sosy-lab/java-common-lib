@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This is a map implementation that uses copy-on-write behavior. This may be a good fit when you

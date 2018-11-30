@@ -20,7 +20,7 @@
 package org.sosy_lab.common.log;
 
 import java.util.logging.LogRecord;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class LogUtils {
 

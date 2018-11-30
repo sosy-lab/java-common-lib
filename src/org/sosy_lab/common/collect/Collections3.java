@@ -47,7 +47,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility class similar to {@link Collections} and {@link Collections2}. */
 public final class Collections3 {

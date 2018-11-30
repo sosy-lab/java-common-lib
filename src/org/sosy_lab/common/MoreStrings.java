@@ -21,9 +21,9 @@ package org.sosy_lab.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.function.Supplier;
-import javax.annotation.CheckReturnValue;
 
 /** Utility class for String-related helpers, similar to {@link com.google.common.base.Strings}. */
 public final class MoreStrings {

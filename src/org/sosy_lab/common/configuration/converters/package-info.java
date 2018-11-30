@@ -24,7 +24,7 @@
  * {@link org.sosy_lab.common.configuration.converters.TypeConverter}, and some default
  * implementations for commonly-used classes are also provided.
  */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

@@ -8,7 +8,7 @@ import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Rational class, throws {@link IllegalArgumentException} on unsupported operations (e.g. {@code
