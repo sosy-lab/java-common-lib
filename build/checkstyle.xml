@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: SoSy-Lab Common
+    Checkstyle-Configuration: SoSy-Lab
     Description: none
 -->
 <module name="Checker">

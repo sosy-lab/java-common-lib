@@ -63,7 +63,7 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/auto-service.jar build/auto-value-annotations.jar build/auto-common.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/auto-service.jar build/auto-value-annotations.jar"/>
     </path>
 
 
