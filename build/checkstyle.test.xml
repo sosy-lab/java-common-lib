@@ -113,7 +113,9 @@
     <module name="DefaultComesLast"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
-    <module name="FallThrough"/>
+    <module name="FallThrough">
+      <property name="reliefPattern" value="\$FALL-THROUGH\$"/>
+    </module>
     <module name="IllegalInstantiation">
       <property name="classes" value="Boolean,Character,Integer,Long,Double,Float,String"/>
     </module>
@@ -173,6 +175,10 @@
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
   </module>
-  <module name="SuppressWarningsFilter"/>
   <module name="JavadocPackage"/>
+  <module name="SuppressWarningsFilter"/>
+  <module name="SuppressionFilter">
+    <property name="file" value="${config_loc}/Checkstyle.exclude.xml"/>
+    <property name="optional" value="true"/>
+  </module>
 </module>
