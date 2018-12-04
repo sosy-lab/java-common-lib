@@ -105,10 +105,7 @@
       <property name="allowLineBreaks" value="true"/>
       <property name="tokens" value="DOT"/>
     </module>
-    <module name="ModifierOrder">
-      <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
+    <module name="ModifierOrder"/>
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
@@ -186,10 +183,6 @@
     <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
     <module name="JavadocParagraph"/>
-    <module name="JavadocType">
-      <property name="scope" value="public"/>
-      <property name="severity" value="ignore"/>
-    </module>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
