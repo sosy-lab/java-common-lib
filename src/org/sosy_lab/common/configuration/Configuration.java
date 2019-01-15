@@ -91,6 +91,8 @@ public final class Configuration {
 
   private static boolean secureMode = false;
 
+  private Configuration parent = null;
+
   /** Create a new Builder instance. */
   public static ConfigurationBuilder builder() {
     return new ConfigurationBuilder();
@@ -116,6 +118,7 @@ public final class Configuration {
         new HashSet<>(0),
         new HashSet<>(0),
         null,
+        null,
         null);
   }
 
@@ -131,7 +134,8 @@ public final class Configuration {
         oldConfig.unusedProperties,
         oldConfig.deprecatedProperties,
         oldConfig.printUsedOptions,
-        oldConfig.logger);
+        oldConfig.logger,
+        oldConfig);
   }
 
   /** Splitter to create string arrays. */
@@ -291,7 +295,8 @@ public final class Configuration {
       Set<String> pUnusedProperties,
       Set<String> pDeprecatedProperties,
       @Nullable PrintStream pPrintUsedOptions,
-      @Nullable LogManager pLogger) {
+      @Nullable LogManager pLogger,
+      @Nullable Configuration pParent) {
 
     checkNotNull(pProperties);
     checkNotNull(pSources);
@@ -306,6 +311,7 @@ public final class Configuration {
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
     printUsedOptions = pPrintUsedOptions;
     logger = firstNonNull(pLogger, LogManager.createNullLogManager());
+    parent = pParent;
   }
 
   public void enableLogging(LogManager pLogger) {
@@ -335,10 +341,16 @@ public final class Configuration {
     checkNotNull(key);
     @Var String result = properties.get(prefix + key);
     unusedProperties.remove(prefix + key);
+    if (parent != null && result != null && result.equals(parent.getProperty(prefix + key))) {
+        parent.unusedProperties.remove(prefix + key);
+    }
 
     if (result == null && !prefix.isEmpty()) {
       result = properties.get(key);
       unusedProperties.remove(key);
+      if (parent != null && result != null && result.equals(parent.getProperty(key))) {
+        parent.unusedProperties.remove(key);
+      }
     }
     return result;
   }

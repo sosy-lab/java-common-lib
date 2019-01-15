@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharSource;
 import com.google.common.io.Resources;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -122,8 +123,10 @@ public final class ConfigurationBuilder {
 
   /**
    * Copy everything from an existing Configuration instance. This also means that the new
-   * configuration object created by this builder will share the set of unused properties with the
-   * configuration instance passed to this class.
+   * configuration object created by this builder will update the set of unused properties of the
+   * configuration instance passed to this class in case a property is requested. The new
+   * configuration will keep track of unused properties only for properties that are not present in
+   * the passed instance.
    *
    * <p>If this method is called, it has to be the first method call on this builder instance.
    *
@@ -374,7 +377,8 @@ public final class ConfigurationBuilder {
     Set<String> newDeprecatedProperties;
     if (oldConfig != null) {
       // share the same set of unused properties
-      newUnusedProperties = oldConfig.unusedProperties;
+      newUnusedProperties =
+          new HashSet<>(Sets.difference(newProperties.keySet(), oldConfig.properties.keySet()));
       newDeprecatedProperties = oldConfig.deprecatedProperties;
     } else {
       newUnusedProperties = new HashSet<>(newProperties.keySet());
@@ -394,7 +398,8 @@ public final class ConfigurationBuilder {
             newUnusedProperties,
             newDeprecatedProperties,
             oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
-            oldConfig != null ? oldConfig.getLogger() : null);
+            oldConfig != null ? oldConfig.getLogger() : null,
+            oldConfig);
 
     // reset builder instance so that it may be re-used
     properties = null;
@@ -432,7 +437,8 @@ public final class ConfigurationBuilder {
             newUnusedProperties,
             newDeprecatedProperties,
             oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
-            oldConfig != null ? oldConfig.getLogger() : null);
+            oldConfig != null ? oldConfig.getLogger() : null,
+            oldConfig);
 
     // This map serves as a cache: if a single TypeConverter is used for multiple types,
     // we call getInstanceForNewConfiguration only once and use the new instance several times.
