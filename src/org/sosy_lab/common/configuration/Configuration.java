@@ -91,7 +91,7 @@ public final class Configuration {
 
   private static boolean secureMode = false;
 
-  private Configuration parent = null;
+  private final Configuration parent;
 
   /** Create a new Builder instance. */
   public static ConfigurationBuilder builder() {
