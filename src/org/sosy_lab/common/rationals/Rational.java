@@ -245,17 +245,17 @@ public final class Rational extends Number implements Comparable<Rational> {
     return den;
   }
 
-  /** @return -1, 0 or 1, representing the sign of the rational number. */
+  /** Returns -1, 0 or 1, representing the sign of the rational number. */
   public int signum() {
     return num.signum();
   }
 
-  /** @return Absolute value of {@code this}. */
+  /** Returns absolute value of {@code this}. */
   public Rational abs() {
     return signum() == -1 ? negate() : this;
   }
 
-  /** @return String of the form num/den. */
+  /** Returns string of the form num/den. */
   @Override
   public String toString() {
     if (stringCache == null) {

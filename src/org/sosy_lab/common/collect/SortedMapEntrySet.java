@@ -62,6 +62,7 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
+  @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
   public int hashCode() {
     return super.hashCode();
   }

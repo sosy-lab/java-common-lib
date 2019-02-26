@@ -105,7 +105,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return out;
   }
 
-  /** @return Number of variables with non-zero coefficients. */
+  /** Returns number of variables with non-zero coefficients. */
   public int size() {
     return data.size();
   }
@@ -114,14 +114,14 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return data.isEmpty();
   }
 
-  /** @return Whether all coefficients are integral. */
+  /** Returns whether all coefficients are integral. */
   public boolean isIntegral() {
     return data.values().stream().allMatch(Rational::isIntegral);
   }
 
   /**
-   * @return {@code a} iff {@code other.multByConst(a) == this}, {@code Optional.absent()} if no
-   *     such constant exists.
+   * Returns {@code a} iff {@code other.multByConst(a) == this}, {@code Optional.absent()} if no
+   * such constant exists.
    */
   public Optional<Rational> divide(LinearExpression<T> other) {
     if (other.size() != data.size()) {
@@ -145,12 +145,12 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
     return data.entrySet().iterator();
   }
 
-  /** @return The underlying stored map. */
+  /** Returns the underlying stored map. */
   public ImmutableMap<T, Rational> getMap() {
     return data;
   }
 
-  /** @return Pretty-printing for linear expressions. E. g. <i>-x + 2y + z</i> */
+  /** Returns a pretty-printed form of the linear expression. E. g. <i>-x + 2y + z</i> */
   @Override
   public String toString() {
     StringBuilder b = new StringBuilder();

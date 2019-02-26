@@ -807,6 +807,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
+  @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
   public int hashCode() {
     return super.hashCode();
   }
@@ -1368,6 +1369,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
+    @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
     public int hashCode() {
       return super.hashCode();
     }

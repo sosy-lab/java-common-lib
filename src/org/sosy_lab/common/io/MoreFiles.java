@@ -45,25 +45,25 @@ public final class MoreFiles {
     /* utility class */
   }
 
-  /** @see com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...) */
+  /** See {@link com.google.common.io.Files#asByteSink(java.io.File, FileWriteMode...)}. */
   @Deprecated
   public static ByteSink asByteSink(Path path, FileWriteMode... options) {
     return com.google.common.io.MoreFiles.asByteSink(path, fileWriteModeToOption(options));
   }
 
-  /** @see com.google.common.io.Files#asByteSource(java.io.File) */
+  /** See {@link com.google.common.io.Files#asByteSource(java.io.File)}. */
   @Deprecated
   public static ByteSource asByteSource(Path path) {
     return com.google.common.io.MoreFiles.asByteSource(path);
   }
 
-  /** @see com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...) */
+  /** See {@link com.google.common.io.Files#asCharSink(java.io.File, Charset, FileWriteMode...)}. */
   @Deprecated
   public static CharSink asCharSink(Path path, Charset charset, FileWriteMode... options) {
     return com.google.common.io.MoreFiles.asCharSink(path, charset, fileWriteModeToOption(options));
   }
 
-  /** @see com.google.common.io.Files#asCharSource(java.io.File, Charset) */
+  /** See {@link com.google.common.io.Files#asCharSource(java.io.File, Charset)}. */
   @Deprecated
   public static CharSource asCharSource(Path path, Charset charset) {
     return com.google.common.io.MoreFiles.asCharSource(path, charset);
@@ -230,7 +230,7 @@ public final class MoreFiles {
     IO.checkReadableFile(path);
   }
 
-  /** @see com.google.common.io.Files#createParentDirs(java.io.File) */
+  /** See {@link com.google.common.io.Files#createParentDirs(java.io.File)}. */
   @Deprecated
   public static void createParentDirs(Path path) throws IOException {
     com.google.common.io.MoreFiles.createParentDirectories(path);

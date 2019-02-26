@@ -63,8 +63,9 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   /**
-   * @return rational converted to double. The method works, because the Java Double class also
-   *     supports Infinity/-Infinity/NaN.
+   * Returns rational converted to double.
+   *
+   * <p>The method works, because the Java Double class also supports Infinity/-Infinity/NaN.
    */
   public double toDouble() {
     switch (numberType) {
@@ -82,9 +83,8 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   }
 
   /**
-   * @return The method can return TWO things. a) String of the form num/den if the number is
-   *     rational. b) String representation of infinity/etc, consistent with the {@code Double}
-   *     class.
+   * Returns one of TWO things. a) String of the form num/den if the number is rational. b) String
+   * representation of infinity/etc, consistent with the {@code Double} class.
    */
   @Override
   public String toString() {

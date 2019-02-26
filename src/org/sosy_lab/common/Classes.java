@@ -336,7 +336,7 @@ public final class Classes {
     return null;
   }
 
-  /** @see #getSingleTypeArgument(Type) */
+  /** See {@link #getSingleTypeArgument(Type)}. */
   public static TypeToken<?> getSingleTypeArgument(TypeToken<?> type) {
     return TypeToken.of(getSingleTypeArgument(type.getType()));
   }
@@ -479,7 +479,7 @@ public final class Classes {
      */
     public abstract B setDirectLoadClasses(Predicate<String> classes);
 
-    /** @see #setDirectLoadClasses(Predicate) */
+    /** See {@link #setDirectLoadClasses(Predicate)}. */
     public B setDirectLoadClasses(Pattern classes) {
       return setDirectLoadClasses(matching(classes));
     }
@@ -499,12 +499,12 @@ public final class Classes {
      */
     public abstract B setCustomLookupNativeLibraries(Predicate<String> libraries);
 
-    /** @see #setCustomLookupNativeLibraries(Predicate) */
+    /** See {@link #setCustomLookupNativeLibraries(Predicate)}. */
     public B setCustomLookupNativeLibraries(Pattern nativeLibraries) {
       return setCustomLookupNativeLibraries(matching(nativeLibraries));
     }
 
-    /** @see #setCustomLookupNativeLibraries(Predicate) */
+    /** See {@link #setCustomLookupNativeLibraries(Predicate)}. */
     public B setCustomLookupNativeLibraries(String... nativeLibraries) {
       return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
     }

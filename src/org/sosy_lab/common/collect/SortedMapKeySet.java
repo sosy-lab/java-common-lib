@@ -62,6 +62,7 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
   }
 
   @Override
+  @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
   public int hashCode() {
     return super.hashCode();
   }

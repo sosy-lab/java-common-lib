@@ -206,11 +206,13 @@ public class TempFile {
     }
 
     @Override
+    @SuppressWarnings("RedundantOverride") // to avoid deprecation warning when method is called
     public Path toPath() {
       return super.toPath();
     }
 
     @Override
+    @SuppressWarnings("RedundantOverride") // to avoid deprecation warning when method is called
     public void close() throws IOException {
       super.close();
     }

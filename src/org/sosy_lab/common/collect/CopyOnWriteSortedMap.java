@@ -212,7 +212,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
     pMap.forEach((key, value) -> put(key, value));
   }
 
-  /** @see Map#clear() */
+  /** See {@link Map#clear()}. */
   @Override
   public void clear() {
     map.set(map.get().empty());
