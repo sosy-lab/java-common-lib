@@ -362,7 +362,13 @@ public final class ConfigurationBuilder {
     String newPrefix;
     if (prefix == null) {
       if (oldConfig != null) {
-        newPrefix = oldConfig.prefix;
+        @Var String tempPrefix = oldConfig.prefix;
+        if (tempPrefix.length() > 1) {
+          // need to remove trailing dot because Configuration constructor will re-add it
+          assert tempPrefix.charAt(tempPrefix.length() - 1) == '.';
+          tempPrefix = tempPrefix.substring(0, tempPrefix.length() - 1);
+        }
+        newPrefix = tempPrefix;
       } else {
         newPrefix = "";
       }

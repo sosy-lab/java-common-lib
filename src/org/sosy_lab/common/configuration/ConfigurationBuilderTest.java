@@ -50,6 +50,19 @@ public class ConfigurationBuilderTest {
   }
 
   @Test
+  public void copyFrom_keepPrefix() throws InvalidConfigurationException {
+    Configuration base = Configuration.builder().setPrefix("base").build();
+    Configuration child = Configuration.copyWithNewPrefix(base, "child");
+    Configuration grandchild =
+        Configuration.builder().copyFrom(child).setOption("dummy", "test").build();
+    Configuration grandgrandchild =
+        Configuration.builder().copyFrom(grandchild).setOption("dummy2", "test").build();
+
+    assertThat(grandchild.prefix).isEqualTo("child.");
+    assertThat(grandgrandchild.prefix).isEqualTo("child.");
+  }
+
+  @Test
   public void addConverter_NoGetInstanceForNewConfiguration() throws InvalidConfigurationException {
     TypeConverter conv1 = mock(TypeConverter.class);
     TypeConverter conv2 = mock(TypeConverter.class);
