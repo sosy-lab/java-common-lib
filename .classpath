@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/mockito-core.jar" sourcepath="lib/java-contrib/mockito-core-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/objenesis.jar"/>
-	<classpathentry kind="lib" path="lib/java/build/auto-service.jar"/>
+	<classpathentry kind="lib" path="lib/java/build/auto-service-annotations.jar" sourcepath="lib/java-contrib/auto-service-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar" sourcepath="lib/java-contrib/auto-value-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>

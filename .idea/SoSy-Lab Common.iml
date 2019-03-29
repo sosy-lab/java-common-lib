@@ -11,7 +11,7 @@
     <libelement value="file://lib/java/test/mockito-core.jar" />
     <libelement value="file://lib/java/test/objenesis.jar" />
     <libelement value="file://lib/java/runtime/annotations.jar" />
-    <libelement value="file://lib/java/build/auto-service.jar" />
+    <libelement value="file://lib/java/build/auto-service-annotations.jar" />
     <libelement value="file://lib/java/build/error_prone_annotations.jar" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
@@ -52,7 +52,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/build/auto-service.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/build/auto-service-annotations.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

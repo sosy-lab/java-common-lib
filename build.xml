@@ -63,7 +63,12 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/auto-service.jar build/auto-value-annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/auto-service-annotations.jar build/auto-value-annotations.jar"/>
+    </path>
+
+    <path id="ecj">
+        <!-- Compilation fails if auto-service is not present here -->
+        <fileset dir="${ivy.lib.dir}/build" includes="ecj.jar guava.jar auto-common.jar auto-service.jar auto-service-annotations.jar"/>
     </path>
 
 
