@@ -221,7 +221,7 @@ public class ConfigurationTest {
         Object injectedValue = field.get(injectedInstance);
         Object defaultValue = field.get(defaultInstance);
 
-        assertThat(injectedValue).isSameAs(defaultValue);
+        assertThat(injectedValue).isSameInstanceAs(defaultValue);
       }
 
     } catch (ReflectiveOperationException e) {

@@ -60,8 +60,8 @@ public class CollectionsTransformationTest {
     Collection<String> result = transformer.apply(input, e -> "" + e.incrementAndGet());
 
     // Check twice to ensure transform function is not called again
-    assertThat(result).containsAllOf("1", "11", "21");
-    assertThat(result).containsAllOf("1", "11", "21");
+    assertThat(result).containsAtLeast("1", "11", "21");
+    assertThat(result).containsAtLeast("1", "11", "21");
 
     // Check how often transform function was called
     assertThat(i1.get()).isEqualTo(1);

@@ -121,7 +121,7 @@ public class ClassesFactoryTest {
   public void alwaysFreshInstances() throws UnsuitedClassException {
     Supplier<Object> generatedFactory =
         Classes.createFactory(OBJECT_SUPPLIER, SimpleTestClass.class);
-    assertThat(generatedFactory.get()).isNotSameAs(generatedFactory.get());
+    assertThat(generatedFactory.get()).isNotSameInstanceAs(generatedFactory.get());
   }
 
   @Test(expected = UnsuitedClassException.class)

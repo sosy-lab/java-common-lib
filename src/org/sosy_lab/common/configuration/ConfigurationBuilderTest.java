@@ -46,7 +46,7 @@ public class ConfigurationBuilderTest {
     verifyNoMoreInteractions(conv);
     assertThat(config2.converters).containsEntry(String.class, conv);
     assertThat(config2.converters.entrySet())
-        .containsAllIn(Configuration.getDefaultConverters().entrySet());
+        .containsAtLeastElementsIn(Configuration.getDefaultConverters().entrySet());
   }
 
   @Test
@@ -76,7 +76,7 @@ public class ConfigurationBuilderTest {
     verifyZeroInteractions(conv1, conv2);
     assertThat(config2.converters).containsEntry(String.class, conv2);
     assertThat(config2.converters.entrySet())
-        .containsAllIn(Configuration.getDefaultConverters().entrySet());
+        .containsAtLeastElementsIn(Configuration.getDefaultConverters().entrySet());
   }
 
   @Test
@@ -101,6 +101,6 @@ public class ConfigurationBuilderTest {
     verifyNoMoreInteractions(conv);
     assertThat(config.converters).containsEntry(String.class, conv);
     assertThat(config.converters.entrySet())
-        .containsAllIn(Configuration.getDefaultConverters().entrySet());
+        .containsAtLeastElementsIn(Configuration.getDefaultConverters().entrySet());
   }
 }

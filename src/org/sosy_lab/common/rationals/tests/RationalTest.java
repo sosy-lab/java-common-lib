@@ -120,27 +120,27 @@ public class RationalTest {
   public void testCanonicity1() {
     Rational a = Rational.ofString("6/8");
     Rational b = Rational.ofString("-6/8");
-    assertThat(a.plus(b)).isSameAs(Rational.ZERO);
+    assertThat(a.plus(b)).isSameInstanceAs(Rational.ZERO);
   }
 
   @Test
   public void testCanonicity2() {
     Rational x = Rational.ofString("-1");
-    assertThat(x).isSameAs(Rational.NEG_ONE);
+    assertThat(x).isSameInstanceAs(Rational.NEG_ONE);
   }
 
   @Test
   public void testCanonicity3() {
     Rational a = Rational.ofString("2");
     Rational b = Rational.ofString("-1");
-    assertThat(a.plus(b)).isSameAs(Rational.ONE);
+    assertThat(a.plus(b)).isSameInstanceAs(Rational.ONE);
   }
 
   @Test
   public void testCanonicity4() {
     Rational a = Rational.ofString("-2");
     Rational b = Rational.ofString("1");
-    assertThat(a.plus(b)).isSameAs(Rational.NEG_ONE);
+    assertThat(a.plus(b)).isSameInstanceAs(Rational.NEG_ONE);
   }
 
   @Test
