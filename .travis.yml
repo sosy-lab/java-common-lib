@@ -1,7 +1,7 @@
 language: java
 jdk:
-  - oraclejdk8
-  - oraclejdk9
+  - openjdk8
+  - openjdk11
 addons:
   apt:
     packages:
@@ -44,7 +44,7 @@ deploy:
     provider: script
     script: build/deploy-coverage.sh
     on:
-      jdk: oraclejdk8
+      jdk: openjdk8
       condition: $NAME = "Unit Tests"
 notifications:
   email:

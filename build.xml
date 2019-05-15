@@ -28,6 +28,7 @@
         - ReturnMissingNullable: buggy
         - BadImport: complains about commonly-used FluentIterable.from
         - TestExceptionChecker, TryFailRefactoring, TestExceptionRefactoring, ExpectedExceptionRefactoring: will be fixed with newer JUnit
+        - Finally: crashes (https://github.com/google/error-prone/issues/1257)
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
@@ -47,6 +48,7 @@
         -Xep:TryFailRefactoring:OFF
         -Xep:TestExceptionRefactoring:OFF
         -Xep:ExpectedExceptionRefactoring:OFF
+        -Xep:Finally:OFF
         "/>
 
     <import file="build/build-version.xml"/>
