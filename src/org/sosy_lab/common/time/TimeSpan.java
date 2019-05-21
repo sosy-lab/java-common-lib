@@ -33,7 +33,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Ascii;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.math.LongMath;
 import com.google.common.primitives.Longs;
@@ -41,6 +40,7 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -205,7 +205,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   }
 
   private static List<String> splitIntoTokens(String input) {
-    List<String> tokens = Lists.newArrayList();
+    List<String> tokens = new ArrayList<>();
     @Var CharType previous = CharType.BEGIN;
     @Var int pos = 0;
 
