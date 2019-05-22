@@ -29,7 +29,6 @@ import com.google.common.collect.testing.TestStringSortedMapGenerator;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -78,7 +77,7 @@ public abstract class OrderStatisticMapTestSuite {
   }
 
   private OrderStatisticMap<String, String> createMap() {
-    return factory.create(Collections.emptyList());
+    return factory.create(ImmutableList.of());
   }
 
   private OrderStatisticMap<String, String> createMap(List<Entry<String, String>> pEntries) {

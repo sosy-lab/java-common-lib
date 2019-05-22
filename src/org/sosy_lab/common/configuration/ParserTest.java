@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,10 +73,7 @@ public class ParserTest {
   private void testSingleOption(String content, String key, String value) {
     try {
       Map<String, String> parsedOptions = test(content);
-
-      Map<String, String> expectedOptions = Collections.singletonMap(key, value);
-
-      assertThat(parsedOptions).isEqualTo(expectedOptions);
+      assertThat(parsedOptions).containsExactly(key, value);
 
     } catch (Exception e) {
       throw new RuntimeException(e);
