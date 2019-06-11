@@ -20,6 +20,7 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -358,14 +359,14 @@ public class PathCopyingPersistentTreeMapTest {
       SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
     assertEquals(comparison, testMap);
     assertEquals(comparison.hashCode(), testMap.hashCode());
-    assertThat(testMap.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
+    assertWithMessage("isEmpty()").that(testMap.isEmpty()).isEqualTo(comparison.isEmpty());
     assertThat(testMap).hasSize(comparison.size());
     checkEqualTo(comparison.entrySet(), testMap.entrySet());
     checkEqualTo(comparison.keySet(), testMap.keySet());
     checkEqualTo(comparison.values(), testMap.values());
     if (!comparison.isEmpty()) {
-      assertThat(testMap.firstKey()).named("firstKey").isEqualTo(comparison.firstKey());
-      assertThat(testMap.lastKey()).named("lastKey").isEqualTo(comparison.lastKey());
+      assertWithMessage("firstKey()").that(testMap.firstKey()).isEqualTo(comparison.firstKey());
+      assertWithMessage("lastKey()").that(testMap.lastKey()).isEqualTo(comparison.lastKey());
     }
   }
 
@@ -377,7 +378,7 @@ public class PathCopyingPersistentTreeMapTest {
 
   private static <T> void checkEqualTo(Collection<T> comparison, Collection<T> set) {
     // equals() and hashCode() is undefined for Collections
-    assertThat(set.isEmpty()).named("isEmpty").isEqualTo(comparison.isEmpty());
+    assertWithMessage("isEmpty()").that(set.isEmpty()).isEqualTo(comparison.isEmpty());
     assertThat(set).hasSize(comparison.size());
     assertThat(set).containsExactlyElementsIn(comparison).inOrder();
   }

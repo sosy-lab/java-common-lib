@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
@@ -67,6 +68,6 @@ public class MoreStringsTest {
 
     Object unused = MoreStrings.longStringOf(instance);
 
-    assertThat(wasCalled.get()).named("Whether toLongString method was called").isFalse();
+    assertWithMessage("toLongString() method was called").that(wasCalled.get()).isFalse();
   }
 }
