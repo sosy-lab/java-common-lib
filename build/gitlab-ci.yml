@@ -202,17 +202,17 @@ deploy-gh-pages:
 build-docker:test:jdk-8:
   extends: .build-docker
   variables:
-    DOCKERFILE: build/Dockerfile.jdk-8
+    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-8
     IMAGE: test:jdk-8
 
 build-docker:test:jdk-11:
   extends: .build-docker
   variables:
-    DOCKERFILE: build/Dockerfile.jdk-11
+    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-11
     IMAGE: test:jdk-11
 
 build-docker:test:jdk-12:
   extends: .build-docker
   variables:
-    DOCKERFILE: build/Dockerfile.jdk-12
+    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-12
     IMAGE: test:jdk-12
