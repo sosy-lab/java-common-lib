@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.io.CharSource;
 import com.google.common.io.MoreFiles;
 import java.io.BufferedWriter;
+import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,10 +57,12 @@ public final class IO {
 
   /** Read the full content of a {@link CharSource} to a char array. */
   public static char[] toCharArray(CharSource source) throws IOException {
-    StringBuilder sb = toStringBuilder(source);
-    char[] result = new char[sb.length()];
-    sb.getChars(0, sb.length(), result, 0);
-    return result;
+    // On newer Java, StringBuilder internally uses byte[] instead of char[].
+    // CharArrayWriter uses char[], so copying into the result array can be optimized more easily.
+    // Code from https://github.com/google/guava/issues/2713#issuecomment-516574887
+    CharArrayWriter writer = new CharArrayWriter();
+    source.copyTo(writer);
+    return writer.toCharArray();
   }
 
   /**
