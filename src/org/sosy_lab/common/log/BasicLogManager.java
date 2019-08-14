@@ -33,6 +33,7 @@ import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.StackWalker.StackFrame;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -432,33 +433,19 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * excluded.
    */
   private static @Nullable StackTraceElement findCallingMethod() {
-    // We use lazy stack trace, because this exactly fits our use case:
-    // Typically we need only one or two StackTraceElements from the top of the trace.
-    @SuppressWarnings("ThrowSpecificExceptions")
-    List<StackTraceElement> trace = Throwables.lazyStackTrace(new Throwable());
+    return StackWalker.getInstance()
+        // First method in stacktrace is this method, second is the log() method.
+        // So we can skip 2 stack trace elements in any case and then filter for logging helpers.
+        .walk(stack -> stack.skip(2).filter(BasicLogManager::isRelevantMethod).findFirst())
+        .map(StackFrame::toStackTraceElement)
+        .orElse(null);
+  }
 
-    // First method in stacktrace is this method, second is the log() method.
-    // So we can skip 2 stack trace elements in any case.
-    @Var int traceIndex = 2;
-
-    @Var
-    @Nullable
-    StackTraceElement frame = null;
-    do {
-      try {
-        frame = trace.get(traceIndex);
-      } catch (IndexOutOfBoundsException e) {
-        // end of stack reached or stack empty:
-        // https://plumbr.io/blog/java/on-a-quest-for-missing-stacktraces
-        // We avoid calling size() such that the JVM does not have to unroll the whole stack.
-        return frame;
-      }
-      traceIndex++;
-    } while (frame.getMethodName().startsWith("log")
-        || frame.getMethodName().startsWith("access$")
-        || frame.getMethodName().startsWith("lambda$log"));
-
-    return frame;
+  private static boolean isRelevantMethod(StackFrame frame) {
+    String methodname = frame.getMethodName();
+    return !methodname.startsWith("log")
+        && !methodname.startsWith("access$")
+        && !methodname.startsWith("lambda$log");
   }
 
   /**
