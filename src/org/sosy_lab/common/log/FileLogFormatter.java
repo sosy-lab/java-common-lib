@@ -20,9 +20,8 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.base.MoreObjects;
-import java.text.FieldPosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -30,15 +29,16 @@ import java.util.logging.LogRecord;
 /** Class to handle formatting for file output. */
 public class FileLogFormatter extends Formatter {
 
-  private final SimpleDateFormat dateFormat =
-      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
+  private static final DateTimeFormatter DATE_FORMAT =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")
+          .withLocale(Locale.getDefault(Locale.Category.FORMAT))
+          .withZone(ZoneId.systemDefault());
 
   @Override
   public String format(LogRecord lr) {
-    @SuppressWarnings("JdkObsolete") // required by SimpleDateFormat
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
-    dateFormat.format(new Date(lr.getMillis()), sb, new FieldPosition(0));
+    DATE_FORMAT.formatTo(lr.getInstant(), sb);
     sb.append('\t').append(lr.getLevel()).append('\t');
 
     if (lr instanceof ExtendedLogRecord) {
