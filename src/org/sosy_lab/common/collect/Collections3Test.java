@@ -19,19 +19,13 @@
  */
 package org.sosy_lab.common.collect;
 
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class Collections3Test {
 
@@ -75,64 +69,5 @@ public class Collections3Test {
     testSet.add("ca");
 
     assertThat(Collections3.subSetWithPrefix(testSet, "b")).isEqualTo(resultSet);
-  }
-
-  /**
-   * Test our assumption that {@link Collections3#transformedImmutableListCopy(java.util.Collection,
-   * com.google.common.base.Function)} actually calls {@link Collection#size()} on the original
-   * collection.
-   *
-   * <p>Strictly speaking, this does not guarantee that the resulting list is appropriately
-   * pre-sized, but it is a strong indicator.
-   *
-   * <p>If this test fails, it is probably an indicator that something changed in Guava or the JDK
-   * and we should re-evaluate whether the assumption that this method does an efficient (pre-sized)
-   * copy still holds.
-   */
-  @Test
-  public void testTransformedImmutableListCopyUsesSize() {
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
-
-    Collections3.transformedImmutableListCopy(list, Functions.identity());
-    Mockito.verify(list).size();
-  }
-
-  /**
-   * Test our assumption that copying a list via {@code Stream.map().collect()} does not call {@link
-   * Collection#size()} on the original collection.
-   *
-   * <p>This basically means that the copy cannot be made into a pre-sized list but needs an
-   * incrementally growing temporary collection and thus repeated copying.
-   *
-   * <p>If this test fails, it is probably an indicator that something changed in Guava or the JDK
-   * and we should re-evaluate whether the assumption that this method does not do an efficient
-   * (pre-sized) copy still holds.
-   */
-  @Test
-  public void testStreamMapDoesNotUseSize() {
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
-
-    list.stream().map(s -> s).collect(ImmutableList.toImmutableList());
-    Mockito.verify(list, Mockito.never()).size();
-  }
-
-  /**
-   * Test our assumption that copying a list via {@code FluentIterable.transform().toList()} does
-   * not call {@link Collection#size()} on the original collection.
-   *
-   * <p>This basically means that the copy cannot be made into a pre-sized list but needs an
-   * incrementally growing temporary collection and thus repeated copying.
-   *
-   * <p>If this test fails, it is probably an indicator that something changed in Guava or the JDK
-   * and we should re-evaluate whether the assumption that this method does not do an efficient
-   * (pre-sized) copy still holds.
-   */
-  @Test
-  public void testFluentIterableTransformDoesNotUseSize() {
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
-
-    from(list).transform(Functions.identity()).toList();
-    Mockito.verify(list, Mockito.never()).size();
-    Mockito.verify(list).iterator();
   }
 }
