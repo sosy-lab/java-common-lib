@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Streams;
 import com.google.common.primitives.Chars;
 import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
@@ -89,13 +90,24 @@ public final class Collections3 {
   }
 
   /**
-   * Provide a steam that consists of the result of applying the given function to each of a map's
+   * Provide a stream that consists of the result of applying the given function to each of a map's
    * entries, similarly to {@link com.google.common.collect.Streams#zip(Stream, Stream,
    * BiFunction)}.
    */
   public static <K, V, R> Stream<R> zipMapEntries(Map<K, V> map, BiFunction<K, V, R> func) {
     checkNotNull(func);
     return map.entrySet().stream().map(entry -> func.apply(entry.getKey(), entry.getValue()));
+  }
+
+  /**
+   * Provide a stream that consists of the result of applying the given function to each of the map
+   * entries, similarly to {@link com.google.common.collect.Streams#zip(Stream, Stream,
+   * BiFunction)}.
+   */
+  public static <K, V, R> Stream<R> zipMapEntries(
+      Iterable<Map.Entry<K, V>> entries, BiFunction<K, V, R> func) {
+    checkNotNull(func);
+    return Streams.stream(entries).map(entry -> func.apply(entry.getKey(), entry.getValue()));
   }
 
   /**
