@@ -90,12 +90,11 @@ public class ClassesFactoryTest {
   }
 
   @SuppressWarnings("serial")
-  private static final TypeToken<Supplier<Object>> OBJECT_SUPPLIER =
-      new TypeToken<Supplier<Object>>() {};
+  private static final TypeToken<Supplier<Object>> OBJECT_SUPPLIER = new TypeToken<>() {};
 
   @SuppressWarnings("serial")
   private static final TypeToken<Supplier<SimpleTestClass>> TEST_CLASS_SUPPLIER =
-      new TypeToken<Supplier<SimpleTestClass>>() {};
+      new TypeToken<>() {};
 
   @Test
   public void genericFactory() throws UnsuitedClassException {

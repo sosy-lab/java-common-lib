@@ -223,7 +223,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public NavigableSet<Map.Entry<K, V>> entrySet() {
-    return new ForwardingNavigableSet<Map.Entry<K, V>>() {
+    return new ForwardingNavigableSet<>() {
 
       @Override
       protected NavigableSet<Map.Entry<K, V>> delegate() {
@@ -234,7 +234,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public NavigableSet<K> keySet() {
-    return new ForwardingNavigableSet<K>() {
+    return new ForwardingNavigableSet<>() {
 
       @Override
       protected NavigableSet<K> delegate() {
@@ -245,7 +245,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
 
   @Override
   public Collection<V> values() {
-    return new ForwardingCollection<V>() {
+    return new ForwardingCollection<>() {
 
       @Override
       protected Collection<V> delegate() {
@@ -258,7 +258,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
   @SuppressWarnings("CheckReturnValue")
   public NavigableMap<K, V> headMap(K pToKey) {
     map.get().headMap(pToKey); // for bounds check
-    return new ForwardingNavigableMap<K, V>() {
+    return new ForwardingNavigableMap<>() {
 
       @Override
       protected NavigableMap<K, V> delegate() {
@@ -271,7 +271,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
   @SuppressWarnings("CheckReturnValue")
   public NavigableMap<K, V> tailMap(K pFromKey) {
     map.get().tailMap(pFromKey); // for bounds check
-    return new ForwardingNavigableMap<K, V>() {
+    return new ForwardingNavigableMap<>() {
 
       @Override
       protected NavigableMap<K, V> delegate() {
@@ -284,7 +284,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
   @SuppressWarnings("CheckReturnValue")
   public NavigableMap<K, V> subMap(K pFromKey, K pToKey) {
     map.get().subMap(pFromKey, pToKey); // for bounds check
-    return new ForwardingNavigableMap<K, V>() {
+    return new ForwardingNavigableMap<>() {
 
       @Override
       protected NavigableMap<K, V> delegate() {

@@ -258,7 +258,7 @@ public class ProcessExecutor<E extends Exception> {
             });
 
     FutureCallback<Object> cancelProcessOnFailure =
-        new FutureCallback<Object>() {
+        new FutureCallback<>() {
 
           @Override
           public void onFailure(Throwable e) {

@@ -217,7 +217,7 @@ public final class Configuration {
    * @return A new map.
    */
   static Map<Class<?>, TypeConverter> createConverterMap() {
-    return new ForwardingMap<Class<?>, TypeConverter>() {
+    return new ForwardingMap<>() {
 
       private final Map<Class<?>, TypeConverter> delegate = new HashMap<>();
 

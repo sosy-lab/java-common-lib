@@ -46,7 +46,7 @@ public class MapsDifference {
    */
   public static <K, V> Visitor<K, V> collectMapsDifferenceTo(Collection<Entry<K, V>> target) {
     checkNotNull(target);
-    return new Visitor<K, V>() {
+    return new Visitor<>() {
       @Override
       public void leftValueOnly(K pKey, V pLeftValue) {
         target.add(Entry.forLeftValueOnly(pKey, pLeftValue));
