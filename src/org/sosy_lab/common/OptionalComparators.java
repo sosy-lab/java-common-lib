@@ -67,7 +67,7 @@ final class OptionalComparators {
         // left yes, right no
         return emptyFirst ? 1 : -1;
       }
-      return Integer.compare(left.getAsInt(), right.getAsInt());
+      return Integer.compare(left.orElseThrow(), right.orElseThrow());
     }
 
     @Override
@@ -110,7 +110,7 @@ final class OptionalComparators {
         // left yes, right no
         return emptyFirst ? 1 : -1;
       }
-      return Long.compare(left.getAsLong(), right.getAsLong());
+      return Long.compare(left.orElseThrow(), right.orElseThrow());
     }
 
     @Override
@@ -153,7 +153,7 @@ final class OptionalComparators {
         // left yes, right no
         return emptyFirst ? 1 : -1;
       }
-      return Double.compare(left.getAsDouble(), right.getAsDouble());
+      return Double.compare(left.orElseThrow(), right.orElseThrow());
     }
 
     @Override

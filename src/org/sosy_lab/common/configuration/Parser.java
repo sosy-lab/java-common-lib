@@ -244,7 +244,7 @@ class Parser {
             source);
 
         // parse included file (content will be in fields of this class)
-        parse0(basePath.get().resolveSibling(Paths.get(line)));
+        parse0(basePath.orElseThrow().resolveSibling(Paths.get(line)));
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {

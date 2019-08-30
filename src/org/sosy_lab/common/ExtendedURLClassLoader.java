@@ -99,7 +99,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
       @SuppressWarnings("deprecation")
       Optional<Path> path = NativeLibraries.findPathForLibrary(libname);
       if (path.isPresent()) {
-        return path.get().toAbsolutePath().toString();
+        return path.orElseThrow().toAbsolutePath().toString();
       }
     }
     return super.findLibrary(libname);

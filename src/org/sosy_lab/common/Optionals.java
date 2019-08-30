@@ -25,7 +25,6 @@ import com.google.common.collect.Comparators;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Streams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.Optional;
@@ -74,7 +73,7 @@ public final class Optionals {
    * @return A set with size at most one.
    */
   public static <T> ImmutableSet<T> asSet(Optional<T> optional) {
-    return optional.isPresent() ? ImmutableSet.of(optional.get()) : ImmutableSet.of();
+    return optional.isPresent() ? ImmutableSet.of(optional.orElseThrow()) : ImmutableSet.of();
   }
 
   /**
@@ -86,11 +85,11 @@ public final class Optionals {
    *
    * @param optional An Optional.
    * @return A stream with size at most one.
-   * @deprecated use {@link Streams#stream(Optional)}
+   * @deprecated use {@link Optional#stream()}
    */
   @Deprecated
   public static <T> Stream<T> asStream(Optional<T> optional) {
-    return Streams.stream(optional);
+    return optional.stream();
   }
 
   /** Get an {@link Iterable} of the present instances of an iterable of {@link Optional}s. */

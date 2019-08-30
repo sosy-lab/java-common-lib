@@ -217,7 +217,7 @@ public final class NativeLibraries {
   public static void loadLibrary(String name) {
     Optional<Path> path = findPathForLibrary(name);
     if (path.isPresent()) {
-      System.load(path.get().toAbsolutePath().toString());
+      System.load(path.orElseThrow().toAbsolutePath().toString());
     } else {
       System.loadLibrary(name);
     }
