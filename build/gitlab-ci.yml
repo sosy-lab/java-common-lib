@@ -9,7 +9,8 @@ stages:
   - checks
   - deploy
 
-image: ${CI_REGISTRY_IMAGE}/test:jdk-8
+# Default image for non-JDK-specific jobs
+image: ${CI_REGISTRY_IMAGE}/test:jdk-11
 
 variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
@@ -41,9 +42,6 @@ build-dependencies:
       - "bin/"
       - "*.jar"
 
-build:jdk-8:
-  <<: *build
-
 build:jdk-11:
   <<: *build
   image: ${CI_REGISTRY_IMAGE}/test:jdk-11
@@ -67,9 +65,6 @@ build:jdk-13:
 .build-project-ecj: &build-project-ecj
   <<: *source_check
   script: "ant $ANT_PROPS_BUILD build-project-ecj"
-
-build-project-ecj:jdk-8:
-  <<: *build-project-ecj
 
 build-project-ecj:jdk-11:
   <<: *build-project-ecj
@@ -99,7 +94,7 @@ javadoc:
   script: "ant $ANT_PROPS_CHECKS javadoc"
   dependencies:
     - build-dependencies
-    - build:jdk-8
+    - build:jdk-11
   artifacts:
     paths:
       - "Javadoc/"
@@ -111,7 +106,7 @@ spotbugs:
     - 'test \! -f SpotBugs.html'
   dependencies:
     - build-dependencies
-    - build:jdk-8
+    - build:jdk-11
   artifacts:
     paths:
       - "SpotBugs.html"
@@ -128,12 +123,6 @@ spotbugs:
     when: always
     reports:
       junit: "junit/TESTS-TestSuites.xml"
-
-unit-tests:jdk-8:
-  <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-8
 
 unit-tests:jdk-11:
   <<: *unit-tests
@@ -154,7 +143,7 @@ deploy-coverage:
   stage: deploy
   script: "build/deploy-coverage.sh"
   dependencies:
-    - unit-tests:jdk-8
+    - unit-tests:jdk-11
   only:
     refs:
       - master
@@ -172,7 +161,7 @@ deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   dependencies:
-    - build:jdk-8
+    - build:jdk-11
     - javadoc
   only:
     refs:
@@ -198,12 +187,6 @@ deploy-gh-pages:
   only:
     - schedules
     - web
-
-build-docker:test:jdk-8:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-8
-    IMAGE: test:jdk-8
 
 build-docker:test:jdk-11:
   extends: .build-docker
