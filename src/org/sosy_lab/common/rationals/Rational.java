@@ -1,8 +1,9 @@
 package org.sosy_lab.common.rationals;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.hash;
 
-import com.google.common.base.Objects;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
@@ -59,9 +60,7 @@ public final class Rational extends Number implements Comparable<Rational> {
   public static Rational of(@Var BigInteger numerator, @Var BigInteger denominator) {
     checkNotNull(numerator);
     int denSignum = denominator.signum();
-    if (denSignum == 0) {
-      throw new IllegalArgumentException("Infinity is not supported, use ExtendedRational instead");
-    }
+    checkArgument(denSignum != 0, "Infinity is not supported, use ExtendedRational instead");
 
     if (denSignum == -1) {
       // Make {@code denominator} positive.
@@ -216,10 +215,8 @@ public final class Rational extends Number implements Comparable<Rational> {
    * @throws IllegalArgumentException If invoked on zero.
    */
   public Rational reciprocal() {
-    if (num.equals(B_ZERO)) {
-      throw new IllegalArgumentException(
-          "Division by zero not supported, use ExtendedRational if you need it");
-    }
+    checkArgument(
+        !num.equals(B_ZERO), "Division by zero not supported, use ExtendedRational if you need it");
     return of(den, num);
   }
 
@@ -292,7 +289,7 @@ public final class Rational extends Number implements Comparable<Rational> {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(num, den);
+    return hash(num, den);
   }
 
   public static Rational max(Rational a, Rational b) {

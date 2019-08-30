@@ -272,7 +272,7 @@ public final class Classes {
       // of Class#forName(String)
       cl = Classes.class.getClassLoader();
     }
-    if (prefix == null || prefix.isEmpty()) {
+    if (isNullOrEmpty(prefix)) {
       return cl.loadClass(name);
     }
 

@@ -229,11 +229,10 @@ public final class Configuration {
       private void check(Class<?> cls, TypeConverter pValue) {
         checkNotNull(cls);
         checkNotNull(pValue);
-        if (cls.isAnnotation() && !cls.isAnnotationPresent(OptionDetailAnnotation.class)) {
-          throw new IllegalArgumentException(
-              "Can register type converters"
-                  + " only for annotations which are option detail annotations");
-        }
+        checkArgument(
+            !cls.isAnnotation() || cls.isAnnotationPresent(OptionDetailAnnotation.class),
+            "Can register type converters"
+                + " only for annotations which are option detail annotations");
       }
 
       @Override
