@@ -48,6 +48,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
@@ -635,5 +636,35 @@ public class ConfigurationTest {
             AnnotatedValue.create(3, "a3"))
         .inOrder();
     assertThat(opts.path).isEqualTo(AnnotatedValue.create(Paths.get("test.txt"), "a"));
+  }
+
+  @Options
+  private abstract static class SetterOptions {
+    @Option(secure = true, description = "test")
+    public abstract void pub(String s);
+
+    @Option(secure = true, description = "test")
+    private void priv(String s) {
+      // private methods cannot be mocked, so we forward to a mockable method
+      privForMock(s);
+    }
+
+    abstract void privForMock(String s);
+
+    @Option(secure = true, description = "test")
+    public abstract void none(String s);
+  }
+
+  @Test
+  public void testSetter() throws InvalidConfigurationException {
+    Configuration c =
+        Configuration.builder().setOption("pub", "public").setOption("priv", "private").build();
+
+    SetterOptions opts = Mockito.mock(SetterOptions.class);
+    c.inject(opts, SetterOptions.class);
+    Mockito.verify(opts).priv("private");
+    Mockito.verify(opts).pub("public");
+    Mockito.verify(opts).none(null);
+    Mockito.verifyNoMoreInteractions(opts);
   }
 }
