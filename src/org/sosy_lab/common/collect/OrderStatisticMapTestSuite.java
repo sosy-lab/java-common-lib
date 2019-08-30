@@ -20,7 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -174,20 +175,20 @@ public abstract class OrderStatisticMapTestSuite {
             .build();
     try {
       putEntry(subMap, ELEMS.get(0));
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
     try {
       putEntry(subMap, ELEMS.get(3));
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
     try {
       // the first 3 elements are in the range of the sublist, but the last isn't
       subMap.putAll(toAdd);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
@@ -325,13 +326,13 @@ public abstract class OrderStatisticMapTestSuite {
 
     try {
       map.getEntryByRank(-1);
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       map.getEntryByRank(ELEMS.size());
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
@@ -413,13 +414,13 @@ public abstract class OrderStatisticMapTestSuite {
 
     try {
       map.getKeyByRank(-1);
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       map.getKeyByRank(ELEMS.size());
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
@@ -519,19 +520,19 @@ public abstract class OrderStatisticMapTestSuite {
 
     try {
       map.removeByRank(-1);
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       map.removeByRank(map.size());
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       emptyMap.removeByRank(0);
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
 

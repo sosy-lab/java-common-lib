@@ -21,9 +21,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
@@ -130,7 +128,7 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(oldMap).hasSize(oldMapSize);
     assertThat(oldMap.toString()).isEqualTo(oldMapStr);
 
-    assertFalse(map.containsKey(key));
+    assertThat(map.containsKey(key)).isFalse();
 
     if (oldMap.containsKey(key)) {
       assertThat(map).hasSize(oldMap.size() - 1);
@@ -154,23 +152,23 @@ public class PathCopyingPersistentTreeMapTest {
   private void putABCD() {
     put("a", "1");
     assertThat(map.toString()).isEqualTo("{a=1}");
-    assertEquals("a", map.firstKey());
-    assertEquals("a", map.lastKey());
+    assertThat(map.firstKey()).isEqualTo("a");
+    assertThat(map.lastKey()).isEqualTo("a");
 
     put("b", "2");
     assertThat(map.toString()).isEqualTo("{a=1, b=2}");
-    assertEquals("a", map.firstKey());
-    assertEquals("b", map.lastKey());
+    assertThat(map.firstKey()).isEqualTo("a");
+    assertThat(map.lastKey()).isEqualTo("b");
 
     put("c", "3");
     assertThat(map.toString()).isEqualTo("{a=1, b=2, c=3}");
-    assertEquals("a", map.firstKey());
-    assertEquals("c", map.lastKey());
+    assertThat(map.firstKey()).isEqualTo("a");
+    assertThat(map.lastKey()).isEqualTo("c");
 
     put("d", "4");
     assertThat(map.toString()).isEqualTo("{a=1, b=2, c=3, d=4}");
-    assertEquals("a", map.firstKey());
-    assertEquals("d", map.lastKey());
+    assertThat(map.firstKey()).isEqualTo("a");
+    assertThat(map.lastKey()).isEqualTo("d");
   }
 
   private void removeDCBA() {
@@ -357,8 +355,8 @@ public class PathCopyingPersistentTreeMapTest {
 
   private static void checkEqualTo(
       SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
-    assertEquals(comparison, testMap);
-    assertEquals(comparison.hashCode(), testMap.hashCode());
+    assertThat(testMap).isEqualTo(comparison);
+    assertThat(testMap.hashCode()).isEqualTo(comparison.hashCode());
     assertWithMessage("isEmpty()").that(testMap.isEmpty()).isEqualTo(comparison.isEmpty());
     assertThat(testMap).hasSize(comparison.size());
     checkEqualTo(comparison.entrySet(), testMap.entrySet());
@@ -371,8 +369,8 @@ public class PathCopyingPersistentTreeMapTest {
   }
 
   private static <T> void checkEqualTo(Set<T> comparison, Set<T> set) {
-    assertEquals(comparison, set);
-    assertEquals(comparison.hashCode(), set.hashCode());
+    assertThat(set).isEqualTo(comparison);
+    assertThat(set.hashCode()).isEqualTo(comparison.hashCode());
     checkEqualTo((Collection<T>) comparison, (Collection<T>) set);
   }
 
@@ -402,19 +400,19 @@ public class PathCopyingPersistentTreeMapTest {
 
     try {
       submap.subMap("a", "c");
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
     }
 
     try {
       submap.subMap("aa", "d");
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
     }
 
     try {
       submap.subMap("a", "d");
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
     }
   }

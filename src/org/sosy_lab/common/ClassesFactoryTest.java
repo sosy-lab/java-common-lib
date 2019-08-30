@@ -20,7 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.reflect.TypeToken;
 import java.io.IOException;
@@ -169,7 +169,7 @@ public class ClassesFactoryTest {
         Classes.createFactory(TypeToken.of(TestFactory.class), ParameterTestClass.class);
     try {
       generatedFactory.get(null);
-      fail();
+      assert_().fail();
     } catch (NullPointerException expected) {
     }
   }
@@ -181,7 +181,7 @@ public class ClassesFactoryTest {
         Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
     try {
       generatedFactory.get(null, null);
-      fail();
+      assert_().fail();
     } catch (NullPointerException expected) {
     }
   }

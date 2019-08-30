@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,7 +54,7 @@ public class ShutdownNotifierTest {
 
   @Test
   public void testNotRequested() throws InterruptedException {
-    assertFalse(instance.shouldShutdown());
+    assertThat(instance.shouldShutdown()).isFalse();
     instance.shutdownIfNecessary();
   }
 
@@ -70,8 +68,8 @@ public class ShutdownNotifierTest {
   @Test
   public void testRequested() {
     instance.requestShutdown(REASON);
-    assertTrue(instance.shouldShutdown());
-    assertEquals(REASON, instance.getReason());
+    assertThat(instance.shouldShutdown()).isTrue();
+    assertThat(instance.getReason()).isEqualTo(REASON);
   }
 
   @Test
@@ -99,7 +97,7 @@ public class ShutdownNotifierTest {
     instance.register(reason -> flag.set(true));
 
     instance.requestShutdown(REASON);
-    assertTrue(flag.get());
+    assertThat(flag.get()).isTrue();
   }
 
   @Test
@@ -109,7 +107,7 @@ public class ShutdownNotifierTest {
     instance.register(reasonReference::set);
 
     instance.requestShutdown(REASON);
-    assertEquals(REASON, reasonReference.get());
+    assertThat(reasonReference.get()).isEqualTo(REASON);
   }
 
   @Test
@@ -122,7 +120,7 @@ public class ShutdownNotifierTest {
     }
 
     instance.requestShutdown(REASON);
-    assertEquals(count, i.get());
+    assertThat(i.get()).isEqualTo(count);
   }
 
   @Test
@@ -134,7 +132,7 @@ public class ShutdownNotifierTest {
     instance.unregister(l);
 
     instance.requestShutdown(REASON);
-    assertFalse(flag.get());
+    assertThat(flag.get()).isFalse();
   }
 
   @Test
@@ -143,9 +141,9 @@ public class ShutdownNotifierTest {
 
     instance.registerAndCheckImmediately(reason -> flag.set(true));
 
-    assertFalse(flag.get());
+    assertThat(flag.get()).isFalse();
     instance.requestShutdown(REASON);
-    assertTrue(flag.get());
+    assertThat(flag.get()).isTrue();
   }
 
   @Test
@@ -155,7 +153,7 @@ public class ShutdownNotifierTest {
     instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(reason -> flag.set(true));
 
-    assertTrue(flag.get());
+    assertThat(flag.get()).isTrue();
   }
 
   @Test
@@ -165,34 +163,34 @@ public class ShutdownNotifierTest {
     instance.requestShutdown(REASON);
     instance.registerAndCheckImmediately(reasonReference::set);
 
-    assertEquals(REASON, reasonReference.get());
+    assertThat(reasonReference.get()).isEqualTo(REASON);
   }
 
   @Test
   public void testParentChild() {
     ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
-    assertFalse(instance.shouldShutdown());
-    assertFalse(child.shouldShutdown());
+    assertThat(instance.shouldShutdown()).isFalse();
+    assertThat(child.shouldShutdown()).isFalse();
 
     instance.requestShutdown(REASON);
 
-    assertTrue(child.shouldShutdown());
-    assertEquals(REASON, child.getReason());
+    assertThat(child.shouldShutdown()).isTrue();
+    assertThat(child.getReason()).isEqualTo(REASON);
   }
 
   @Test
   public void testChildParent() {
     ShutdownNotifier child = ShutdownManager.createWithParent(instance).getNotifier();
 
-    assertFalse(instance.shouldShutdown());
-    assertFalse(child.shouldShutdown());
+    assertThat(instance.shouldShutdown()).isFalse();
+    assertThat(child.shouldShutdown()).isFalse();
 
     child.requestShutdown(REASON);
 
-    assertFalse(instance.shouldShutdown());
-    assertTrue(child.shouldShutdown());
-    assertEquals(REASON, child.getReason());
+    assertThat(instance.shouldShutdown()).isFalse();
+    assertThat(child.shouldShutdown()).isTrue();
+    assertThat(child.getReason()).isEqualTo(REASON);
   }
 
   @Test
@@ -204,7 +202,7 @@ public class ShutdownNotifierTest {
     child.register(reason -> flag.set(true));
 
     instance.requestShutdown(REASON);
-    assertTrue(flag.get());
+    assertThat(flag.get()).isTrue();
   }
 
   @Test
@@ -216,6 +214,6 @@ public class ShutdownNotifierTest {
     child.register(reasonReference::set);
 
     instance.requestShutdown(REASON);
-    assertEquals(REASON, reasonReference.get());
+    assertThat(reasonReference.get()).isEqualTo(REASON);
   }
 }

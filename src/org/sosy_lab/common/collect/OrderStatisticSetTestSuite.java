@@ -20,7 +20,8 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.testing.TestStringSortedSetGenerator;
@@ -120,14 +121,14 @@ public abstract class OrderStatisticSetTestSuite {
 
     try {
       subSet.add(ELEMS[0]);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
 
     try {
       subSet.add(ELEMS[3]);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
@@ -135,7 +136,7 @@ public abstract class OrderStatisticSetTestSuite {
     try {
       // the first 3 elements are in the range of the sublist, but the last isn't
       subSet.addAll(toAdd);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
       // expected outcome
     }
@@ -242,13 +243,13 @@ public abstract class OrderStatisticSetTestSuite {
 
     try {
       set.getByRank(-1);
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       set.getByRank(ELEMS.length);
-      fail("Expected " + IndexOutOfBoundsException.class.getSimpleName());
+      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
@@ -338,19 +339,19 @@ public abstract class OrderStatisticSetTestSuite {
 
     try {
       set.removeByRank(-1);
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       set.removeByRank(set.size());
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       emptySet.removeByRank(0);
-      fail();
+      assert_().fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }

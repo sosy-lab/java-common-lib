@@ -20,7 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import java.io.IOException;
 import java.net.URL;
@@ -76,7 +76,7 @@ public class ExtendedURLClassLoaderTest {
             .build()) {
       try {
         cl.loadClass(TEST_CLASS.getName());
-        fail();
+        assert_().fail();
       } catch (ClassNotFoundException e) {
       }
     }

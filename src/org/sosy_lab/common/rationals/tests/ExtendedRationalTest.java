@@ -6,7 +6,6 @@ import com.google.errorprone.annotations.Var;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.ExtendedRational;
 import org.sosy_lab.common.rationals.Rational;
@@ -28,7 +27,7 @@ public class ExtendedRationalTest {
   public void testInstantiation() {
     ExtendedRational x;
     x = new ExtendedRational(Rational.ofLongs(108, 96));
-    Assert.assertEquals("9/8", x.toString());
+    assertThat(x.toString()).isEqualTo("9/8");
     assertThat(x.toString()).isEqualTo("9/8");
   }
 
@@ -197,6 +196,6 @@ public class ExtendedRationalTest {
   @Test
   public void testOfStringNumber() {
     ExtendedRational a = ExtendedRational.ofString("-2");
-    Assert.assertEquals(new ExtendedRational(Rational.ofLong(-2)), a);
+    assertThat(a).isEqualTo(new ExtendedRational(Rational.ofLong(-2)));
   }
 }
