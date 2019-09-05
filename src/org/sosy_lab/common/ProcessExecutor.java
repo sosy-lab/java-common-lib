@@ -33,6 +33,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.errorprone.annotations.Var;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -47,6 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.log.LogManager;
 
@@ -88,7 +90,24 @@ public class ProcessExecutor<E extends Exception> {
   /** See {@link #ProcessExecutor(LogManager, Class, String...)}. */
   public ProcessExecutor(LogManager logger, Class<E> exceptionClass, String... cmd)
       throws IOException {
-    this(logger, exceptionClass, ImmutableMap.<String, String>of(), cmd);
+    this(logger, exceptionClass, ImmutableMap.<String, String>of(), null, cmd);
+  }
+
+  /** See {@link #ProcessExecutor(LogManager, Class, File, String...)}. */
+  public ProcessExecutor(
+      LogManager logger, Class<E> exceptionClass, @Nullable File executionDirectory, String... cmd)
+      throws IOException {
+    this(logger, exceptionClass, ImmutableMap.<String, String>of(), executionDirectory, cmd);
+  }
+
+  /** See {@link #ProcessExecutor(LogManager, Class, Map, String...)}. */
+  public ProcessExecutor(
+      LogManager logger,
+      Class<E> exceptionClass,
+      Map<String, String> environmentOverride,
+      String... cmd)
+      throws IOException {
+    this(logger, exceptionClass, environmentOverride, null, cmd);
   }
 
   /**
@@ -110,6 +129,7 @@ public class ProcessExecutor<E extends Exception> {
    * @param logger A LogManager for debug output.
    * @param exceptionClass The type of exception that the handler methods may throw.
    * @param environmentOverride Map with environment variables to set.
+   * @param executionDirectory The directory for the command to be executed in.
    * @param cmd The command with arguments to execute.
    * @throws IOException If the process cannot be executed.
    */
@@ -118,6 +138,7 @@ public class ProcessExecutor<E extends Exception> {
       LogManager logger,
       Class<E> exceptionClass,
       Map<String, String> environmentOverride,
+      @Nullable File executionDirectory,
       String... cmd)
       throws IOException {
     checkNotNull(cmd);
@@ -131,6 +152,7 @@ public class ProcessExecutor<E extends Exception> {
     logger.log(Level.ALL, (Object[]) cmd);
 
     ProcessBuilder proc = new ProcessBuilder(cmd);
+    proc.directory(executionDirectory);
     Map<String, String> environment = proc.environment();
     for (Map.Entry<String, String> entry : environmentOverride.entrySet()) {
       if (entry.getValue() == null) {
