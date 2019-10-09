@@ -30,21 +30,31 @@
 
     <developers>
         <developer>
-            <name>Dirk Beyer</name>
-            <email>dirk.beyer@sosy-lab.org</email>
-            <url>https://www.sosy-lab.org/~dbeyer/</url>
+            <name>Philipp Wendler</name>
+            <email>uni@philippwendler.de</email>
             <organization>Software Systems Lab</organization>
-            <organizationUrl>https://www.sosy-lab.org/</organizationUrl>
+            <url>https://www.sosy-lab.org/people/wendler/</url>
             <roles>
-                <role>project manager</role>
+                <role>project maintainer</role>
             </roles>
         </developer>
         <developer>
-            <name>George Karpenkov</name>
-            <email>george@metaworld.me</email>
-            <url>http://metaworld.me</url>
+            <name>Karlheinz Friedberger</name>
+            <email>kfriedberger@gmail.com</email>
+            <organization>Software Systems Lab</organization>
+            <url>https://www.sosy-lab.org/people/friedberger/</url>
             <roles>
-                <role>maintainer of "Rationals" library</role>
+                <role>project maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Dirk Beyer</name>
+            <email>dirk.beyer@sosy-lab.org</email>
+            <url>https://www.sosy-lab.org/people/beyer/</url>
+            <organization>Software Systems Lab</organization>
+            <organizationUrl>http://www.sosy-lab.org/</organizationUrl>
+            <roles>
+                <role>project manager</role>
             </roles>
         </developer>
     </developers>
