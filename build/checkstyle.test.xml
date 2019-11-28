@@ -29,7 +29,6 @@
       <property name="allowMissingParamTags" value="true"/>
       <property name="allowMissingThrowsTags" value="true"/>
       <property name="allowMissingReturnTag" value="true"/>
-      <property name="allowMissingJavadoc" value="true"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="ClassTypeParameterName">
@@ -64,11 +63,6 @@
       <property name="processJavadoc" value="true"/>
     </module>
     <module name="OuterTypeNumber"/>
-    <module name="LineLength">
-      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
-      <property name="max" value="100"/>
-      <property name="tabWidth" value="2"/>
-    </module>
     <module name="ParameterNumber"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
@@ -171,6 +165,11 @@
     <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
     <module name="JavadocParagraph"/>
+  </module>
+  <module name="LineLength">
+    <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
+    <property name="max" value="100"/>
+    <property name="tabWidth" value="2"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
