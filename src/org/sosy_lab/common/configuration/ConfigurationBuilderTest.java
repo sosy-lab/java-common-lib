@@ -23,8 +23,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
@@ -73,7 +73,7 @@ public class ConfigurationBuilderTest {
     Configuration config2 =
         new ConfigurationBuilder().copyFrom(config).addConverter(String.class, conv2).build();
 
-    verifyZeroInteractions(conv1, conv2);
+    verifyNoInteractions(conv1, conv2);
     assertThat(config2.converters).containsEntry(String.class, conv2);
     assertThat(config2.converters.entrySet())
         .containsAtLeastElementsIn(Configuration.getDefaultConverters().entrySet());
