@@ -23,6 +23,7 @@ import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** This class may be used to read the log into a String. */
 public class StringBuildingLogHandler extends Handler {
@@ -41,7 +42,7 @@ public class StringBuildingLogHandler extends Handler {
   }
 
   @Override
-  public synchronized void publish(LogRecord record) {
+  public synchronized void publish(@Nullable LogRecord record) {
     // code copied from java.util.logging.StreamHandler#publish(LogRecord)
     if (!isLoggable(record)) {
       return;
