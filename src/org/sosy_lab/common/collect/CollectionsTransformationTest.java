@@ -19,12 +19,12 @@
  */
 package org.sosy_lab.common.collect;
 
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -201,7 +201,7 @@ public class CollectionsTransformationTest {
     List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
 
     @SuppressWarnings("unused")
-    List<String> transformed = from(list).transform(Functions.identity()).toList();
+    List<String> transformed = FluentIterable.from(list).transform(Functions.identity()).toList();
     Mockito.verify(list, Mockito.never()).size();
     Mockito.verify(list).iterator();
   }

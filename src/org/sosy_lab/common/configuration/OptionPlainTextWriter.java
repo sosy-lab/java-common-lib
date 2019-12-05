@@ -20,10 +20,10 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
 import com.google.errorprone.annotations.Var;
 import java.io.PrintStream;
 import java.lang.reflect.AnnotatedElement;
@@ -73,7 +73,7 @@ class OptionPlainTextWriter {
         lastDescription = description;
       }
     }
-    for (OptionInfo option : from(allInstances).filter(OptionInfo.class)) {
+    for (OptionInfo option : FluentIterable.from(allInstances).filter(OptionInfo.class)) {
       String infoText = getOptionInfo(option);
       if (!lastInfo.equals(infoText)) {
         out.append(infoText);

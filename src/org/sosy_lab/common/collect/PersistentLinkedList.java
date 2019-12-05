@@ -21,8 +21,8 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.FluentIterable.from;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
@@ -230,7 +230,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
 
     // get start of list until value
     // into a separate list so we can iterate in reverse
-    ImmutableList<T> prefix = from(this).limit(pos).toList();
+    ImmutableList<T> prefix = FluentIterable.from(this).limit(pos).toList();
 
     // concatenate prefix and suffix
     @Var PersistentLinkedList<T> result = suffix;

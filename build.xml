@@ -26,7 +26,6 @@
         - NullableDereference: buggy
         - FieldMissingNullable: buggy
         - ReturnMissingNullable: buggy
-        - BadImport: complains about commonly-used FluentIterable.from
         - TestExceptionChecker, TryFailRefactoring, TestExceptionRefactoring, ExpectedExceptionRefactoring: will be fixed with newer JUnit
         - Finally: crashes (https://github.com/google/error-prone/issues/1257)
     -->
@@ -43,7 +42,6 @@
         -Xep:ReturnMissingNullable:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
-        -Xep:BadImport:OFF
         -Xep:TestExceptionChecker:OFF
         -Xep:TryFailRefactoring:OFF
         -Xep:TestExceptionRefactoring:OFF

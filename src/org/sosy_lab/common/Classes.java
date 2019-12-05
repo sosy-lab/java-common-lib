@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Verify.verify;
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -316,7 +315,7 @@ public final class Classes {
   public static @Nullable String verifyDeclaredExceptions(
       Invokable<?, ?> invokable, Class<?>... allowedExceptionTypes) {
     return verifyDeclaredExceptions(
-        from(invokable.getExceptionTypes()).transform(TypeToken::getRawType),
+        FluentIterable.from(invokable.getExceptionTypes()).transform(TypeToken::getRawType),
         Arrays.asList(allowedExceptionTypes));
   }
 
@@ -325,7 +324,7 @@ public final class Classes {
       Iterable<Class<?>> declaredExceptionTypes, Iterable<Class<?>> pAllowedExceptionTypes) {
     // RuntimeException and Error are always allowed
     FluentIterable<Class<?>> allowedExceptionTypes =
-        from(pAllowedExceptionTypes).append(RuntimeException.class, Error.class);
+        FluentIterable.from(pAllowedExceptionTypes).append(RuntimeException.class, Error.class);
 
     for (Class<?> declaredException : declaredExceptionTypes) {
       if (!allowedExceptionTypes.anyMatch(

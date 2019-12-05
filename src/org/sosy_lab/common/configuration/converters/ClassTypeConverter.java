@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.common.configuration.converters;
 
-import static com.google.common.collect.FluentIterable.from;
-
+import com.google.common.collect.FluentIterable;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
@@ -54,7 +53,8 @@ public class ClassTypeConverter implements TypeConverter {
             "Options of type Class may not be annotated with " + secondaryOption);
       }
       packagePrefixes =
-          from(packagePrefixes).append(((ClassOption) secondaryOption).packagePrefix());
+          FluentIterable.from(packagePrefixes)
+              .append(((ClassOption) secondaryOption).packagePrefix());
     }
 
     // get class object
