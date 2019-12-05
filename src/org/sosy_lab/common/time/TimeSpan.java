@@ -557,60 +557,58 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   // Code for formatting as string
 
-  private static final Function<TimeSpan, String> FORMAT_SIMPLE =
-      pInput -> pInput.span + TIME_UNITS.get(pInput.unit);
+  private String formatSimple() {
+    return span + TIME_UNITS.get(unit);
+  }
 
   @VisibleForTesting
-  static final Function<TimeSpan, String> FORMAT_HUMAN_READABLE_LARGE =
-      pInput -> {
-        TimeUnit unit = pInput.getUnit();
-        StringBuilder result = new StringBuilder();
-        @Var boolean started = false;
+  String formatHumanReadableLarge() {
+    StringBuilder result = new StringBuilder();
+    @Var boolean started = false;
 
-        long years = pInput.getChecked(DAYS) / 365;
-        if (years > 0) {
-          started = true;
-          result.append(years).append("a ");
-        }
+    long years = getChecked(DAYS) / 365;
+    if (years > 0) {
+      started = true;
+      result.append(years).append("a ");
+    }
 
-        long days = pInput.getChecked(DAYS) - years * 365;
-        if (started || days > 0) {
-          started = true;
-          result.append(days).append("d ");
-        }
-        if (unit.equals(DAYS)) {
-          return result.toString().trim();
-        }
+    long days = getChecked(DAYS) - years * 365;
+    if (started || days > 0) {
+      started = true;
+      result.append(days).append("d ");
+    }
+    if (unit.equals(DAYS)) {
+      return result.toString().trim();
+    }
 
-        long hours = pInput.getChecked(HOURS) - years * 365 * 24 - days * 24;
-        if (started || hours > 0) {
-          started = true;
-          result.append(String.format("%02dh ", hours));
-        }
-        if (unit.equals(HOURS)) {
-          return result.toString().trim();
-        }
+    long hours = getChecked(HOURS) - years * 365 * 24 - days * 24;
+    if (started || hours > 0) {
+      started = true;
+      result.append(String.format("%02dh ", hours));
+    }
+    if (unit.equals(HOURS)) {
+      return result.toString().trim();
+    }
 
-        long minutes =
-            pInput.getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
-        if (started || minutes > 0) {
-          result.append(String.format("%02dmin ", minutes));
-        }
-        if (unit.equals(MINUTES)) {
-          started = true;
-          return result.toString().trim();
-        }
+    long minutes = getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
+    if (started || minutes > 0) {
+      result.append(String.format("%02dmin ", minutes));
+    }
+    if (unit.equals(MINUTES)) {
+      started = true;
+      return result.toString().trim();
+    }
 
-        long seconds =
-            pInput.getChecked(SECONDS)
-                - years * 365 * 24 * 60 * 60
-                - days * 24 * 60 * 60
-                - hours * 60 * 60
-                - minutes * 60;
-        result.append(String.format("%02ds", seconds));
+    long seconds =
+        getChecked(SECONDS)
+            - years * 365 * 24 * 60 * 60
+            - days * 24 * 60 * 60
+            - hours * 60 * 60
+            - minutes * 60;
+    result.append(String.format("%02ds", seconds));
 
-        return result.toString();
-      };
+    return result.toString();
+  }
 
   private static final String DEFAULT_FORMAT_PROPERTY_NAME =
       TimeSpan.class.getCanonicalName() + ".defaultFormat";
@@ -622,13 +620,13 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
         Ascii.toUpperCase(System.getProperty(DEFAULT_FORMAT_PROPERTY_NAME, "SIMPLE").trim());
     switch (format) {
       case "HUMAN_READABLE_LARGE":
-        DEFAULT_FORMAT = FORMAT_HUMAN_READABLE_LARGE;
+        DEFAULT_FORMAT = TimeSpan::formatHumanReadableLarge;
         break;
       case "SIMPLE":
-        DEFAULT_FORMAT = FORMAT_SIMPLE;
+        DEFAULT_FORMAT = TimeSpan::formatSimple;
         break;
       default:
-        DEFAULT_FORMAT = FORMAT_SIMPLE;
+        DEFAULT_FORMAT = TimeSpan::formatSimple;
     }
   }
 }
