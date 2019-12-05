@@ -38,7 +38,9 @@ public class ShutdownNotifierTest {
 
   private static final String REASON = "Shutdown Request Reason";
 
+  @SuppressWarnings("FieldCanBeLocal") // must not be garbage collected during test
   private @Nullable ShutdownManager manager;
+
   private @Nullable ShutdownNotifier instance;
 
   @Before

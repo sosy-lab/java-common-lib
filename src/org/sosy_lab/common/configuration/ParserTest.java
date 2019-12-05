@@ -66,7 +66,7 @@ public class ParserTest {
       assertThat(parsedOptions).isEmpty();
 
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new AssertionError(e);
     }
   }
 
@@ -76,7 +76,7 @@ public class ParserTest {
       assertThat(parsedOptions).containsExactly(key, value);
 
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new AssertionError(e);
     }
   }
 

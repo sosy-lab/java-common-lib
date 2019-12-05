@@ -73,7 +73,8 @@
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="3.1.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-core" rev="3.2.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-errorprone" rev="3.2.0" conf="build->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -82,8 +83,8 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.3" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.3" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.4" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.4" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -95,7 +96,7 @@
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.36.0" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.26" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.27" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>
@@ -104,6 +105,6 @@
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.3"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.4"/>
     </dependencies>
 </ivy-module>

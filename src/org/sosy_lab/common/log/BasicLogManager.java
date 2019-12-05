@@ -434,6 +434,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static @Nullable StackTraceElement findCallingMethod() {
     // We use lazy stack trace, because this exactly fits our use case:
     // Typically we need only one or two StackTraceElements from the top of the trace.
+    @SuppressWarnings("ThrowSpecificExceptions")
     List<StackTraceElement> trace = Throwables.lazyStackTrace(new Throwable());
 
     // First method in stacktrace is this method, second is the log() method.

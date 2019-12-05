@@ -226,7 +226,7 @@ public class ConfigurationTest {
       }
 
     } catch (ReflectiveOperationException e) {
-      throw new RuntimeException(e);
+      throw new AssertionError(e);
     }
   }
 

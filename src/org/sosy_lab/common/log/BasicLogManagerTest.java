@@ -103,6 +103,7 @@ public class BasicLogManagerTest {
     checkExpectedLogRecordSource(testHandler, "throwException");
   }
 
+  @SuppressWarnings("ThrowSpecificExceptions")
   private static void throwException() {
     throw new RuntimeException();
   }

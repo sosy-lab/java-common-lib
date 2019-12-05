@@ -27,6 +27,7 @@ import org.sosy_lab.common.Appenders.AbstractAppender;
 
 public class AppendersTest {
 
+  @SuppressWarnings("UnnecessaryAnonymousClass") // easier for test
   private final Appender testAppender =
       new AbstractAppender() {
         @Override
