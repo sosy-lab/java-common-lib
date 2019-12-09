@@ -27,6 +27,7 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.RuntimeErrorException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.log.LogManager;
 
@@ -68,6 +69,14 @@ public abstract class AbstractMBean {
     }
   }
 
+  protected RuntimeErrorException handleRuntimeErrorException(RuntimeErrorException e) {
+    if (e.getTargetError() != null) {
+      // Errors are better not hidden in an exception.
+      throw e.getTargetError();
+    }
+    throw e;
+  }
+
   /**
    * Register this instance at the platform MBeanServer. Swallows all checked exceptions that might
    * occur and logs them.
@@ -86,6 +95,8 @@ public abstract class AbstractMBean {
         // now register our instance
         MBEAN_SERVER.registerMBean(this, oname);
 
+      } catch (RuntimeErrorException e) {
+        throw handleRuntimeErrorException(e);
       } catch (JMException | SecurityException e) {
         logger.logException(Level.WARNING, e, "Error during registration of management interface");
         oname = null;
@@ -103,6 +114,8 @@ public abstract class AbstractMBean {
     if (MBEAN_SERVER != null && oname != null) {
       try {
         MBEAN_SERVER.unregisterMBean(oname);
+      } catch (RuntimeErrorException e) {
+        throw handleRuntimeErrorException(e);
       } catch (JMException | SecurityException e) {
         logger.logException(
             Level.WARNING, e, "Error during unregistration of management interface");
