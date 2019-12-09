@@ -30,6 +30,7 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.RuntimeErrorException;
 
 /** Class providing several convenient {@link Ticker} implementations. */
 public class Tickers {
@@ -134,6 +135,12 @@ public class Tickers {
     public long read() {
       try {
         return (Long) mbeanServer.getAttribute(osMbean, PROCESS_CPU_TIME);
+      } catch (RuntimeErrorException e) {
+        // Errors are better not hidden in an exception.
+        if (e.getTargetError() != null) {
+          throw e.getTargetError();
+        }
+        throw e;
       } catch (JMException e) {
         throw new UnsupportedOperationException(e);
       }
