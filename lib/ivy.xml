@@ -95,8 +95,8 @@
         <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.6" conf="format-source->default"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.36.0" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.27" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.28" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>

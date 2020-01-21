@@ -23,9 +23,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An annotation similar to {@link javax.annotation.ParametersAreNonnullByDefault} that defines that
@@ -33,8 +31,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * method.
  */
 @Documented
-@Nonnull
-@NonNull
+@javax.annotation.Nonnull
+@org.checkerframework.checker.nullness.qual.NonNull
 @TypeQualifierDefault(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FieldsAreNonnullByDefault {}

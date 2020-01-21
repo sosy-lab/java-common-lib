@@ -635,7 +635,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         .append("Exception in thread \"")
         .append(Thread.currentThread().getName())
         .append("\" ");
-    e.printStackTrace(new PrintWriter(CharStreams.asWriter(logMessage)));
+    @SuppressWarnings("checkstyle:IllegalInstantiation")
+    PrintWriter printWriterToLogMessage = new PrintWriter(CharStreams.asWriter(logMessage));
+    e.printStackTrace(printWriterToLogMessage);
     return logMessage;
   }
 
