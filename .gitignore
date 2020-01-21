@@ -2,6 +2,7 @@
 # /
 /bin
 /.apt-generated/
+/build.properties
 /ivy-*.xml
 /common-*.jar
 /TEST-*.txt
