@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.common.log;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -37,6 +36,7 @@ import java.lang.StackWalker.StackFrame;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -399,14 +399,14 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
     String[] argsStr = new String[args.length];
     for (int i = 0; i < args.length; i++) {
-      Object o = firstNonNull(args[i], "null");
+      Object o = Objects.requireNonNullElse(args[i], "null");
       @Var String arg;
       if (o instanceof Appender && (truncateSize > 0)) {
         arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
       } else {
         arg = o.toString();
       }
-      arg = firstNonNull(arg, "null"); // may happen if toString() returns null
+      arg = Objects.requireNonNullElse(arg, "null"); // may happen if toString() returns null
       if ((truncateSize > 0) && (arg.length() > truncateSize)) {
         String length =
             (o instanceof Appender) ? ">= " + truncateSize : Integer.toString(arg.length());

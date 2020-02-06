@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.common.configuration;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -64,6 +63,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -304,7 +304,7 @@ public final class Configuration {
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
     printUsedOptions = pPrintUsedOptions;
-    logger = firstNonNull(pLogger, LogManager.createNullLogManager());
+    logger = Objects.requireNonNullElse(pLogger, LogManager.createNullLogManager());
   }
 
   public void enableLogging(LogManager pLogger) {
@@ -1032,7 +1032,7 @@ public final class Configuration {
             type,
             secondaryOption,
             sources.get(optionName),
-            firstNonNull(logger, LogManager.createNullLogManager()));
+            Objects.requireNonNullElse(logger, LogManager.createNullLogManager()));
 
     if (result != null && isAnnotated) {
       result = AnnotatedValue.create(result, Optional.ofNullable(annotation));

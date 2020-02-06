@@ -492,7 +492,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     // Check black height balancing.
     checkState(
         leftBlackHeight == rightBlackHeight,
-        "Black path length on left is " + leftBlackHeight + " and on right is " + rightBlackHeight);
+        "Black path length on left is %s and on right is %s",
+        leftBlackHeight,
+        rightBlackHeight);
 
     @Var int blackHeight = leftBlackHeight;
     if (!current.isRed) {

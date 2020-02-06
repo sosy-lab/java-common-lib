@@ -21,6 +21,7 @@ package org.sosy_lab.common.log;
 
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Var;
+import java.util.Objects;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -76,9 +77,9 @@ public class ConsoleLogFormatter extends Formatter {
       }
     }
 
-    sb.append(MoreObjects.firstNonNull(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
+    sb.append(Objects.requireNonNullElse(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
         .append('.')
-        .append(MoreObjects.firstNonNull(lr.getSourceMethodName(), "$unknown$"))
+        .append(Objects.requireNonNullElse(lr.getSourceMethodName(), "$unknown$"))
         .append(", ")
         .append(lr.getLevel().toString())
         .append(')');

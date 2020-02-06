@@ -23,6 +23,7 @@ import com.google.common.base.MoreObjects;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -47,9 +48,9 @@ public class FileLogFormatter extends Formatter {
         sb.append(component).append(':');
       }
     }
-    sb.append(MoreObjects.firstNonNull(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
+    sb.append(Objects.requireNonNullElse(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
         .append('.')
-        .append(MoreObjects.firstNonNull(lr.getSourceMethodName(), "$unknown$"))
+        .append(Objects.requireNonNullElse(lr.getSourceMethodName(), "$unknown$"))
         .append('\t')
         .append(lr.getMessage())
         .append("\n\n");

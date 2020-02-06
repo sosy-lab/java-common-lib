@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Equivalence;
 import com.google.common.base.Function;
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -195,7 +194,7 @@ public final class Collections3 {
         @SuppressWarnings("unchecked")
         Comparator<Object> comp =
             (Comparator<Object>)
-                MoreObjects.firstNonNull(coll1.comparator(), Comparator.naturalOrder());
+                Objects.requireNonNullElse(coll1.comparator(), Comparator.naturalOrder());
         Iterator<?> it1 = coll1.iterator();
         Iterator<?> it2 = coll2.iterator();
         try {
@@ -258,7 +257,7 @@ public final class Collections3 {
       @SuppressWarnings("unchecked")
       Comparator<Object> comparator =
           (Comparator<Object>)
-              MoreObjects.firstNonNull(coll1.comparator(), Comparator.naturalOrder());
+              Objects.requireNonNullElse(coll1.comparator(), Comparator.naturalOrder());
 
       Iterator<?> it1 = coll1.iterator();
       Iterator<?> it2 = coll2.iterator();
