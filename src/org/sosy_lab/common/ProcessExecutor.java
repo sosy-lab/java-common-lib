@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
@@ -47,6 +48,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
@@ -70,6 +72,7 @@ import org.sosy_lab.common.log.LogManager;
 public class ProcessExecutor<E extends Exception> {
 
   private final String name;
+  private final long pid;
   private final Class<E> exceptionClass;
 
   private final Writer in;
@@ -148,9 +151,6 @@ public class ProcessExecutor<E extends Exception> {
     this.exceptionClass = checkNotNull(exceptionClass);
     this.name = cmd[0];
 
-    logger.log(Level.FINEST, "Executing", name);
-    logger.log(Level.ALL, (Object[]) cmd);
-
     ProcessBuilder proc = new ProcessBuilder(cmd);
     proc.directory(executionDirectory);
     Map<String, String> environment = proc.environment();
@@ -161,8 +161,17 @@ public class ProcessExecutor<E extends Exception> {
         environment.put(entry.getKey(), entry.getValue());
       }
     }
+    Supplier<String> executingMsgSupplier =
+        () -> String.format("Executing '%s'", Joiner.on(" ").join(cmd));
+    logger.log(Level.FINEST, executingMsgSupplier);
 
     Process process = proc.start();
+    this.pid = process.pid();
+
+    Supplier<String> startedMsgSupplier =
+        () -> String.format("Started '%s' with pid [%d]", Joiner.on(" ").join(cmd), pid);
+    logger.log(Level.FINEST, startedMsgSupplier);
+
     processFuture =
         executor.submit(
             () -> {
@@ -170,11 +179,11 @@ public class ProcessExecutor<E extends Exception> {
               // the external process also has finished and it has been wait()ed for
               // (which is important for ulimit timing measurements on Linux)
 
-              logger.log(Level.FINEST, "Waiting for", name);
+              logger.logf(Level.FINEST, "Waiting for %s[%d]", name, pid);
 
               try {
                 int exitCode1 = process.waitFor();
-                logger.log(Level.FINEST, name, "has terminated normally");
+                logger.logf(Level.FINEST, "%s[%d] has terminated normally", name, pid);
 
                 handleExitCode(exitCode1);
 
@@ -187,7 +196,8 @@ public class ProcessExecutor<E extends Exception> {
                 while (true) {
                   try {
                     int exitCode2 = process.waitFor();
-                    logger.log(Level.FINEST, name, "has terminated after it was cancelled");
+                    logger.logf(
+                        Level.FINEST, "%s[%d] has terminated after it was cancelled", name, pid);
 
                     // no call to handleExitCode() here, we do this only with normal termination
 
@@ -224,7 +234,7 @@ public class ProcessExecutor<E extends Exception> {
                   // IOExceptions after a killed process are no suprise
                   // Log and ignore so they don't mask the real cause
                   // why we killed the process.
-                  logger.logDebugException(e, "IOException after process was killed");
+                  logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
                 } else {
                   throw e;
                 }
@@ -249,7 +259,7 @@ public class ProcessExecutor<E extends Exception> {
                   // IOExceptions after a killed process are no suprise
                   // Log and ignore so they don't mask the real cause
                   // why we killed the process.
-                  logger.logDebugException(e, "IOException after process was killed");
+                  logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
                 } else {
                   throw e;
                 }
@@ -263,13 +273,13 @@ public class ProcessExecutor<E extends Exception> {
           @Override
           public void onFailure(Throwable e) {
             if (!processFuture.isCancelled()) {
-              logger.logUserException(
-                  Level.FINEST, e, "Killing " + name + " due to error in output handling");
+              logger.logfUserException(
+                  Level.FINEST, e, "Killing %s[%d] due to error in output handling", name, pid);
               processFuture.cancel(true);
 
             } else {
-              logger.logDebugException(
-                  e, "Error in output handling after " + name + " was already killed");
+              logger.logfDebugException(
+                  e, "Error in output handling after %s[%d] was already killed", name, pid);
             }
           }
 
@@ -353,19 +363,20 @@ public class ProcessExecutor<E extends Exception> {
       return exitCode;
 
     } catch (TimeoutException e) {
-      logger.log(Level.WARNING, "Killing", name, "due to timeout");
+      logger.logf(Level.WARNING, "Killing %s[%d] due to timeout", name, pid);
       processFuture.cancel(true);
       throw e;
 
     } catch (InterruptedException e) {
-      logger.log(Level.WARNING, "Killing", name, "due to user interrupt");
+      logger.log(Level.WARNING, "Killing %s[%d] due to user interrupt", name, pid);
       processFuture.cancel(true);
       throw e;
 
     } catch (ExecutionException e) {
       Throwable t = e.getCause();
       Throwables.propagateIfPossible(t, IOException.class, exceptionClass);
-      throw new UnexpectedCheckedException("output handling of external process " + name, t);
+      throw new UnexpectedCheckedException(
+          String.format("output handling of external process %s[%d]", name, pid), t);
 
     } finally {
       // cleanup
@@ -416,7 +427,7 @@ public class ProcessExecutor<E extends Exception> {
    */
   protected void handleOutput(String line) throws E {
     checkNotNull(line);
-    logger.log(Level.ALL, name, "output:", line);
+    logger.logf(Level.ALL, "%s[%d] output: %s", name, pid, line);
     output.add(line);
   }
 
@@ -432,7 +443,7 @@ public class ProcessExecutor<E extends Exception> {
    */
   protected void handleErrorOutput(String line) throws E {
     checkNotNull(line);
-    logger.log(Level.WARNING, name, "error output:", line);
+    logger.logf(Level.WARNING, "%s[%d] error output: %s", name, pid, line);
     errorOutput.add(line);
   }
 
@@ -446,7 +457,7 @@ public class ProcessExecutor<E extends Exception> {
    */
   protected void handleExitCode(int code) throws E {
     if (code != 0) {
-      logger.log(Level.WARNING, "Exit code from", name, "was", code);
+      logger.logf(Level.WARNING, "Exit code from %s[%d] was %d", name, pid, code);
     }
   }
 
