@@ -70,6 +70,9 @@ public class OptionCollector {
   private static final Pattern IGNORED_CLASSES =
       Pattern.compile("^org\\.sosy_lab\\.common\\..*Test(\\$.*)?$");
 
+  private static final Pattern PATHS_PATTERN =
+      Pattern.compile(
+          "Classes\\.getCodeLocation\\([^)]+\\)\\s*\\.resolve(Sibling)?\\((.*)\\)", Pattern.DOTALL);
   private static final Pattern IMMUTABLE_SET_PATTERN =
       Pattern.compile("ImmutableSet\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
   private static final Pattern IMMUTABLE_LIST_PATTERN =
@@ -436,6 +439,10 @@ public class OptionCollector {
         match = IMMUTABLE_LIST_PATTERN.matcher(defaultValue);
         if (match.matches()) {
           defaultValue = "[" + match.group(2) + "]";
+        }
+        match = PATHS_PATTERN.matcher(defaultValue);
+        if (match.matches()) {
+          defaultValue = match.group(2);
         }
       }
     } else {

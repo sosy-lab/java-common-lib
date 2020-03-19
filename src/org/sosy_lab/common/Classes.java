@@ -51,8 +51,11 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -104,6 +107,19 @@ public final class Classes {
           source);
 
       assert (source instanceof Exception) && !(source instanceof RuntimeException);
+    }
+  }
+
+  /**
+   * Return the {@link Path} to the location of the code of the given class, e.g., the JAR file. If
+   * the class is in a {@code *.class} file, the base directory of the package structure is
+   * returned.
+   */
+  public static Path getCodeLocation(Class<?> cls) {
+    try {
+      return Paths.get(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
+    } catch (URISyntaxException e) {
+      throw new AssertionError(e);
     }
   }
 

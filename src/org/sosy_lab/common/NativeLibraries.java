@@ -19,15 +19,12 @@
  */
 package org.sosy_lab.common;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
 import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -185,20 +182,13 @@ public final class NativeLibraries {
       String os = Ascii.toLowerCase(OS.guessOperatingSystem().name());
 
       nativePath =
-          getPathToJar().getParent().getParent().resolve(Paths.get("native", arch + "-" + os));
+          Classes.getCodeLocation(NativeLibraries.class)
+              .getParent()
+              .getParent()
+              .getParent()
+              .resolve(Paths.get("native", arch + "-" + os));
     }
     return nativePath;
-  }
-
-  /** @return Path to <b>this</b> JAR, holding SoSy Lab-Common library. */
-  private static Path getPathToJar() {
-    URI pathToJar;
-    try {
-      pathToJar = NativeLibraries.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-    } catch (URISyntaxException e) {
-      throw new AssertionError(e);
-    }
-    return checkNotNull(Paths.get(pathToJar).getParent());
   }
 
   /**
@@ -237,7 +227,7 @@ public final class NativeLibraries {
     if (Files.exists(p)) {
       return Optional.of(p);
     }
-    p = getPathToJar().resolve(osLibName).toAbsolutePath();
+    p = Classes.getCodeLocation(NativeLibraries.class).resolveSibling(osLibName).toAbsolutePath();
     if (Files.exists(p)) {
       return Optional.of(p);
     }
