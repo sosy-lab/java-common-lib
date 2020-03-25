@@ -8,46 +8,16 @@
 
 package org.sosy_lab.common.log;
 
-import com.google.common.base.MoreObjects;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.logging.Formatter;
-import java.util.logging.LogRecord;
+/** @deprecated use {@link TimestampedLogFormatter} instead. */
+@Deprecated
+public class FileLogFormatter extends TimestampedLogFormatter {
 
-/** Class to handle formatting for file output. */
-public class FileLogFormatter extends Formatter {
-
-  private static final DateTimeFormatter DATE_FORMAT =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")
-          .withLocale(Locale.getDefault(Locale.Category.FORMAT))
-          .withZone(ZoneId.systemDefault());
-
-  @Override
-  public String format(LogRecord lr) {
-    StringBuilder sb = new StringBuilder();
-
-    DATE_FORMAT.formatTo(lr.getInstant(), sb);
-    sb.append('\t').append(lr.getLevel()).append('\t');
-
-    if (lr instanceof ExtendedLogRecord) {
-      String component = ((ExtendedLogRecord) lr).getSourceComponentName();
-      if (!component.isEmpty()) {
-        sb.append(component).append(':');
-      }
-    }
-    sb.append(Objects.requireNonNullElse(LogUtils.extractSimpleClassName(lr), "$Unknown$"))
-        .append('.')
-        .append(Objects.requireNonNullElse(lr.getSourceMethodName(), "$unknown$"))
-        .append('\t')
-        .append(lr.getMessage())
-        .append("\n\n");
-    return sb.toString();
+  /** @deprecated use {@link TimestampedLogFormatter#withoutColors()} */
+  @Deprecated
+  public FileLogFormatter() {
+    super(false);
   }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).toString();
-  }
+
+
 }

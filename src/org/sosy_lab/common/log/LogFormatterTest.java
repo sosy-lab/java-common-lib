@@ -29,7 +29,8 @@ public class LogFormatterTest {
     return ImmutableList.of(
         ConsoleLogFormatter.withColorsIfPossible(),
         ConsoleLogFormatter.withoutColors(),
-        new FileLogFormatter());
+        TimestampedLogFormatter.withColorsIfPossible(),
+        TimestampedLogFormatter.withoutColors());
   }
 
   @Parameter(0)
