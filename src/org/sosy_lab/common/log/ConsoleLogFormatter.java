@@ -36,14 +36,19 @@ public class ConsoleLogFormatter extends Formatter {
   }
 
   private ConsoleLogFormatter(@Var boolean pUseColors) {
-    // Using colors is only good if stderr is connected to a terminal and not
-    // redirected into a file.
-    // AFAIK there is no way to determine this from Java, but at least there
-    // is a way to determine whether stdout is connected to a terminal.
-    // We assume that most users only redirect stderr if they also redirect
-    // stdout, so this should be ok.
+
     if (pUseColors) {
-      if ((System.console() == null) || System.getProperty("os.name", "").startsWith("Windows")) {
+      // Using colors is only good if stderr is connected to a terminal and not
+      // redirected into a file.
+      // AFAIK there is no way to determine this from Java, but at least there
+      // is a way to determine whether stdout is connected to a terminal.
+      // We assume that most users only redirect stderr if they also redirect
+      // stdout, so this should be ok.
+      if ((System.console() == null)
+          // Windows terminal does not support colors
+          || System.getProperty("os.name", "").startsWith("Windows")
+          // https://no-color.org/
+          || System.getenv("NO_COLOR") != null) {
         pUseColors = false;
       }
     }
