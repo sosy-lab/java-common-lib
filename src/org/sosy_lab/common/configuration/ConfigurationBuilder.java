@@ -391,6 +391,7 @@ public final class ConfigurationBuilder {
         buildNewConverters(
             newProperties, newSources, newPrefix, newUnusedProperties, newDeprecatedProperties);
 
+    @SuppressWarnings("resource")
     Configuration newConfig =
         new Configuration(
             newProperties,
@@ -429,6 +430,7 @@ public final class ConfigurationBuilder {
 
     // For the previously existing converters we need to call getInstanceForNewConfiguration,
     // so we create a temp config and iterate over all previously existing and still used converters
+    @SuppressWarnings("resource")
     Configuration tempConfig =
         new Configuration(
             newProperties,

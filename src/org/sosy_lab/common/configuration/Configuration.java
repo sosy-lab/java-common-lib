@@ -316,6 +316,7 @@ public final class Configuration {
    * Let this instance write human-readable information about every option that is used to the given
    * stream.
    */
+  @SuppressWarnings("resource")
   public void dumpUsedOptionsTo(PrintStream out) {
     checkNotNull(out);
     checkState(printUsedOptions == null);

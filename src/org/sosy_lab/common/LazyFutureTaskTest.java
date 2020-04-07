@@ -20,7 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.util.concurrent.Callables;
 import com.google.common.util.concurrent.Runnables;
@@ -28,13 +28,9 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class LazyFutureTaskTest {
-
-  @Rule public final ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testRunnable() throws InterruptedException, ExecutionException {
@@ -55,7 +51,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  public void testException() throws InterruptedException, ExecutionException {
+  public void testException() {
     NullPointerException testException = new NullPointerException();
 
     Future<Boolean> f =
@@ -64,9 +60,8 @@ public class LazyFutureTaskTest {
               throw testException;
             });
 
-    thrown.expect(ExecutionException.class);
-    thrown.expectCause(is(testException));
-    f.get();
+    ExecutionException thrown = assertThrows(ExecutionException.class, () -> f.get());
+    assertThat(thrown).hasCauseThat().isSameInstanceAs(testException);
   }
 
   @Test
@@ -92,12 +87,11 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  public void testCancel() throws InterruptedException, ExecutionException {
+  public void testCancel() {
     Future<Void> f = new LazyFutureTask<>(Runnables.doNothing(), null);
 
     f.cancel(false);
 
-    thrown.expect(CancellationException.class);
-    f.get();
+    assertThrows(CancellationException.class, () -> f.get());
   }
 }

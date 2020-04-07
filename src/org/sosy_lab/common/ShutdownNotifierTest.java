@@ -20,6 +20,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,14 +28,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 
 public class ShutdownNotifierTest {
-
-  @Rule public final ExpectedException thrown = ExpectedException.none();
 
   private static final String REASON = "Shutdown Request Reason";
 
@@ -61,10 +58,8 @@ public class ShutdownNotifierTest {
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void testNotRequestedReason() {
-    thrown.expect(IllegalStateException.class);
-    instance.getReason();
+    assertThrows(IllegalStateException.class, () -> instance.getReason());
   }
 
   @Test
@@ -75,12 +70,12 @@ public class ShutdownNotifierTest {
   }
 
   @Test
-  public void testRequestedException() throws InterruptedException {
+  public void testRequestedException() {
     instance.requestShutdown(REASON);
 
-    thrown.expect(InterruptedException.class);
-    thrown.expectMessage(REASON);
-    instance.shutdownIfNecessary();
+    InterruptedException thrown =
+        assertThrows(InterruptedException.class, () -> instance.shutdownIfNecessary());
+    assertThat(thrown).hasMessageThat().isEqualTo(REASON);
   }
 
   @Test
@@ -88,8 +83,7 @@ public class ShutdownNotifierTest {
     ShutdownRequestListener l = reason -> {};
 
     instance.register(l);
-    thrown.expect(IllegalArgumentException.class);
-    instance.register(l);
+    assertThrows(IllegalArgumentException.class, () -> instance.register(l));
   }
 
   @Test

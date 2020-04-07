@@ -22,6 +22,7 @@ package org.sosy_lab.common.configuration.converters;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.common.configuration.Configuration.defaultConfiguration;
 import static org.sosy_lab.common.configuration.converters.FileTypeConverter.stripTrailingSeparator;
 
@@ -30,14 +31,13 @@ import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharSource;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.Callable;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -175,8 +175,6 @@ public class FileTypeConverterTest {
     @Parameter(2)
     public boolean isSafeWhenInConfigFile;
 
-    @Rule public final ExpectedException thrown = ExpectedException.none();
-
     @Options
     static class FileInjectionTestOptions {
       @FileOption(Type.OPTIONAL_INPUT_FILE)
@@ -189,54 +187,59 @@ public class FileTypeConverterTest {
 
     abstract boolean isAllowed(boolean isInFile);
 
-    private void expectExceptionAbout(String... msgParts) {
-      thrown.expect(InvalidConfigurationException.class);
-      thrown.expectMessage(testPath.replace('/', File.separatorChar));
+    private void assertThrowsICE(ThrowingRunnable code, String... msgParts) {
+      InvalidConfigurationException thrown =
+          assertThrows(InvalidConfigurationException.class, code);
+      assertThat(thrown).hasMessageThat().contains(testPath.replace('/', File.separatorChar));
       for (String part : msgParts) {
-        thrown.expectMessage(part);
+        assertThat(thrown).hasMessageThat().contains(part);
       }
     }
 
     @Test
-    public void testCheckSafePath() throws InvalidConfigurationException {
+    public void testCheckSafePath() throws Exception {
       FileTypeConverter conv = createFileTypeConverter(defaultConfiguration());
-
       Path path = Paths.get(testPath);
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("safe mode", "dummy");
-      }
+      Callable<Path> code = () -> conv.checkSafePath(path, "dummy");
 
-      assertThat(conv.checkSafePath(path, "dummy")).isEqualTo(path);
+      if (isAllowed(false)) {
+        assertThat(code.call()).isEqualTo(path);
+      } else {
+        assertThrowsICE(code::call, "safe mode", "dummy");
+      }
     }
 
     @Test
-    public void testCreation_RootDirectory() throws InvalidConfigurationException {
+    public void testCreation_RootDirectory() throws Exception {
       Configuration config = Configuration.builder().setOption("rootDirectory", testPath).build();
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("safe mode", "rootDirectory");
-      }
+      Callable<FileTypeConverter> code = () -> createFileTypeConverter(config);
 
-      FileTypeConverter conv = createFileTypeConverter(config);
-      assertThat(conv.getOutputDirectory())
-          .isEqualTo(Paths.get(testPath).resolve("output").toString());
+      if (isAllowed(false)) {
+        assertThat(code.call().getOutputDirectory())
+            .isEqualTo(Paths.get(testPath).resolve("output").toString());
+      } else {
+        assertThrowsICE(code::call, "safe mode", "rootDirectory");
+      }
     }
 
     @Test
-    public void testCreation_OutputPath() throws InvalidConfigurationException {
+    public void testCreation_OutputPath() throws Exception {
       Configuration config = Configuration.builder().setOption("output.path", testPath).build();
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("output.path");
-      }
+      Callable<FileTypeConverter> code = () -> createFileTypeConverter(config);
 
-      FileTypeConverter conv = createFileTypeConverter(config);
-      assertThat(conv.getOutputDirectory()).isEqualTo(Paths.get(".").resolve(testPath).toString());
+      if (isAllowed(false)) {
+        assertThat(code.call().getOutputDirectory())
+            .isEqualTo(Paths.get(".").resolve(testPath).toString());
+      } else {
+        assertThrowsICE(code::call, "output.path");
+      }
     }
 
     @Test
-    public void testConvert_InjectPath() throws InvalidConfigurationException {
+    public void testConvert_InjectPath() throws Throwable {
       Configuration config =
           Configuration.builder()
               .setOption("test.path", testPath)
@@ -244,16 +247,18 @@ public class FileTypeConverterTest {
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("safe mode", "test.path");
-      }
+      ThrowingRunnable code = () -> config.inject(options);
 
-      config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get(testPath));
+      if (isAllowed(false)) {
+        code.run();
+        assertThat(options.path).isEqualTo(Paths.get(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
     }
 
     @Test
-    public void testConvert_DefaultPath() throws InvalidConfigurationException {
+    public void testConvert_DefaultPath() throws Throwable {
       Configuration config =
           Configuration.builder()
               .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
@@ -261,16 +266,18 @@ public class FileTypeConverterTest {
       FileInjectionTestOptions options = new FileInjectionTestOptions();
       options.path = Paths.get(testPath);
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("safe mode", "test.path");
-      }
+      ThrowingRunnable code = () -> config.inject(options);
 
-      config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get(".").resolve(testPath));
+      if (isAllowed(false)) {
+        code.run();
+        assertThat(options.path).isEqualTo(Paths.get(".").resolve(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
     }
 
     @Test
-    public void testConvert_DefaultPathWithRootDirectory() throws InvalidConfigurationException {
+    public void testConvert_DefaultPathWithRootDirectory() throws Throwable {
       Configuration configForConverter =
           Configuration.builder()
               .setOption("rootDirectory", "root")
@@ -284,16 +291,18 @@ public class FileTypeConverterTest {
       FileInjectionTestOptions options = new FileInjectionTestOptions();
       options.path = Paths.get(testPath);
 
-      if (!isAllowed(true)) {
-        expectExceptionAbout("safe mode", "test.path");
-      }
+      ThrowingRunnable code = () -> config.inject(options);
 
-      config.inject(options);
-      assertThat(options.path).isEqualTo(Paths.get("root").resolve(testPath));
+      if (isAllowed(true)) {
+        code.run();
+        assertThat(options.path).isEqualTo(Paths.get("root").resolve(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
     }
 
     @Test
-    public void testConvert_InjectPathFromFile() throws InvalidConfigurationException, IOException {
+    public void testConvert_InjectPathFromFile() throws Throwable {
       CharSource configFile = CharSource.wrap("test.path = " + testPath);
       Configuration config =
           Configuration.builder()
@@ -302,16 +311,18 @@ public class FileTypeConverterTest {
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
 
-      if (!isAllowed(true)) {
-        expectExceptionAbout("safe mode", "test.path");
-      }
+      ThrowingRunnable code = () -> config.inject(options);
 
-      config.inject(options);
-      assertThat((Comparable<?>) options.path).isEqualTo(Paths.get("config").resolve(testPath));
+      if (isAllowed(true)) {
+        code.run();
+        assertThat((Comparable<?>) options.path).isEqualTo(Paths.get("config").resolve(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
     }
 
     @Test
-    public void testConvertDefaultValueFromOtherInstance() throws InvalidConfigurationException {
+    public void testConvertDefaultValueFromOtherInstance() throws Throwable {
       Configuration configForConverter =
           Configuration.builder()
               .setOption("rootDirectory", "root")
@@ -326,12 +337,15 @@ public class FileTypeConverterTest {
       options.path = Paths.get(testPath);
       FileInjectionTestOptions options2 = new FileInjectionTestOptions();
 
-      if (!isAllowed(false)) {
-        expectExceptionAbout("safe mode", "test.path");
-      }
+      ThrowingRunnable code =
+          () -> config.injectWithDefaults(options2, FileInjectionTestOptions.class, options);
 
-      config.injectWithDefaults(options2, FileInjectionTestOptions.class, options);
-      assertThat(options2.path).isEqualTo(Paths.get(testPath));
+      if (isAllowed(false)) {
+        code.run();
+        assertThat(options2.path).isEqualTo(Paths.get(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
     }
   }
 }

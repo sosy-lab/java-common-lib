@@ -20,6 +20,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,9 +46,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
@@ -56,8 +55,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 
 public class ConfigurationTest {
-
-  @Rule public final ExpectedException thrown = ExpectedException.none();
 
   @Options
   private static class TestStringOptions {
@@ -312,9 +309,9 @@ public class ConfigurationTest {
     Configuration.enableSecureModeGlobally();
     SecureOptions opts = new SecureOptions();
 
-    thrown.expect(InvalidConfigurationException.class);
-    thrown.expectMessage("not allowed in secure mode");
-    c.inject(opts);
+    InvalidConfigurationException thrown =
+        assertThrows(InvalidConfigurationException.class, () -> c.inject(opts));
+    assertThat(thrown).hasMessageThat().contains("not allowed in secure mode");
   }
 
   @Test
@@ -537,27 +534,17 @@ public class ConfigurationTest {
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void testFromCmdLineArgumentsFailFormat() throws Exception {
-    thrown.expect(InvalidConfigurationException.class);
-
-    // No break should be there.
-    Configuration.fromCmdLineArguments(
-        new String[] {
-          "--option1", "value1",
-        });
+    String[] args = {"--option1", "value1"};
+    assertThrows(
+        InvalidConfigurationException.class, () -> Configuration.fromCmdLineArguments(args));
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void testFromCmdLineArgumentsFailFormat2() throws Exception {
-    thrown.expect(InvalidConfigurationException.class);
-
-    // No break should be there.
-    Configuration.fromCmdLineArguments(
-        new String[] {
-          "-option1", "value1",
-        });
+    String[] args = {"-option1", "value1"};
+    assertThrows(
+        InvalidConfigurationException.class, () -> Configuration.fromCmdLineArguments(args));
   }
 
   @Options
