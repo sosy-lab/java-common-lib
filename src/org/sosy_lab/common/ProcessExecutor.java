@@ -368,7 +368,7 @@ public class ProcessExecutor<E extends Exception> {
       throw e;
 
     } catch (InterruptedException e) {
-      logger.log(Level.WARNING, "Killing %s[%d] due to user interrupt", name, pid);
+      logger.logf(Level.WARNING, "Killing %s[%d] due to user interrupt", name, pid);
       processFuture.cancel(true);
       throw e;
 
