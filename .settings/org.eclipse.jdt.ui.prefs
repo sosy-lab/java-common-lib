@@ -1,3 +1,11 @@
+# This file is part of SoSy-Lab Java-Project Template,
+# a collection of common files and build definitions for Java projects:
+# https://gitlab.com/sosy-lab/software/java-project-template
+#
+# SPDX-FileCopyrightText: 2018-2020 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 cleanup.add_default_serial_version_id=true
 cleanup.add_generated_serial_version_id=false
 cleanup.add_missing_annotations=true
