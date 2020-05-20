@@ -1,0 +1,11 @@
+This file is part of SoSy-Lab Common,
+a library of useful utilities:
+https://github.com/sosy-lab/java-common-lib
+
+{% for copyright_line in copyright_lines %}
+{{ copyright_line }}
+{% endfor %}
+
+{% for expression in spdx_expressions %}
+SPDX-License-Identifier: {{ expression }}
+{% endfor %}
