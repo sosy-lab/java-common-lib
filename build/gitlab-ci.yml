@@ -195,6 +195,18 @@ refaster:
       - $REFASTER_VERSION == null # required for job
 
 
+# check license declarations etc.
+reuse:
+  stage: checks
+  dependencies: []
+  needs: []
+  image:
+    name: fsfe/reuse:latest
+    entrypoint: [""]
+  script:
+    - reuse lint
+
+
 deploy-coverage:
   stage: deploy
   script: "build/deploy-coverage.sh"

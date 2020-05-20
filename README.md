@@ -13,7 +13,7 @@ SPDX-License-Identifier: Apache-2.0
 [![Build Status](https://travis-ci.org/sosy-lab/java-common-lib.svg "Build Status")](https://travis-ci.org/sosy-lab/java-common-lib)
 [![Code Quality](https://api.codacy.com/project/badge/Grade/683f2b95be8d44b29c0f7d3d3c70b3fa)](https://www.codacy.com/app/PhilippWendler/java-common-lib?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-common-lib&amp;utm_campaign=Badge_Grade)
 [![Test Coverage](https://api.codacy.com/project/badge/Coverage/683f2b95be8d44b29c0f7d3d3c70b3fa)](https://www.codacy.com/app/PhilippWendler/java-common-lib?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-common-lib&amp;utm_campaign=Badge_Coverage)
-[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/common/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/common)
 
 A collection of utilities for Java.
@@ -28,6 +28,11 @@ A collection of utilities for Java.
 
 
 [Javadoc documentation](https://sosy-lab.github.io/java-common-lib/) for entire project.
+
+## License and Copyright
+
+The license of this project is the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0),
+copyright [Dirk Beyer](https://www.sosy-lab.org/people/beyer/) and others.
 
 ## Installation
 
