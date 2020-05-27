@@ -22,11 +22,14 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NavigableSet;
 import org.sosy_lab.common.configuration.OptionCollector.AnnotationInfo;
 import org.sosy_lab.common.configuration.OptionCollector.OptionInfo;
 
 /** Class that creates a plain-text documentation of options. */
 class OptionPlainTextWriter {
+
+  private static final String COMMENT_PREFIX = "# ";
 
   private static final int CHARS_PER_LINE = 75; // for description
 
@@ -42,6 +45,24 @@ class OptionPlainTextWriter {
   OptionPlainTextWriter(boolean pVerbose, PrintStream pOut) {
     verbose = pVerbose;
     out = checkNotNull(pOut);
+  }
+
+  /**
+   * Write header with copyright and license information.
+   *
+   * @param copyrights A sorted set of REUSE-compatible copyright declarations
+   * @param licenses A sorted set of REUSE-compatible license declarations
+   */
+  void writeHeader(NavigableSet<String> copyrights, NavigableSet<String> licenses) {
+    for (String s : copyrights) {
+      out.append(COMMENT_PREFIX).println(s);
+    }
+    if (!copyrights.isEmpty() && !licenses.isEmpty()) {
+      out.println(COMMENT_PREFIX.stripTrailing());
+    }
+    for (String s : licenses) {
+      out.append(COMMENT_PREFIX).println(s);
+    }
   }
 
   /**
@@ -139,7 +160,7 @@ class OptionPlainTextWriter {
    * before each line.
    */
   private static String formatText(String text) {
-    return formatText(text, "# ", /* useLineStartInFirstLine= */ true);
+    return formatText(text, COMMENT_PREFIX, /* useLineStartInFirstLine= */ true);
   }
 
   /** This function formats text and splits lines, if they are too long. */

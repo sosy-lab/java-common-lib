@@ -41,11 +41,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -66,6 +71,8 @@ public class OptionCollector {
       Pattern.compile("ImmutableSet\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
   private static final Pattern IMMUTABLE_LIST_PATTERN =
       Pattern.compile("ImmutableList\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
+  private static final Pattern COPYRIGHT_PATTERN = Pattern.compile("SPDX-FileCopyrightText: .*");
+  private static final Pattern LICENSE_PATTERN = Pattern.compile("SPDX-License-Identifier: .*");
 
   /**
    * The main-method collects all classes of a program and then it searches for all {@link Option}s.
@@ -149,14 +156,21 @@ public class OptionCollector {
     Comparator<AnnotationInfo> annotationComparator =
         Comparator.comparing(a -> a.owningClass().getName());
 
-    OptionPlainTextWriter outputWriter = new OptionPlainTextWriter(verbose, out);
+    NavigableSet<String> copyrights = new ConcurrentSkipListSet<>();
+    NavigableSet<String> licenses = new ConcurrentSkipListSet<>();
 
     // Collect and dump all options
-    getClassesWithOptions(classPath)
-        .flatMap(this::collectOptions)
-        .collect(groupingBySorted(AnnotationInfo::name, Ordering.natural(), annotationComparator))
-        .values()
-        .forEach(outputWriter::writeOption);
+    SortedMap<String, List<AnnotationInfo>> options =
+        getClassesWithOptions(classPath)
+            .flatMap(c -> collectOptions(c, copyrights::add, licenses::add))
+            .collect(
+                groupingBySorted(AnnotationInfo::name, Ordering.natural(), annotationComparator));
+
+    // Now copyrights and licenses have been filled because collect is a terminal operation.
+
+    OptionPlainTextWriter outputWriter = new OptionPlainTextWriter(verbose, out);
+    outputWriter.writeHeader(copyrights, licenses);
+    options.values().forEach(outputWriter::writeOption);
   }
 
   /** Copy files with options documentation found on the class path to the output. */
@@ -165,6 +179,7 @@ public class OptionCollector {
       if (new File(resourceInfo.getResourceName()).getName().equals(OPTIONS_FILE)) {
         try {
           resourceInfo.asCharSource(StandardCharsets.UTF_8).copyTo(out);
+          out.println();
         } catch (IOException e) {
           errorMessages.add("Could not find the required resource " + resourceInfo.url());
         }
@@ -211,9 +226,13 @@ public class OptionCollector {
    *
    * @param c class where to take the Option from
    */
-  private Stream<AnnotationInfo> collectOptions(Class<?> c) {
+  private Stream<AnnotationInfo> collectOptions(
+      Class<?> c, Consumer<String> addCopyright, Consumer<String> addLicense) {
     Stream.Builder<AnnotationInfo> result = Stream.builder();
     String classSource = getSourceCode(c);
+
+    COPYRIGHT_PATTERN.matcher(classSource).results().map(MatchResult::group).forEach(addCopyright);
+    LICENSE_PATTERN.matcher(classSource).results().map(MatchResult::group).forEach(addLicense);
 
     Options classOption = c.getAnnotation(Options.class);
     verifyNotNull(classOption, "Class without @Options annotation");
@@ -462,7 +481,7 @@ public class OptionCollector {
    * Return a collector that groups values by keys into a map, and sorts both keys and the values
    * per key.
    */
-  private static <T, K> Collector<T, ?, SortedMap<K, List<T>>> groupingBySorted(
+  private static <T, K> Collector<T, ?, NavigableMap<K, List<T>>> groupingBySorted(
       Function<? super T, ? extends K> classifier,
       Comparator<? super K> keyComparator,
       Comparator<? super T> valueComparator) {
