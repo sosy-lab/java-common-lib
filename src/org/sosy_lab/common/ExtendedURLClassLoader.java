@@ -46,6 +46,10 @@ final class ExtendedURLClassLoader extends URLClassLoader {
 
     abstract Predicate<String> customLookupNativeLibraries();
 
+    static AutoBuilder builder() {
+      return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder();
+    }
+
     @AutoValue.Builder
     abstract static class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder> {
       AutoBuilder() {}

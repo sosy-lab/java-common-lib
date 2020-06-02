@@ -529,7 +529,7 @@ public final class Classes {
    * features. This method returns a builder that can be used to configure the new class loader.
    */
   public static ClassLoaderBuilder<?> makeExtendedURLClassLoader() {
-    return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder()
+    return ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration.builder()
         .setDirectLoadClasses(c -> false)
         .setCustomLookupNativeLibraries(l -> false);
   }
