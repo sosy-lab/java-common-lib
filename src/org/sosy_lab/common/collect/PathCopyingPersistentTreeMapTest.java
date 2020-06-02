@@ -329,14 +329,37 @@ public class PathCopyingPersistentTreeMapTest {
     String key1 = Integer.toString(rnd.nextInt());
     String key2 = Integer.toString(rnd.nextInt());
 
-    checkEqualTo(comparison.tailMap(key1), map.tailMap(key1));
-    checkEqualTo(comparison.tailMap(key2), map.tailMap(key2));
-    checkEqualTo(comparison.headMap(key1), map.headMap(key1));
-    checkEqualTo(comparison.headMap(key2), map.headMap(key2));
+    checkEqualTo(
+        comparison.tailMap(key1, /*inclusive=*/ true), map.tailMap(key1, /*pInclusive=*/ true));
+    checkEqualTo(
+        comparison.tailMap(key2, /*inclusive=*/ true), map.tailMap(key2, /*pInclusive=*/ true));
+    checkEqualTo(
+        comparison.tailMap(key1, /*inclusive=*/ false), map.tailMap(key1, /*pInclusive=*/ false));
+    checkEqualTo(
+        comparison.tailMap(key2, /*inclusive=*/ false), map.tailMap(key2, /*pInclusive=*/ false));
+    checkEqualTo(
+        comparison.headMap(key1, /*inclusive=*/ true), map.headMap(key1, /*pInclusive=*/ true));
+    checkEqualTo(
+        comparison.headMap(key2, /*inclusive=*/ true), map.headMap(key2, /*pInclusive=*/ true));
+    checkEqualTo(
+        comparison.headMap(key1, /*inclusive=*/ false), map.headMap(key1, /*pInclusive=*/ false));
+    checkEqualTo(
+        comparison.headMap(key2, /*inclusive=*/ false), map.headMap(key2, /*pInclusive=*/ false));
 
     String lowKey = Ordering.natural().min(key1, key2);
     String highKey = Ordering.natural().max(key1, key2);
-    checkEqualTo(comparison.subMap(lowKey, highKey), map.subMap(lowKey, highKey));
+    checkEqualTo(
+        comparison.subMap(lowKey, /*pFromInclusive=*/ true, highKey, /*pToInclusive=*/ true),
+        map.subMap(lowKey, /*pFromInclusive=*/ true, highKey, /*pToInclusive=*/ true));
+    checkEqualTo(
+        comparison.subMap(lowKey, /*pFromInclusive=*/ true, highKey, /*pToInclusive=*/ false),
+        map.subMap(lowKey, /*pFromInclusive=*/ true, highKey, /*pToInclusive=*/ false));
+    checkEqualTo(
+        comparison.subMap(lowKey, /*pFromInclusive=*/ false, highKey, /*pToInclusive=*/ true),
+        map.subMap(lowKey, /*pFromInclusive=*/ false, highKey, /*pToInclusive=*/ true));
+    checkEqualTo(
+        comparison.subMap(lowKey, /*pFromInclusive=*/ false, highKey, /*pToInclusive=*/ false),
+        map.subMap(lowKey, /*pFromInclusive=*/ false, highKey, /*pToInclusive=*/ false));
   }
 
   private void checkEqualTo(NavigableMap<String, String> comparison) {
@@ -344,7 +367,7 @@ public class PathCopyingPersistentTreeMapTest {
   }
 
   private static void checkEqualTo(
-      SortedMap<String, String> comparison, SortedMap<String, String> testMap) {
+      NavigableMap<String, String> comparison, NavigableMap<String, String> testMap) {
     assertThat(testMap).isEqualTo(comparison);
     assertThat(testMap.hashCode()).isEqualTo(comparison.hashCode());
     assertWithMessage("isEmpty()").that(testMap.isEmpty()).isEqualTo(comparison.isEmpty());
@@ -379,13 +402,13 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(submap).containsExactly("b", "b");
 
     // The bounds of further submap calls may be at most those of the original call
-    @Var SortedMap<String, String> subsubmap = submap.subMap("aaa", "c");
+    @Var NavigableMap<String, String> subsubmap = submap.subMap("aaa", true, "c", false);
     assertThat(subsubmap).containsExactly("b", "b");
 
-    subsubmap = submap.subMap("aa", "bb");
+    subsubmap = submap.subMap("aa", /*fromInclusive=*/ true, "bb", /*toInclusive=*/ false);
     assertThat(subsubmap).containsExactly("b", "b");
 
-    subsubmap = submap.subMap("aaa", "bb");
+    subsubmap = submap.subMap("aaa", /*fromInclusive=*/ true, "bb", /*toInclusive=*/ false);
     assertThat(subsubmap).containsExactly("b", "b");
 
     try {
