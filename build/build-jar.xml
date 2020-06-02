@@ -36,6 +36,7 @@ SPDX-License-Identifier: Apache-2.0
                 includes="**"
                 excludes="${jar.excludes}"
                 whenmanifestonly="fail">
+            <metainf dir="." includes="LICENSE"/>
             <manifest>
                 <attribute name="Class-Path" value="${classpath.jar}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
@@ -51,6 +52,7 @@ SPDX-License-Identifier: Apache-2.0
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="**/*.java"/>
             <fileset dir="${source.generated.dir}/" includes="**/*.java"/>
+            <metainf dir="." includes="LICENSE"/>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name}"/>
                     <attribute name="Implementation-Version" value="${version}"/>
