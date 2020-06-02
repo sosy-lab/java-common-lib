@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import org.junit.Test;
 
+@SuppressWarnings("BadImport") // want to import Map.Entry because this class is about Map
 public abstract class OrderStatisticMapTestSuite {
 
   private static final ImmutableList<Entry<String, String>> ELEMS =

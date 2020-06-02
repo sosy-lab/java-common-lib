@@ -28,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>This implementation forwards all methods to the underlying map.
  */
+@SuppressWarnings("BadImport") // want to import Map.Entry because this class is about Map
 final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
     implements NavigableSet<Entry<K, V>>, Serializable {
 

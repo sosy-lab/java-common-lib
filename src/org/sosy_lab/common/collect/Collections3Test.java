@@ -21,6 +21,7 @@ import org.junit.Test;
 public class Collections3Test {
 
   @Test
+  @SuppressWarnings("JdkObsolete") // we want to test that method
   public void testSubMapWithPrefix() {
     NavigableMap<String, Void> resultMap = new TreeMap<>();
     resultMap.put("b", null);
@@ -44,6 +45,7 @@ public class Collections3Test {
   }
 
   @Test
+  @SuppressWarnings("JdkObsolete") // we want to test that method
   public void testSubSetWithPrefix() {
     NavigableSet<String> resultSet = new TreeSet<>();
     resultSet.add("b");

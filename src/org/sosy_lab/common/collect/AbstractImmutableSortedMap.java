@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Var;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -37,8 +38,9 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
     // (or the same as ours, but reversed), we can do a linear comparison
     @Var boolean hasSameOrder = false;
     if (other instanceof SortedMap<?, ?>) {
-      if (Collections3.guaranteedSameOrder(
-          this.comparator(), ((SortedMap<?, ?>) other).comparator())) {
+      @SuppressWarnings("JdkObsolete") // want to handle other SortedMaps here
+      Comparator<?> comparator = ((SortedMap<?, ?>) other).comparator();
+      if (Collections3.guaranteedSameOrder(this.comparator(), comparator)) {
         hasSameOrder = true;
       } else if (other instanceof NavigableMap<?, ?>) {
         NavigableMap<?, ?> descendingOther = ((NavigableMap<?, ?>) other).descendingMap();

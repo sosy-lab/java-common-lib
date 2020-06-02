@@ -42,7 +42,7 @@ public class ClassesFactoryTest {
   }
 
   public static class ExceptionTestClass {
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "CheckedExceptionNotThrown"}) // for tests
     public ExceptionTestClass() throws IOException {}
   }
 

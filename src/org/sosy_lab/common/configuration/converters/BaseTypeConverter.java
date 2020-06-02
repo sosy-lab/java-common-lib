@@ -107,6 +107,7 @@ public enum BaseTypeConverter implements TypeConverter {
   }
 
   @Override
+  @SuppressWarnings("CheckedExceptionNotThrown") // for overriding
   public <T> T convertDefaultValue(
       String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption)
       throws InvalidConfigurationException {

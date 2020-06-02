@@ -127,6 +127,7 @@ public final class Collections3 {
    * @param prefix The prefix that all keys in the result need to have.
    * @return A partial map of the input.
    */
+  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
   public static <V> SortedMap<String, V> subMapWithPrefix(SortedMap<String, V> map, String prefix) {
     checkNotNull(map);
     checkArgument(!prefix.isEmpty());
@@ -163,6 +164,7 @@ public final class Collections3 {
    * @param prefix The prefix that all keys in the result need to have.
    * @return A subset of the input.
    */
+  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
   public static SortedSet<String> subSetWithPrefix(SortedSet<String> set, String prefix) {
     checkNotNull(set);
     checkArgument(!prefix.isEmpty());
@@ -203,6 +205,7 @@ public final class Collections3 {
   }
 
   /** An implementation of {@link SortedSet#equals(Object)}. */
+  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
   static boolean sortedSetEquals(SortedSet<?> coll1, @Nullable Object pColl2) {
     checkNotNull(coll1);
     if (coll1 == pColl2) {
@@ -250,6 +253,7 @@ public final class Collections3 {
   }
 
   /* This method implements {@link SortedSet#containsAll} */
+  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
   static boolean sortedSetContainsAll(
       SortedSet<?> coll1, Collection<?> pColl2, @Nullable Equivalence<Object> pAdditionalEquality) {
     checkNotNull(coll1);

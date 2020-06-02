@@ -29,16 +29,16 @@ SPDX-License-Identifier: Apache-2.0
     <property name="ivy.pom.artifactId" value="common"/>
 
     <!-- We activate even the experimental error-prone checks, with a few exceptions:
-        - StaticOrDefaultInterfaceMethod: only relevant for Android
+        - StaticOrDefaultInterfaceMethod, AndroidJdkLibsChecker, Java7ApiChecker: only relevant for Android
         - FieldCanBeFinal: not possible for our @Option fields
+        - InconsistentOverloads: backwards compatibility
+        - UngroupedOverloads: not worth it
         - ParameterPackage: buggy
         - ConstructorInvokesOverridable: buggy
-        - ConstructorLeaksThis: warns about config.inject()
-        - NullableDereference: buggy
         - FieldMissingNullable: buggy
-        - ReturnMissingNullable: buggy
-        - TestExceptionChecker, TryFailRefactoring, TestExceptionRefactoring, ExpectedExceptionRefactoring: will be fixed with newer JUnit
-        - Finally: crashes (https://github.com/google/error-prone/issues/1257)
+        - TestExceptionChecker, TryFailRefactoring: will be fixed with newer JUnit
+        - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/1652
+        - SuppressWarningsWithoutExplanation: TODO
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
@@ -47,17 +47,12 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:Java7ApiChecker:OFF
         -Xep:FieldCanBeFinal:OFF
         -Xep:ParameterPackage:OFF
-        -Xep:ConstructorLeaksThis:OFF
-        -Xep:NullableDereference:OFF
         -Xep:FieldMissingNullable:OFF
-        -Xep:ReturnMissingNullable:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
         -Xep:TestExceptionChecker:OFF
-        -Xep:TryFailRefactoring:OFF
-        -Xep:TestExceptionRefactoring:OFF
-        -Xep:ExpectedExceptionRefactoring:OFF
-        -Xep:Finally:OFF
+        -Xep:UnnecessarilyFullyQualified:OFF
+        -Xep:SuppressWarningsWithoutExplanation:OFF
         "/>
 
     <import file="build/build-version.xml"/>
