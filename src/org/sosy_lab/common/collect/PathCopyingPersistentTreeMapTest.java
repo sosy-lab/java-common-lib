@@ -22,6 +22,7 @@ import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
@@ -282,7 +283,7 @@ public class PathCopyingPersistentTreeMapTest {
   public void testRandom() {
     int iterations = 50;
     Random rnd = new Random(3987432434L); // static seed for reproducibility
-    SortedMap<String, String> comparison = new TreeMap<>();
+    NavigableMap<String, String> comparison = new TreeMap<>();
 
     // Insert nodes
     for (int i = 0; i < iterations; i++) {
@@ -324,7 +325,7 @@ public class PathCopyingPersistentTreeMapTest {
     testEmpty();
   }
 
-  private void checkPartialMaps(SortedMap<String, String> comparison, Random rnd) {
+  private void checkPartialMaps(NavigableMap<String, String> comparison, Random rnd) {
     String key1 = Integer.toString(rnd.nextInt());
     String key2 = Integer.toString(rnd.nextInt());
 
@@ -338,7 +339,7 @@ public class PathCopyingPersistentTreeMapTest {
     checkEqualTo(comparison.subMap(lowKey, highKey), map.subMap(lowKey, highKey));
   }
 
-  private void checkEqualTo(SortedMap<String, String> comparison) {
+  private void checkEqualTo(NavigableMap<String, String> comparison) {
     checkEqualTo(comparison, map);
   }
 
@@ -374,7 +375,7 @@ public class PathCopyingPersistentTreeMapTest {
   public void testSubmapSubmap() {
     map = map.putAndCopy("a", "a").putAndCopy("b", "b").putAndCopy("c", "c");
 
-    SortedMap<String, String> submap = map.subMap("aa", "c");
+    NavigableMap<String, String> submap = map.subMap("aa", "c");
     assertThat(submap).containsExactly("b", "b");
 
     // The bounds of further submap calls may be at most those of the original call

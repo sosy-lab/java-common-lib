@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
@@ -160,7 +159,7 @@ public class OptionCollector {
     NavigableSet<String> licenses = new ConcurrentSkipListSet<>();
 
     // Collect and dump all options
-    SortedMap<String, List<AnnotationInfo>> options =
+    NavigableMap<String, List<AnnotationInfo>> options =
         getClassesWithOptions(classPath)
             .flatMap(c -> collectOptions(c, copyrights::add, licenses::add))
             .collect(
