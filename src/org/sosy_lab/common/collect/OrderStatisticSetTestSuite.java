@@ -36,7 +36,7 @@ public abstract class OrderStatisticSetTestSuite {
 
   private final OrderStatisticSetFactory factory;
 
-  public OrderStatisticSetTestSuite(OrderStatisticSetFactory pFactory) {
+  OrderStatisticSetTestSuite(OrderStatisticSetFactory pFactory) {
     factory = pFactory;
   }
 

@@ -38,7 +38,7 @@ public class ClassesFactoryTest {
   }
 
   public abstract static class AbstractTestClass {
-    public AbstractTestClass() {}
+    protected AbstractTestClass() {}
   }
 
   public static class ExceptionTestClass {

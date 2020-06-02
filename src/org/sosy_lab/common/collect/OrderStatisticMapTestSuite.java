@@ -59,7 +59,7 @@ public abstract class OrderStatisticMapTestSuite {
 
   private final OrderStatisticMapFactory factory;
 
-  public OrderStatisticMapTestSuite(OrderStatisticMapFactory pFactory) {
+  OrderStatisticMapTestSuite(OrderStatisticMapFactory pFactory) {
     factory = pFactory;
   }
 
