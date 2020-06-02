@@ -28,28 +28,25 @@ import org.junit.Test;
 public abstract class OrderStatisticMapTestSuite {
 
   private static final ImmutableList<Entry<String, String>> ELEMS =
-      ImmutableList.<Entry<String, String>>builder()
-          .add(Maps.immutableEntry("aaa", "Vzza"))
-          .add(Maps.immutableEntry("hha", "Vppa"))
-          .add(Maps.immutableEntry("ppa", "Vhha"))
-          .add(Maps.immutableEntry("zza", "Vaaa"))
-          .build();
+      ImmutableList.of(
+          Maps.immutableEntry("aaa", "Vzza"),
+          Maps.immutableEntry("hha", "Vppa"),
+          Maps.immutableEntry("ppa", "Vhha"),
+          Maps.immutableEntry("zza", "Vaaa"));
 
   private static final ImmutableList<Entry<String, String>> ELEMS_ABOVE =
-      ImmutableList.<Entry<String, String>>builder()
-          .add(Maps.immutableEntry("aab", "Vzzb"))
-          .add(Maps.immutableEntry("hhb", "Vppb"))
-          .add(Maps.immutableEntry("ppb", "Vhhb"))
-          .add(Maps.immutableEntry("zzb", "Vaab"))
-          .build();
+      ImmutableList.of(
+          Maps.immutableEntry("aab", "Vzzb"),
+          Maps.immutableEntry("hhb", "Vppb"),
+          Maps.immutableEntry("ppb", "Vhhb"),
+          Maps.immutableEntry("zzb", "Vaab"));
 
   private static final ImmutableList<Entry<String, String>> ELEMS_BELOW =
-      ImmutableList.<Entry<String, String>>builder()
-          .add(Maps.immutableEntry("aa", "Vzz"))
-          .add(Maps.immutableEntry("hh", "Vpp"))
-          .add(Maps.immutableEntry("pp", "Vhh"))
-          .add(Maps.immutableEntry("zz", "Vaa"))
-          .build();
+      ImmutableList.of(
+          Maps.immutableEntry("aa", "Vzz"),
+          Maps.immutableEntry("hh", "Vpp"),
+          Maps.immutableEntry("pp", "Vhh"),
+          Maps.immutableEntry("zz", "Vaa"));
 
   protected abstract static class OrderStatisticMapFactory extends TestStringSortedMapGenerator {
 
