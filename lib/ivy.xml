@@ -84,8 +84,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="3.3.1" conf="test->default; contrib->sources"/>
-        <dependency org="org.mockito" name="mockito-errorprone" rev="3.3.1" conf="build->default"/>
+        <dependency org="org.mockito" name="mockito-core" rev="3.3.3" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-errorprone" rev="3.3.3" conf="build->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -107,7 +107,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.29" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.33" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.0.1" conf="spotbugs->default"/>
