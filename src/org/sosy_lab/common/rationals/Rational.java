@@ -135,7 +135,7 @@ public final class Rational extends Number implements Comparable<Rational> {
       return ofBigInteger(num);
     } else {
       num = new BigInteger(s.substring(0, idx));
-      den = new BigInteger(s.substring(idx + 1, s.length()));
+      den = new BigInteger(s.substring(idx + 1));
       return of(num, den);
     }
   }

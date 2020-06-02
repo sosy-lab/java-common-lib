@@ -190,7 +190,10 @@ public class CollectionsTransformationTest {
     List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
 
     @SuppressWarnings("unused")
-    List<String> transformed = FluentIterable.from(list).transform(Functions.identity()).toList();
+    List<String> transformed =
+        FluentIterable.from(list) /* suppress RefasterRules.TransformedImmutableList */
+            .transform(Functions.identity())
+            .toList();
     Mockito.verify(list, Mockito.never()).size();
     Mockito.verify(list).iterator();
   }
