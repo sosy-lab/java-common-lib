@@ -29,6 +29,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
@@ -99,6 +101,25 @@ public final class Collections3 {
   }
 
   /**
+   * Given a {@link NavigableMap} with {@link String}s as key, return a partial map (similar to
+   * {@link NavigableMap#subMap(Object, Object)}) of all keys that have a given prefix.
+   *
+   * @param map The map to filter.
+   * @param prefix The prefix that all keys in the result need to have.
+   * @return A partial map of the input.
+   */
+  public static <V> NavigableMap<String, V> subMapWithPrefix(
+      NavigableMap<String, V> map, String prefix) {
+    checkNotNull(map);
+    checkArgument(!prefix.isEmpty());
+
+    // As the end marker of the set, create the string that is
+    // the next bigger string than all possible strings with the given prefix.
+    String end = incrementStringByOne(prefix);
+    return map.subMap(prefix, true, end, false);
+  }
+
+  /**
    * Given a {@link SortedMap} with {@link String}s as key, return a partial map (similar to {@link
    * SortedMap#subMap(Object, Object)}) of all keys that have a given prefix.
    *
@@ -114,6 +135,24 @@ public final class Collections3 {
     // the next bigger string than all possible strings with the given prefix.
     String end = incrementStringByOne(prefix);
     return map.subMap(prefix, end);
+  }
+
+  /**
+   * Given a {@link NavigableSet} of {@link String}, return a set (similar to {@link
+   * NavigableSet#subSet(Object, Object)}) of all entries that have a given prefix.
+   *
+   * @param set The set to filter.
+   * @param prefix The prefix that all keys in the result need to have.
+   * @return A subset of the input.
+   */
+  public static NavigableSet<String> subSetWithPrefix(NavigableSet<String> set, String prefix) {
+    checkNotNull(set);
+    checkArgument(!prefix.isEmpty());
+
+    // As the end marker of the set, create the string that is
+    // the next bigger string than all possible strings with the given prefix.
+    String end = incrementStringByOne(prefix);
+    return set.subSet(prefix, true, end, false);
   }
 
   /**

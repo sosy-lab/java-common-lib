@@ -10,6 +10,8 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -20,14 +22,14 @@ public class Collections3Test {
 
   @Test
   public void testSubMapWithPrefix() {
-    SortedMap<String, Void> resultMap = new TreeMap<>();
+    NavigableMap<String, Void> resultMap = new TreeMap<>();
     resultMap.put("b", null);
     resultMap.put("b" + 0, null);
     resultMap.put("b1", null);
     resultMap.put("b2", null);
     resultMap.put("b" + Character.MAX_VALUE, null);
 
-    SortedMap<String, Void> testMap = new TreeMap<>();
+    NavigableMap<String, Void> testMap = new TreeMap<>();
     testMap.putAll(resultMap);
     testMap.put("", null);
     testMap.put("a", null);
@@ -37,18 +39,20 @@ public class Collections3Test {
     testMap.put("ca", null);
 
     assertThat(Collections3.subMapWithPrefix(testMap, "b")).isEqualTo(resultMap);
+    assertThat(Collections3.subMapWithPrefix((SortedMap<String, Void>) testMap, "b"))
+        .isEqualTo(resultMap);
   }
 
   @Test
   public void testSubSetWithPrefix() {
-    SortedSet<String> resultSet = new TreeSet<>();
+    NavigableSet<String> resultSet = new TreeSet<>();
     resultSet.add("b");
     resultSet.add("b" + 0);
     resultSet.add("b1");
     resultSet.add("b2");
     resultSet.add("b" + Character.MAX_VALUE);
 
-    SortedSet<String> testSet = new TreeSet<>();
+    NavigableSet<String> testSet = new TreeSet<>();
     testSet.addAll(resultSet);
     testSet.add("");
     testSet.add("a");
@@ -58,5 +62,7 @@ public class Collections3Test {
     testSet.add("ca");
 
     assertThat(Collections3.subSetWithPrefix(testSet, "b")).isEqualTo(resultSet);
+    assertThat(Collections3.subSetWithPrefix((SortedSet<String>) testSet, "b"))
+        .isEqualTo(resultSet);
   }
 }
