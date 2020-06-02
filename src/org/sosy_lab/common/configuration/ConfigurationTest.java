@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.converters.FileTypeConverter;
 import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.log.LogManager;
@@ -562,7 +561,7 @@ public class ConfigurationTest {
     List<AnnotatedValue<Integer>> integerList;
 
     @Option(secure = true, description = "test")
-    @FileOption(Type.OPTIONAL_INPUT_FILE)
+    @FileOption(FileOption.Type.OPTIONAL_INPUT_FILE)
     AnnotatedValue<Path> path;
   }
 

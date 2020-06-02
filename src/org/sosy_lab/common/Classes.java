@@ -19,7 +19,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multiset.Entry;
+import com.google.common.collect.Multiset;
 import com.google.common.reflect.AbstractInvocationHandler;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Reflection;
@@ -593,7 +593,8 @@ public final class Classes {
     Parameter[] formalParams = interfaceMethod.getParameters();
     List<TypeToken<?>> formalParamTypes =
         resolve(factoryType, interfaceMethod.getGenericParameterTypes()).collect(toImmutableList());
-    for (Entry<TypeToken<?>> entry : ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
+    for (Multiset.Entry<TypeToken<?>> entry :
+        ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
       verify(
           entry.getCount() == 1,
           "Method %s of factory interface %s declares parameter of type %s multiple times",

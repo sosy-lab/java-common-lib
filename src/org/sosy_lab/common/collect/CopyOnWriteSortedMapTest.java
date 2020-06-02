@@ -26,7 +26,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
@@ -40,16 +39,16 @@ public class CopyOnWriteSortedMapTest {
   private static class FeatureOverrideTestSuiteBuilder<K, V>
       extends FeatureSpecificTestSuiteBuilder<
           FeatureOverrideTestSuiteBuilder<K, V>,
-          OneSizeTestContainerGenerator<Map<K, V>, Entry<K, V>>> {
+          OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>>> {
 
     private final FeatureSpecificTestSuiteBuilder<
-            ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Entry<K, V>>>
+            ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>>>
         delegate;
     private final Set<Feature<?>> features;
 
     FeatureOverrideTestSuiteBuilder(
         FeatureSpecificTestSuiteBuilder<
-                ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Entry<K, V>>>
+                ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>>>
             pDelegate,
         Set<Feature<?>> pFeatures) {
       delegate = pDelegate;
@@ -78,7 +77,7 @@ public class CopyOnWriteSortedMapTest {
     }
 
     @Override
-    public OneSizeTestContainerGenerator<Map<K, V>, Entry<K, V>> getSubjectGenerator() {
+    public OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>> getSubjectGenerator() {
       return delegate.getSubjectGenerator();
     }
   }
@@ -98,7 +97,7 @@ public class CopyOnWriteSortedMapTest {
     @Override
     protected List<TestSuite> createDerivedSuites(
         FeatureSpecificTestSuiteBuilder<
-                ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Entry<K, V>>>
+                ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>>>
             pParentBuilder) {
 
       Set<Feature<?>> features = new HashSet<>(pParentBuilder.getFeatures());
@@ -120,7 +119,7 @@ public class CopyOnWriteSortedMapTest {
       new TestStringSortedMapGenerator() {
 
         @Override
-        protected SortedMap<String, String> create(Entry<String, String>[] pEntries) {
+        protected SortedMap<String, String> create(Map.Entry<String, String>[] pEntries) {
           CopyOnWriteSortedMap<String, String> result =
               CopyOnWriteSortedMap.copyOf(PathCopyingPersistentTreeMap.<String, String>of());
           Stream.of(pEntries).forEach((entry) -> result.put(entry.getKey(), entry.getValue()));

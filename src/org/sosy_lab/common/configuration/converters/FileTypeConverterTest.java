@@ -35,7 +35,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -75,7 +74,7 @@ public class FileTypeConverterTest {
 
   @Options
   static class FileInjectionTestOptions {
-    @FileOption(Type.OPTIONAL_INPUT_FILE)
+    @FileOption(FileOption.Type.OPTIONAL_INPUT_FILE)
     @Option(secure = true, description = "none", name = "test.path")
     Path path;
   }
@@ -166,7 +165,7 @@ public class FileTypeConverterTest {
 
     @Options
     static class FileInjectionTestOptions {
-      @FileOption(Type.OPTIONAL_INPUT_FILE)
+      @FileOption(FileOption.Type.OPTIONAL_INPUT_FILE)
       @Option(secure = true, description = "none", name = "test.path")
       Path path;
     }

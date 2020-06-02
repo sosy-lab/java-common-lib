@@ -18,7 +18,6 @@ import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -29,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <p>Every constant stored has to have a non-zero value.
  */
 @Immutable(containerOf = "T")
-public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
+public final class LinearExpression<T> implements Iterable<Map.Entry<T, Rational>> {
   private final ImmutableMap<T, Rational> data;
   @LazyInit private transient int hashCache = 0;
 
@@ -68,7 +67,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   /** Add {@code other} linear expression. */
   public LinearExpression<T> add(LinearExpression<T> other) {
     ImmutableMap.Builder<T, Rational> resultData = ImmutableMap.builder();
-    for (Entry<T, Rational> e : data.entrySet()) {
+    for (Map.Entry<T, Rational> e : data.entrySet()) {
       T var = e.getKey();
       @Var Rational value = e.getValue();
       Rational otherValue = other.data.get(var);
@@ -79,7 +78,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
         resultData.put(var, value);
       }
     }
-    for (Entry<T, Rational> e : other.data.entrySet()) {
+    for (Map.Entry<T, Rational> e : other.data.entrySet()) {
       T var = e.getKey();
       if (!data.containsKey(var)) {
         resultData.put(e.getKey(), e.getValue());
@@ -150,7 +149,7 @@ public final class LinearExpression<T> implements Iterable<Entry<T, Rational>> {
   }
 
   @Override
-  public Iterator<Entry<T, Rational>> iterator() {
+  public Iterator<Map.Entry<T, Rational>> iterator() {
     return data.entrySet().iterator();
   }
 

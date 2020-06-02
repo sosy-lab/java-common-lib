@@ -18,7 +18,7 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import junit.framework.JUnit4TestAdapter;
@@ -30,14 +30,14 @@ public class NaiveOrderStatisticMapTest extends OrderStatisticMapTestSuite {
   private static class OrderStatisticMapProxyFactory extends OrderStatisticMapFactory {
 
     @Override
-    protected OrderStatisticMap<String, String> create(Entry<String, String>[] pEntries) {
+    protected OrderStatisticMap<String, String> create(Map.Entry<String, String>[] pEntries) {
       return create(Arrays.asList(pEntries));
     }
 
     @Override
-    protected OrderStatisticMap<String, String> create(List<Entry<String, String>> pEntries) {
+    protected OrderStatisticMap<String, String> create(List<Map.Entry<String, String>> pEntries) {
       NaiveOrderStatisticMap<String, String> map = createMap();
-      for (Entry<String, String> e : pEntries) {
+      for (Map.Entry<String, String> e : pEntries) {
         map.put(e.getKey(), e.getValue());
       }
       return map;
