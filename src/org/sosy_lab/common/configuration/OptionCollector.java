@@ -70,8 +70,11 @@ public class OptionCollector {
       Pattern.compile("ImmutableSet\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
   private static final Pattern IMMUTABLE_LIST_PATTERN =
       Pattern.compile("ImmutableList\\.(<.*>)?of\\((.*)\\)", Pattern.DOTALL);
-  private static final Pattern COPYRIGHT_PATTERN = Pattern.compile("SPDX-FileCopyrightText: .*");
-  private static final Pattern LICENSE_PATTERN = Pattern.compile("SPDX-License-Identifier: .*");
+  // Joining the following string literals would break reuse, do not do that.
+  private static final Pattern COPYRIGHT_PATTERN =
+      Pattern.compile("SPDX-FileCopyrightText" + ": .*");
+  private static final Pattern LICENSE_PATTERN =
+      Pattern.compile("SPDX-License-Identifier" + ": .*");
 
   /**
    * The main-method collects all classes of a program and then it searches for all {@link Option}s.
