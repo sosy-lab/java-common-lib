@@ -8,7 +8,7 @@
 
 package org.sosy_lab.common.time;
 
-import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
@@ -18,21 +18,21 @@ public class TimerTest {
   @Test
   public void initialValue() {
     Timer timer = new Timer();
-    assert_().that(timer.getNumberOfIntervals()).isEqualTo(0);
-    assert_().that(timer.getSumTime()).isEqualTo(TimeSpan.empty());
-    assert_().that(timer.getLengthOfLastInterval()).isEqualTo(TimeSpan.empty());
-    assert_().that(timer.getMaxTime()).isEqualTo(TimeSpan.empty());
-    assert_().that(timer.getMinTime()).isEqualTo(TimeSpan.empty());
+    assertThat(timer.getNumberOfIntervals()).isEqualTo(0);
+    assertThat(timer.getSumTime()).isEqualTo(TimeSpan.empty());
+    assertThat(timer.getLengthOfLastInterval()).isEqualTo(TimeSpan.empty());
+    assertThat(timer.getMaxTime()).isEqualTo(TimeSpan.empty());
+    assertThat(timer.getMinTime()).isEqualTo(TimeSpan.empty());
   }
 
   @Test
   public void interval() {
     Timer timer = new Timer();
-    assert_().that(timer.getNumberOfIntervals()).isEqualTo(0);
+    assertThat(timer.getNumberOfIntervals()).isEqualTo(0);
     timer.start();
-    assert_().that(timer.getNumberOfIntervals()).isEqualTo(1);
+    assertThat(timer.getNumberOfIntervals()).isEqualTo(1);
     timer.stop();
-    assert_().that(timer.getNumberOfIntervals()).isEqualTo(1);
+    assertThat(timer.getNumberOfIntervals()).isEqualTo(1);
   }
 
   @Test
@@ -40,11 +40,11 @@ public class TimerTest {
     Timer timer = new Timer();
 
     for (int i = 0; i < 5; i++) {
-      assert_().that(timer.getNumberOfIntervals()).isEqualTo(i);
+      assertThat(timer.getNumberOfIntervals()).isEqualTo(i);
       timer.start();
-      assert_().that(timer.getNumberOfIntervals()).isEqualTo(i + 1);
+      assertThat(timer.getNumberOfIntervals()).isEqualTo(i + 1);
       timer.stop();
-      assert_().that(timer.getNumberOfIntervals()).isEqualTo(i + 1);
+      assertThat(timer.getNumberOfIntervals()).isEqualTo(i + 1);
     }
   }
 
