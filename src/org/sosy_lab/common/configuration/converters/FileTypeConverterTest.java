@@ -303,7 +303,30 @@ public class FileTypeConverterTest {
 
       if (isAllowed(true)) {
         code.run();
-        assertThat((Comparable<?>) options.path).isEqualTo(Paths.get("config").resolve(testPath));
+        assertThat(options.path).isEqualTo(Paths.get("config").resolve(testPath));
+      } else {
+        assertThrowsICE(code, "safe mode", "test.path");
+      }
+    }
+
+    @Test
+    public void testConvert_InjectPathWithPrefixFromFile() throws Throwable {
+      CharSource configFile1 = CharSource.wrap("Prefix.test.path = " + testPath);
+      CharSource configFile2 = CharSource.wrap("test.path = some/other/path");
+      Configuration config =
+          Configuration.builder()
+              .loadFromSource(configFile1, "config1", "config1/file1")
+              .loadFromSource(configFile2, "config2", "config2/file2")
+              .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
+              .setPrefix("Prefix")
+              .build();
+      FileInjectionTestOptions options = new FileInjectionTestOptions();
+
+      ThrowingRunnable code = () -> config.inject(options);
+
+      if (isAllowed(true)) {
+        code.run();
+        assertThat(options.path).isEqualTo(Paths.get("config1").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }

@@ -1011,6 +1011,13 @@ public final class Configuration {
       annotation = Iterators.getNext(parts, null);
     }
 
+    Path source;
+    if (!prefix.isEmpty() && properties.get(prefix + optionName) != null) {
+      source = sources.get(prefix + optionName);
+    } else {
+      source = sources.get(optionName);
+    }
+
     // try to find a type converter, either for the type of the annotation
     // or for the type of the field
     TypeConverter converter = getConverter(type, secondaryOption);
@@ -1021,7 +1028,7 @@ public final class Configuration {
             valueStr,
             type,
             secondaryOption,
-            sources.get(optionName),
+            source,
             Objects.requireNonNullElse(logger, LogManager.createNullLogManager()));
 
     if (result != null && isAnnotated) {
