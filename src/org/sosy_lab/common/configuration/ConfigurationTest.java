@@ -106,11 +106,11 @@ public class ConfigurationTest {
     assertThat(options.values).containsExactly(TestEnum.E2, TestEnum.E3).inOrder();
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testSetOfEnumsIsImmutable() throws InvalidConfigurationException {
     TestSetOfEnumsOptions options = new TestSetOfEnumsOptions();
     enumTestConfiguration().inject(options);
-    options.values.add(TestEnum.E1);
+    assertThrows(UnsupportedOperationException.class, () -> options.values.add(TestEnum.E1));
   }
 
   @Test
@@ -140,18 +140,18 @@ public class ConfigurationTest {
     assertThat(options.charset).isEqualTo(StandardCharsets.UTF_8);
   }
 
-  @Test(expected = InvalidConfigurationException.class)
+  @Test
   public void testInvalidCharsetName() throws InvalidConfigurationException {
     Configuration config = Configuration.builder().setOption("charset", "invalid;name").build();
     TestCharsetOptions options = new TestCharsetOptions();
-    config.inject(options);
+    assertThrows(InvalidConfigurationException.class, () -> config.inject(options));
   }
 
-  @Test(expected = InvalidConfigurationException.class)
+  @Test
   public void testUnsupportedCharset() throws InvalidConfigurationException {
     Configuration config = Configuration.builder().setOption("charset", "foo-bar").build();
     TestCharsetOptions options = new TestCharsetOptions();
-    config.inject(options);
+    assertThrows(InvalidConfigurationException.class, () -> config.inject(options));
   }
 
   @Options
@@ -171,12 +171,12 @@ public class ConfigurationTest {
     assertThat("barTESTfoo").doesNotMatch(options.regexp);
   }
 
-  @Test(expected = InvalidConfigurationException.class)
+  @Test
   public void testInvalidPattern() throws InvalidConfigurationException {
     Configuration config = Configuration.builder().setOption("regexp", "*foo.*bar").build();
 
     TestPatternOptions options = new TestPatternOptions();
-    config.inject(options);
+    assertThrows(InvalidConfigurationException.class, () -> config.inject(options));
   }
 
   @Test

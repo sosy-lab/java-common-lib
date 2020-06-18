@@ -9,7 +9,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.reflect.TypeToken;
 import java.io.IOException;
@@ -99,10 +99,11 @@ public class ClassesFactoryTest {
     assertThat(generatedFactory.get()).isInstanceOf(SimpleTestClass.class);
   }
 
-  @Test(expected = UnsuitedClassException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void genericFactory_nonmatchingType() throws UnsuitedClassException {
-    Classes.createFactory(TEST_CLASS_SUPPLIER, SimpleTestClass2.class);
+  @Test
+  public void genericFactory_nonmatchingType() {
+    assertThrows(
+        UnsuitedClassException.class,
+        () -> Classes.createFactory(TEST_CLASS_SUPPLIER, SimpleTestClass2.class));
   }
 
   @Test
@@ -112,22 +113,24 @@ public class ClassesFactoryTest {
     assertThat(generatedFactory.get()).isNotSameInstanceAs(generatedFactory.get());
   }
 
-  @Test(expected = UnsuitedClassException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void multipleConstructors() throws UnsuitedClassException {
-    Classes.createFactory(OBJECT_SUPPLIER, String.class);
+  @Test
+  public void multipleConstructors() {
+    assertThrows(
+        UnsuitedClassException.class, () -> Classes.createFactory(OBJECT_SUPPLIER, String.class));
   }
 
-  @Test(expected = UnsuitedClassException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void abstractClass() throws UnsuitedClassException {
-    Classes.createFactory(OBJECT_SUPPLIER, AbstractTestClass.class);
+  @Test
+  public void abstractClass() {
+    assertThrows(
+        UnsuitedClassException.class,
+        () -> Classes.createFactory(OBJECT_SUPPLIER, AbstractTestClass.class));
   }
 
-  @Test(expected = UnsuitedClassException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void illegalDeclaredException() throws UnsuitedClassException {
-    Classes.createFactory(OBJECT_SUPPLIER, ExceptionTestClass.class);
+  @Test
+  public void illegalDeclaredException() {
+    assertThrows(
+        UnsuitedClassException.class,
+        () -> Classes.createFactory(OBJECT_SUPPLIER, ExceptionTestClass.class));
   }
 
   @Test
@@ -144,34 +147,25 @@ public class ClassesFactoryTest {
     assertThat(generatedFactory.get("", null)).isInstanceOf(ExceptionTestClass.class);
   }
 
-  @Test(expected = UnsuitedClassException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void missingParameter() throws UnsuitedClassException {
-    Classes.createFactory(OBJECT_SUPPLIER, ParameterTestClass.class);
+  @Test
+  public void missingParameter() {
+    assertThrows(
+        UnsuitedClassException.class,
+        () -> Classes.createFactory(OBJECT_SUPPLIER, ParameterTestClass.class));
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void nullParameter() throws Exception {
     TestFactory generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory.class), ParameterTestClass.class);
-    try {
-      generatedFactory.get(null);
-      assert_().fail();
-    } catch (NullPointerException expected) {
-    }
+    assertThrows(NullPointerException.class, () -> generatedFactory.get(null));
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void nullParameter2() throws Exception {
     TestFactory2 generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
-    try {
-      generatedFactory.get(null, null);
-      assert_().fail();
-    } catch (NullPointerException expected) {
-    }
+    assertThrows(NullPointerException.class, () -> generatedFactory.get(null, null));
   }
 
   @Test

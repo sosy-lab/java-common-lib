@@ -16,6 +16,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.common.time.TimeSpan.sum;
 
 import com.google.common.testing.EqualsTester;
@@ -38,9 +39,9 @@ public class TimeSpanTest {
     assertThat(result).isEqualTo(expected);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testValueOfNegative() {
-    TimeSpan.valueOf("-10");
+    assertThrows(IllegalArgumentException.class, () -> TimeSpan.valueOf("-10"));
   }
 
   @Test
@@ -175,14 +176,14 @@ public class TimeSpanTest {
     assertThat(result).isEqualTo(expected);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testDoubleDeclaration() {
-    TimeSpan.valueOf("77s314s");
+    assertThrows(IllegalArgumentException.class, () -> TimeSpan.valueOf("77s314s"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testNonsense() {
-    TimeSpan.valueOf("1asdflkajsd1`;32asd fva");
+    assertThrows(IllegalArgumentException.class, () -> TimeSpan.valueOf("1asdflkajsd1`;32asd fva"));
   }
 
   @Test
@@ -191,9 +192,9 @@ public class TimeSpanTest {
     assertThat(LARGE.getChecked(MINUTES)).isEqualTo(LARGE_VALUE * 24 * 60);
   }
 
-  @Test(expected = ArithmeticException.class)
+  @Test
   public void testGetCheckedOverflow() {
-    LARGE.getChecked(SECONDS);
+    assertThrows(ArithmeticException.class, () -> LARGE.getChecked(SECONDS));
   }
 
   @Test
@@ -216,9 +217,9 @@ public class TimeSpanTest {
     assertThat(LARGE.toChecked(MINUTES)).isEqualTo(LARGE_AS_MINUTES);
   }
 
-  @Test(expected = ArithmeticException.class)
+  @Test
   public void testToGetCheckedOverflow() {
-    LARGE.toChecked(SECONDS);
+    assertThrows(ArithmeticException.class, () -> LARGE.toChecked(SECONDS));
   }
 
   @Test
@@ -280,10 +281,10 @@ public class TimeSpanTest {
     assertThat(result).isEqualTo(TimeSpan.of(2 * (VERY_LARGE_VALUE / 24), DAYS));
   }
 
-  @Test(expected = ArithmeticException.class)
+  @Test
   public void testSumOverflow() {
     TimeSpan input = TimeSpan.of(VERY_LARGE_VALUE, DAYS);
-    sum(input, input);
+    assertThrows(ArithmeticException.class, () -> sum(input, input));
   }
 
   @Test
@@ -295,9 +296,12 @@ public class TimeSpanTest {
     assertThat(result).isEqualTo(TimeSpan.of(2 * (-VERY_LARGE_VALUE / 24), DAYS));
   }
 
-  @Test(expected = ArithmeticException.class)
+  @Test
   public void testDifferenceOverflow() {
-    TimeSpan.difference(TimeSpan.of(-VERY_LARGE_VALUE, DAYS), TimeSpan.of(VERY_LARGE_VALUE, DAYS));
+    TimeSpan largeNegative = TimeSpan.of(-VERY_LARGE_VALUE, DAYS);
+    TimeSpan largePositive = TimeSpan.of(VERY_LARGE_VALUE, DAYS);
+    assertThrows(
+        ArithmeticException.class, () -> TimeSpan.difference(largeNegative, largePositive));
   }
 
   @Test
@@ -307,10 +311,9 @@ public class TimeSpanTest {
     assertThat(result).isEqualTo(LARGE.multiply(1000));
   }
 
-  @Test(expected = ArithmeticException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void testMultiplyOverflow() {
-    LARGE_AS_HOURS.multiply(1000 * 1000);
+    assertThrows(ArithmeticException.class, () -> LARGE_AS_HOURS.multiply(1000 * 1000));
   }
 
   @Test

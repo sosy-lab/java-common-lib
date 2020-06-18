@@ -10,7 +10,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
@@ -411,23 +411,9 @@ public class PathCopyingPersistentTreeMapTest {
     subsubmap = submap.subMap("aaa", /*fromInclusive=*/ true, "bb", /*toInclusive=*/ false);
     assertThat(subsubmap).containsExactly("b", "b");
 
-    try {
-      submap.subMap("a", "c");
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-    }
-
-    try {
-      submap.subMap("aa", "d");
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-    }
-
-    try {
-      submap.subMap("a", "d");
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-    }
+    assertThrows(IllegalArgumentException.class, () -> submap.subMap("a", "c"));
+    assertThrows(IllegalArgumentException.class, () -> submap.subMap("aa", "d"));
+    assertThrows(IllegalArgumentException.class, () -> submap.subMap("a", "d"));
   }
 
   @Test

@@ -9,7 +9,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 import java.net.URL;
@@ -59,15 +59,13 @@ public class ExtendedURLClassLoaderTest {
 
   @Test
   public void testDelegationMatchingNotFound() throws IOException {
+    String testClassName = TEST_CLASS.getName();
     try (URLClassLoader cl =
         newDefaultBuilder()
-            .setDirectLoadClasses(Pattern.compile(Pattern.quote(TEST_CLASS.getName())))
+            .setDirectLoadClasses(Pattern.compile(Pattern.quote(testClassName)))
             .build()) {
-      try {
-        cl.loadClass(TEST_CLASS.getName());
-        assert_().fail();
-      } catch (ClassNotFoundException e) {
-      }
+
+      assertThrows(ClassNotFoundException.class, () -> cl.loadClass(testClassName));
     }
   }
 }

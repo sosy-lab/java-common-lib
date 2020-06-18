@@ -9,6 +9,7 @@
 package org.sosy_lab.common.time;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
@@ -47,18 +48,18 @@ public class TimerTest {
     }
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void startTwice() {
     Timer timer = new Timer();
     timer.start();
-    timer.start();
+    assertThrows(IllegalStateException.class, () -> timer.start());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void stopTwice() {
     Timer timer = new Timer();
     timer.start();
     timer.stop();
-    timer.stop();
+    assertThrows(IllegalStateException.class, () -> timer.stop());
   }
 }

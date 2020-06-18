@@ -10,7 +10,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -160,25 +160,14 @@ public abstract class OrderStatisticMapTestSuite {
             .put(ELEMS.get(2))
             .put(ELEMS_ABOVE.get(3))
             .build();
-    try {
-      putEntry(subMap, ELEMS.get(0));
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-      // expected outcome
-    }
-    try {
-      putEntry(subMap, ELEMS.get(3));
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-      // expected outcome
-    }
-    try {
-      // the first 3 elements are in the range of the sublist, but the last isn't
-      subMap.putAll(toAdd);
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-      // expected outcome
-    }
+
+    Entry<String, String> firstEntry = ELEMS.get(0);
+    Entry<String, String> fourthEntry = ELEMS.get(3);
+    assertThrows(IllegalArgumentException.class, () -> putEntry(subMap, firstEntry));
+    assertThrows(IllegalArgumentException.class, () -> putEntry(subMap, fourthEntry));
+
+    // the first 3 elements are in the range of the sublist, but the last isn't
+    assertThrows(IllegalArgumentException.class, () -> subMap.putAll(toAdd));
   }
 
   @Test
@@ -505,25 +494,9 @@ public abstract class OrderStatisticMapTestSuite {
     OrderStatisticMap<String, String> map = createMap(ELEMS);
     OrderStatisticMap<String, String> emptyMap = createMap();
 
-    try {
-      map.removeByRank(-1);
-      assert_().fail();
-    } catch (IndexOutOfBoundsException expected) {
-      // expected outcome
-    }
-    try {
-      map.removeByRank(map.size());
-      assert_().fail();
-    } catch (IndexOutOfBoundsException expected) {
-      // expected outcome
-    }
-    try {
-      emptyMap.removeByRank(0);
-      assert_().fail();
-    } catch (IndexOutOfBoundsException expected) {
-      // expected outcome
-
-    }
+    assertThrows(IndexOutOfBoundsException.class, () -> map.removeByRank(-1));
+    assertThrows(IndexOutOfBoundsException.class, () -> map.removeByRank(map.size()));
+    assertThrows(IndexOutOfBoundsException.class, () -> emptyMap.removeByRank(0));
   }
 
   @Test

@@ -11,9 +11,11 @@ package org.sosy_lab.common.configuration.converters;
 import static com.google.common.truth.Truth.assertThat;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertThrows;
 
 import com.google.auto.value.AutoAnnotation;
 import com.google.common.reflect.TypeToken;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -23,6 +25,9 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 
 public class TimeSpanTypeConverterTest {
+
+  private static final Path DUMMY_PATH = Paths.get("dummy.properties");
+  private static final TypeToken<TimeSpan> TYPE_TOKEN = TypeToken.of(TimeSpan.class);
 
   @AutoAnnotation
   private static TimeSpanOption createAnnotation(TimeUnit codeUnit, TimeUnit defaultUserUnit) {
@@ -38,7 +43,7 @@ public class TimeSpanTypeConverterTest {
                 value,
                 TypeToken.of(Integer.class),
                 createAnnotation(SECONDS, defaultUserUnit),
-                Paths.get("dummy.properties"),
+                DUMMY_PATH,
                 LogManager.createTestLogManager());
   }
 
@@ -49,10 +54,20 @@ public class TimeSpanTypeConverterTest {
             .convert(
                 "dummy",
                 value,
-                TypeToken.of(TimeSpan.class),
+                TYPE_TOKEN,
                 createAnnotation(SECONDS, defaultUserUnit),
-                Paths.get("dummy.properties"),
+                DUMMY_PATH,
                 LogManager.createTestLogManager());
+  }
+
+  private static void testInvalid(String value) {
+    TimeSpanTypeConverter conv = new TimeSpanTypeConverter();
+    TimeSpanOption annotation = createAnnotation(SECONDS, SECONDS);
+    LogManager logger = LogManager.createTestLogManager();
+
+    assertThrows(
+        InvalidConfigurationException.class,
+        () -> conv.convert("dummy", value, TYPE_TOKEN, annotation, DUMMY_PATH, logger));
   }
 
   @Test
@@ -90,27 +105,24 @@ public class TimeSpanTypeConverterTest {
     assertThat(convertToInt("10min", SECONDS)).isEqualTo(10 * 60);
   }
 
-  @Test(expected = InvalidConfigurationException.class)
-  public void test_onlyUnit() throws InvalidConfigurationException {
-    assertThat(convertToInt("s", SECONDS)).isEqualTo(10 * 60);
+  @Test
+  public void test_onlyUnit() {
+    testInvalid("s");
   }
 
-  @Test(expected = InvalidConfigurationException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void test_invalidUnit() throws InvalidConfigurationException {
-    convertToInt("10foo", SECONDS);
+  @Test
+  public void test_invalidUnit() {
+    testInvalid("10foo");
   }
 
-  @Test(expected = InvalidConfigurationException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void test_textPrefix() throws InvalidConfigurationException {
-    convertToInt("foo10s", SECONDS);
+  @Test
+  public void test_textPrefix() {
+    testInvalid("foo10s");
   }
 
-  @Test(expected = InvalidConfigurationException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void test_onlyText() throws InvalidConfigurationException {
-    convertToInt("foo", SECONDS);
+  @Test
+  public void test_onlyText() {
+    testInvalid("foo");
   }
 
   @Test

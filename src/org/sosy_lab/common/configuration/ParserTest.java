@@ -9,6 +9,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Var;
@@ -46,6 +47,12 @@ public class ParserTest {
       throws IOException, InvalidConfigurationException {
     return Parser.parse(CharSource.wrap(content), Optional.ofNullable(basePath), "test")
         .getOptions();
+  }
+
+  private void testInvalid(String content) {
+    CharSource source = CharSource.wrap(content);
+    Optional<Path> path = Optional.ofNullable(basePath);
+    assertThrows(InvalidConfigurationFileException.class, () -> Parser.parse(source, path, "test"));
   }
 
   private void testEmpty(String content) {
@@ -140,119 +147,125 @@ public class ParserTest {
     testSingleOption("foo.bar=abc\\\n \\\n \\\n 123", "foo.bar", "abc123");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalLine1() throws IOException, InvalidConfigurationException {
-    test("a");
+  @Test
+  public final void illegalLine1() {
+    testInvalid("a");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalLine2() throws IOException, InvalidConfigurationException {
-    test("abc.bar");
+  @Test
+  public final void illegalLine2() {
+    testInvalid("abc.bar");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalLine3() throws IOException, InvalidConfigurationException {
-    test("[foo.bar");
+  @Test
+  public final void illegalLine3() {
+    testInvalid("[foo.bar");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalKey1() throws IOException, InvalidConfigurationException {
-    test("foo bar = abc");
+  @Test
+  public final void illegalKey1() {
+    testInvalid("foo bar = abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalKey2() throws IOException, InvalidConfigurationException {
-    test("fooäöüßbar = abc");
+  @Test
+  public final void illegalKey2() {
+    testInvalid("fooäöüßbar = abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalKey3() throws IOException, InvalidConfigurationException {
-    test("foo\tbar = abc");
+  @Test
+  public final void illegalKey3() {
+    testInvalid("foo\tbar = abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalKey4() throws IOException, InvalidConfigurationException {
-    test("foo\\bar = abc");
+  @Test
+  public final void illegalKey4() {
+    testInvalid("foo\\bar = abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalCategory1() throws IOException, InvalidConfigurationException {
-    test("[foo bar]");
+  @Test
+  public final void illegalCategory1() {
+    testInvalid("[foo bar]");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalCategory2() throws IOException, InvalidConfigurationException {
-    test("[fooäöüßbar]");
+  @Test
+  public final void illegalCategory2() {
+    testInvalid("[fooäöüßbar]");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalCategory3() throws IOException, InvalidConfigurationException {
-    test("[foo\tbar]");
+  @Test
+  public final void illegalCategory3() {
+    testInvalid("[foo\tbar]");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalCategory4() throws IOException, InvalidConfigurationException {
-    test("[foo\\bar]");
+  @Test
+  public final void illegalCategory4() {
+    testInvalid("[foo\\bar]");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalDirective() throws IOException, InvalidConfigurationException {
-    test("#comment");
+  @Test
+  public final void illegalDirective() {
+    testInvalid("#comment");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalInclude1() throws IOException, InvalidConfigurationException {
-    test("#include");
+  @Test
+  public final void illegalInclude1() {
+    testInvalid("#include");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void illegalInclude2() throws IOException, InvalidConfigurationException {
-    test("#include  \t");
+  @Test
+  public final void illegalInclude2() {
+    testInvalid("#include  \t");
   }
 
-  @Test(expected = FileNotFoundException.class)
-  public final void illegalInclude3() throws IOException, InvalidConfigurationException {
-    test("#include .");
+  private void testInvalidInclude(String content) {
+    CharSource source = CharSource.wrap(content);
+    Optional<Path> path = Optional.ofNullable(basePath);
+    assertThrows(FileNotFoundException.class, () -> Parser.parse(source, path, "test"));
   }
 
-  @Test(expected = FileNotFoundException.class)
-  public final void illegalInclude4() throws IOException, InvalidConfigurationException {
-    test("#include \\");
+  @Test
+  public final void illegalInclude3() {
+    testInvalidInclude("#include .");
   }
 
-  @Test(expected = FileNotFoundException.class)
-  public final void illegalInclude5() throws IOException, InvalidConfigurationException {
-    test("#include /");
+  @Test
+  public final void illegalInclude4() {
+    testInvalidInclude("#include \\");
   }
 
-  @Test(expected = FileNotFoundException.class)
-  public final void illegalInclude6() throws IOException, InvalidConfigurationException {
-    test("#include ./SoSy-Lab Common Tests/Non-Existing-File");
+  @Test
+  public final void illegalInclude5() {
+    testInvalidInclude("#include /");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void duplicateOption1() throws IOException, InvalidConfigurationException {
-    test("foo.bar=abc \n foo.bar=abc");
+  @Test
+  public final void illegalInclude6() {
+    testInvalidInclude("#include ./SoSy-Lab Common Tests/Non-Existing-File");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void duplicateOption2() throws IOException, InvalidConfigurationException {
-    test("foo.bar=abc \n foo.bar=123");
+  @Test
+  public final void duplicateOption1() {
+    testInvalid("foo.bar=abc \n foo.bar=abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void duplicateOption3() throws IOException, InvalidConfigurationException {
-    test("foo.bar=abc \n [foo] \n bar=abc");
+  @Test
+  public final void duplicateOption2() {
+    testInvalid("foo.bar=abc \n foo.bar=123");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void duplicateOption4() throws IOException, InvalidConfigurationException {
-    test("[foo] \n bar=abc \n [foo] \n bar=abc");
+  @Test
+  public final void duplicateOption3() {
+    testInvalid("foo.bar=abc \n [foo] \n bar=abc");
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void duplicateOption5() throws IOException, InvalidConfigurationException {
-    test("[foo] \n bar=abc \n [] \n foo.bar=abc");
+  @Test
+  public final void duplicateOption4() {
+    testInvalid("[foo] \n bar=abc \n [foo] \n bar=abc");
+  }
+
+  @Test
+  public final void duplicateOption5() {
+    testInvalid("[foo] \n bar=abc \n [] \n foo.bar=abc");
   }
 
   private static Path createTempFile(String prefix, String suffix, String content)
@@ -274,9 +287,11 @@ public class ParserTest {
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public final void includeWithoutBasePath() throws IOException, InvalidConfigurationException {
-    Parser.parse(CharSource.wrap("#include test.properties"), Optional.empty(), "test");
+  @Test
+  public final void includeWithoutBasePath() {
+    CharSource source = CharSource.wrap("#include test.properties");
+    assertThrows(
+        IllegalArgumentException.class, () -> Parser.parse(source, Optional.empty(), "test"));
   }
 
   @Test
@@ -342,8 +357,8 @@ public class ParserTest {
     }
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void recursiveInclude() throws IOException, InvalidConfigurationException {
+  @Test
+  public final void recursiveInclude() throws IOException {
     try (DeleteOnCloseFile included =
         TempFile.builder()
             .prefix(TEST_FILE_PREFIX)
@@ -353,19 +368,19 @@ public class ParserTest {
           included.toPath(),
           Charset.defaultCharset(),
           "#include " + included.toPath().toAbsolutePath());
-      test("#include " + included.toPath().toAbsolutePath());
+      testInvalid("#include " + included.toPath().toAbsolutePath());
     }
   }
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void recursiveIncludeDepthTwo() throws IOException, InvalidConfigurationException {
+  @Test
+  public final void recursiveIncludeDepthTwo() throws IOException {
     Path included1 = TempFile.builder().prefix(TEST_FILE_PREFIX).suffix(TEST_FILE_SUFFIX).create();
     Path included2 =
         createTempFile(
             TEST_FILE_PREFIX, TEST_FILE_SUFFIX, "#include " + included1.toAbsolutePath());
     IO.writeFile(included1, Charset.defaultCharset(), "#include " + included2.toAbsolutePath());
     try {
-      test("#include " + included1.toAbsolutePath());
+      testInvalid("#include " + included1.toAbsolutePath());
     } finally {
       Files.delete(included1);
       Files.delete(included2);
@@ -374,8 +389,8 @@ public class ParserTest {
 
   private static final int MAX_RECURSIVE_INCLUDE_TEST_DEPTH = 10;
 
-  @Test(expected = InvalidConfigurationFileException.class)
-  public final void recursiveIncludeDepthN() throws IOException, InvalidConfigurationException {
+  @Test
+  public final void recursiveIncludeDepthN() throws IOException {
     Path firstIncluded =
         TempFile.builder().prefix(TEST_FILE_PREFIX).suffix(TEST_FILE_SUFFIX).create();
 
@@ -393,7 +408,7 @@ public class ParserTest {
     IO.writeFile(firstIncluded, Charset.defaultCharset(), "#include " + included.toAbsolutePath());
 
     try {
-      test("#include " + included.toAbsolutePath());
+      testInvalid("#include " + included.toAbsolutePath());
     } finally {
       for (Path toDelete : allFiles) {
         Files.delete(toDelete);
