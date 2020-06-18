@@ -121,7 +121,7 @@ public class CollectionsTransformationTest {
         Maps::newHashMap,
         (input, transformer) -> ImmutableMap.copyOf(Maps.transformValues(input, transformer)));
     testMapTransformCalledOnlyOnce(
-        input -> new TreeMap<>(input),
+        TreeMap::new,
         (input, transformer) -> ImmutableMap.copyOf(Maps.transformValues(input, transformer)));
 
     testMapTransformCalledOnlyOnce(
