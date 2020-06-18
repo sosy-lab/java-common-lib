@@ -293,7 +293,7 @@ public final class Rational extends Number implements Comparable<Rational> {
       return false;
     }
     Rational b = (Rational) y;
-    return (num.equals(b.num) && den.equals(b.den));
+    return num.equals(b.num) && den.equals(b.den);
   }
 
   @Override

@@ -166,7 +166,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
                 .getParameters()
                 .stream()
                 .anyMatch(
-                    (param) -> typeToString(param.asType()).equals(Configuration.class.getName()));
+                    param -> typeToString(param.asType()).equals(Configuration.class.getName()));
         if (!foundConfigurationParameter && warningsEnabled(constructor)) {
           message(
               WARNING,
@@ -478,7 +478,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     return element
         .getEnclosedElements()
         .stream()
-        .anyMatch((child) -> child.getAnnotation(annotation) != null);
+        .anyMatch(child -> child.getAnnotation(annotation) != null);
   }
 
   /**
@@ -496,7 +496,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     String annotationName = annotation.getName();
     return elem.getAnnotationMirrors()
         .stream()
-        .filter((am) -> am.getAnnotationType().toString().equals(annotationName))
+        .filter(am -> am.getAnnotationType().toString().equals(annotationName))
         .findFirst();
   }
 

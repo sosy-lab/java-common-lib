@@ -182,7 +182,7 @@ public final class Collections3 {
 
     int lastPos = end.length() - 1;
     // This is basically end[lastPos] += 1
-    end.setCharAt(lastPos, Chars.checkedCast((end.charAt(lastPos) + 1)));
+    end.setCharAt(lastPos, Chars.checkedCast(end.charAt(lastPos) + 1));
 
     return end.toString();
   }

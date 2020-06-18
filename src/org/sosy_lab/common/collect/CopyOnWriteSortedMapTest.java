@@ -122,7 +122,7 @@ public class CopyOnWriteSortedMapTest {
         protected SortedMap<String, String> create(Map.Entry<String, String>[] pEntries) {
           CopyOnWriteSortedMap<String, String> result =
               CopyOnWriteSortedMap.copyOf(PathCopyingPersistentTreeMap.<String, String>of());
-          Stream.of(pEntries).forEach((entry) -> result.put(entry.getKey(), entry.getValue()));
+          Stream.of(pEntries).forEach(entry -> result.put(entry.getKey(), entry.getValue()));
           return result;
         }
       };

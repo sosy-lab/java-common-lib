@@ -305,7 +305,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    */
   @Override
   public boolean wouldBeLogged(Level priority) {
-    return (logger.isLoggable(priority));
+    return logger.isLoggable(priority);
   }
 
   /**
@@ -390,7 +390,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     for (int i = 0; i < args.length; i++) {
       Object o = Objects.requireNonNullElse(args[i], "null");
       @Var String arg;
-      if (o instanceof Appender && (truncateSize > 0)) {
+      if (o instanceof Appender && truncateSize > 0) {
         arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
       } else {
         arg = o.toString();
@@ -525,7 +525,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       logMessage.append(additionalMessage);
 
       if (!exceptionMessage.isEmpty()) {
-        if ((e instanceof IOException)
+        if (e instanceof IOException
             && additionalMessage.endsWith("file")
             && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
           // nicer error message, so that we have something like
