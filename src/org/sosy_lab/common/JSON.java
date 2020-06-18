@@ -63,10 +63,7 @@ public final class JSON {
         out.append(value.toString());
       }
 
-    } else if (value instanceof Number) {
-      out.append(value.toString());
-
-    } else if (value instanceof Boolean) {
+    } else if ((value instanceof Number) || (value instanceof Boolean)) {
       out.append(value.toString());
 
     } else if (value instanceof Map<?, ?>) {
