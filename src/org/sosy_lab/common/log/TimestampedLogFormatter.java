@@ -8,7 +8,6 @@
 
 package org.sosy_lab.common.log;
 
-import com.google.common.base.MoreObjects;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -51,11 +50,6 @@ public class TimestampedLogFormatter extends AbstractColoredLogFormatter {
         .append('\t')
         .append(lr.getMessage())
         .append("\n\n");
-  }
-
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).toString();
   }
 
   public static Formatter withoutColors() {
