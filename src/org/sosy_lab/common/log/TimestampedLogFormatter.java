@@ -18,8 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
- * Class to handle timestamped log formatting:<br>
- *
+ * Log formatter that produces output containing a timestamp. Each log message will look like this:
  * <pre>
  * timestamp {@link Level} (component:class.method) message
  * </pre>
