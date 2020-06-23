@@ -17,7 +17,4 @@ public class FileLogFormatter extends TimestampedLogFormatter {
   public FileLogFormatter() {
     super(false);
   }
-
-
-
 }

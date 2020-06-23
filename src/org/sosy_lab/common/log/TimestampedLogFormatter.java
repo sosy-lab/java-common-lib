@@ -18,6 +18,7 @@ import java.util.logging.LogRecord;
 
 /**
  * Log formatter that produces output containing a timestamp. Each log message will look like this:
+ *
  * <pre>
  * timestamp {@link Level} (component:class.method) message
  * </pre>
