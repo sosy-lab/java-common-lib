@@ -231,7 +231,11 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         Handler outfileHandler =
             new FileHandler(outputFile.toAbsolutePath().toString(), /*append=*/ false);
         setupHandler(
-            logger, outfileHandler, new FileLogFormatter(), fileLevel, options.getFileExclude());
+            logger,
+            outfileHandler,
+            TimestampedLogFormatter.withoutColors(),
+            fileLevel,
+            options.getFileExclude());
       } catch (IOException e) {
         // redirect log messages to console
         if (consoleLevel.intValue() > fileLevel.intValue()) {
