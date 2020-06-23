@@ -20,7 +20,7 @@ import java.util.logging.LogRecord;
  */
 abstract class AbstractColoredLogFormatter extends Formatter {
 
-  private boolean useColors;
+  private final boolean useColors;
 
   protected AbstractColoredLogFormatter(@Var boolean pUseColors) {
     if (pUseColors) {
