@@ -28,6 +28,7 @@ public class BasicLogManagerTest {
   private static final int TRUNCATE_SIZE = 150;
   private static final String LONG_STRING = Strings.repeat("1234567890", 100_000); // 1 MB size
 
+  @SuppressWarnings("UnnecessaryAnonymousClass")
   private static final Appender LONG_STRING_APPENDER =
       new AbstractAppender() {
 
