@@ -20,12 +20,22 @@ import java.util.logging.LogRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders.AbstractAppender;
 
 public class BasicLogManagerTest {
 
   private static final int TRUNCATE_SIZE = 150;
-  private static final String LONG_STRING = Strings.repeat("1234567890", 20);
+  private static final String LONG_STRING = Strings.repeat("1234567890", 100_000); // 1 MB size
+
+  private static final Appender LONG_STRING_APPENDER =
+      new AbstractAppender() {
+
+        @Override
+        public void appendTo(Appendable pAppendable) throws IOException {
+          pAppendable.append(LONG_STRING);
+        }
+      };
 
   private TestLogHandler testHandler;
   private LogManager logger;
@@ -134,17 +144,7 @@ public class BasicLogManagerTest {
 
   @Test
   public void testLogAppenderTruncate() {
-    logger.log(
-        Level.SEVERE,
-        "|",
-        new AbstractAppender() {
-
-          @Override
-          public void appendTo(Appendable pAppendable) throws IOException {
-            pAppendable.append(LONG_STRING);
-          }
-        },
-        "|");
+    logger.log(Level.SEVERE, "|", LONG_STRING_APPENDER, "|");
     checkExpectedTruncatedMessage(false);
   }
 
@@ -152,5 +152,26 @@ public class BasicLogManagerTest {
   public void testLogfTruncate() {
     logger.logf(Level.SEVERE, "| %s |", LONG_STRING);
     checkExpectedTruncatedMessage(true);
+  }
+
+  private void testLongStringWithoutTrunction(Object longMessage) throws Exception {
+    tearDown(); // close logger because we need to recreate it
+    logger =
+        BasicLogManager.createWithHandler(
+            testHandler, /*truncateSize=*/ 0); // 0 disables truncation
+    logger.log(Level.SEVERE, "|", longMessage, "|");
+    List<LogRecord> records = testHandler.getStoredLogRecords();
+    assertThat(records).hasSize(1);
+    assertThat(records.get(0).getMessage()).isEqualTo("| " + LONG_STRING + " |");
+  }
+
+  @Test
+  public void testLogNoTruncate() throws Exception {
+    testLongStringWithoutTrunction(LONG_STRING);
+  }
+
+  @Test
+  public void testLogAppenderNoTruncate() throws Exception {
+    testLongStringWithoutTrunction(LONG_STRING_APPENDER);
   }
 }

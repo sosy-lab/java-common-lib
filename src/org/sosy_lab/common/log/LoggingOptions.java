@@ -65,8 +65,11 @@ public class LoggingOptions {
 
   @Option(
       secure = true,
-      description = "maximum size of log output strings before they will be truncated")
-  @IntegerOption(min = 1)
+      description =
+          "Maximum size of log output strings before they will be truncated."
+              + " Note that truncation is not precise and truncation to small values has no effect."
+              + " Use 0 for disabling truncation completely.")
+  @IntegerOption(min = 0)
   private int truncateSize = 10000;
 
   @Option(secure = true, description = "use colors for log messages on console")
