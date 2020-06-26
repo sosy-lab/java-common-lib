@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.configuration.converters;
 
+import com.google.common.collect.Range;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.nio.file.Path;
@@ -44,10 +45,16 @@ public class IntegerTypeConverter implements TypeConverter {
 
     long n = ((Number) value).longValue();
     if (option.min() > n || n > option.max()) {
+      Range<Long> bound = Range.closed(option.min(), option.max());
+      Range<Long> typeBound =
+          type.equals(Integer.class)
+              ? Range.closed((long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE)
+              : Range.all();
+
       throw new InvalidConfigurationException(
           String.format(
-              "Invalid value in configuration file: \"%s = %s\" (not in range [%d, %d]).",
-              optionName, value, option.min(), option.max()));
+              "Invalid value in configuration file: \"%s = %s\" (not in range %s).",
+              optionName, value, bound.intersection(typeBound)));
     }
 
     return value;
