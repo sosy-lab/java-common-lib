@@ -283,8 +283,13 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   private void addMxBean(Handler pConsoleHandler, Level pFileLevel) {
     checkState(mxBean == null);
-    mxBean = new LogManagerBean(pConsoleHandler, pFileLevel);
-    mxBean.register();
+    try {
+      mxBean = new LogManagerBean(pConsoleHandler, pFileLevel);
+      mxBean.register();
+    } catch (NoClassDefFoundError e) {
+      logUserException(
+          Level.WARNING, e, "Error during registration of management interface for logger");
+    }
   }
 
   private BasicLogManager(BasicLogManager originalLogger, String pComponentName) {

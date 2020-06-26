@@ -87,11 +87,16 @@ public abstract class AbstractMBean {
       } catch (RuntimeErrorException e) {
         throw handleRuntimeErrorException(e);
       } catch (JMException | SecurityException e) {
-        logger.logException(Level.WARNING, e, "Error during registration of management interface");
+        logger.logfUserException(
+            Level.WARNING,
+            e,
+            "Error during registration of management interface %s",
+            this.getClass().getSimpleName());
         oname = null;
       }
     } else {
-      logger.log(Level.WARNING, "Cannot register management interface");
+      logger.log(
+          Level.WARNING, "Cannot register management interface ", this.getClass().getSimpleName());
     }
   }
 
