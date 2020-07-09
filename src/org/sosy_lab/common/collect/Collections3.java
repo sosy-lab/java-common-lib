@@ -16,6 +16,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
@@ -44,6 +45,48 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Collections3 {
 
   private Collections3() {}
+
+  /**
+   * Check whether all elements contained in the given iterable are equal to each other. For a
+   * non-empty iterable, this is the same as {@code ImmutableSet.copyOf(iterable).size() == 1}, but
+   * more efficient.
+   *
+   * @throws IllegalArgumentException if the iterable is empty
+   */
+  public static boolean allElementsEqual(Iterable<?> iterable) {
+    return allElementsEqual(iterable.iterator());
+  }
+  /**
+   * Check whether all elements contained in the given array are equal to each other. For a
+   * non-empty array, this is the same as {@code ImmutableSet.copyOf(array).size() == 1}, but more
+   * efficient.
+   *
+   * @throws IllegalArgumentException if the array is empty
+   */
+  public static boolean allElementsEqual(Object[] array) {
+    return allElementsEqual(Iterators.forArray(array));
+  }
+  /**
+   * Check whether all elements contained in the given stream are equal to each other. For a
+   * non-empty stream, this is the same as {@code stream.distinct().count() == 1}, but more
+   * efficient.
+   *
+   * @throws IllegalArgumentException if the stream is empty
+   */
+  public static boolean allElementsEqual(Stream<?> stream) {
+    return allElementsEqual(stream.unordered().iterator());
+  }
+
+  private static boolean allElementsEqual(Iterator<?> it) {
+    checkArgument(it.hasNext(), "Input was empty");
+    Object o = it.next();
+    while (it.hasNext()) {
+      if (!Objects.equals(o, it.next())) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   /**
    * Apply a function to all elements in a collection and return an {@link ImmutableList} with the

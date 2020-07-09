@@ -9,16 +9,36 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 import org.junit.Test;
 
 public class Collections3Test {
+
+  @Test
+  public void testAllElementsEqual_emptyArray() {
+    assertThrows(
+        IllegalArgumentException.class, () -> Collections3.allElementsEqual(ImmutableList.of()));
+  }
+
+  @Test
+  public void testAllElementsEqual_emptyList() {
+    assertThrows(
+        IllegalArgumentException.class, () -> Collections3.allElementsEqual(new String[0]));
+  }
+
+  @Test
+  public void testAllElementsEqual_emptyStream() {
+    assertThrows(IllegalArgumentException.class, () -> Collections3.allElementsEqual(Stream.of()));
+  }
 
   @Test
   @SuppressWarnings("JdkObsolete") // we want to test that method
