@@ -24,7 +24,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class CollectionsAllElementsEqualTest {
 
   @Parameters(name = "{0}: {1}")
-  public static List<Object[]> parameters() {
+  public static ImmutableList<Object[]> parameters() {
     return ImmutableList.of(
         new Object[] {Lists.newArrayList(""), true},
         new Object[] {Lists.newArrayList("", ""), true},
