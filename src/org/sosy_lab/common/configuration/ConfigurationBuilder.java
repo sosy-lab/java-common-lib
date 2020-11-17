@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -313,7 +314,7 @@ public final class ConfigurationBuilder {
           try {
             // try to register a new file system (provider) for the JAR.
             return provider.newFileSystem(uri, ImmutableMap.of());
-          } catch (FileSystemNotFoundException e) {
+          } catch (FileSystemAlreadyExistsException e) {
             // file system already exists: ignore it and return null after the loop
           }
         }
