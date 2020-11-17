@@ -19,12 +19,14 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -260,9 +262,26 @@ public final class ConfigurationBuilder {
     @Var Path sourcePath;
     @Var String sourceString;
     try {
+      // try to access the requested file.
+      URI uri = url.toURI();
+      if ("jar".equals(uri.getScheme())) {
+        // if packed in a JAR file, we try to register the JAR as file system.
+        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+          if (provider.getScheme().equalsIgnoreCase("jar")) {
+            try {
+              provider.getFileSystem(uri);
+            } catch (FileSystemNotFoundException e) {
+              provider.newFileSystem(uri, ImmutableMap.of());
+            }
+          }
+        }
+      }
       sourcePath = Paths.get(url.toURI());
       sourceString = sourcePath.toString();
-    } catch (URISyntaxException | FileSystemNotFoundException | IllegalArgumentException e) {
+    } catch (URISyntaxException
+        | FileSystemNotFoundException
+        | IllegalArgumentException
+        | IOException e) {
       // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
       // This will not allow resolving relative path names, but everything else works.
       sourcePath = null;
