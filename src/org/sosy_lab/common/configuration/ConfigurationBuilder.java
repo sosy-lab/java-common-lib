@@ -260,11 +260,9 @@ public final class ConfigurationBuilder {
 
     setupProperties();
 
-    // Get the path to the source, used for error messages and resolving relative path names.
     try {
-      // try to access the requested file.
       URI uri = url.toURI();
-      try (FileSystem fs = getFileSystemForUri(uri)) {
+      try (FileSystem fs = getFileSystemForUriInJars(uri)) {
         // Path uses FileSystemProvider internally to access the file, thus fs is unused.
         Path sourcePath = Paths.get(uri);
         parseSource(
@@ -299,21 +297,24 @@ public final class ConfigurationBuilder {
   }
 
   /**
-   * If the URI is part of a JAR file, we open the file system from the JAR. If this fails, we
-   * register/open a new file system for the JAR file. The paths for this file system are valid as
-   * long as the file system not closed.
+   * If the URI is part of a JAR file, we open the file system from the JAR. We only register/open a
+   * new file system for the JAR file, if it was not already open before. The paths for this file
+   * system are valid as long as the file system not closed. If anything fails, e.g., if the URI
+   * does not point to a JAR file or the JAR is already open, we return <code>null</code>.
    *
-   * @return the opened file system of the JAR file or <code>null</code>.
+   * A JAR-based file system uses ZipFileSystem that can be opened and closed several times.
+   *
+   * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
    */
-  private static FileSystem getFileSystemForUri(URI uri) throws IOException {
+  private static FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
     if ("jar".equals(uri.getScheme())) {
       for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
         if (provider.getScheme().equalsIgnoreCase("jar")) {
           try {
-            return provider.getFileSystem(uri);
-          } catch (FileSystemNotFoundException e) {
-            // register a new file system (provider) for the JAR.
+            // try to register a new file system (provider) for the JAR.
             return provider.newFileSystem(uri, ImmutableMap.of());
+          } catch (FileSystemNotFoundException e) {
+            // file system already exists: ignore it and return null after the loop
           }
         }
       }
