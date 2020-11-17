@@ -302,7 +302,7 @@ public final class ConfigurationBuilder {
    * system are valid as long as the file system not closed. If anything fails, e.g., if the URI
    * does not point to a JAR file or the JAR is already open, we return <code>null</code>.
    *
-   * A JAR-based file system uses ZipFileSystem that can be opened and closed several times.
+   * <p>A JAR-based file system uses ZipFileSystem that can be opened and closed several times.
    *
    * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
    */
