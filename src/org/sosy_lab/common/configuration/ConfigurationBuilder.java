@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -252,6 +253,7 @@ public final class ConfigurationBuilder {
    * @throws IllegalArgumentException If the resource cannot be found or read, or contains invalid
    *     syntax or #include directives.
    */
+  @SuppressWarnings("try")
   public ConfigurationBuilder loadFromResource(Class<?> contextClass, String resourceName) {
     URL url = Resources.getResource(contextClass, resourceName);
     CharSource source = Resources.asCharSource(url, StandardCharsets.UTF_8);
@@ -259,45 +261,64 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     // Get the path to the source, used for error messages and resolving relative path names.
-    @Var Path sourcePath;
-    @Var String sourceString;
     try {
       // try to access the requested file.
       URI uri = url.toURI();
-      if ("jar".equals(uri.getScheme())) {
-        // if packed in a JAR file, we try to register the JAR as file system.
-        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
-          if (provider.getScheme().equalsIgnoreCase("jar")) {
-            try {
-              provider.getFileSystem(uri);
-            } catch (FileSystemNotFoundException e) {
-              provider.newFileSystem(uri, ImmutableMap.of());
-            }
-          }
-        }
+      try (FileSystem fs = getFileSystemForUri(uri)) {
+        // Path uses FileSystemProvider internally to access the file, thus fs is unused.
+        Path sourcePath = Paths.get(uri);
+        parseSource(
+            contextClass, resourceName, source, Optional.of(sourcePath), sourcePath.toString());
       }
-      sourcePath = Paths.get(url.toURI());
-      sourceString = sourcePath.toString();
     } catch (URISyntaxException
         | FileSystemNotFoundException
         | IllegalArgumentException
         | IOException e) {
       // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
       // This will not allow resolving relative path names, but everything else works.
-      sourcePath = null;
-      sourceString = url.toString();
+      parseSource(contextClass, resourceName, source, Optional.empty(), url.toString());
     }
 
+    return this;
+  }
+
+  private void parseSource(
+      Class<?> contextClass,
+      String resourceName,
+      CharSource source,
+      Optional<Path> sourcePath,
+      String sourceString) {
     try {
-      Parser parser = Parser.parse(source, Optional.ofNullable(sourcePath), sourceString);
+      Parser parser = Parser.parse(source, sourcePath, sourceString);
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {
       throw new IllegalArgumentException(
           "Error in resource " + resourceName + " relative to " + contextClass.getName(), e);
     }
+  }
 
-    return this;
+  /**
+   * If the URI is part of a JAR file, we open the file system from the JAR. If this fails, we
+   * register/open a new file system for the JAR file. The paths for this file system are valid as
+   * long as the file system not closed.
+   *
+   * @return the opened file system of the JAR file or <code>null</code>.
+   */
+  private static FileSystem getFileSystemForUri(URI uri) throws IOException {
+    if ("jar".equals(uri.getScheme())) {
+      for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+        if (provider.getScheme().equalsIgnoreCase("jar")) {
+          try {
+            return provider.getFileSystem(uri);
+          } catch (FileSystemNotFoundException e) {
+            // register a new file system (provider) for the JAR.
+            return provider.newFileSystem(uri, ImmutableMap.of());
+          }
+        }
+      }
+    }
+    return null; // default case: we do not need an extra file system
   }
 
   /**
