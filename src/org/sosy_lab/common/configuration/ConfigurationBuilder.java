@@ -19,12 +19,17 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -71,7 +76,7 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.put(name, value);
-    sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
+    sources.remove(name);
 
     return this;
   }
@@ -93,9 +98,7 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.putAll(options);
-    for (String name : options.keySet()) {
-      sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
-    }
+    sources.keySet().removeAll(options.keySet());
 
     return this;
   }
@@ -154,7 +157,11 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.put(option, sourceConfig.properties.get(option));
-    sources.put(option, sourceConfig.sources.get(option));
+    if (sourceConfig.sources.containsKey(option)) {
+      sources.put(option, sourceConfig.sources.get(option));
+    } else {
+      sources.remove(option);
+    }
 
     return this;
   }
@@ -188,8 +195,8 @@ public final class ConfigurationBuilder {
    *
    * @param source The source to read from.
    * @param basePath The directory where relative #include directives should be based on.
-   * @param sourceName A string to use as source of the file in error messages (this should usually
-   *     be a filename or something similar).
+   * @param sourceName A string to use as source of the file in error messages or for other uses by
+   *     the {@link TypeConverter}. This needs to be convertible into a {@link Path}.
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
@@ -199,9 +206,18 @@ public final class ConfigurationBuilder {
     checkNotNull(basePath);
     setupProperties();
 
+    @Var Path sourcePath;
+    try {
+      sourcePath = Paths.get(sourceName);
+    } catch (InvalidPathException e) {
+      // If this fails, e.g., because sourceName is a HTTP URL, we can also go without source
+      // information. This will not allow resolving relative path names, but everything else works.
+      sourcePath = null;
+    }
+
     // Need to append something to base path because resolveSibling() is used.
     Path base = Paths.get(basePath).resolve("dummy");
-    Parser parser = Parser.parse(source, Optional.of(base), sourceName);
+    Parser parser = Parser.parse(source, Optional.of(base), sourcePath);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -250,35 +266,68 @@ public final class ConfigurationBuilder {
    * @throws IllegalArgumentException If the resource cannot be found or read, or contains invalid
    *     syntax or #include directives.
    */
+  @SuppressWarnings("try")
   public ConfigurationBuilder loadFromResource(Class<?> contextClass, String resourceName) {
     URL url = Resources.getResource(contextClass, resourceName);
     CharSource source = Resources.asCharSource(url, StandardCharsets.UTF_8);
 
     setupProperties();
 
-    // Get the path to the source, used for error messages and resolving relative path names.
-    @Var Path sourcePath;
-    @Var String sourceString;
     try {
-      sourcePath = Paths.get(url.toURI());
-      sourceString = sourcePath.toString();
-    } catch (URISyntaxException | FileSystemNotFoundException | IllegalArgumentException e) {
-      // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
+      URI uri = url.toURI();
+      try (FileSystem fs = getFileSystemForUriInJars(uri)) {
+        // Path uses FileSystemProvider internally to access the file, thus fs is unused.
+        Path sourcePath = Paths.get(uri);
+        parseSource(contextClass, resourceName, source, Optional.of(sourcePath));
+      }
+    } catch (URISyntaxException
+        | FileSystemNotFoundException
+        | IllegalArgumentException
+        | IOException e) {
+      // If this fails, e.g., because url is a HTTP URL, we can also go without source information.
       // This will not allow resolving relative path names, but everything else works.
-      sourcePath = null;
-      sourceString = url.toString();
+      parseSource(contextClass, resourceName, source, Optional.empty());
     }
 
+    return this;
+  }
+
+  private void parseSource(
+      Class<?> contextClass, String resourceName, CharSource source, Optional<Path> sourcePath) {
     try {
-      Parser parser = Parser.parse(source, Optional.ofNullable(sourcePath), sourceString);
+      Parser parser = Parser.parse(source, sourcePath, sourcePath.orElse(null));
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {
       throw new IllegalArgumentException(
           "Error in resource " + resourceName + " relative to " + contextClass.getName(), e);
     }
+  }
 
-    return this;
+  /**
+   * If the URI is part of a JAR file, we open the file system from the JAR. We only register/open a
+   * new file system for the JAR file, if it was not already open before. The paths for this file
+   * system are valid as long as the file system not closed. If anything fails, e.g., if the URI
+   * does not point to a JAR file or the JAR is already open, we return <code>null</code>.
+   *
+   * <p>A JAR-based file system uses ZipFileSystem that can be opened and closed several times.
+   *
+   * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
+   */
+  private static FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
+    if ("jar".equals(uri.getScheme())) {
+      for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+        if (provider.getScheme().equalsIgnoreCase("jar")) {
+          try {
+            // try to register a new file system (provider) for the JAR.
+            return provider.newFileSystem(uri, ImmutableMap.of());
+          } catch (FileSystemAlreadyExistsException e) {
+            // file system already exists: ignore it and return null after the loop
+          }
+        }
+      }
+    }
+    return null; // default case: we do not need an extra file system
   }
 
   /**

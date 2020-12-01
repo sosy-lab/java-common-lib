@@ -12,6 +12,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.Maps;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
@@ -29,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.IO;
 
 /**
@@ -68,8 +72,9 @@ class Parser {
 
     private static final long serialVersionUID = 8146907093750189669L;
 
-    private InvalidConfigurationFileException(String msg, int lineno, String source, String line) {
-      super(msg + " in line " + lineno + " of " + source + ": " + line);
+    private InvalidConfigurationFileException(
+        String msg, int lineno, @Nullable Path source, String line) {
+      super(msg + " in line " + lineno + (source != null ? " of " + source : "") + ": " + line);
     }
 
     private InvalidConfigurationFileException(String msg) {
@@ -132,7 +137,7 @@ class Parser {
     includeStack.addLast(fileName);
 
     try (BufferedReader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-      parse(r, Optional.of(file), file.toString());
+      parse(r, Optional.of(file), file);
     }
     includeStack.removeLast();
   }
@@ -146,18 +151,18 @@ class Parser {
    * @param source The source to read the file from.
    * @param basePath If #include filenames are relative, resolve them as sibling of basePath. Source
    *     must not contain #include if absent.
-   * @param sourceName A string to use as source of the file in error messages (this should usually
-   *     be a filename or something similar).
+   * @param sourcePath An optional Path to use as source of the options in error messages or for
+   *     other uses by the {@link TypeConverter}.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @CheckReturnValue
-  static Parser parse(CharSource source, Optional<Path> basePath, String sourceName)
+  static Parser parse(CharSource source, Optional<Path> basePath, @Nullable Path sourcePath)
       throws IOException, InvalidConfigurationException {
 
     Parser parser = new Parser();
     try (BufferedReader r = source.openBufferedStream()) {
-      parser.parse(r, basePath, sourceName);
+      parser.parse(r, basePath, sourcePath);
     }
     verify(parser.includeStack.isEmpty());
     return parser;
@@ -172,18 +177,17 @@ class Parser {
    * @param r The reader to read the file from.
    * @param basePath If #include filenames are relative, resolve them as sibling of basePath. Source
    *     must not contain #include if absent.
-   * @param source A string to use as source of the file in error messages (this should usually be a
-   *     filename or something similar).
+   * @param source An optional Path to use as source of the options in error messages or for other
+   *     uses by the {@link TypeConverter}.
    * @throws IOException If an I/O error occurs.
    * @throws InvalidConfigurationException If the configuration file has an invalid format.
    */
   @SuppressFBWarnings(
       value = "SBSC_USE_STRINGBUFFER_CONCATENATION",
       justification = "performance irrelevant compared to I/O, String much more convenient")
-  private void parse(BufferedReader r, Optional<Path> basePath, String source)
+  private void parse(BufferedReader r, Optional<Path> basePath, @Nullable Path source)
       throws IOException, InvalidConfigurationException {
     checkNotNull(basePath);
-    checkNotNull(source);
 
     @Var String line;
     @Var int lineno = 0;
@@ -303,9 +307,10 @@ class Parser {
     // now overwrite included options with local ones
     options.putAll(definedOptions);
 
-    Path thisSource = Paths.get(source);
-    for (String name : definedOptions.keySet()) {
-      sources.put(name, thisSource);
+    if (source != null) {
+      sources.putAll(Maps.asMap(definedOptions.keySet(), Functions.constant(source)));
+    } else {
+      sources.keySet().removeAll(definedOptions.keySet());
     }
   }
 }

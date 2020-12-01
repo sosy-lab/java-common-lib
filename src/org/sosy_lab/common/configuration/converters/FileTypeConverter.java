@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -78,9 +79,7 @@ public final class FileTypeConverter implements TypeConverter {
           "disable all default output files\n(any explicitly given file will still be written)")
   private boolean disableOutput = false;
 
-  @Option(
-      description =
-          "base directory for all input & output files\n(except for the configuration file itself)")
+  @Option(description = "base directory for all paths in default values")
   private String rootDirectory = ".";
 
   @VisibleForTesting final Path rootPath;
@@ -237,7 +236,7 @@ public final class FileTypeConverter implements TypeConverter {
         path,
         ((FileOption) secondaryOption).value(),
         type,
-        pSource,
+        Objects.requireNonNullElse(pSource, Paths.get("")),
         /*doResolve=*/ true);
   }
 
@@ -331,7 +330,7 @@ public final class FileTypeConverter implements TypeConverter {
       @Var Path file,
       FileOption.Type typeInfo,
       Class<?> targetType,
-      Path source,
+      @Nullable Path source,
       boolean doResolve)
       throws InvalidConfigurationException {
 
