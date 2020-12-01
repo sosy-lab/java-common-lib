@@ -220,7 +220,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         assertThat(code.call().getOutputDirectory())
-            .isEqualTo(Paths.get(".").resolve(testPath).toString());
+            .isEqualTo(Paths.get("").resolve(testPath).toString());
       } else {
         assertThrowsICE(code::call, "output.path");
       }
@@ -258,7 +258,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get(".").resolve(testPath));
+        assertThat(options.path).isEqualTo(Paths.get("").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }

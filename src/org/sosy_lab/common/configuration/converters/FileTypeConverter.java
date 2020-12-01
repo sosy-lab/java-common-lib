@@ -81,7 +81,7 @@ public final class FileTypeConverter implements TypeConverter {
   @Option(
       description =
           "base directory for all input & output files\n(except for the configuration file itself)")
-  private String rootDirectory = ".";
+  private String rootDirectory = "";
 
   @VisibleForTesting final Path rootPath;
 
