@@ -197,9 +197,7 @@ public class OptionCollector {
    * @return stream of classes with options
    */
   private Stream<Class<?>> getClassesWithOptions(ClassPath classPath) {
-    return classPath
-        .getAllClasses()
-        .parallelStream()
+    return classPath.getAllClasses().parallelStream()
         .filter(clsInfo -> clsInfo.url().getProtocol().equals("file"))
         .filter(clsInfo -> !IGNORED_CLASSES.matcher(clsInfo.getName()).matches())
         .flatMap(this::tryLoadClass)
