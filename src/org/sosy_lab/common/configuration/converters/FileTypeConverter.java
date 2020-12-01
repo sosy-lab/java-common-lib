@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.FluentIterable;
@@ -27,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -236,7 +236,7 @@ public final class FileTypeConverter implements TypeConverter {
         path,
         ((FileOption) secondaryOption).value(),
         type,
-        MoreObjects.firstNonNull(pSource, Paths.get("")),
+        Objects.requireNonNullElse(pSource, Paths.get("")),
         /*doResolve=*/ true);
   }
 
