@@ -75,9 +75,6 @@ public final class Configuration {
   /** Signal for the processor that the deprecated-prefix feature is not used. */
   static final String NO_DEPRECATED_PREFIX = "<NO_DEPRECATION>";
 
-  /** Dummy value used for source paths that have no correspondence to the file system. */
-  static final String NO_NAMED_SOURCE = "manually set";
-
   private static boolean secureMode = false;
 
   /** Create a new Builder instance. */
@@ -285,7 +282,7 @@ public final class Configuration {
     checkNotNull(pSources);
     checkNotNull(pPrefix);
 
-    assert pProperties.keySet().equals(pSources.keySet());
+    assert pProperties.keySet().containsAll(pSources.keySet());
     properties = pProperties;
     sources = pSources;
     prefix = (pPrefix.isEmpty() ? "" : (pPrefix + "."));
@@ -786,7 +783,7 @@ public final class Configuration {
   private String getOptionSourceForLogging(String optionDeprecatedName) {
     if (sources.containsKey(optionDeprecatedName)) {
       String source = sources.get(optionDeprecatedName).toString();
-      if (!source.isEmpty() && !source.equals(NO_NAMED_SOURCE)) {
+      if (!source.isEmpty()) {
         return " in file " + source;
       }
     }
@@ -1011,7 +1008,7 @@ public final class Configuration {
       annotation = Iterators.getNext(parts, null);
     }
 
-    Path source;
+    @Nullable Path source;
     if (!prefix.isEmpty() && properties.get(prefix + optionName) != null) {
       source = sources.get(prefix + optionName);
     } else {

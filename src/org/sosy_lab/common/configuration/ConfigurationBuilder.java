@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
@@ -75,7 +76,7 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.put(name, value);
-    sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
+    sources.remove(name);
 
     return this;
   }
@@ -97,9 +98,7 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.putAll(options);
-    for (String name : options.keySet()) {
-      sources.put(name, Paths.get(Configuration.NO_NAMED_SOURCE));
-    }
+    sources.keySet().removeAll(options.keySet());
 
     return this;
   }
@@ -158,7 +157,11 @@ public final class ConfigurationBuilder {
     setupProperties();
 
     properties.put(option, sourceConfig.properties.get(option));
-    sources.put(option, sourceConfig.sources.get(option));
+    if (sourceConfig.sources.containsKey(option)) {
+      sources.put(option, sourceConfig.sources.get(option));
+    } else {
+      sources.remove(option);
+    }
 
     return this;
   }
@@ -192,8 +195,8 @@ public final class ConfigurationBuilder {
    *
    * @param source The source to read from.
    * @param basePath The directory where relative #include directives should be based on.
-   * @param sourceName A string to use as source of the file in error messages (this should usually
-   *     be a filename or something similar).
+   * @param sourceName A string to use as source of the file in error messages or for other uses by
+   *     the {@link TypeConverter}. This needs to be convertible into a {@link Path}.
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
@@ -203,9 +206,18 @@ public final class ConfigurationBuilder {
     checkNotNull(basePath);
     setupProperties();
 
+    @Var Path sourcePath;
+    try {
+      sourcePath = Paths.get(sourceName);
+    } catch (InvalidPathException e) {
+      // If this fails, e.g., because sourceName is a HTTP URL, we can also go without source
+      // information. This will not allow resolving relative path names, but everything else works.
+      sourcePath = null;
+    }
+
     // Need to append something to base path because resolveSibling() is used.
     Path base = Paths.get(basePath).resolve("dummy");
-    Parser parser = Parser.parse(source, Optional.of(base), sourceName);
+    Parser parser = Parser.parse(source, Optional.of(base), sourcePath);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
 
@@ -266,29 +278,24 @@ public final class ConfigurationBuilder {
       try (FileSystem fs = getFileSystemForUriInJars(uri)) {
         // Path uses FileSystemProvider internally to access the file, thus fs is unused.
         Path sourcePath = Paths.get(uri);
-        parseSource(
-            contextClass, resourceName, source, Optional.of(sourcePath), sourcePath.toString());
+        parseSource(contextClass, resourceName, source, Optional.of(sourcePath));
       }
     } catch (URISyntaxException
         | FileSystemNotFoundException
         | IllegalArgumentException
         | IOException e) {
-      // If this fails, e.g., because url is a HTTP URL, we can also use the raw string.
+      // If this fails, e.g., because url is a HTTP URL, we can also go without source information.
       // This will not allow resolving relative path names, but everything else works.
-      parseSource(contextClass, resourceName, source, Optional.empty(), url.toString());
+      parseSource(contextClass, resourceName, source, Optional.empty());
     }
 
     return this;
   }
 
   private void parseSource(
-      Class<?> contextClass,
-      String resourceName,
-      CharSource source,
-      Optional<Path> sourcePath,
-      String sourceString) {
+      Class<?> contextClass, String resourceName, CharSource source, Optional<Path> sourcePath) {
     try {
-      Parser parser = Parser.parse(source, sourcePath, sourceString);
+      Parser parser = Parser.parse(source, sourcePath, sourcePath.orElse(null));
       properties.putAll(parser.getOptions());
       sources.putAll(parser.getSources());
     } catch (InvalidConfigurationException | IOException e) {

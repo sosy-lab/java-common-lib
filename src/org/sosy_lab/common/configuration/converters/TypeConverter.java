@@ -47,7 +47,7 @@ public interface TypeConverter {
    * @param secondaryOption An optional second annotation for the option (this is one of the
    *     annotations marked with {@link OptionDetailAnnotation}).
    * @param source The file where the configuration option was read from. May contain a dummy value
-   *     if the option was given somehow else.
+   *     or null if the option was given somehow else.
    * @param logger A logger for warnings etc.
    * @return An instance of the target type produced from the string representation-
    * @throws UnsupportedOperationException If the option specification in the source code is invalid
@@ -60,7 +60,7 @@ public interface TypeConverter {
       String value,
       TypeToken<?> type,
       @Nullable Annotation secondaryOption,
-      Path source,
+      @Nullable Path source,
       LogManager logger)
       throws InvalidConfigurationException;
 

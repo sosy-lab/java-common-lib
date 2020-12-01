@@ -331,7 +331,7 @@ public final class FileTypeConverter implements TypeConverter {
       @Var Path file,
       FileOption.Type typeInfo,
       Class<?> targetType,
-      Path source,
+      @Nullable Path source,
       boolean doResolve)
       throws InvalidConfigurationException {
 

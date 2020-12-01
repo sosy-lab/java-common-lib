@@ -45,14 +45,15 @@ public class ParserTest {
 
   private Map<String, String> test(String content)
       throws IOException, InvalidConfigurationException {
-    return Parser.parse(CharSource.wrap(content), Optional.ofNullable(basePath), "test")
+    return Parser.parse(CharSource.wrap(content), Optional.ofNullable(basePath), basePath)
         .getOptions();
   }
 
   private void testInvalid(String content) {
     CharSource source = CharSource.wrap(content);
     Optional<Path> path = Optional.ofNullable(basePath);
-    assertThrows(InvalidConfigurationFileException.class, () -> Parser.parse(source, path, "test"));
+    assertThrows(
+        InvalidConfigurationFileException.class, () -> Parser.parse(source, path, basePath));
   }
 
   private void testEmpty(String content) {
@@ -220,7 +221,7 @@ public class ParserTest {
   private void testInvalidInclude(String content) {
     CharSource source = CharSource.wrap(content);
     Optional<Path> path = Optional.ofNullable(basePath);
-    assertThrows(FileNotFoundException.class, () -> Parser.parse(source, path, "test"));
+    assertThrows(FileNotFoundException.class, () -> Parser.parse(source, path, basePath));
   }
 
   @Test
@@ -291,7 +292,7 @@ public class ParserTest {
   public final void includeWithoutBasePath() {
     CharSource source = CharSource.wrap("#include test.properties");
     assertThrows(
-        IllegalArgumentException.class, () -> Parser.parse(source, Optional.empty(), "test"));
+        IllegalArgumentException.class, () -> Parser.parse(source, Optional.empty(), basePath));
   }
 
   @Test

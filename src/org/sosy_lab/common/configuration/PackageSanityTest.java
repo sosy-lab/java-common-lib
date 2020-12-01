@@ -23,7 +23,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(String[].class, new String[] {"test"});
     setDefault(Path.class, Paths.get("test"));
     setDefault(Configuration.class, Configuration.defaultConfiguration());
-    setDefault(CharSource.class, CharSource.wrap("test"));
+    setDefault(CharSource.class, CharSource.wrap("key=value"));
     setDefault(Optional.class, Optional.empty());
   }
 }
