@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.FluentIterable;
@@ -78,10 +79,8 @@ public final class FileTypeConverter implements TypeConverter {
           "disable all default output files\n(any explicitly given file will still be written)")
   private boolean disableOutput = false;
 
-  @Option(
-      description =
-          "base directory for all input & output files\n(except for the configuration file itself)")
-  private String rootDirectory = "";
+  @Option(description = "base directory for all paths in default values")
+  private String rootDirectory = ".";
 
   @VisibleForTesting final Path rootPath;
 
@@ -237,7 +236,7 @@ public final class FileTypeConverter implements TypeConverter {
         path,
         ((FileOption) secondaryOption).value(),
         type,
-        pSource,
+        MoreObjects.firstNonNull(pSource, Paths.get("")),
         /*doResolve=*/ true);
   }
 
