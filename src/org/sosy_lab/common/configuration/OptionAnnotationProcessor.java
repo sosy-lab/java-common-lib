@@ -163,9 +163,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
         }
 
         boolean foundConfigurationParameter =
-            constructor
-                .getParameters()
-                .stream()
+            constructor.getParameters().stream()
                 .anyMatch(
                     param -> typeToString(param.asType()).equals(Configuration.class.getName()));
         if (!foundConfigurationParameter && warningsEnabled(constructor)) {
@@ -476,9 +474,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
    * annotation.
    */
   private boolean hasChildWithAnnotation(Element element, Class<? extends Annotation> annotation) {
-    return element
-        .getEnclosedElements()
-        .stream()
+    return element.getEnclosedElements().stream()
         .anyMatch(child -> child.getAnnotation(annotation) != null);
   }
 
@@ -495,8 +491,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
   private Optional<? extends AnnotationMirror> findAnnotationMirror(
       Class<? extends Annotation> annotation, Element elem) {
     String annotationName = annotation.getName();
-    return elem.getAnnotationMirrors()
-        .stream()
+    return elem.getAnnotationMirrors().stream()
         .filter(am -> am.getAnnotationType().toString().equals(annotationName))
         .findFirst();
   }
@@ -522,10 +517,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       throw new IllegalArgumentException(e);
     }
 
-    return annotation
-        .getElementValues()
-        .entrySet()
-        .stream()
+    return annotation.getElementValues().entrySet().stream()
         .filter(entry -> entry.getKey().getSimpleName().contentEquals(fieldName))
         .map(Map.Entry::getValue)
         .findFirst();
