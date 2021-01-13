@@ -22,6 +22,7 @@ import javax.annotation.meta.TypeQualifierDefault;
  * <p>It is defined here because the annotation supplied by FindBugs is deprecated: {@link
  * edu.umd.cs.findbugs.annotations.ReturnValuesAreNonnullByDefault}.
  */
+@SuppressWarnings("UnnecessarilyFullyQualified")
 @Documented
 @javax.annotation.Nonnull
 @org.checkerframework.checker.nullness.qual.NonNull

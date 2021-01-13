@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
+import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class CopyOnWriteSortedMapTest {
@@ -127,7 +128,7 @@ public class CopyOnWriteSortedMapTest {
         }
       };
 
-  public static junit.framework.Test suite() throws NoSuchMethodException {
+  public static Test suite() throws NoSuchMethodException {
     // Our collection views are unmodifiable, so we need special TestSuiteBuilder
     return new UnmodifiableViewSortedMapTestSuiteBuilder<String, String>()
         .usingGenerator(mapGenerator)

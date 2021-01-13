@@ -15,6 +15,7 @@ import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.errorprone.annotations.Var;
 import java.util.SortedSet;
+import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class SortedMapKeySetTest {
@@ -34,7 +35,7 @@ public class SortedMapKeySetTest {
     }
   }
 
-  public static junit.framework.Test suite() {
+  public static Test suite() {
     TestSortedSetGenerator<String> testSetGenerator = new OrderStatisticsSetProxyFactory();
 
     TestSuite suite =

@@ -19,6 +19,7 @@ import javax.annotation.meta.TypeQualifierDefault;
  * all fields inside the annotated element are never null, unless this is overridden with another
  * method.
  */
+@SuppressWarnings("UnnecessarilyFullyQualified")
 @Documented
 @javax.annotation.Nonnull
 @org.checkerframework.checker.nullness.qual.NonNull
