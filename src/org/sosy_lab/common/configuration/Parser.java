@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -237,7 +236,7 @@ class Parser {
             source);
 
         // parse included file (content will be in fields of this class)
-        parse0(basePath.orElseThrow().resolveSibling(Paths.get(line)));
+        parse0(basePath.orElseThrow().resolveSibling(line));
         continue;
 
       } else if (line.startsWith("[") && line.endsWith("]")) {
