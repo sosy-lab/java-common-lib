@@ -482,7 +482,7 @@ public final class ConfigurationBuilder {
 
     // This map serves as a cache: if a single TypeConverter is used for multiple types,
     // we call getInstanceForNewConfiguration only once and use the new instance several times.
-    Map<TypeConverter, TypeConverter> adjustedConverters =
+    IdentityHashMap<TypeConverter, TypeConverter> adjustedConverters =
         new IdentityHashMap<>(oldConverters.size());
     for (Map.Entry<Class<?>, TypeConverter> oldConverter : oldConverters.entrySet()) {
       if (converters != null && converters.containsKey(oldConverter.getKey())) {
