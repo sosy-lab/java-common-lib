@@ -34,8 +34,7 @@ public class ExtendedRationalTest {
 
   @Test
   public void testInstantiation() {
-    ExtendedRational x;
-    x = new ExtendedRational(Rational.ofLongs(108, 96));
+    ExtendedRational x = new ExtendedRational(Rational.ofLongs(108, 96));
     assertThat(x.toString()).isEqualTo("9/8");
     assertThat(x.toString()).isEqualTo("9/8");
   }
