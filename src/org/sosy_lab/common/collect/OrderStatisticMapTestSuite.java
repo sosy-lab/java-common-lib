@@ -99,7 +99,7 @@ public abstract class OrderStatisticMapTestSuite {
     }
 
     // Check the map property
-    @Var OrderStatisticMap<String, String> l3 = createMap();
+    OrderStatisticMap<String, String> l3 = createMap();
     for (int i = ELEMS.size() - 1; i >= 0; i--) {
       l3.put(ELEMS.get(i).getKey(), ELEMS.get(i).getValue());
     }

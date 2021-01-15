@@ -499,9 +499,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       String additionalMessage = additionalMessageSupplier.get();
       if (wouldBeLogged(priority)) {
         StringBuilder logMessage = buildUserExceptionLogMessage(priority, e, additionalMessage);
-        @Var
-        @Nullable
-        StackTraceElement frame = locateStackTraceElement(e);
+        @Nullable StackTraceElement frame = locateStackTraceElement(e);
         log0(priority, frame, logMessage.toString());
       }
       logDebugException(e, additionalMessage);
