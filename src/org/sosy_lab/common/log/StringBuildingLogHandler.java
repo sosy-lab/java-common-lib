@@ -39,7 +39,7 @@ public class StringBuildingLogHandler extends Handler {
     String msg;
     try {
       msg = getFormatter().format(record);
-    } catch (Exception ex) {
+    } catch (RuntimeException ex) {
       // We don't want to throw an exception here, but we
       // report the exception to any registered ErrorManager.
       reportError(null, ex, ErrorManager.FORMAT_FAILURE);
@@ -48,7 +48,7 @@ public class StringBuildingLogHandler extends Handler {
 
     try {
       sb.append(msg);
-    } catch (Exception ex) {
+    } catch (RuntimeException ex) {
       // We don't want to throw an exception here, but we
       // report the exception to any registered ErrorManager.
       reportError(null, ex, ErrorManager.WRITE_FAILURE);
