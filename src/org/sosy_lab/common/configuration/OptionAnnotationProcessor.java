@@ -109,7 +109,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       processOption(elem);
       checkOptionDetailAnnotations(elem);
     }
-    return true; // no further processing of these annotation types by other processors
+    return false; // recommended by https://errorprone.info/bugpattern/DoNotClaimAnnotations
   }
 
   /**
