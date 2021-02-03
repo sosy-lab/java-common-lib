@@ -389,7 +389,37 @@ public final class Configuration {
    * @throws InvalidConfigurationException If the user specified configuration is wrong.
    */
   public void inject(Object obj) throws InvalidConfigurationException {
+    Class<?> cls = obj.getClass();
+
+    // A common error is that a class calls "inject(this)" in a constructor although a subclass
+    // exists. Then the options of the subclass instead of the desired ones would get injected.
+    // To prevent this error, we check whether the caller of this method is a superclass of the
+    // to-be injected class. Because of the cost of accessing the caller class we do this only as an
+    // assertion.
+    assert cls.getSuperclass() == Object.class // optimization for common case
+            || checkCallerClass(
+                cls,
+                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass())
+        : "Configuration options of a "
+            + cls.getSimpleName()
+            + " instance injected by calls from a superclass. This is most likely a bug"
+            + " and the caller of this method should instead call 'inject(this, <CLASS>.cls)'";
+
     inject(obj, obj.getClass());
+  }
+
+  private static boolean checkCallerClass(Class<?> cls, Class<?> callerClass) {
+    if (cls == callerClass) {
+      // class injects itself, no problem
+      return true;
+    }
+    if (callerClass.isAssignableFrom(cls)) {
+      // callerClass injects its subclass cls. This is typically a bug because callerClass should
+      // call "inject(this, callerClass)" instead of "inject(this)" to inject the correct fields.
+      return false;
+    }
+    // unrelated classes are ok, e.g., cases where Foo creates and injects FooOptions
+    return true;
   }
 
   /**

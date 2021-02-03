@@ -9,6 +9,7 @@
 package org.sosy_lab.common.configuration;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -408,10 +409,43 @@ public class ConfigurationTest {
   private static class OptionsSuperclass {
     @Option(secure = true, description = "blah")
     protected String test = "oldValue";
+
+    void callInjectSuperclassBug(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+
+    void callInjectSuperclassCorrect(Configuration config) throws InvalidConfigurationException {
+      config.inject(this, OptionsSuperclass.class);
+    }
   }
 
   @Options
-  private static class OptionsSubclass extends OptionsSuperclass {}
+  private static class OptionsSubclass extends OptionsSuperclass {
+
+    void callInjectSubclass(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
+
+  @Test
+  public void testDetectionOfSubclass() throws Exception {
+    OptionsSubclass opts = new OptionsSubclass();
+    Configuration c = Configuration.builder().setOption("test", "newValue").build();
+
+    // expected to succeed but do nothing
+    opts.callInjectSubclass(c);
+    assertThat(opts.test).isEqualTo("oldValue");
+
+    // expected to succeed
+    opts.callInjectSuperclassCorrect(c);
+    assertThat(opts.test).isEqualTo("newValue");
+
+    // expected to fail with assertion (but only if assertions are enabled)
+    assume().that(ConfigurationTest.class.desiredAssertionStatus()).isTrue();
+    AssertionError error =
+        assertThrows(AssertionError.class, () -> opts.callInjectSuperclassBug(c));
+    assertThat(error).hasMessageThat().contains("injected by calls from a superclass");
+  }
 
   @Test
   public void testRecursiveInject() throws Exception {
