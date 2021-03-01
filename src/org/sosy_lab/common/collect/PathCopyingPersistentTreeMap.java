@@ -73,7 +73,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
-  private static final long serialVersionUID = 1041711151457528188L;
+  private static final long serialVersionUID = -8878491978270416107L;
 
   @SuppressWarnings("unused")
   @SuppressFBWarnings(
@@ -86,11 +86,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private static final boolean RED = true;
     private static final boolean BLACK = false;
 
-    private static final long serialVersionUID = -7393505826652634501L;
+    private static final long serialVersionUID = 3222777055260841400L;
 
     private final @Nullable Node<K, V> left;
     private final @Nullable Node<K, V> right;
     private final boolean isRed;
+
+    private final int subTreeSize;
+    private final int subTreeHash;
 
     // Leaf node
     Node(K pKey, V pValue) {
@@ -98,6 +101,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       left = null;
       right = null;
       isRed = RED;
+      subTreeSize = 1;
+      subTreeHash = super.hashCode();
     }
 
     // Any node
@@ -106,6 +111,22 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       left = pLeft;
       right = pRight;
       isRed = pRed;
+      subTreeSize =
+          (pLeft == null ? 0 : pLeft.getSubTreeSize())
+              + (pRight == null ? 0 : pRight.getSubTreeSize())
+              + 1;
+      subTreeHash =
+          (pLeft == null ? 0 : pLeft.getSubTreeHash())
+              + (pRight == null ? 0 : pRight.getSubTreeHash())
+              + super.hashCode();
+    }
+
+    public int getSubTreeSize() {
+      return subTreeSize;
+    }
+
+    public int getSubTreeHash() {
+      return subTreeHash;
     }
 
     boolean isLeaf() {
@@ -156,7 +177,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if (n == null) {
         return 0;
       }
-      return countNodes(n.left) + 1 + countNodes(n.right);
+      return n.getSubTreeSize();
     }
   }
 
@@ -232,10 +253,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   @LazyInit
   private transient @Nullable NavigableSet<Entry<K, V>> entrySet;
 
-  @LazyInit private transient int size;
+  private final int size;
+  private final int hashCode;
 
   private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
     root = pRoot;
+    size = pRoot == null ? 0 : pRoot.getSubTreeSize();
+    hashCode = pRoot == null ? 0 : pRoot.getSubTreeHash();
   }
 
   // private utility methods
@@ -798,9 +822,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
   public int hashCode() {
-    return super.hashCode();
+    return hashCode;
   }
 
   @Override
@@ -847,9 +870,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public int size() {
-    if (size <= 0) {
-      size = Node.countNodes(root);
-    }
     return size;
   }
 
