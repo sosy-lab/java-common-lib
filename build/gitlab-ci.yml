@@ -217,7 +217,7 @@ deploy-gh-pages:
     - javadoc
   only:
     refs:
-      - master
+      - $CI_DEFAULT_BRANCH
     variables:
       - $CI_PROJECT_PATH == $PROJECT_PATH # not on forks
   except:
