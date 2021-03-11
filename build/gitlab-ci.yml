@@ -216,9 +216,8 @@ deploy-gh-pages:
     - build:jdk-11
     - javadoc
   only:
-    refs:
-      - $CI_DEFAULT_BRANCH
     variables:
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # only on default branch
       - $CI_PROJECT_PATH == $PROJECT_PATH # not on forks
   except:
     variables:
