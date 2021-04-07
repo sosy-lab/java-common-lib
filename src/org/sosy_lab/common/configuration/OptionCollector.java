@@ -81,6 +81,7 @@ public class OptionCollector {
    *
    * @param args use '-v' for verbose output
    */
+  @SuppressWarnings("SystemOut")
   public static void main(String[] args) {
 
     // parse args
@@ -106,6 +107,7 @@ public class OptionCollector {
    *     included
    * @param out the output target
    */
+  @SuppressWarnings("SystemOut")
   public static void collectOptions(
       boolean verbose, boolean includeLibraryOptions, PrintStream out) {
     OptionCollector optionCollector = new OptionCollector(verbose, includeLibraryOptions);

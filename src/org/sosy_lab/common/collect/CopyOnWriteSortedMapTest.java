@@ -45,7 +45,7 @@ public class CopyOnWriteSortedMapTest {
     private final FeatureSpecificTestSuiteBuilder<
             ?, ? extends OneSizeTestContainerGenerator<Map<K, V>, Map.Entry<K, V>>>
         delegate;
-    private final Set<Feature<?>> features;
+    private final ImmutableSet<Feature<?>> features;
 
     FeatureOverrideTestSuiteBuilder(
         FeatureSpecificTestSuiteBuilder<

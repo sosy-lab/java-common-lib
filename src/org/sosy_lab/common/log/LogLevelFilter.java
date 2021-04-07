@@ -10,7 +10,6 @@ package org.sosy_lab.common.log;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -18,7 +17,7 @@ import java.util.logging.LogRecord;
 /** {@link Filter} implementation for blacklisting log levels. */
 class LogLevelFilter implements Filter {
 
-  private final Set<Level> excludeLevels;
+  private final ImmutableSet<Level> excludeLevels;
 
   LogLevelFilter(List<Level> excludeLevels) {
     this.excludeLevels = ImmutableSet.copyOf(excludeLevels);

@@ -33,7 +33,7 @@ SPDX-License-Identifier: Apache-2.0
         - FieldCanBeFinal: not possible for our @Option fields
         - InconsistentOverloads: backwards compatibility
         - UngroupedOverloads: not worth it
-        - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/1652
+        - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
     -->
     <property name="errorprone.options" value="
@@ -44,6 +44,7 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:FieldCanBeFinal:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
+        -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
         "/>
 

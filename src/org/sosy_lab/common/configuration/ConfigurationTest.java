@@ -212,7 +212,7 @@ public class ConfigurationTest {
       }
 
     } catch (ReflectiveOperationException e) {
-      throw new AssertionError(e);
+      throw new LinkageError("Reflective access to " + clsWithOptions.getName() + " failed", e);
     }
   }
 
