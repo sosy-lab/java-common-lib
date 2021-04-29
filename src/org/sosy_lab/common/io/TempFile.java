@@ -61,8 +61,7 @@ public class TempFile {
     /** Prefix of randomly-generated file name. */
     @CanIgnoreReturnValue
     public TempFileBuilder prefix(String pPrefix) {
-      suffix = checkNotNull(pPrefix);
-      prefix = pPrefix;
+      prefix = checkNotNull(pPrefix);
       return this;
     }
 
