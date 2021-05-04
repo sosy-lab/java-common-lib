@@ -35,6 +35,7 @@ public class ExtendedLogRecord extends LogRecord {
   }
 
   @Override
+  @SuppressWarnings("deprecation") // Java 16 replaces getThreadID() with getLongThreadID()
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("sequenceNumber", getSequenceNumber())
