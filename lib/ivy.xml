@@ -71,11 +71,11 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- JUnit
              Testing framework. -->
-        <dependency org="junit" name="junit" rev="4.13.1" conf="test->default; contrib->sources"/>
+        <dependency org="junit" name="junit" rev="4.13.2" conf="test->default; contrib->sources"/>
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.6" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.7" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -84,8 +84,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="3.8.0" conf="test->default; contrib->sources"/>
-        <dependency org="org.mockito" name="mockito-errorprone" rev="3.8.0" conf="build->default"/>
+        <dependency org="org.mockito" name="mockito-core" rev="3.9.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-errorprone" rev="3.9.0" conf="build->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
@@ -107,12 +107,12 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.39.0" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.41" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.42" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.2.2" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.2.3" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.2.2" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.2.3" conf="runtime->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
