@@ -196,6 +196,62 @@ public class TempFile {
     }
   }
 
+  /**
+   * Create a fresh temporary directory in JVM's temp directory.
+   *
+   * <p>The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseDir}, which deletes
+   * the directory recursively including its contents as soon as {@link DeleteOnCloseDir#close()} is
+   * called.
+   *
+   * <p>It is recommended to use the following pattern: <code>
+   * try (DeleteOnCloseDir tempDir = TempFile.createDeleteOnCloseDir()) {
+   *   // use tempDir.toPath() to get the Path object denoting the temporary directory
+   * }
+   * </code>
+   *
+   * @param pPrefix The prefix of the randomly-generated directory name.
+   * @param pFileAttributes The {@link FileAttribute}s used for creating the directory.
+   */
+  public static DeleteOnCloseDir createDeleteOnCloseDir(
+      String pPrefix, FileAttribute<?>... pFileAttributes) throws IOException {
+    checkNotNull(pPrefix);
+    Path tempDir;
+    try {
+      tempDir = Files.createTempDirectory(TMPDIR, pPrefix, pFileAttributes);
+    } catch (IOException e) {
+      throw improveIoExceptionMessage(e, TMPDIR, pPrefix + "*");
+    }
+    return new DeleteOnCloseDir(tempDir);
+  }
+
+  /**
+   * A simple wrapper around {@link Path} that calls {@link
+   * com.google.common.io.MoreFiles#deleteRecursively(Path,
+   * com.google.common.io.RecursiveDeleteOption...)} recursively from {@link AutoCloseable#close()}
+   * to delete the directory including its contents.
+   */
+  @Immutable
+  public static final class DeleteOnCloseDir implements AutoCloseable {
+
+    private final Path path;
+
+    private DeleteOnCloseDir(Path pDir) {
+      path = pDir;
+    }
+
+    public Path toPath() {
+      return path;
+    }
+
+    /**
+     * Recursively delete all files and directories in the directory represented by this instance.
+     */
+    @Override
+    public void close() throws IOException {
+      com.google.common.io.MoreFiles.deleteRecursively(path);
+    }
+  }
+
   private static IOException improveIoExceptionMessage(
       IOException pException, Path pDir, String pPathString) {
     // The message of this exception is often quite unhelpful,
