@@ -41,18 +41,6 @@ matrix:
     - env: NAME='Check source-code format'
       script:
         - ant format-source && git diff -s --exit-code
-deploy:
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-gh-pages.sh
-    on:
-      condition: $NAME = "Create Javadoc"
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-coverage.sh
-    on:
-      jdk: openjdk8
-      condition: $NAME = "Unit Tests"
 notifications:
   email:
     - common-java-dev@googlegroups.com
