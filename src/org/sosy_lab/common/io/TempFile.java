@@ -109,18 +109,7 @@ public class TempFile {
       try {
         file = Files.createTempFile(dir, prefix, suffix, fileAttributes);
       } catch (IOException e) {
-        // The message of this exception is often quite unhelpful,
-        // improve it by adding the path were we attempted to write.
-        if (e.getMessage() != null && e.getMessage().contains(dir.toString())) {
-          throw e;
-        }
-
-        String fileName = dir.resolve(prefix + "*" + suffix).toString();
-        if (Strings.nullToEmpty(e.getMessage()).isEmpty()) {
-          throw new IOException(fileName, e);
-        } else {
-          throw new IOException(fileName + " (" + e.getMessage() + ")", e);
-        }
+        throw improveIoExceptionMessage(e, dir, prefix + "*" + suffix);
       }
 
       if (deleteOnJvmExit) {
@@ -151,7 +140,8 @@ public class TempFile {
      * the file as soon as {@link DeleteOnCloseFile#close()} is called.
      *
      * <p>It is recommended to use the following pattern: <code>
-     * try (DeleteOnCloseFile tempFile = Files.createTempFile(...)) {
+     * try (DeleteOnCloseFile tempFile =
+     *     TempFile.builder()[.. adjust builder ..].createDeleteOnClose()) {
      *   // use tempFile.toPath() for writing and reading of the temporary file
      * }
      * </code> The file can be opened and closed multiple times, potentially from different
@@ -203,6 +193,78 @@ public class TempFile {
     @SuppressWarnings("RedundantOverride") // to avoid deprecation warning when method is called
     public void close() throws IOException {
       super.close();
+    }
+  }
+
+  /**
+   * Create a fresh temporary directory in JVM's temp directory.
+   *
+   * <p>The resulting {@link Path} object is wrapped in a {@link DeleteOnCloseDir}, which deletes
+   * the directory recursively including its contents as soon as {@link DeleteOnCloseDir#close()} is
+   * called.
+   *
+   * <p>It is recommended to use the following pattern: <code>
+   * try (DeleteOnCloseDir tempDir = TempFile.createDeleteOnCloseDir()) {
+   *   // use tempDir.toPath() to get the Path object denoting the temporary directory
+   * }
+   * </code>
+   *
+   * @param pPrefix The prefix of the randomly-generated directory name.
+   * @param pFileAttributes The {@link FileAttribute}s used for creating the directory.
+   */
+  public static DeleteOnCloseDir createDeleteOnCloseDir(
+      String pPrefix, FileAttribute<?>... pFileAttributes) throws IOException {
+    checkNotNull(pPrefix);
+    Path tempDir;
+    try {
+      tempDir = Files.createTempDirectory(TMPDIR, pPrefix, pFileAttributes);
+    } catch (IOException e) {
+      throw improveIoExceptionMessage(e, TMPDIR, pPrefix + "*");
+    }
+    return new DeleteOnCloseDir(tempDir);
+  }
+
+  /**
+   * A simple wrapper around {@link Path} that calls {@link
+   * com.google.common.io.MoreFiles#deleteRecursively(Path,
+   * com.google.common.io.RecursiveDeleteOption...)} recursively from {@link AutoCloseable#close()}
+   * to delete the directory including its contents.
+   */
+  @Immutable
+  public static final class DeleteOnCloseDir implements AutoCloseable {
+
+    private final Path path;
+
+    private DeleteOnCloseDir(Path pDir) {
+      path = pDir;
+    }
+
+    public Path toPath() {
+      return path;
+    }
+
+    /**
+     * Recursively delete all files and directories in the directory represented by this instance.
+     */
+    @Override
+    public void close() throws IOException {
+      com.google.common.io.MoreFiles.deleteRecursively(path);
+    }
+  }
+
+  private static IOException improveIoExceptionMessage(
+      IOException pException, Path pDir, String pPathString) {
+    // The message of this exception is often quite unhelpful,
+    // improve it by adding the path were we attempted to write.
+    if (pException.getMessage() != null && pException.getMessage().contains(pDir.toString())) {
+      return pException;
+    }
+
+    String fileName = pDir.resolve(pPathString).toString();
+    if (Strings.nullToEmpty(pException.getMessage()).isEmpty()) {
+      return new IOException(fileName, pException);
+    } else {
+      return new IOException(fileName + " (" + pException.getMessage() + ")", pException);
     }
   }
 }
