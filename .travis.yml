@@ -10,15 +10,6 @@ language: java
 dist: focal
 jdk:
   - openjdk11
-addons:
-  apt:
-    packages:
-      - jq
-before_install: # lets update the very old version of ANT in TravisCI
-  - wget --no-check-certificate https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.tar.bz2
-  - tar -xvf apache-ant-1.10.5-bin.tar.bz2
-  - export PATH=`pwd`/apache-ant-1.10.5/bin:$PATH
-  - echo $(ant -version)
 install:
   - ant resolve-dependencies
 matrix:
