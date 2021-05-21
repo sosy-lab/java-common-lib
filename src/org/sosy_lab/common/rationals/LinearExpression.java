@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import com.google.errorprone.annotations.Var;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.util.Iterator;
@@ -47,6 +48,9 @@ public final class LinearExpression<T> implements Iterable<Map.Entry<T, Rational
    * @deprecated Use {@link #monomial} instead.
    */
   @Deprecated
+  @InlineMe(
+      replacement = "LinearExpression.monomial(var, coeff)",
+      imports = "org.sosy_lab.common.rationals.LinearExpression")
   public static <T> LinearExpression<T> pair(T var, Rational coeff) {
     return monomial(var, coeff);
   }

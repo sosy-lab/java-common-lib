@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.InlineMe;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,9 @@ public final class MoreCollectors {
    * @deprecated use {@link PersistentLinkedList#toPersistentLinkedList()}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "PersistentLinkedList.toPersistentLinkedList()",
+      imports = "org.sosy_lab.common.collect.PersistentLinkedList")
   public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
     return PersistentLinkedList.toPersistentLinkedList();
   }
@@ -38,6 +42,9 @@ public final class MoreCollectors {
    * @deprecated use {@link ImmutableList#toImmutableList()}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "ImmutableList.toImmutableList()",
+      imports = "com.google.common.collect.ImmutableList")
   public static <T> Collector<T, ?, ImmutableList<T>> toImmutableList() {
     return ImmutableList.toImmutableList();
   }
@@ -53,6 +60,9 @@ public final class MoreCollectors {
    * @deprecated use {@link ImmutableList#toImmutableList()}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "ImmutableSet.toImmutableSet()",
+      imports = "com.google.common.collect.ImmutableSet")
   public static <T> Collector<T, ?, ImmutableSet<T>> toImmutableSet() {
     return ImmutableSet.toImmutableSet();
   }

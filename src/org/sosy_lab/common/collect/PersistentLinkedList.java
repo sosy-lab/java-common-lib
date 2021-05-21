@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import com.google.errorprone.annotations.Var;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
@@ -381,6 +382,9 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @deprecated renamed to {@link #toPersistentLinkedList()} to conform with Guava's naming
    */
   @Deprecated
+  @InlineMe(
+      replacement = "PersistentLinkedList.toPersistentLinkedList()",
+      imports = "org.sosy_lab.common.collect.PersistentLinkedList")
   public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
     return toPersistentLinkedList();
   }

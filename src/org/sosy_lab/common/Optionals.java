@@ -14,6 +14,7 @@ import com.google.common.collect.Comparators;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
+import com.google.errorprone.annotations.InlineMe;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.Optional;
@@ -36,6 +37,9 @@ public final class Optionals {
    * @deprecated use {@link com.google.common.base.Optional#fromJavaUtil(Optional)}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional))",
+      staticImports = "com.google.common.base.Preconditions.checkNotNull")
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static <T> com.google.common.base.Optional<T> toGuavaOptional(Optional<T> optional) {
     return com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional));
@@ -47,6 +51,7 @@ public final class Optionals {
    * @deprecated use {@link com.google.common.base.Optional#toJavaUtil()}
    */
   @Deprecated
+  @InlineMe(replacement = "optional.toJavaUtil()")
   public static <T> Optional<T> fromGuavaOptional(com.google.common.base.Optional<T> optional) {
     return optional.toJavaUtil();
   }
@@ -77,6 +82,7 @@ public final class Optionals {
    * @deprecated use {@link Optional#stream()}
    */
   @Deprecated
+  @InlineMe(replacement = "optional.stream()")
   public static <T> Stream<T> asStream(Optional<T> optional) {
     return optional.stream();
   }
@@ -113,6 +119,9 @@ public final class Optionals {
    * @deprecated Use {@link Comparators#emptiesFirst(Comparator)}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "Comparators.emptiesFirst(Comparator.<T>naturalOrder())",
+      imports = {"com.google.common.collect.Comparators", "java.util.Comparator"})
   public static <T extends Comparable<T>> Comparator<Optional<T>> comparingEmptyFirst() {
     return Comparators.emptiesFirst(Comparator.<T>naturalOrder());
   }
@@ -124,6 +133,9 @@ public final class Optionals {
    * @deprecated Use {@link Comparators#emptiesFirst(Comparator)}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "Comparators.emptiesFirst(comparator)",
+      imports = "com.google.common.collect.Comparators")
   public static <T> Comparator<Optional<T>> comparingEmptyFirst(Comparator<T> comparator) {
     return Comparators.emptiesFirst(comparator);
   }
@@ -135,6 +147,9 @@ public final class Optionals {
    * @deprecated Use {@link Comparators#emptiesLast(Comparator)}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "Comparators.emptiesLast(Comparator.<T>naturalOrder())",
+      imports = {"com.google.common.collect.Comparators", "java.util.Comparator"})
   public static <T extends Comparable<T>> Comparator<Optional<T>> comparingEmptyLast() {
     return Comparators.emptiesLast(Comparator.<T>naturalOrder());
   }
@@ -146,6 +161,9 @@ public final class Optionals {
    * @deprecated Use {@link Comparators#emptiesLast(Comparator)}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "Comparators.emptiesLast(comparator)",
+      imports = "com.google.common.collect.Comparators")
   public static <T> Comparator<Optional<T>> comparingEmptyLast(Comparator<T> comparator) {
     return Comparators.emptiesLast(comparator);
   }

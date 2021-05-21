@@ -14,6 +14,7 @@ import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import com.google.errorprone.annotations.Var;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,6 +43,7 @@ public final class MoreFiles {
 
   /** See {@link com.google.common.io.Files#asByteSource(java.io.File)}. */
   @Deprecated
+  @InlineMe(replacement = "com.google.common.io.MoreFiles.asByteSource(path)")
   public static ByteSource asByteSource(Path path) {
     return com.google.common.io.MoreFiles.asByteSource(path);
   }
@@ -54,6 +56,7 @@ public final class MoreFiles {
 
   /** See {@link com.google.common.io.Files#asCharSource(java.io.File, Charset)}. */
   @Deprecated
+  @InlineMe(replacement = "com.google.common.io.MoreFiles.asCharSource(path, charset)")
   public static CharSource asCharSource(Path path, Charset charset) {
     return com.google.common.io.MoreFiles.asCharSource(path, charset);
   }
@@ -155,8 +158,9 @@ public final class MoreFiles {
    * @deprecated use {@code asCharSource(file, charset).read()}
    */
   @Deprecated
+  @InlineMe(replacement = "com.google.common.io.MoreFiles.asCharSource(file, charset).read()")
   public static String toString(Path file, Charset charset) throws IOException {
-    return asCharSource(file, charset).read();
+    return com.google.common.io.MoreFiles.asCharSource(file, charset).read();
   }
 
   /**
@@ -167,6 +171,9 @@ public final class MoreFiles {
    * @deprecated moved to {@link IO}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "IO.writeFile(file, charset, content)",
+      imports = "org.sosy_lab.common.io.IO")
   public static void writeFile(Path file, Charset charset, Object content) throws IOException {
     IO.writeFile(file, charset, content);
   }
@@ -179,6 +186,9 @@ public final class MoreFiles {
    * @deprecated moved to {@link IO}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "IO.writeGZIPFile(file, charset, content)",
+      imports = "org.sosy_lab.common.io.IO")
   public static void writeGZIPFile(Path file, Charset charset, Object content) throws IOException {
     IO.writeGZIPFile(file, charset, content);
   }
@@ -202,6 +212,9 @@ public final class MoreFiles {
    * @deprecated moved to {@link IO}
    */
   @Deprecated
+  @InlineMe(
+      replacement = "IO.appendToFile(file, charset, content)",
+      imports = "org.sosy_lab.common.io.IO")
   public static void appendToFile(Path file, Charset charset, Object content) throws IOException {
     IO.appendToFile(file, charset, content);
   }
@@ -215,12 +228,14 @@ public final class MoreFiles {
    * @deprecated moved to {@link IO}
    */
   @Deprecated
+  @InlineMe(replacement = "IO.checkReadableFile(path)", imports = "org.sosy_lab.common.io.IO")
   public static void checkReadableFile(Path path) throws FileNotFoundException {
     IO.checkReadableFile(path);
   }
 
   /** See {@link com.google.common.io.Files#createParentDirs(java.io.File)}. */
   @Deprecated
+  @InlineMe(replacement = "com.google.common.io.MoreFiles.createParentDirectories(path)")
   public static void createParentDirs(Path path) throws IOException {
     com.google.common.io.MoreFiles.createParentDirectories(path);
   }
