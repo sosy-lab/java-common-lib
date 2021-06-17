@@ -420,6 +420,7 @@ public class OptionCollector {
         // remove brackets from file: new File("example.txt") --> "example.txt"
         defaultValue = stripSurroundingFunctionCall(defaultValue, "new File");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Paths.get");
+        defaultValue = stripSurroundingFunctionCall(defaultValue, "Path.of");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "new Path");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "Pattern.compile");
         defaultValue = stripSurroundingFunctionCall(defaultValue, "PathTemplate.ofFormatString");
