@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Immutable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 
@@ -50,7 +49,7 @@ public final class PathTemplate {
   public Path getPath(Object... args) {
     checkArgument(!Arrays.asList(args).contains(null), "Values for PathTemplate may not be null");
 
-    return Paths.get(String.format(template, args));
+    return Path.of(String.format(template, args));
   }
 
   /** Returns the raw template of this instance. */

@@ -28,7 +28,6 @@ import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -208,7 +207,7 @@ public final class ConfigurationBuilder {
 
     @Var Path sourcePath;
     try {
-      sourcePath = Paths.get(sourceName);
+      sourcePath = Path.of(sourceName);
     } catch (InvalidPathException e) {
       // If this fails, e.g., because sourceName is a HTTP URL, we can also go without source
       // information. This will not allow resolving relative path names, but everything else works.
@@ -216,7 +215,7 @@ public final class ConfigurationBuilder {
     }
 
     // Need to append something to base path because resolveSibling() is used.
-    Path base = Paths.get(basePath).resolve("dummy");
+    Path base = Path.of(basePath).resolve("dummy");
     Parser parser = Parser.parse(source, Optional.of(base), sourcePath);
     properties.putAll(parser.getOptions());
     sources.putAll(parser.getSources());
@@ -232,7 +231,7 @@ public final class ConfigurationBuilder {
    */
   public ConfigurationBuilder loadFromFile(String filename)
       throws IOException, InvalidConfigurationException {
-    return loadFromFile(Paths.get(filename));
+    return loadFromFile(Path.of(filename));
   }
 
   /**
@@ -277,7 +276,7 @@ public final class ConfigurationBuilder {
       URI uri = url.toURI();
       try (FileSystem fs = getFileSystemForUriInJars(uri)) {
         // Path uses FileSystemProvider internally to access the file, thus fs is unused.
-        Path sourcePath = Paths.get(uri);
+        Path sourcePath = Path.of(uri);
         parseSource(contextClass, resourceName, source, Optional.of(sourcePath));
       }
     } catch (URISyntaxException

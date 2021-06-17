@@ -23,14 +23,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utilities for temporary files. */
 public class TempFile {
 
-  private static final Path TMPDIR = Paths.get(StandardSystemProperty.JAVA_IO_TMPDIR.value());
+  private static final Path TMPDIR = Path.of(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 
   private TempFile() {}
 

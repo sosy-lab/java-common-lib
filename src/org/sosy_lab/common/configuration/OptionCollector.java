@@ -34,7 +34,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -293,7 +292,7 @@ public class OptionCollector {
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private static Path getSourcePath(CodeSource codeSource) throws URISyntaxException {
     // Get base folder for classes, go via URI to handle escaping
-    @Var Path basePath = Paths.get(codeSource.getLocation().toURI());
+    @Var Path basePath = Path.of(codeSource.getLocation().toURI());
 
     // check the folders known as source, depending on the current folder
     // structure for the class files
@@ -311,7 +310,7 @@ public class OptionCollector {
 
     // gradle projects do also in eclipse have another folder for sources
     // so check which folder is the actual source folder
-    List<Path> candidates = ImmutableList.of(Paths.get("src", "main", "java"), Paths.get("src"));
+    List<Path> candidates = ImmutableList.of(Path.of("src", "main", "java"), Path.of("src"));
     for (Path candidate : candidates) {
       Path sourcePath = basePath.resolve(candidate);
       if (Files.isDirectory(sourcePath)) {

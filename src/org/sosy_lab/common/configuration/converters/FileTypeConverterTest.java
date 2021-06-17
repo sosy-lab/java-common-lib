@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.CharSource;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.junit.BeforeClass;
@@ -68,7 +67,7 @@ public class FileTypeConverterTest {
 
       assertThat(conv2.rootPath).isEqualTo(conv1.rootPath);
       assertThat(conv2.safePathsOnly).isEqualTo(conv1.safePathsOnly);
-      assertThat(conv2.outputPath).isEqualTo(Paths.get("root", "output2"));
+      assertThat(conv2.outputPath).isEqualTo(Path.of("root", "output2"));
     }
   }
 
@@ -187,7 +186,7 @@ public class FileTypeConverterTest {
     @Test
     public void testCheckSafePath() throws Exception {
       FileTypeConverter conv = createFileTypeConverter(defaultConfiguration());
-      Path path = Paths.get(testPath);
+      Path path = Path.of(testPath);
 
       Callable<Path> code = () -> conv.checkSafePath(path, "dummy");
 
@@ -206,7 +205,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         assertThat(code.call().getOutputDirectory())
-            .isEqualTo(Paths.get(testPath).resolve("output").toString());
+            .isEqualTo(Path.of(testPath).resolve("output").toString());
       } else {
         assertThrowsICE(code::call, "safe mode", "rootDirectory");
       }
@@ -220,7 +219,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         assertThat(code.call().getOutputDirectory())
-            .isEqualTo(Paths.get(".").resolve(testPath).toString());
+            .isEqualTo(Path.of(".").resolve(testPath).toString());
       } else {
         assertThrowsICE(code::call, "output.path");
       }
@@ -239,7 +238,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get(testPath));
+        assertThat(options.path).isEqualTo(Path.of(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }
@@ -252,13 +251,13 @@ public class FileTypeConverterTest {
               .addConverter(FileOption.class, createFileTypeConverter(defaultConfiguration()))
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
-      options.path = Paths.get(testPath);
+      options.path = Path.of(testPath);
 
       ThrowingRunnable code = () -> config.inject(options);
 
       if (isAllowed(false)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get(".").resolve(testPath));
+        assertThat(options.path).isEqualTo(Path.of(".").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }
@@ -277,13 +276,13 @@ public class FileTypeConverterTest {
               .addConverter(FileOption.class, createFileTypeConverter(configForConverter))
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
-      options.path = Paths.get(testPath);
+      options.path = Path.of(testPath);
 
       ThrowingRunnable code = () -> config.inject(options);
 
       if (isAllowed(true)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get("root").resolve(testPath));
+        assertThat(options.path).isEqualTo(Path.of("root").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }
@@ -303,7 +302,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(true)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get("config").resolve(testPath));
+        assertThat(options.path).isEqualTo(Path.of("config").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }
@@ -326,7 +325,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(true)) {
         code.run();
-        assertThat(options.path).isEqualTo(Paths.get("config1").resolve(testPath));
+        assertThat(options.path).isEqualTo(Path.of("config1").resolve(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }
@@ -345,7 +344,7 @@ public class FileTypeConverterTest {
               .addConverter(FileOption.class, createFileTypeConverter(configForConverter))
               .build();
       FileInjectionTestOptions options = new FileInjectionTestOptions();
-      options.path = Paths.get(testPath);
+      options.path = Path.of(testPath);
       FileInjectionTestOptions options2 = new FileInjectionTestOptions();
 
       ThrowingRunnable code =
@@ -353,7 +352,7 @@ public class FileTypeConverterTest {
 
       if (isAllowed(false)) {
         code.run();
-        assertThat(options2.path).isEqualTo(Paths.get(testPath));
+        assertThat(options2.path).isEqualTo(Path.of(testPath));
       } else {
         assertThrowsICE(code, "safe mode", "test.path");
       }

@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -619,7 +618,7 @@ public class ConfigurationTest {
         .containsExactly(
             AnnotatedValue.create(1), AnnotatedValue.create(2), AnnotatedValue.create(3))
         .inOrder();
-    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Paths.get("test.txt")));
+    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Path.of("test.txt")));
   }
 
   @Test
@@ -644,7 +643,7 @@ public class ConfigurationTest {
             AnnotatedValue.create(2),
             AnnotatedValue.create(3, "a3"))
         .inOrder();
-    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Paths.get("test.txt"), "a"));
+    assertThat(opts.path).isEqualTo(AnnotatedValue.create(Path.of("test.txt"), "a"));
   }
 
   @Options

@@ -11,7 +11,6 @@ package org.sosy_lab.common.configuration;
 import com.google.common.io.CharSource;
 import com.google.common.testing.AbstractPackageSanityTests;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import org.sosy_lab.common.Classes;
 
@@ -21,7 +20,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     ignoreClasses(Classes.IS_GENERATED);
 
     setDefault(String[].class, new String[] {"test"});
-    setDefault(Path.class, Paths.get("test"));
+    setDefault(Path.class, Path.of("test"));
     setDefault(Configuration.class, Configuration.defaultConfiguration());
     setDefault(CharSource.class, CharSource.wrap("key=value"));
     setDefault(Optional.class, Optional.empty());

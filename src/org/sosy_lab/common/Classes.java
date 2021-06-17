@@ -44,7 +44,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -106,7 +105,7 @@ public final class Classes {
    */
   public static Path getCodeLocation(Class<?> cls) {
     try {
-      return Paths.get(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
+      return Path.of(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }

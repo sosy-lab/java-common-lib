@@ -16,7 +16,6 @@ import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -175,7 +174,7 @@ public final class NativeLibraries {
               .getParent()
               .getParent()
               .getParent()
-              .resolve(Paths.get("native", arch + "-" + os));
+              .resolve(Path.of("native", arch + "-" + os));
     }
     return nativePath;
   }

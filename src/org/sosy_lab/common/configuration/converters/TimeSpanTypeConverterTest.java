@@ -16,7 +16,6 @@ import static org.junit.Assert.assertThrows;
 import com.google.auto.value.AutoAnnotation;
 import com.google.common.reflect.TypeToken;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -26,7 +25,7 @@ import org.sosy_lab.common.time.TimeSpan;
 
 public class TimeSpanTypeConverterTest {
 
-  private static final Path DUMMY_PATH = Paths.get("dummy.properties");
+  private static final Path DUMMY_PATH = Path.of("dummy.properties");
   private static final TypeToken<TimeSpan> TYPE_TOKEN = TypeToken.of(TimeSpan.class);
 
   @AutoAnnotation

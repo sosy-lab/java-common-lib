@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
@@ -24,7 +23,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(String[].class, new String[] {"test"});
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
-    setDefault(Path.class, Paths.get(""));
+    setDefault(Path.class, Path.of(""));
     try {
       setDefault(Constructor.class, PackageSanityTest.class.getConstructor());
       setDefault(Method.class, PackageSanityTest.class.getDeclaredMethod("defaultMethod"));

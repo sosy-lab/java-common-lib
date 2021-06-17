@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
@@ -29,7 +28,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(
         ExtendedURLClassLoaderConfiguration.class,
         Classes.makeExtendedURLClassLoader().setUrls().autoBuild());
-    setDefault(Path.class, Paths.get(""));
+    setDefault(Path.class, Path.of(""));
     try {
       setDefault(Constructor.class, PackageSanityTest.class.getConstructor());
       setDefault(Method.class, PackageSanityTest.class.getDeclaredMethod("defaultMethod"));

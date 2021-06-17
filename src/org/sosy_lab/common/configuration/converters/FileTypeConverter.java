@@ -25,7 +25,6 @@ import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
@@ -93,7 +92,7 @@ public final class FileTypeConverter implements TypeConverter {
     safePathsOnly = pSafePathsOnly; // set before calls to checkSafePath
     config.inject(this, FileTypeConverter.class);
 
-    rootPath = checkSafePath(Paths.get(rootDirectory), "rootDirectory");
+    rootPath = checkSafePath(Path.of(rootDirectory), "rootDirectory");
     outputPath = checkSafePath(rootPath.resolve(outputDirectory), "output.path");
   }
 
@@ -102,7 +101,7 @@ public final class FileTypeConverter implements TypeConverter {
     safePathsOnly = defaultsInstance.safePathsOnly; // set before calls to checkSafePath
     config.injectWithDefaults(this, FileTypeConverter.class, defaultsInstance);
 
-    rootPath = checkSafePath(Paths.get(rootDirectory), "rootDirectory");
+    rootPath = checkSafePath(Path.of(rootDirectory), "rootDirectory");
     outputPath = checkSafePath(rootPath.resolve(outputDirectory), "output.path");
   }
 
@@ -225,7 +224,7 @@ public final class FileTypeConverter implements TypeConverter {
 
     Path path;
     try {
-      path = Paths.get(pValue);
+      path = Path.of(pValue);
     } catch (InvalidPathException e) {
       throw new InvalidConfigurationException(
           String.format("Invalid file name in option %s: %s", optionName, e.getMessage()), e);
@@ -236,7 +235,7 @@ public final class FileTypeConverter implements TypeConverter {
         path,
         ((FileOption) secondaryOption).value(),
         type,
-        Objects.requireNonNullElse(pSource, Paths.get("")),
+        Objects.requireNonNullElse(pSource, Path.of("")),
         /*doResolve=*/ true);
   }
 
@@ -286,9 +285,9 @@ public final class FileTypeConverter implements TypeConverter {
     if (type.equals(File.class)) {
       defaultValue = ((File) pDefaultValue).toPath();
     } else if (type.equals(PathTemplate.class)) {
-      defaultValue = Paths.get(((PathTemplate) pDefaultValue).getTemplate());
+      defaultValue = Path.of(((PathTemplate) pDefaultValue).getTemplate());
     } else if (type.equals(PathCounterTemplate.class)) {
-      defaultValue = Paths.get(((PathCounterTemplate) pDefaultValue).getTemplate());
+      defaultValue = Path.of(((PathCounterTemplate) pDefaultValue).getTemplate());
     } else {
       defaultValue = (Path) pDefaultValue;
     }

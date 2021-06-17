@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.MoreObjects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.IllegalFormatException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -64,7 +63,7 @@ public final class PathCounterTemplate {
    *     template.
    */
   public Path getFreshPath() {
-    return Paths.get(String.format(template, counter.getAndIncrement()));
+    return Path.of(String.format(template, counter.getAndIncrement()));
   }
 
   /** Returns the raw template of this instance. */

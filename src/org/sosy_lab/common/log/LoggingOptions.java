@@ -10,7 +10,6 @@ package org.sosy_lab.common.log;
 
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import org.sosy_lab.common.configuration.Configuration;
@@ -61,7 +60,7 @@ public class LoggingOptions {
 
   @Option(secure = true, name = "file", description = "name of the log file")
   @FileOption(FileOption.Type.OUTPUT_FILE)
-  private Path outputFile = Paths.get("CPALog.txt");
+  private Path outputFile = Path.of("CPALog.txt");
 
   @Option(
       secure = true,
