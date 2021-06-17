@@ -69,6 +69,10 @@ public final class JSON {
     } else if (value instanceof Map<?, ?>) {
       writeJSONString((Map<?, ?>) value, out);
 
+    } else if (value instanceof Path) {
+      // Path is also an Iterable, but typically desired to be written as a single String.
+      writeJSONString(value.toString(), out);
+
     } else if (value instanceof Iterable<?>) {
       writeJSONString((Iterable<?>) value, out);
 
