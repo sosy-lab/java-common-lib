@@ -352,12 +352,12 @@ public class ProcessExecutor<E extends Exception> {
       return exitCode;
 
     } catch (TimeoutException e) {
-      logger.logf(Level.WARNING, "Killing %s[%d] due to timeout", name, pid);
+      logger.logf(Level.FINEST, "Killing %s[%d] due to timeout", name, pid);
       processFuture.cancel(true);
       throw e;
 
     } catch (InterruptedException e) {
-      logger.logf(Level.WARNING, "Killing %s[%d] due to user interrupt", name, pid);
+      logger.logf(Level.FINEST, "Killing %s[%d] due to user interrupt", name, pid);
       processFuture.cancel(true);
       throw e;
 
