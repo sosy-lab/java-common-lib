@@ -73,7 +73,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
-  private static final long serialVersionUID = 1041711151457528188L;
+  private static final long serialVersionUID = -5708332286565509457L;
 
   @SuppressWarnings("unused")
   @SuppressFBWarnings(
@@ -160,10 +160,40 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
   }
 
+  @Immutable(containerOf = {"K", "V"})
+  private static final class ContainerOfNodeWithDiffs<K, V> {
+    private final Node<K, V> node;
+    private final int sizeDiff;
+    private final int hashDiff;
+
+    private ContainerOfNodeWithDiffs(Node<K, V> node, int sizeDiff, int hashDiff) {
+      this.node = node;
+      this.sizeDiff = sizeDiff;
+      this.hashDiff = hashDiff;
+    }
+
+    static <V, K extends Comparable<? super K>> ContainerOfNodeWithDiffs<K, V> of(
+        Node<K, V> node, int sizeDiff, int hashDiff) {
+      return new ContainerOfNodeWithDiffs<>(node, sizeDiff, hashDiff);
+    }
+
+    Node<K, V> getNode() {
+      return node;
+    }
+
+    int getSizeDiff() {
+      return sizeDiff;
+    }
+
+    int getHashDiff() {
+      return hashDiff;
+    }
+  }
+
   // static creation methods
 
   private static final PathCopyingPersistentTreeMap<?, ?> EMPTY_MAP =
-      new PathCopyingPersistentTreeMap<String, Object>(null);
+      new PathCopyingPersistentTreeMap<String, Object>(null, 0, 0);
 
   @SuppressWarnings("unchecked")
   public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> of() {
@@ -232,10 +262,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   @LazyInit
   private transient @Nullable NavigableSet<Entry<K, V>> entrySet;
 
-  @LazyInit private transient int size;
+  private final int size;
+  private final int hashCode;
 
-  private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot) {
+  private PathCopyingPersistentTreeMap(@Nullable Node<K, V> pRoot, int pSize, int pHashCode) {
     root = pRoot;
+    size = pSize;
+    hashCode = pHashCode;
   }
 
   // private utility methods
@@ -508,11 +541,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   /**
    * Create a map instance with a given root node.
    *
-   * @param newRoot A node or null (meaning the empty tree).
+   * @param pRoot Container of a node or null (meaning the empty tree) with size and hash changes.
    * @return A map instance with the given tree.
    */
   @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
-  private PersistentSortedMap<K, V> mapFromTree(@Var Node<K, V> newRoot) {
+  private PersistentSortedMap<K, V> mapFromTree(ContainerOfNodeWithDiffs<K, V> pRoot) {
+    @Var Node<K, V> newRoot = pRoot.getNode();
     if (newRoot == root) {
       return this;
     } else if (newRoot == null) {
@@ -520,42 +554,57 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     } else {
       // Root is always black.
       newRoot = newRoot.withColor(Node.BLACK);
-      return new PathCopyingPersistentTreeMap<>(newRoot);
+      return new PathCopyingPersistentTreeMap<>(
+          newRoot, size + pRoot.getSizeDiff(), hashCode + pRoot.getHashDiff());
     }
   }
 
   @Override
   public PersistentSortedMap<K, V> putAndCopy(K key, V value) {
-    return mapFromTree(putAndCopy0(checkNotNull(key), value, root));
+    return mapFromTree(putAndCopy0(checkNotNull(key), value, root, 0, 0));
   }
 
-  private static <K extends Comparable<? super K>, V> Node<K, V> putAndCopy0(
-      K key, V value, @Var Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> ContainerOfNodeWithDiffs<K, V> putAndCopy0(
+      K key, V value, @Var Node<K, V> current, @Var int sizeDiff, @Var int hashDiff) {
     // Inserting is easy:
     // We find the place where to insert,
     // and afterwards fix the invariants by some rotations or re-colorings.
 
     if (current == null) {
-      return new Node<>(key, value);
+      Node<K, V> node = new Node<>(key, value);
+      sizeDiff = sizeDiff + 1;
+      hashDiff = hashDiff + node.hashCode();
+      return ContainerOfNodeWithDiffs.of(node, sizeDiff, hashDiff);
     }
 
     int comp = key.compareTo(current.getKey());
     if (comp < 0) {
       // key < current.data
-      Node<K, V> newLeft = putAndCopy0(key, value, current.left);
+      ContainerOfNodeWithDiffs<K, V> containerOfNodeWithDiffs =
+          putAndCopy0(key, value, current.left, sizeDiff, hashDiff);
+      sizeDiff = containerOfNodeWithDiffs.getSizeDiff();
+      hashDiff = containerOfNodeWithDiffs.getHashDiff();
+      Node<K, V> newLeft = containerOfNodeWithDiffs.getNode();
       current = current.withLeftChild(newLeft);
 
     } else if (comp > 0) {
       // key > current.data
-      Node<K, V> newRight = putAndCopy0(key, value, current.right);
+      ContainerOfNodeWithDiffs<K, V> containerOfNodeWithDiffs =
+          putAndCopy0(key, value, current.right, sizeDiff, hashDiff);
+      sizeDiff = containerOfNodeWithDiffs.getSizeDiff();
+      hashDiff = containerOfNodeWithDiffs.getHashDiff();
+      Node<K, V> newRight = containerOfNodeWithDiffs.getNode();
       current = current.withRightChild(newRight);
 
     } else {
+      // replace current node with a new one
+      hashDiff = hashDiff - current.hashCode();
       current = new Node<>(key, value, current.left, current.right, current.getColor());
+      hashDiff = hashDiff + current.hashCode();
     }
 
     // restore invariants
-    return restoreInvariants(current);
+    return ContainerOfNodeWithDiffs.of(restoreInvariants(current), sizeDiff, hashDiff);
   }
 
   @SuppressWarnings("unchecked")
@@ -564,12 +613,12 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     if (isEmpty()) {
       return this;
     }
-    return mapFromTree(removeAndCopy0((K) checkNotNull(key), root));
+    return mapFromTree(removeAndCopy0((K) checkNotNull(key), root, 0, 0));
   }
 
   @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> removeAndCopy0(
-      K key, @Var Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> ContainerOfNodeWithDiffs<K, V> removeAndCopy0(
+      K key, @Var Node<K, V> current, @Var int sizeDiff, @Var int hashDiff) {
     // Removing a node is more difficult.
     // We can remove a leaf if it is red.
     // So we try to always have a red node while going downwards.
@@ -588,7 +637,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       // key < current.data
       if (current.left == null) {
         // Target key is not in map.
-        return current;
+        return ContainerOfNodeWithDiffs.of(current, sizeDiff, hashDiff);
       }
 
       // Go down leftwards, keeping a red node.
@@ -599,14 +648,18 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
 
       // recursive descent
-      Node<K, V> newLeft = removeAndCopy0(key, current.left);
+      ContainerOfNodeWithDiffs<K, V> containerOfNodeWithDiffs =
+          removeAndCopy0(key, current.left, sizeDiff, hashDiff);
+      sizeDiff = containerOfNodeWithDiffs.getSizeDiff();
+      hashDiff = containerOfNodeWithDiffs.getHashDiff();
+      Node<K, V> newLeft = containerOfNodeWithDiffs.getNode();
       current = current.withLeftChild(newLeft);
 
     } else {
       // key >= current.data
       if ((comp > 0) && (current.right == null)) {
         // Target key is not in map.
-        return current;
+        return ContainerOfNodeWithDiffs.of(current, sizeDiff, hashDiff);
       }
 
       if (Node.isRed(current.left)) {
@@ -621,7 +674,9 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       if ((comp == 0) && (current.right == null)) {
         assert current.left == null;
         // We can delete the node easily, it's a leaf.
-        return null;
+        hashDiff = hashDiff - current.hashCode();
+        sizeDiff = sizeDiff - 1;
+        return ContainerOfNodeWithDiffs.of(null, sizeDiff, hashDiff);
       }
 
       if (!Node.isRed(current.right) && !Node.isRed(current.right.left)) {
@@ -637,7 +692,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // We have to delete current, but is has children.
         // We replace current with the smallest node in the right subtree (the "successor"),
         // and delete that (leaf) node there.
-
+        hashDiff = hashDiff - current.hashCode();
+        sizeDiff = sizeDiff - 1;
         @Var Node<K, V> successor = current.right;
         while (successor.left != null) {
           successor = successor.left;
@@ -658,12 +714,16 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         // key > current.data
         // Go down rightwards.
 
-        Node<K, V> newRight = removeAndCopy0(key, current.right);
+        ContainerOfNodeWithDiffs<K, V> containerOfNodeWithDiffs =
+            removeAndCopy0(key, current.right, sizeDiff, hashDiff);
+        sizeDiff = containerOfNodeWithDiffs.getSizeDiff();
+        hashDiff = containerOfNodeWithDiffs.getHashDiff();
+        Node<K, V> newRight = containerOfNodeWithDiffs.getNode();
         current = current.withRightChild(newRight);
       }
     }
 
-    return restoreInvariants(current);
+    return ContainerOfNodeWithDiffs.of(restoreInvariants(current), sizeDiff, hashDiff);
   }
 
   /**
@@ -798,9 +858,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  @SuppressWarnings("RedundantOverride") // to document that using super.hashCode is intended
   public int hashCode() {
-    return super.hashCode();
+    return hashCode;
   }
 
   @Override
@@ -847,9 +906,6 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   public int size() {
-    if (size <= 0) {
-      size = Node.countNodes(root);
-    }
     return size;
   }
 
