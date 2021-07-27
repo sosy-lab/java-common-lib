@@ -41,7 +41,7 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
-  public boolean equals(Object pO) {
+  public boolean equals(@Nullable Object pO) {
     if (pO instanceof SortedMapEntrySet<?, ?>
         && Collections3.guaranteedSameOrder(
             this.map.comparator(), ((SortedMapEntrySet<?, ?>) pO).map.comparator())) {

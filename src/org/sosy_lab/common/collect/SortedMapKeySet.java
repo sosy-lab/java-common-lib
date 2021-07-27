@@ -46,7 +46,7 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
   }
 
   @Override
-  public boolean equals(Object pO) {
+  public boolean equals(@Nullable Object pO) {
     return Collections3.sortedSetEquals(this, pO);
   }
 

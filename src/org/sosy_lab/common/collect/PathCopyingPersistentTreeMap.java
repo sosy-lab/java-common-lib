@@ -789,7 +789,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
 
   @Override
   @SuppressWarnings("ReferenceEquality") // comparing nodes with equals would not suffice
-  public boolean equals(Object pObj) {
+  public boolean equals(@Nullable Object pObj) {
     if (pObj instanceof PathCopyingPersistentTreeMap<?, ?>
         && ((PathCopyingPersistentTreeMap<?, ?>) pObj).root == root) {
       return true;
@@ -853,6 +853,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return size;
   }
 
+  @Nullable
   @Override
   public Entry<K, V> firstEntry() {
     if (isEmpty()) {
@@ -862,6 +863,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return findSmallestNode(root);
   }
 
+  @Nullable
   @Override
   public Entry<K, V> lastEntry() {
     if (isEmpty()) {
@@ -1372,6 +1374,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return inRange(key, /*treatBoundsAsInclusive=*/ false) && findNode(key, root) != null;
     }
 
+    @Nullable
     @Override
     public Node<K, V> getEntry(Object pKey) {
       @SuppressWarnings("unchecked")
@@ -1420,6 +1423,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
     }
 
+    @Nullable
     @Override
     public Entry<K, V> ceilingEntry(K pKey) {
       Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ true);
@@ -1429,6 +1433,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
+    @Nullable
     @Override
     public Entry<K, V> floorEntry(K pKey) {
       Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ true);
@@ -1438,6 +1443,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
+    @Nullable
     @Override
     public Entry<K, V> higherEntry(K pKey) {
       Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ false);
@@ -1447,6 +1453,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
+    @Nullable
     @Override
     public Entry<K, V> lowerEntry(K pKey) {
       Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ false);

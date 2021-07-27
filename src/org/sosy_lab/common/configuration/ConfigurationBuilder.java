@@ -313,6 +313,7 @@ public final class ConfigurationBuilder {
    *
    * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
    */
+  @Nullable
   private static FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
     if ("jar".equals(uri.getScheme())) {
       for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {

@@ -61,7 +61,7 @@ final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
   }
 
   @Override
-  public boolean equals(Object pObject) {
+  public boolean equals(@Nullable Object pObject) {
     if (pObject instanceof DescendingSortedMap<?, ?>) {
       // order is irrelevant for equals, and after unwrapping comparison could be linear
       return map.equals(((DescendingSortedMap<?, ?>) pObject).map);

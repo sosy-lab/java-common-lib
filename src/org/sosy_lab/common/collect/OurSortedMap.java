@@ -166,7 +166,7 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
     }
 
     @Override
-    public boolean equals(Object pObj) {
+    public boolean equals(@Nullable Object pObj) {
       return pObj instanceof Map<?, ?> && ((Map<?, ?>) pObj).isEmpty();
     }
 
