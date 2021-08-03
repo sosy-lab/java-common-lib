@@ -23,6 +23,10 @@ import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.StackWalker.StackFrame;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -503,7 +507,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       // build additionalMessage only if actually logged
       String additionalMessage = additionalMessageSupplier.get();
       if (wouldBeLogged(priority)) {
-        StringBuilder logMessage = buildUserExceptionLogMessage(priority, e, additionalMessage);
+        StringBuilder logMessage =
+            buildUserExceptionLogMessage(priority, e, Strings.nullToEmpty(additionalMessage));
         @Nullable StackTraceElement frame = locateStackTraceElement(e);
         log0(priority, frame, logMessage.toString());
       }
@@ -521,11 +526,15 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       logMessage.append("Warning: ");
     }
 
-    String exceptionMessage = Strings.nullToEmpty(e.getMessage());
+    CharSequence exceptionMessage =
+        e instanceof FileSystemException
+            ? createFileSystemExceptionMessage(
+                (FileSystemException) e, /*asSuffix=*/ additionalMessage.endsWith("file"))
+            : Strings.nullToEmpty(e.getMessage());
 
-    if (Strings.isNullOrEmpty(additionalMessage)) {
+    if (additionalMessage.isEmpty()) {
 
-      if (!exceptionMessage.isEmpty()) {
+      if (exceptionMessage.length() > 0) {
         logMessage.append(exceptionMessage);
       } else {
         // No message at all, this shoudn't happen as its not nice for the user
@@ -536,7 +545,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     } else {
       logMessage.append(additionalMessage);
 
-      if (!exceptionMessage.isEmpty()) {
+      if (exceptionMessage.length() > 0) {
         if (e instanceof IOException
             && additionalMessage.endsWith("file")
             && exceptionMessage.charAt(exceptionMessage.length() - 1) == ')') {
@@ -549,6 +558,70 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       }
     }
     return logMessage;
+  }
+
+  private static CharSequence createFileSystemExceptionMessage(
+      FileSystemException fse, boolean asSuffix) {
+    @Var
+    @Nullable
+    String file = Strings.emptyToNull(fse.getFile());
+    @Var
+    @Nullable
+    String otherFile = Strings.emptyToNull(fse.getOtherFile());
+    if (file == null && otherFile != null) {
+      // Probably never happens, but would be confusing. Swap now to simplify logic later.
+      file = otherFile;
+      otherFile = null;
+    } else if (file != null && file.equals(otherFile)) {
+      otherFile = null; // no need for duplicate file name
+    }
+
+    StringBuilder msg = new StringBuilder();
+    // Ignore getMessage(), we can do better with the individual fields because for subclasses
+    // like FileAlreadyExistsException the reason is always empty.
+
+    if (asSuffix) {
+      // return "file (reason)" like IOException does
+      if (file != null) {
+        msg.append(file);
+      }
+      msg.append(" (").append(getReasonForFileSystemException(fse));
+      if (otherFile != null) {
+        msg.append(": ").append(otherFile);
+      }
+      msg.append(")");
+
+    } else {
+      // return "reason: file" to emphasize the reason
+      msg.append(getReasonForFileSystemException(fse));
+      if (file != null) {
+        msg.append(": ").append(file);
+        if (otherFile != null) {
+          msg.append(" -> ").append(otherFile);
+        }
+      }
+    }
+
+    return msg;
+  }
+
+  /** Return a non-empty string with a reason for the exception, as precise as possible. */
+  private static String getReasonForFileSystemException(FileSystemException fse) {
+    @Nullable String reason = fse.getReason();
+    if (!Strings.isNullOrEmpty(reason)) {
+      return reason;
+    }
+
+    if (fse instanceof AccessDeniedException) {
+      return "Permission denied";
+    } else if (fse instanceof NoSuchFileException) {
+      return "No such file or directory";
+    } else if (fse instanceof FileAlreadyExistsException) {
+      return "File already exists";
+    } else if (fse.getClass() != FileSystemException.class) {
+      return fse.getClass().getSimpleName();
+    }
+    return "Unknown file-system error";
   }
 
   private static @Nullable StackTraceElement locateStackTraceElement(Throwable e) {
