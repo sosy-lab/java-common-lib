@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -53,6 +55,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private final int truncateSize;
   private @Nullable LogManagerBean mxBean = null;
   private final String componentName;
+
+  private static final String CONFIGURATION_PACKAGE_NAME =
+      Configuration.class.getPackage().getName();
 
   public interface LogManagerMXBean {
 
@@ -559,21 +564,32 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       return null;
     }
 
+    // Attempt to find the most interesting trace element
+
+    Predicate<StackTraceElement> isRelevant;
     if (e instanceof InvalidConfigurationException) {
-      // find first method outside of the Configuration class,
-      // this is probably the most interesting trace element
-      String confPackage = Configuration.class.getPackage().getName();
-      @Var int traceIndex = 0;
-      while (frame.getClassName().startsWith(confPackage)) {
-        traceIndex++;
-        try {
-          frame = trace.get(traceIndex);
-        } catch (IndexOutOfBoundsException endOfStackException) {
-          // We avoid calling size() such that the JVM does not have to unroll the whole stack.
-          return frame;
-        }
+      // find first method outside of the Configuration package
+      isRelevant = f -> !f.getClassName().startsWith(CONFIGURATION_PACKAGE_NAME);
+
+    } else if (e instanceof IOException) {
+      // Ignore the class UnixException class, whose methods just translate from other exceptions
+      isRelevant = f -> !f.getClassName().equals("sun.nio.fs.UnixException");
+
+    } else {
+      isRelevant = Predicates.alwaysTrue();
+    }
+
+    @Var int traceIndex = 0;
+    while (!isRelevant.test(frame)) {
+      traceIndex++;
+      try {
+        frame = trace.get(traceIndex);
+      } catch (IndexOutOfBoundsException endOfStackException) {
+        // We avoid calling size() such that the JVM does not have to unroll the whole stack.
+        break;
       }
     }
+
     return frame;
   }
 
