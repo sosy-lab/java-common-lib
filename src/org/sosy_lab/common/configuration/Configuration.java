@@ -873,7 +873,7 @@ public final class Configuration {
       if (a.annotationType().isAnnotationPresent(OptionDetailAnnotation.class)) {
         if (result != null) {
           throw new UnsupportedOperationException(
-              "Both " + result + " and " + a + " are present at " + element.toString());
+              "Both " + result + " and " + a + " are present at " + element);
         }
         result = a;
       }
