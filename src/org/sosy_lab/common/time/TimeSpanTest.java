@@ -20,6 +20,8 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.common.time.TimeSpan.sum;
 
 import com.google.common.testing.EqualsTester;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import org.junit.Test;
 
 @SuppressWarnings("CheckReturnValue")
@@ -350,5 +352,22 @@ public class TimeSpanTest {
   public void testToStringDaysMinutes() {
     TimeSpan time = TimeSpan.of(2 * 24 * 60 + 45, MINUTES);
     assertThat(time.formatHumanReadableLarge()).isEqualTo("2d 00h 45min");
+  }
+
+  @Test
+  public void testAsDuration() {
+    assertThat(TimeSpan.of(1, NANOSECONDS).asDuration()).isEqualTo(Duration.ofNanos(1));
+    assertThat(TimeSpan.of(VERY_LARGE_VALUE, NANOSECONDS).asDuration())
+        .isEqualTo(Duration.ofNanos(VERY_LARGE_VALUE));
+    assertThat(TimeSpan.of(VERY_LARGE_VALUE, MILLISECONDS).asDuration())
+        .isEqualTo(Duration.ofMillis(VERY_LARGE_VALUE));
+    assertThat(TimeSpan.of(VERY_LARGE_VALUE, MICROSECONDS).asDuration())
+        .isEqualTo(Duration.of(VERY_LARGE_VALUE, ChronoUnit.MICROS));
+    assertThat(TimeSpan.of(VERY_LARGE_VALUE, SECONDS).asDuration())
+        .isEqualTo(Duration.ofSeconds(VERY_LARGE_VALUE));
+    assertThat(TimeSpan.of(LARGE_VALUE, HOURS).asDuration())
+        .isEqualTo(Duration.ofHours(LARGE_VALUE));
+
+    assertThrows(ArithmeticException.class, () -> LARGE_AS_MINUTES.asDuration());
   }
 }

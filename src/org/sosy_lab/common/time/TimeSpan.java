@@ -21,6 +21,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Ascii;
 import com.google.common.collect.EnumHashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
@@ -28,6 +29,11 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -50,7 +56,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * their unit, for example, 60s and 1min are considered equal.
  */
 @Immutable
-public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
+public final class TimeSpan implements Comparable<TimeSpan>, Serializable, TemporalAmount {
 
   private static final long serialVersionUID = -4013592312989551009L;
 
@@ -341,7 +347,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   /**
    * Get the value of this TimeSpan as nanoseconds.
    *
-   * @throws ArithmeticException If the value cannot be represented as milliseconds due to overflow.
+   * @throws ArithmeticException If the value cannot be represented as nanoseconds due to overflow.
    */
   public long asNanos() {
     return getChecked(NANOSECONDS);
@@ -349,6 +355,17 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   public TimeUnit getUnit() {
     return unit;
+  }
+
+  /**
+   * Return a {@link Duration} instance that represents the same amount of time (but it won't be
+   * possible to retrieve our unit as from {@link #getUnit()}). Note that not all possible {@link
+   * TimeSpan} values can be represented by a {@link Duration}.
+   *
+   * @throws ArithmeticException If an overflow occurs.
+   */
+  public Duration asDuration() {
+    return Duration.of(span, unit.toChronoUnit());
   }
 
   /**
@@ -541,6 +558,39 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
   public TimeSpan divide(int divisor) {
     checkArgument(divisor >= 0, "Cannot divide TimeSpan by negative value %s", divisor);
     return new TimeSpan(span / divisor, unit);
+  }
+
+  // Methods for implementing TemporalAmount
+
+  /** Only for implementing {@link TemporalAmount}. Use {@link #getUnit()} instead. */
+  @Deprecated
+  @Override
+  public ImmutableList<TemporalUnit> getUnits() {
+    return ImmutableList.of(unit.toChronoUnit());
+  }
+
+  /**
+   * Only for implementing {@link TemporalAmount}. It is not possible to pass arbitrary units here.
+   * Use {@link #getChecked(TimeUnit)} instead.
+   */
+  @Deprecated
+  @Override
+  public long get(TemporalUnit pUnit) {
+    checkNotNull(pUnit);
+    if (pUnit != unit.toChronoUnit()) {
+      throw new UnsupportedTemporalTypeException("Unsupported unit: " + pUnit);
+    }
+    return span;
+  }
+
+  @Override
+  public Temporal addTo(Temporal pTemporal) {
+    return pTemporal.plus(span, unit.toChronoUnit());
+  }
+
+  @Override
+  public Temporal subtractFrom(Temporal pTemporal) {
+    return pTemporal.minus(span, unit.toChronoUnit());
   }
 
   // Code for formatting as string
