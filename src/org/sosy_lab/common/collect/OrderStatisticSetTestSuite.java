@@ -41,8 +41,7 @@ public abstract class OrderStatisticSetTestSuite {
   }
 
   private OrderStatisticSet<String> createSet() {
-    String[] elems = new String[0];
-    return factory.create(elems);
+    return factory.create(new String[0]);
   }
 
   private OrderStatisticSet<String> createSet(String[] pElems) {

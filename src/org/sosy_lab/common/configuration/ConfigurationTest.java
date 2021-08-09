@@ -194,7 +194,7 @@ public class ConfigurationTest {
     Configuration config = Configuration.defaultConfiguration();
 
     try {
-      Constructor<?> constructor = clsWithOptions.getDeclaredConstructor(new Class<?>[0]);
+      Constructor<?> constructor = clsWithOptions.getDeclaredConstructor();
       constructor.setAccessible(true);
 
       Object injectedInstance = constructor.newInstance();

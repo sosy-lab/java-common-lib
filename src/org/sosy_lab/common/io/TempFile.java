@@ -46,7 +46,7 @@ public class TempFile {
     private @Nullable Object content;
     private @Nullable Charset charset;
     private boolean deleteOnJvmExit = true;
-    private FileAttribute<?>[] fileAttributes = new FileAttribute<?>[0];
+    private FileAttribute<?>[] fileAttributes = {};
 
     private TempFileBuilder() {}
 
