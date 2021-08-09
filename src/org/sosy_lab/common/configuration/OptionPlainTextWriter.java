@@ -253,12 +253,13 @@ class OptionPlainTextWriter {
       str.append("  allowed values: ").append(Arrays.toString(option.values())).append('\n');
     }
 
-    if (verbose && !option.regexp().isEmpty()) {
-      str.append("  regexp:   ").append(option.regexp()).append('\n');
-    }
-
-    if (verbose && option.toUppercase()) {
-      str.append("  uppercase: true\n");
+    if (verbose) {
+      if (!option.regexp().isEmpty()) {
+        str.append("  regexp:   ").append(option.regexp()).append('\n');
+      }
+      if (option.toUppercase()) {
+        str.append("  uppercase: true\n");
+      }
     }
   }
 

@@ -262,29 +262,28 @@ public final class Collections3 {
       return false;
     }
 
-    if (pColl2 instanceof SortedSet<?>) {
-      if (Collections3.guaranteedSameOrder(
-          coll1.comparator(), ((SortedSet<?>) coll2).comparator())) {
-        @SuppressWarnings("unchecked")
-        Comparator<Object> comp =
-            (Comparator<Object>)
-                Objects.requireNonNullElse(coll1.comparator(), Comparator.naturalOrder());
-        Iterator<?> it1 = coll1.iterator();
-        Iterator<?> it2 = coll2.iterator();
-        try {
-          while (it1.hasNext()) {
-            Object element = it1.next();
-            Object otherElement = it2.next();
-            if (otherElement == null || comp.compare(element, otherElement) != 0) {
-              return false;
-            }
+    if (pColl2 instanceof SortedSet<?>
+        && Collections3.guaranteedSameOrder(
+            coll1.comparator(), ((SortedSet<?>) coll2).comparator())) {
+      @SuppressWarnings("unchecked")
+      Comparator<Object> comp =
+          (Comparator<Object>)
+              Objects.requireNonNullElse(coll1.comparator(), Comparator.naturalOrder());
+      Iterator<?> it1 = coll1.iterator();
+      Iterator<?> it2 = coll2.iterator();
+      try {
+        while (it1.hasNext()) {
+          Object element = it1.next();
+          Object otherElement = it2.next();
+          if (otherElement == null || comp.compare(element, otherElement) != 0) {
+            return false;
           }
-          return true;
-        } catch (ClassCastException e) {
-          return false;
-        } catch (NoSuchElementException e) {
-          return false; // concurrent change to other set
         }
+        return true;
+      } catch (ClassCastException e) {
+        return false;
+      } catch (NoSuchElementException e) {
+        return false; // concurrent change to other set
       }
     }
 

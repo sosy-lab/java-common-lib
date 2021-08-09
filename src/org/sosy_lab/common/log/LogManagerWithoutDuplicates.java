@@ -59,12 +59,9 @@ public class LogManagerWithoutDuplicates extends ForwardingLogManager implements
    */
   public void logOnce(Level pPriority, Object... pArgs) {
     checkNotNull(pArgs);
-    if (wouldBeLogged(pPriority)) {
-
-      if (seenMessages.add(ImmutableList.copyOf(pArgs))) {
-        // log only if not already seen
-        log(pPriority, pArgs);
-      }
+    if (wouldBeLogged(pPriority) && seenMessages.add(ImmutableList.copyOf(pArgs))) {
+      // log only if not already seen
+      log(pPriority, pArgs);
     }
   }
 
