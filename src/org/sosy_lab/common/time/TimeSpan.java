@@ -23,7 +23,6 @@ import com.google.common.base.Ascii;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
-import com.google.common.math.LongMath;
 import com.google.common.primitives.Longs;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
@@ -246,7 +245,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
       // Example case: we have seconds, but we want milliseconds (can overflow)
       long factor = dest.convert(1, unit);
       assert factor > 1;
-      return LongMath.checkedMultiply(span, factor);
+      return Math.multiplyExact(span, factor);
     }
 
     // Example case: we have nanoseconds, but we want seconds (cannot overflow)
@@ -442,7 +441,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     while (true) {
       try {
         return new TimeSpan(
-            LongMath.checkedAdd(a.getChecked(leastCommonUnit), b.getChecked(leastCommonUnit)),
+            Math.addExact(a.getChecked(leastCommonUnit), b.getChecked(leastCommonUnit)),
             leastCommonUnit);
       } catch (ArithmeticException e) {
         // Overflow is expected to be very rare, thus handle exception case instead of checking.
@@ -495,7 +494,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     while (true) {
       try {
         return new TimeSpan(
-            LongMath.checkedSubtract(a.getChecked(leastCommonUnit), b.getChecked(leastCommonUnit)),
+            Math.subtractExact(a.getChecked(leastCommonUnit), b.getChecked(leastCommonUnit)),
             leastCommonUnit);
       } catch (ArithmeticException e) {
         // Overflow is expected to be very rare, thus handle exception case instead of checking.
@@ -520,7 +519,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
     @Var TimeUnit dest = unit;
     while (true) {
       try {
-        return new TimeSpan(LongMath.checkedMultiply(getChecked(dest), factor), dest);
+        return new TimeSpan(Math.multiplyExact(getChecked(dest), factor), dest);
       } catch (ArithmeticException e) {
         // Overflow is expected to be very rare, thus handle exception case instead of checking.
         // Try again with next unit.
