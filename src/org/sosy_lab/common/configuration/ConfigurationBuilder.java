@@ -106,7 +106,7 @@ public final class ConfigurationBuilder {
   public ConfigurationBuilder setPrefix(String newPrefix) {
     checkNotNull(newPrefix);
 
-    this.prefix = newPrefix;
+    prefix = newPrefix;
 
     return this;
   }
@@ -125,12 +125,12 @@ public final class ConfigurationBuilder {
    */
   public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
     checkNotNull(sourceConfig);
-    checkState(this.properties == null);
-    checkState(this.sources == null);
-    checkState(this.oldConfig == null);
-    checkState(this.converters == null);
+    checkState(properties == null);
+    checkState(sources == null);
+    checkState(oldConfig == null);
+    checkState(converters == null);
 
-    this.oldConfig = sourceConfig;
+    oldConfig = sourceConfig;
 
     return this;
   }

@@ -30,7 +30,7 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
       return false;
     }
     @Var Map<?, ?> other = (Map<?, ?>) pObj;
-    if (this.size() != other.size()) {
+    if (size() != other.size()) {
       return false;
     }
 
@@ -40,12 +40,12 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
     if (other instanceof SortedMap<?, ?>) {
       @SuppressWarnings("JdkObsolete") // want to handle other SortedMaps here
       Comparator<?> comparator = ((SortedMap<?, ?>) other).comparator();
-      if (Collections3.guaranteedSameOrder(this.comparator(), comparator)) {
+      if (Collections3.guaranteedSameOrder(comparator(), comparator)) {
         hasSameOrder = true;
       } else if (other instanceof NavigableMap<?, ?>) {
         NavigableMap<?, ?> descendingOther = ((NavigableMap<?, ?>) other).descendingMap();
 
-        if (Collections3.guaranteedSameOrder(this.comparator(), descendingOther.comparator())) {
+        if (Collections3.guaranteedSameOrder(comparator(), descendingOther.comparator())) {
           hasSameOrder = true;
           other = descendingOther;
         }

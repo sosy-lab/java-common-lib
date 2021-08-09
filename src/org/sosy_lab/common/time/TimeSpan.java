@@ -384,12 +384,12 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
       return false;
     }
     TimeSpan other = (TimeSpan) obj;
-    if (this.unit == other.unit) {
-      return this.span == other.span;
+    if (unit == other.unit) {
+      return span == other.span;
     }
     TimeUnit leastCommonUnit = leastCommonUnit(this, other);
     try {
-      return this.getChecked(leastCommonUnit) == other.getChecked(leastCommonUnit);
+      return getChecked(leastCommonUnit) == other.getChecked(leastCommonUnit);
     } catch (ArithmeticException e) {
       // In case of overflow, both values cannot be the same.
       return false;
@@ -406,17 +406,17 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable {
 
   @Override
   public int compareTo(TimeSpan other) {
-    if (this.unit == other.unit) {
-      return Long.compare(this.span, other.span);
+    if (unit == other.unit) {
+      return Long.compare(span, other.span);
     }
     TimeUnit leastCommonUnit = leastCommonUnit(this, other);
     try {
-      return Long.compare(this.getChecked(leastCommonUnit), other.getChecked(leastCommonUnit));
+      return Long.compare(getChecked(leastCommonUnit), other.getChecked(leastCommonUnit));
     } catch (ArithmeticException e) {
       // Only one of the two calls can overflow,
       // and it has to be the one with the larger unit.
       // Thus in case of overflow the TimeSpan with the larger unit also has the larger value.
-      return this.unit.compareTo(other.unit);
+      return unit.compareTo(other.unit);
     }
   }
 
