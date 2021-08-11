@@ -14,8 +14,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Equivalence;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
@@ -141,6 +143,37 @@ public final class Collections3 {
       Iterable<Map.Entry<K, V>> entries, BiFunction<K, V, R> func) {
     checkNotNull(func);
     return Streams.stream(entries).map(entry -> func.apply(entry.getKey(), entry.getValue()));
+  }
+
+  /**
+   * Provide a stream that results from filtering the given stream's element by their class.
+   * Additionally, the resulting stream is typed accordingly. This is a stream equivalent of {@link
+   * FluentIterable#filter(Class)} and {@link Iterables#filter(Iterable, Class)}.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Stream<T> filterByClass(Stream<? super T> stream, Class<T> cls) {
+    // Unchecked cast is safe because of isInstance check.
+    // Alternative way would be to add .map(cls::cast), but that does additional work.
+    // cf. Iterables#filter(Iterable, Class)
+    return (Stream<T>) stream.filter(cls::isInstance);
+  }
+
+  /**
+   * Provide a stream that results from filtering the given collection's element by their class.
+   * Additionally, the resulting stream is typed accordingly. This is a stream equivalent of {@link
+   * FluentIterable#filter(Class)} and {@link Iterables#filter(Iterable, Class)}.
+   */
+  public static <T> Stream<T> filterByClass(Collection<? super T> collection, Class<T> cls) {
+    return filterByClass(collection.stream(), cls);
+  }
+
+  /**
+   * Provide a stream that results from filtering the given iterable's element by their class.
+   * Additionally, the resulting stream is typed accordingly. This is a stream equivalent of {@link
+   * FluentIterable#filter(Class)} and {@link Iterables#filter(Iterable, Class)}.
+   */
+  public static <T> Stream<T> filterByClass(Iterable<? super T> iterable, Class<T> cls) {
+    return filterByClass(Streams.stream(iterable), cls);
   }
 
   /**

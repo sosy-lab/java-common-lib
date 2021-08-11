@@ -9,9 +9,11 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.SortedMap;
@@ -22,6 +24,8 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class Collections3Test {
+
+  private static final ImmutableList<Object> MIXED_OBJECTS_LIST = ImmutableList.of("1", 1, 1L, 1);
 
   @Test
   public void testAllElementsEqual_emptyArray() {
@@ -38,6 +42,23 @@ public class Collections3Test {
   @Test
   public void testAllElementsEqual_emptyStream() {
     assertThrows(IllegalArgumentException.class, () -> Collections3.allElementsEqual(Stream.of()));
+  }
+
+  @Test
+  public void testFilterByClass() {
+    assertThat(Collections3.filterByClass(MIXED_OBJECTS_LIST, Integer.class)).containsExactly(1, 1);
+  }
+
+  @Test
+  public void testFilterByClass_NoMatch() {
+    assertThat(Collections3.filterByClass(MIXED_OBJECTS_LIST, IOException.class)).isEmpty();
+  }
+
+  @Test
+  public void testFilterByClass_AllMatch() {
+    assertThat(Collections3.filterByClass(MIXED_OBJECTS_LIST, Object.class))
+        .containsExactlyElementsIn(MIXED_OBJECTS_LIST)
+        .inOrder();
   }
 
   @Test
