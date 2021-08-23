@@ -29,6 +29,7 @@ import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
@@ -192,6 +193,7 @@ public final class Configuration {
    *
    * @return A reference to the map of type converters used by this class.
    */
+  @SuppressFBWarnings("MS_EXPOSE_REP") // by design
   public static Map<Class<?>, TypeConverter> getDefaultConverters() {
     return DEFAULT_CONVERTERS;
   }
