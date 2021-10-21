@@ -103,7 +103,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.11.0" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.12.0" conf="format-source->default"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.40.0" conf="checkstyle->default"/>

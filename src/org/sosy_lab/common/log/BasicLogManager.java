@@ -563,11 +563,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static CharSequence createFileSystemExceptionMessage(
       FileSystemException fse, boolean asSuffix) {
     @Var
-    @Nullable
-    String file = Strings.emptyToNull(fse.getFile());
+    @Nullable String file = Strings.emptyToNull(fse.getFile());
     @Var
-    @Nullable
-    String otherFile = Strings.emptyToNull(fse.getOtherFile());
+    @Nullable String otherFile = Strings.emptyToNull(fse.getOtherFile());
     if (file == null && otherFile != null) {
       // Probably never happens, but would be confusing. Swap now to simplify logic later.
       file = otherFile;

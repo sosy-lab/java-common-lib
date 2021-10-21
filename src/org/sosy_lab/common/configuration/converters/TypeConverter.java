@@ -54,8 +54,7 @@ public interface TypeConverter {
    *     (e.g., a missing annotation).
    * @throws InvalidConfigurationException If the user specified an invalid value.
    */
-  @Nullable
-  Object convert(
+  @Nullable Object convert(
       String optionName,
       String value,
       TypeToken<?> type,
@@ -77,8 +76,7 @@ public interface TypeConverter {
    * @throws UnsupportedOperationException If the option specification in the source code is invalid
    *     (e.g., a missing annotation).
    */
-  @Nullable
-  <T> T convertDefaultValue(
+  @Nullable <T> T convertDefaultValue(
       String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException;
 
