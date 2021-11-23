@@ -10,7 +10,6 @@ package org.sosy_lab.common.log;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.base.Strings;
 import com.google.common.testing.TestLogHandler;
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +25,7 @@ import org.sosy_lab.common.Appenders.AbstractAppender;
 public class BasicLogManagerTest {
 
   private static final int TRUNCATE_SIZE = 150;
-  private static final String LONG_STRING = Strings.repeat("1234567890", 100_000); // 1 MB size
+  private static final String LONG_STRING = "1234567890".repeat(100_000); // 1 MB size
 
   @SuppressWarnings("UnnecessaryAnonymousClass")
   private static final Appender LONG_STRING_APPENDER =
