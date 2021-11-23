@@ -241,15 +241,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   // private utility methods
 
   @SuppressWarnings("unchecked")
-  @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(
+  private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> findNode(
       Object key, Node<K, V> root) {
     checkNotNull(key);
     return findNode((K) key, root);
   }
 
-  @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> findNode(K key, Node<K, V> root) {
+  private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> findNode(
+      K key, Node<K, V> root) {
     checkNotNull(key);
 
     @Var Node<K, V> current = root;
@@ -316,7 +315,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextGreaterNode(
+  private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> findNextGreaterNode(
       K key, Node<K, V> root, boolean inclusive) {
     checkNotNull(key);
 
@@ -379,7 +378,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param root The tree to look in.
    * @return A node or null.
    */
-  private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findNextSmallerNode(
+  private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> findNextSmallerNode(
       K key, Node<K, V> root, boolean inclusive) {
     checkNotNull(key);
 
@@ -567,8 +566,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return mapFromTree(removeAndCopy0((K) checkNotNull(key), root));
   }
 
-  @Nullable
-  private static <K extends Comparable<? super K>, V> Node<K, V> removeAndCopy0(
+  private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> removeAndCopy0(
       K key, @Var Node<K, V> current) {
     // Removing a node is more difficult.
     // We can remove a leaf if it is red.
@@ -671,8 +669,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    *
    * @return A new subtree reflecting the change.
    */
-  @Nullable
-  private static <K, V> Node<K, V> removeMininumNodeInTree(@Var Node<K, V> current) {
+  private static <K, V> @Nullable Node<K, V> removeMininumNodeInTree(@Var Node<K, V> current) {
     if (current.left == null) {
       // This is the minium node to delete
       return null;
@@ -853,9 +850,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return size;
   }
 
-  @Nullable
   @Override
-  public Entry<K, V> firstEntry() {
+  public @Nullable Entry<K, V> firstEntry() {
     if (isEmpty()) {
       return null;
     }
@@ -863,9 +859,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     return findSmallestNode(root);
   }
 
-  @Nullable
   @Override
-  public Entry<K, V> lastEntry() {
+  public @Nullable Entry<K, V> lastEntry() {
     if (isEmpty()) {
       return null;
     }
@@ -1257,7 +1252,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     // Find the best root for a given set of bounds
     // (the lowest node in the tree that represents the complete range).
     // Not using root directly but potentially only a subtree is more efficient.
-    private static @Nullable <K extends Comparable<? super K>, V> Node<K, V> findBestRoot(
+    private static <K extends Comparable<? super K>, V> @Nullable Node<K, V> findBestRoot(
         @Nullable Node<K, V> pRoot,
         @Nullable K pFromKey,
         boolean pFromInclusive,
@@ -1374,9 +1369,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return inRange(key, /*treatBoundsAsInclusive=*/ false) && findNode(key, root) != null;
     }
 
-    @Nullable
     @Override
-    public Node<K, V> getEntry(Object pKey) {
+    public @Nullable Node<K, V> getEntry(Object pKey) {
       @SuppressWarnings("unchecked")
       K key = (K) checkNotNull(pKey);
       if (!inRange(key, /*treatBoundsAsInclusive=*/ false)) {
@@ -1423,9 +1417,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       }
     }
 
-    @Nullable
     @Override
-    public Entry<K, V> ceilingEntry(K pKey) {
+    public @Nullable Entry<K, V> ceilingEntry(K pKey) {
       Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ true);
       if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
         return null;
@@ -1433,9 +1426,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
-    @Nullable
     @Override
-    public Entry<K, V> floorEntry(K pKey) {
+    public @Nullable Entry<K, V> floorEntry(K pKey) {
       Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ true);
       if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
         return null;
@@ -1443,9 +1435,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
-    @Nullable
     @Override
-    public Entry<K, V> higherEntry(K pKey) {
+    public @Nullable Entry<K, V> higherEntry(K pKey) {
       Entry<K, V> result = findNextGreaterNode(pKey, root, /*inclusive=*/ false);
       if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
         return null;
@@ -1453,9 +1444,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       return result;
     }
 
-    @Nullable
     @Override
-    public Entry<K, V> lowerEntry(K pKey) {
+    public @Nullable Entry<K, V> lowerEntry(K pKey) {
       Entry<K, V> result = findNextSmallerNode(pKey, root, /*inclusive=*/ false);
       if (result != null && !inRange(result.getKey(), /*treatBoundsAsInclusive=*/ false)) {
         return null;

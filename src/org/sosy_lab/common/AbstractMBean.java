@@ -30,8 +30,7 @@ public abstract class AbstractMBean {
 
   private static final @Nullable MBeanServer MBEAN_SERVER = getMBeanServer();
 
-  @Nullable
-  private static MBeanServer getMBeanServer() {
+  private static @Nullable MBeanServer getMBeanServer() {
     try {
       // wrap this call in method so that an exception does not prevent the
       // whole program from continuing

@@ -141,10 +141,9 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
    *
    * @see NavigableMap#pollFirstEntry()
    */
-  @Nullable
   @Override
   @CanIgnoreReturnValue
-  public Entry<K, V> pollFirstEntry() {
+  public @Nullable Entry<K, V> pollFirstEntry() {
     @Var PersistentSortedMap<K, V> oldMap;
     @Var PersistentSortedMap<K, V> newMap;
     @Var Entry<K, V> firstEntry;
@@ -167,10 +166,9 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
    *
    * @see NavigableMap#pollLastEntry()
    */
-  @Nullable
   @Override
   @CanIgnoreReturnValue
-  public Entry<K, V> pollLastEntry() {
+  public @Nullable Entry<K, V> pollLastEntry() {
     @Var PersistentSortedMap<K, V> oldMap;
     @Var PersistentSortedMap<K, V> newMap;
     @Var Entry<K, V> lastEntry;

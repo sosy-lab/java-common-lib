@@ -76,7 +76,7 @@ public interface TypeConverter {
    * @throws UnsupportedOperationException If the option specification in the source code is invalid
    *     (e.g., a missing annotation).
    */
-  @Nullable <T> T convertDefaultValue(
+  <T> @Nullable T convertDefaultValue(
       String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException;
 
@@ -89,8 +89,7 @@ public interface TypeConverter {
    * changes values and this should not be done twice if the value is injected again into another
    * instance.
    */
-  @Nullable
-  default <T> T convertDefaultValueFromOtherInstance(
+  default <T> @Nullable T convertDefaultValueFromOtherInstance(
       String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
     return convertDefaultValue(optionName, value, type, secondaryOption);

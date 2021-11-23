@@ -317,9 +317,8 @@ public final class Configuration {
    * <p>Use configuration injection with {@link Option} and {@link #inject(Object)} instead. This
    * provides type safety, documentation, logging etc.
    */
-  @Nullable
   @Deprecated
-  public String getProperty(String key) {
+  public @Nullable String getProperty(String key) {
     checkNotNull(key);
     @Var String result = properties.get(prefix + key);
     unusedProperties.remove(prefix + key);
@@ -729,8 +728,7 @@ public final class Configuration {
    *     invalid.
    * @throws InvalidConfigurationException If the user specified an invalid value for the option.
    */
-  @Nullable
-  private <T> Object getValue(
+  private <T> @Nullable Object getValue(
       Options options,
       Member method,
       @Nullable T defaultValue,
@@ -830,8 +828,7 @@ public final class Configuration {
    * @param option the option-annotation of the field of the value
    * @param alwaysUppercase how to write the value
    */
-  @Nullable
-  private String getValueString(String name, Option option, boolean alwaysUppercase)
+  private @Nullable String getValueString(String name, Option option, boolean alwaysUppercase)
       throws InvalidConfigurationException {
 
     // get value in String representation
@@ -950,7 +947,7 @@ public final class Configuration {
    * @param pType type of the object
    * @param secondaryOption the optional second annotation of the option
    */
-  private @Nullable <T> Object convertValue(
+  private <T> @Nullable Object convertValue(
       String optionName, String valueStr, TypeToken<?> pType, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {
     // convert value to correct type
@@ -1093,7 +1090,7 @@ public final class Configuration {
     return result;
   }
 
-  private @Nullable <T> Object convertDefaultValue(
+  private <T> @Nullable Object convertDefaultValue(
       String optionName,
       @Nullable T defaultValue,
       TypeToken<T> type,
@@ -1151,8 +1148,7 @@ public final class Configuration {
   }
 
   /** A null-safe combination of {@link String#trim()} and {@link Strings#emptyToNull(String)}. */
-  @Nullable
-  private static String trimToNull(@Nullable String s) {
+  private static @Nullable String trimToNull(@Nullable String s) {
     if (s == null) {
       return null;
     }

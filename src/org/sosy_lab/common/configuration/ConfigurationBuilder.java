@@ -43,16 +43,16 @@ import org.sosy_lab.common.io.IO;
 @CanIgnoreReturnValue
 public final class ConfigurationBuilder {
 
-  @Nullable private Map<String, String> properties = null;
-  @Nullable private Map<String, Path> sources = null;
-  @Nullable private Configuration oldConfig = null;
-  @Nullable private String prefix = null;
+  private @Nullable Map<String, String> properties = null;
+  private @Nullable Map<String, Path> sources = null;
+  private @Nullable Configuration oldConfig = null;
+  private @Nullable String prefix = null;
 
   /**
    * Map of to-be-used converters or null. If null, no converters have been explicitly set yet. If
    * not null, only the converters that have been explicitly added to this builder are in the map.
    */
-  @Nullable private Map<Class<?>, TypeConverter> converters = null;
+  private @Nullable Map<Class<?>, TypeConverter> converters = null;
 
   ConfigurationBuilder() {}
 
@@ -313,8 +313,7 @@ public final class ConfigurationBuilder {
    *
    * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
    */
-  @Nullable
-  private static FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
+  private static @Nullable FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
     if ("jar".equals(uri.getScheme())) {
       for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
         if (provider.getScheme().equalsIgnoreCase("jar")) {
