@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Parser.InvalidConfigurationFileException;
@@ -35,7 +36,7 @@ public class ParserTest {
   private static final String TEST_FILE_SUFFIX = ".properties";
   private static final String TEST_FILE_PREFIX = "SoSy-Lab_Common_ParserTest";
 
-  private Path basePath;
+  private @Nullable Path basePath;
 
   @Before
   public void resetBasePath() {

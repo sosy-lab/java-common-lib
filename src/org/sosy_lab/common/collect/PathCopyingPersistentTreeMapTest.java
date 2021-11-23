@@ -29,6 +29,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class PathCopyingPersistentTreeMapTest {
     return suite;
   }
 
-  private PersistentSortedMap<String, String> map;
+  private @Nullable PersistentSortedMap<String, String> map;
 
   @Before
   public void setUp() {

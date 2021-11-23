@@ -263,7 +263,7 @@ public final class Collections3 {
     return end.toString();
   }
 
-  private static boolean guaranteesNaturalOrder(Comparator<?> comp) {
+  private static boolean guaranteesNaturalOrder(@Nullable Comparator<?> comp) {
     return comp == null
         || comp.equals(Comparator.naturalOrder())
         || comp.equals(Ordering.natural());

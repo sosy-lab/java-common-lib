@@ -448,7 +448,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
   }
 
-  private static <K extends Comparable<? super K>, V> int checkAssertions(Node<K, V> current) {
+  private static <K extends Comparable<? super K>, V> int checkAssertions(
+      @Nullable Node<K, V> current) {
     if (current == null) {
       return 0;
     }
@@ -511,7 +512,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @return A map instance with the given tree.
    */
   @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
-  private PersistentSortedMap<K, V> mapFromTree(@Var Node<K, V> newRoot) {
+  private PersistentSortedMap<K, V> mapFromTree(@Var @Nullable Node<K, V> newRoot) {
     if (newRoot == root) {
       return this;
     } else if (newRoot == null) {
@@ -529,7 +530,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   private static <K extends Comparable<? super K>, V> Node<K, V> putAndCopy0(
-      K key, V value, @Var Node<K, V> current) {
+      K key, V value, @Var @Nullable Node<K, V> current) {
     // Inserting is easy:
     // We find the place where to insert,
     // and afterwards fix the invariants by some rotations or re-colorings.
@@ -1301,14 +1302,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
         boolean pFromInclusive,
         @Nullable K pToKey,
         boolean pToInclusive) {
-      root = pRoot;
+      root = checkNotNull(pRoot);
       fromKey = pFromKey;
       fromInclusive = pFromInclusive;
       toKey = pToKey;
       toInclusive = pToInclusive;
 
       // check non-emptiness invariant
-      assert root != null;
       assert pFromKey == null
           || containsKey(findNextGreaterNode(pFromKey, pRoot, fromInclusive).getKey());
       assert pToKey == null
