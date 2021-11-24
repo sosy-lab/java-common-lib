@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.Var;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -512,7 +513,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
     // check whether annotation declares field
     try {
-      annotationClass.getDeclaredMethod(checkNotNull(fieldName));
+      @SuppressWarnings("unused")
+      Method unused = annotationClass.getDeclaredMethod(checkNotNull(fieldName));
     } catch (NoSuchMethodException e) {
       throw new IllegalArgumentException(e);
     }

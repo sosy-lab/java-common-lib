@@ -35,17 +35,22 @@ SPDX-License-Identifier: Apache-2.0
         - UngroupedOverloads: not worth it
         - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
+        - VoidMissingNullable: https://github.com/google/error-prone/issues/2679
+        - FieldMissingNullable: buggy, maybe same bug as VoidMissingNullable
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
         -Xep:StaticOrDefaultInterfaceMethod:OFF
         -Xep:AndroidJdkLibsChecker:OFF
         -Xep:Java7ApiChecker:OFF
+        -Xep:Java8ApiChecker:OFF
         -Xep:FieldCanBeFinal:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
         -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
+        -Xep:VoidMissingNullable:OFF
+        -Xep:FieldMissingNullable:OFF
         "/>
 
     <import file="build/build-version.xml"/>
