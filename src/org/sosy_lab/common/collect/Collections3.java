@@ -25,6 +25,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Chars;
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -282,6 +283,9 @@ public final class Collections3 {
 
   /** An implementation of {@link SortedSet#equals(Object)}. */
   @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressFBWarnings(
+      value = "DCN_NULLPOINTER_EXCEPTION",
+      justification = "handle null even if one of the collections does not")
   static boolean sortedSetEquals(SortedSet<?> coll1, @Nullable Object pColl2) {
     checkNotNull(coll1);
     if (coll1 == pColl2) {
@@ -329,6 +333,9 @@ public final class Collections3 {
 
   /* This method implements {@link SortedSet#containsAll} */
   @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressFBWarnings(
+      value = "DCN_NULLPOINTER_EXCEPTION",
+      justification = "handle null even if comparator does not")
   static boolean sortedSetContainsAll(
       SortedSet<?> coll1, Collection<?> pColl2, @Nullable Equivalence<Object> pAdditionalEquality) {
     checkNotNull(coll1);
