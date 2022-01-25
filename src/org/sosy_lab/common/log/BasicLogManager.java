@@ -16,7 +16,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.Var;
@@ -625,16 +624,6 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static @Nullable StackTraceElement locateStackTraceElement(Throwable e) {
     // use exception stack trace here so that the location where the exception
     // occurred appears in the message
-    List<StackTraceElement> trace = Throwables.lazyStackTrace(e);
-    @Var StackTraceElement frame;
-    try {
-      frame = trace.get(0);
-    } catch (IndexOutOfBoundsException stackEmptyException) {
-      // stack may be empty: https://plumbr.io/blog/java/on-a-quest-for-missing-stacktraces
-      // We avoid calling size() such that the JVM does not have to unroll the whole stack.
-      return null;
-    }
-
     // Attempt to find the most interesting trace element
 
     Predicate<StackTraceElement> isRelevant;
@@ -650,18 +639,15 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       isRelevant = Predicates.alwaysTrue();
     }
 
-    @Var int traceIndex = 0;
-    while (!isRelevant.test(frame)) {
-      traceIndex++;
-      try {
-        frame = trace.get(traceIndex);
-      } catch (IndexOutOfBoundsException endOfStackException) {
-        // We avoid calling size() such that the JVM does not have to unroll the whole stack.
-        break;
+    for (StackTraceElement frame : e.getStackTrace()) {
+      if (isRelevant.test(frame)) {
+        return frame;
       }
     }
 
-    return frame;
+    // stack may be empty: https://plumbr.io/blog/java/on-a-quest-for-missing-stacktraces
+    // (hypothetically, all frames could be irrelevant as well)
+    return null;
   }
 
   /** {@inheritDoc} */
