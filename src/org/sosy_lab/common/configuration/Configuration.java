@@ -236,7 +236,7 @@ public final class Configuration {
       }
 
       @Override
-      public Set<java.util.Map.Entry<Class<?>, TypeConverter>> entrySet() {
+      public Set<Map.Entry<Class<?>, TypeConverter>> entrySet() {
         return Collections.unmodifiableSet(super.entrySet());
       }
     };
