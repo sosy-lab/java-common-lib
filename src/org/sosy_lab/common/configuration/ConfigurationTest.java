@@ -93,6 +93,7 @@ public class ConfigurationTest {
   }
 
   @Options
+  @SuppressWarnings("PreferredInterfaceType")
   private static class TestSetOfEnumsOptions {
 
     @Option(secure = true, description = "Test injection of a set of enum values")

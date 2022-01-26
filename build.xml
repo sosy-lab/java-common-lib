@@ -35,8 +35,7 @@ SPDX-License-Identifier: Apache-2.0
         - UngroupedOverloads: not worth it
         - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
-        - VoidMissingNullable: https://github.com/google/error-prone/issues/2679
-        - FieldMissingNullable: buggy, maybe same bug as VoidMissingNullable
+        - ReturnMissingNullable: https://github.com/google/error-prone/issues/2910
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
@@ -49,8 +48,7 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:UngroupedOverloads:OFF
         -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
-        -Xep:VoidMissingNullable:OFF
-        -Xep:FieldMissingNullable:OFF
+        -Xep:ReturnMissingNullable:OFF
         "/>
 
     <import file="build/build-version.xml"/>
