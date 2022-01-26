@@ -224,7 +224,7 @@ public final class Configuration {
       }
 
       @Override
-      public TypeConverter put(Class<?> cls, TypeConverter pValue) {
+      public @Nullable TypeConverter put(Class<?> cls, TypeConverter pValue) {
         check(cls, pValue);
         return super.put(cls, pValue);
       }

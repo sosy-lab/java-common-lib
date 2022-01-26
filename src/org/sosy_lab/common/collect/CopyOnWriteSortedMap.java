@@ -93,7 +93,7 @@ public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, 
    */
   @Override
   @CanIgnoreReturnValue
-  public V put(K pKey, V pValue) {
+  public @Nullable V put(K pKey, V pValue) {
     PersistentSortedMap<K, V> oldMap = put0(pKey, pValue);
 
     return oldMap.get(pKey);

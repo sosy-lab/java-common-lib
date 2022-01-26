@@ -74,7 +74,7 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
     }
 
     @Override
-    public Comparator<? super K> comparator() {
+    public @Nullable Comparator<? super K> comparator() {
       return null;
     }
 
@@ -110,32 +110,32 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
     }
 
     @Override
-    public Entry<K, V> firstEntry() {
+    public @Nullable Entry<K, V> firstEntry() {
       return null;
     }
 
     @Override
-    public Entry<K, V> lastEntry() {
+    public @Nullable Entry<K, V> lastEntry() {
       return null;
     }
 
     @Override
-    public Entry<K, V> ceilingEntry(K pKey) {
+    public @Nullable Entry<K, V> ceilingEntry(K pKey) {
       return null;
     }
 
     @Override
-    public Entry<K, V> floorEntry(K pKey) {
+    public @Nullable Entry<K, V> floorEntry(K pKey) {
       return null;
     }
 
     @Override
-    public Entry<K, V> higherEntry(K pKey) {
+    public @Nullable Entry<K, V> higherEntry(K pKey) {
       return null;
     }
 
     @Override
-    public Entry<K, V> lowerEntry(K pKey) {
+    public @Nullable Entry<K, V> lowerEntry(K pKey) {
       return null;
     }
 
@@ -185,7 +185,7 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
     }
 
     @Override
-    public V get(Object pKey) {
+    public @Nullable V get(Object pKey) {
       return null;
     }
 

@@ -115,62 +115,62 @@ final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
   }
 
   @Override
-  public Entry<K, V> lowerEntry(@Nullable K pKey) {
+  public @Nullable Entry<K, V> lowerEntry(@Nullable K pKey) {
     return map.higherEntry(pKey);
   }
 
   @Override
-  public K lowerKey(@Nullable K pKey) {
+  public @Nullable K lowerKey(@Nullable K pKey) {
     return map.higherKey(pKey);
   }
 
   @Override
-  public Entry<K, V> floorEntry(@Nullable K pKey) {
+  public @Nullable Entry<K, V> floorEntry(@Nullable K pKey) {
     return map.ceilingEntry(pKey);
   }
 
   @Override
-  public K floorKey(@Nullable K pKey) {
+  public @Nullable K floorKey(@Nullable K pKey) {
     return map.ceilingKey(pKey);
   }
 
   @Override
-  public Entry<K, V> ceilingEntry(@Nullable K pKey) {
+  public @Nullable Entry<K, V> ceilingEntry(@Nullable K pKey) {
     return map.floorEntry(pKey);
   }
 
   @Override
-  public K ceilingKey(@Nullable K pKey) {
+  public @Nullable K ceilingKey(@Nullable K pKey) {
     return map.floorKey(pKey);
   }
 
   @Override
-  public Entry<K, V> higherEntry(@Nullable K pKey) {
+  public @Nullable Entry<K, V> higherEntry(@Nullable K pKey) {
     return map.lowerEntry(pKey);
   }
 
   @Override
-  public K higherKey(@Nullable K pKey) {
+  public @Nullable K higherKey(@Nullable K pKey) {
     return map.lowerKey(pKey);
   }
 
   @Override
-  public Entry<K, V> firstEntry() {
+  public @Nullable Entry<K, V> firstEntry() {
     return map.lastEntry();
   }
 
   @Override
-  public Entry<K, V> lastEntry() {
+  public @Nullable Entry<K, V> lastEntry() {
     return map.firstEntry();
   }
 
   @Override
-  public Entry<K, V> pollFirstEntry() {
+  public @Nullable Entry<K, V> pollFirstEntry() {
     return map.pollLastEntry();
   }
 
   @Override
-  public Entry<K, V> pollLastEntry() {
+  public @Nullable Entry<K, V> pollLastEntry() {
     return map.pollFirstEntry();
   }
 

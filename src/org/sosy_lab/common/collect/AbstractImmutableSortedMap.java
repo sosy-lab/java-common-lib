@@ -97,22 +97,22 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
   }
 
   @Override
-  public final K ceilingKey(K pKey) {
+  public final @Nullable K ceilingKey(K pKey) {
     return keyOrNull(ceilingEntry(pKey));
   }
 
   @Override
-  public final K floorKey(K pKey) {
+  public final @Nullable K floorKey(K pKey) {
     return keyOrNull(floorEntry(pKey));
   }
 
   @Override
-  public final K higherKey(K pKey) {
+  public final @Nullable K higherKey(K pKey) {
     return keyOrNull(higherEntry(pKey));
   }
 
   @Override
-  public final K lowerKey(K pKey) {
+  public final @Nullable K lowerKey(K pKey) {
     return keyOrNull(lowerEntry(pKey));
   }
 

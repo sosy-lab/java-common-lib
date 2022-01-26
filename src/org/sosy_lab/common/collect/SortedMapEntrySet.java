@@ -88,7 +88,7 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
-  public Entry<K, V> ceiling(Entry<K, V> pE) {
+  public @Nullable Entry<K, V> ceiling(Entry<K, V> pE) {
     return map.ceilingEntry(pE.getKey());
   }
 
@@ -101,12 +101,12 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
-  public Entry<K, V> floor(Entry<K, V> pE) {
+  public @Nullable Entry<K, V> floor(Entry<K, V> pE) {
     return map.floorEntry(pE.getKey());
   }
 
   @Override
-  public Entry<K, V> higher(Entry<K, V> pE) {
+  public @Nullable Entry<K, V> higher(Entry<K, V> pE) {
     return map.higherEntry(pE.getKey());
   }
 
@@ -119,7 +119,7 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
-  public Entry<K, V> lower(Entry<K, V> pE) {
+  public @Nullable Entry<K, V> lower(Entry<K, V> pE) {
     return map.lowerEntry(pE.getKey());
   }
 
@@ -153,12 +153,12 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
   }
 
   @Override
-  public Entry<K, V> pollFirst() {
+  public @Nullable Entry<K, V> pollFirst() {
     return map.pollFirstEntry();
   }
 
   @Override
-  public Entry<K, V> pollLast() {
+  public @Nullable Entry<K, V> pollLast() {
     return map.pollLastEntry();
   }
 

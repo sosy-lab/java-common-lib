@@ -827,7 +827,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public V get(Object pObj) {
+  public @Nullable V get(Object pObj) {
     Node<K, V> node = findNode(pObj, root);
     return node == null ? null : node.getValue();
   }
@@ -870,22 +870,22 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public Entry<K, V> ceilingEntry(K pKey) {
+  public @Nullable Entry<K, V> ceilingEntry(K pKey) {
     return findNextGreaterNode(pKey, root, /*inclusive=*/ true);
   }
 
   @Override
-  public Entry<K, V> floorEntry(K pKey) {
+  public @Nullable Entry<K, V> floorEntry(K pKey) {
     return findNextSmallerNode(pKey, root, /*inclusive=*/ true);
   }
 
   @Override
-  public Entry<K, V> higherEntry(K pKey) {
+  public @Nullable Entry<K, V> higherEntry(K pKey) {
     return findNextGreaterNode(pKey, root, /*inclusive=*/ false);
   }
 
   @Override
-  public Entry<K, V> lowerEntry(K pKey) {
+  public @Nullable Entry<K, V> lowerEntry(K pKey) {
     return findNextSmallerNode(pKey, root, /*inclusive=*/ false);
   }
 
@@ -1381,7 +1381,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public V get(Object pKey) {
+    public @Nullable V get(Object pKey) {
       Node<K, V> node = getEntry(pKey);
       return node == null ? null : node.getValue();
     }
@@ -1400,7 +1400,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public Entry<K, V> firstEntry() {
+    public @Nullable Entry<K, V> firstEntry() {
       if (fromKey == null) {
         return findSmallestNode(root);
       } else {
@@ -1409,7 +1409,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public Entry<K, V> lastEntry() {
+    public @Nullable Entry<K, V> lastEntry() {
       if (toKey == null) {
         return findLargestNode(root);
       } else {
