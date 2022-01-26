@@ -17,6 +17,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
@@ -45,7 +46,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -590,7 +590,7 @@ public final class Classes {
             .map(TypeToken::getRawType)
             .toArray(Class[]::new);
     Parameter[] formalParams = interfaceMethod.getParameters();
-    List<TypeToken<?>> formalParamTypes =
+    ImmutableList<TypeToken<?>> formalParamTypes =
         resolve(factoryType, interfaceMethod.getGenericParameterTypes()).collect(toImmutableList());
     for (Multiset.Entry<TypeToken<?>> entry :
         ImmutableMultiset.copyOf(formalParamTypes).entrySet()) {
@@ -616,7 +616,7 @@ public final class Classes {
           "'%s' declares illegal checked exception %s", target, exception);
     }
     Parameter[] targetParameters = target.getParameters();
-    List<TypeToken<?>> targetParamTypes =
+    ImmutableList<TypeToken<?>> targetParamTypes =
         Arrays.stream(targetParameters)
             .map(Parameter::getAnnotatedType)
             .map(AnnotatedType::getType)
@@ -711,7 +711,7 @@ public final class Classes {
    */
   private static Executable getInstantiationMethodForClass(Class<?> cls)
       throws UnsuitedClassException {
-    List<Method> factoryMethods =
+    ImmutableList<Method> factoryMethods =
         Arrays.stream(cls.getDeclaredMethods())
             .filter(m -> m.getName().equals("create"))
             .filter(m -> Modifier.isStatic(m.getModifiers()))

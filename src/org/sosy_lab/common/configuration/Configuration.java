@@ -129,7 +129,7 @@ public final class Configuration {
       Splitter.on("::").limit(2).trimResults();
 
   /** Map that stores which implementation we use for the collection classes. */
-  static final Map<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
+  static final ImmutableMap<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> COLLECTIONS;
 
   static {
     ImmutableMap.Builder<Class<? extends Iterable<?>>, Class<? extends Iterable<?>>> builder =

@@ -310,7 +310,8 @@ public class OptionCollector {
 
     // gradle projects do also in eclipse have another folder for sources
     // so check which folder is the actual source folder
-    List<Path> candidates = ImmutableList.of(Path.of("src", "main", "java"), Path.of("src"));
+    ImmutableList<Path> candidates =
+        ImmutableList.of(Path.of("src", "main", "java"), Path.of("src"));
     for (Path candidate : candidates) {
       Path sourcePath = basePath.resolve(candidate);
       if (Files.isDirectory(sourcePath)) {

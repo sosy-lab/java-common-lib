@@ -50,13 +50,13 @@ public class LoggingOptions {
       secure = true,
       toUppercase = true,
       description = "single levels to be excluded from being logged")
-  private List<Level> fileExclude = ImmutableList.of();
+  private ImmutableList<Level> fileExclude = ImmutableList.of();
 
   @Option(
       secure = true,
       toUppercase = true,
       description = "single levels to be excluded from being logged")
-  private List<Level> consoleExclude = ImmutableList.of();
+  private ImmutableList<Level> consoleExclude = ImmutableList.of();
 
   @Option(secure = true, name = "file", description = "name of the log file")
   @FileOption(FileOption.Type.OUTPUT_FILE)

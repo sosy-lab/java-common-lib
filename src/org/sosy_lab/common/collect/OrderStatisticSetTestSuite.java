@@ -17,7 +17,6 @@ import com.google.common.collect.testing.TestStringSortedSetGenerator;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.SerializableTester;
 import com.google.errorprone.annotations.Var;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.NavigableSet;
 import org.junit.Test;
@@ -105,7 +104,8 @@ public abstract class OrderStatisticSetTestSuite {
   public void testSubsetView_outOfBounds_add() {
     NavigableSet<String> set = createSet(ELEMS);
     NavigableSet<String> subSet = set.subSet(ELEMS_ABOVE[0], true, ELEMS_ABOVE[2], true);
-    Collection<String> toAdd = ImmutableList.of(ELEMS[1], ELEMS_BELOW[2], ELEMS[2], ELEMS_ABOVE[3]);
+    ImmutableList<String> toAdd =
+        ImmutableList.of(ELEMS[1], ELEMS_BELOW[2], ELEMS[2], ELEMS_ABOVE[3]);
 
     assertThrows(IllegalArgumentException.class, () -> subSet.add(ELEMS[0]));
     assertThrows(IllegalArgumentException.class, () -> subSet.add(ELEMS[3]));
@@ -125,7 +125,7 @@ public abstract class OrderStatisticSetTestSuite {
     assertThat(set).contains(ELEMS[1]);
     assertThat(set).contains(ELEMS[3]);
 
-    Collection<String> toRemove = ImmutableList.of(ELEMS_BELOW[2], ELEMS[2], ELEMS[1]);
+    ImmutableList<String> toRemove = ImmutableList.of(ELEMS_BELOW[2], ELEMS[2], ELEMS[1]);
     subSet.removeAll(toRemove);
 
     assertThat(set).contains(ELEMS[1]);

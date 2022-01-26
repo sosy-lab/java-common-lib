@@ -147,10 +147,10 @@ public class CollectionsTransformationTest {
   @Test
   public void testTransformedImmutableListCopyUsesSize() {
     @SuppressWarnings("DoNotMock")
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
+    ImmutableList<String> list = Mockito.spy(ImmutableList.of("a", "b"));
 
     @SuppressWarnings("unused")
-    List<String> transformed =
+    ImmutableList<String> transformed =
         Collections3.transformedImmutableListCopy(list, Functions.identity());
     Mockito.verify(list).size();
   }
@@ -169,10 +169,11 @@ public class CollectionsTransformationTest {
   @Test
   public void testStreamMapDoesNotUseSize() {
     @SuppressWarnings("DoNotMock")
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
+    ImmutableList<String> list = Mockito.spy(ImmutableList.of("a", "b"));
 
     @SuppressWarnings("unused")
-    List<String> transformed = list.stream().map(s -> s).collect(ImmutableList.toImmutableList());
+    ImmutableList<String> transformed =
+        list.stream().map(s -> s).collect(ImmutableList.toImmutableList());
     Mockito.verify(list, Mockito.never()).size();
   }
 
@@ -190,10 +191,10 @@ public class CollectionsTransformationTest {
   @Test
   public void testFluentIterableTransformDoesNotUseSize() {
     @SuppressWarnings("DoNotMock")
-    List<String> list = Mockito.spy(ImmutableList.of("a", "b"));
+    ImmutableList<String> list = Mockito.spy(ImmutableList.of("a", "b"));
 
     @SuppressWarnings("unused")
-    List<String> transformed =
+    ImmutableList<String> transformed =
         FluentIterable.from(list) /* suppress RefasterRules.TransformedImmutableList */
             .transform(Functions.identity())
             .toList();

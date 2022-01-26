@@ -569,7 +569,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     return super.getCompletions(element, annotation, field, userText);
   }
 
-  private Iterable<? extends Completion> returnPackagePrefixCompletions(
+  private List<? extends Completion> returnPackagePrefixCompletions(
       Element element, String userText) {
     List<Completion> packages = new ArrayList<>();
     PackageElement pkg = elementUtils().getPackageOf(element);
