@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -38,6 +39,10 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
 
   SortedMapKeySet(OurSortedMap<K, ?> pMap) {
     map = checkNotNull(pMap);
+  }
+
+  private @Nullable K keyOrNull(@Nullable Entry<K, ?> entry) {
+    return entry == null ? null : entry.getKey();
   }
 
   @Override
@@ -142,12 +147,12 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
 
   @Override
   public K pollFirst() {
-    return map.pollFirstEntry().getKey();
+    return keyOrNull(map.pollFirstEntry());
   }
 
   @Override
   public K pollLast() {
-    return map.pollLastEntry().getKey();
+    return keyOrNull(map.pollLastEntry());
   }
 
   @Override
