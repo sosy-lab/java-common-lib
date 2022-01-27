@@ -126,32 +126,32 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
   }
 
   @Override
-  public K lower(@Nullable K pE) {
+  public @Nullable K lower(@Nullable K pE) {
     return map.lowerKey(pE);
   }
 
   @Override
-  public K floor(@Nullable K pE) {
+  public @Nullable K floor(@Nullable K pE) {
     return map.floorKey(pE);
   }
 
   @Override
-  public K ceiling(@Nullable K pE) {
+  public @Nullable K ceiling(@Nullable K pE) {
     return map.ceilingKey(pE);
   }
 
   @Override
-  public K higher(@Nullable K pE) {
+  public @Nullable K higher(@Nullable K pE) {
     return map.higherKey(pE);
   }
 
   @Override
-  public K pollFirst() {
+  public @Nullable K pollFirst() {
     return keyOrNull(map.pollFirstEntry());
   }
 
   @Override
-  public K pollLast() {
+  public @Nullable K pollLast() {
     return keyOrNull(map.pollLastEntry());
   }
 

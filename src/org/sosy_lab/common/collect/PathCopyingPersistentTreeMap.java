@@ -890,7 +890,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
   }
 
   @Override
-  public Comparator<? super K> comparator() {
+  public @Nullable Comparator<? super K> comparator() {
     return null;
   }
 
@@ -1454,7 +1454,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     }
 
     @Override
-    public Comparator<? super K> comparator() {
+    public @Nullable Comparator<? super K> comparator() {
       return null;
     }
 
