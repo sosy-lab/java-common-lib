@@ -66,7 +66,7 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? INT_EMPTY_FIRST : INT_EMTPY_LAST;
+      return emptyFirst ? INT_EMPTY_FIRST : INT_EMPTY_LAST;
     }
   }
 
@@ -109,7 +109,7 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? LONG_EMPTY_FIRST : LONG_EMTPY_LAST;
+      return emptyFirst ? LONG_EMPTY_FIRST : LONG_EMPTY_LAST;
     }
   }
 
@@ -152,7 +152,7 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? DOUBLE_EMPTY_FIRST : DOUBLE_EMTPY_LAST;
+      return emptyFirst ? DOUBLE_EMPTY_FIRST : DOUBLE_EMPTY_LAST;
     }
   }
 }
