@@ -323,7 +323,7 @@ public class OptionCollector {
 
   /**
    * This function searches for the default field value of an {@link Option} in the sourcefile of
-   * the actual field/class and returns it or an emtpy String, if the value not found.
+   * the actual field/class and returns it or an empty String, if the value not found.
    *
    * <p>This part only works, if you have the source code.
    *

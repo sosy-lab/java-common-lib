@@ -173,7 +173,7 @@ public final class Optionals {
    * all non-empty instances, and compares present integers using their natural order.
    */
   public static Ordering<OptionalInt> comparingIntEmptyFirst() {
-    return OptionalComparators.INT_EMTPY_FIRST;
+    return OptionalComparators.INT_EMPTY_FIRST;
   }
 
   /**
@@ -181,7 +181,7 @@ public final class Optionals {
    * all non-empty instances, and compares present integers using their natural order.
    */
   public static Ordering<OptionalInt> comparingIntEmptyLast() {
-    return OptionalComparators.INT_EMTPY_LAST;
+    return OptionalComparators.INT_EMPTY_LAST;
   }
 
   /**
@@ -189,7 +189,7 @@ public final class Optionals {
    * than all non-empty instances, and compares present longs using their natural order.
    */
   public static Ordering<OptionalLong> comparingLongEmptyFirst() {
-    return OptionalComparators.LONG_EMTPY_FIRST;
+    return OptionalComparators.LONG_EMPTY_FIRST;
   }
 
   /**
@@ -197,7 +197,7 @@ public final class Optionals {
    * all non-empty instances, and compares present longs using their natural order.
    */
   public static Ordering<OptionalLong> comparingLongEmptyLast() {
-    return OptionalComparators.LONG_EMTPY_LAST;
+    return OptionalComparators.LONG_EMPTY_LAST;
   }
 
   /**
@@ -205,7 +205,7 @@ public final class Optionals {
    * than all non-empty instances, and compares present doubles using their natural order.
    */
   public static Ordering<OptionalDouble> comparingDoubleEmptyFirst() {
-    return OptionalComparators.DOUBLE_EMTPY_FIRST;
+    return OptionalComparators.DOUBLE_EMPTY_FIRST;
   }
 
   /**
@@ -213,6 +213,6 @@ public final class Optionals {
    * than all non-empty instances, and compares present doubles using their natural order.
    */
   public static Ordering<OptionalDouble> comparingDoubleEmptyLast() {
-    return OptionalComparators.DOUBLE_EMTPY_LAST;
+    return OptionalComparators.DOUBLE_EMPTY_LAST;
   }
 }

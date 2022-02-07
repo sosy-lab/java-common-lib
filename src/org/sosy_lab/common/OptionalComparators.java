@@ -27,9 +27,9 @@ final class OptionalComparators {
 
   private OptionalComparators() {}
 
-  static final Ordering<OptionalInt> INT_EMTPY_FIRST =
+  static final Ordering<OptionalInt> INT_EMPTY_FIRST =
       new OptionalIntComparator(/*pEmptyFirst=*/ true);
-  static final Ordering<OptionalInt> INT_EMTPY_LAST =
+  static final Ordering<OptionalInt> INT_EMPTY_LAST =
       new OptionalIntComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalIntComparator extends Ordering<OptionalInt>
@@ -66,13 +66,13 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? INT_EMTPY_FIRST : INT_EMTPY_LAST;
+      return emptyFirst ? INT_EMPTY_FIRST : INT_EMTPY_LAST;
     }
   }
 
-  static final Ordering<OptionalLong> LONG_EMTPY_FIRST =
+  static final Ordering<OptionalLong> LONG_EMPTY_FIRST =
       new OptionalLongComparator(/*pEmptyFirst=*/ true);
-  static final Ordering<OptionalLong> LONG_EMTPY_LAST =
+  static final Ordering<OptionalLong> LONG_EMPTY_LAST =
       new OptionalLongComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalLongComparator extends Ordering<OptionalLong>
@@ -109,13 +109,13 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? LONG_EMTPY_FIRST : LONG_EMTPY_LAST;
+      return emptyFirst ? LONG_EMPTY_FIRST : LONG_EMTPY_LAST;
     }
   }
 
-  static final Ordering<OptionalDouble> DOUBLE_EMTPY_FIRST =
+  static final Ordering<OptionalDouble> DOUBLE_EMPTY_FIRST =
       new OptionalDoubleComparator(/*pEmptyFirst=*/ true);
-  static final Ordering<OptionalDouble> DOUBLE_EMTPY_LAST =
+  static final Ordering<OptionalDouble> DOUBLE_EMPTY_LAST =
       new OptionalDoubleComparator(/*pEmptyFirst=*/ false);
 
   private static final class OptionalDoubleComparator extends Ordering<OptionalDouble>
@@ -152,7 +152,7 @@ final class OptionalComparators {
 
     private Object readResolve() {
       // Multiton avoids need for equals()/hashCode()
-      return emptyFirst ? DOUBLE_EMTPY_FIRST : DOUBLE_EMTPY_LAST;
+      return emptyFirst ? DOUBLE_EMPTY_FIRST : DOUBLE_EMTPY_LAST;
     }
   }
 }
