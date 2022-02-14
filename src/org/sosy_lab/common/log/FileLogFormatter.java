@@ -8,11 +8,15 @@
 
 package org.sosy_lab.common.log;
 
-/** @deprecated use {@link TimestampedLogFormatter} instead. */
+/**
+ * @deprecated use {@link TimestampedLogFormatter} instead.
+ */
 @Deprecated
 public class FileLogFormatter extends TimestampedLogFormatter {
 
-  /** @deprecated use {@link TimestampedLogFormatter#withoutColors()} */
+  /**
+   * @deprecated use {@link TimestampedLogFormatter#withoutColors()}
+   */
   @Deprecated
   public FileLogFormatter() {
     super(false);
