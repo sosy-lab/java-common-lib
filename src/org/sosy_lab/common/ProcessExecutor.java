@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.log.LogManager;
 
 /**
@@ -202,7 +202,7 @@ public class ProcessExecutor<E extends Exception> {
             });
 
     // platform charset is what processes usually use for communication
-    in = new OutputStreamWriter(process.getOutputStream(), Charset.defaultCharset());
+    in = new OutputStreamWriter(process.getOutputStream(), IO.getNativeCharset());
 
     // wrap both output handling callables in CancellingCallables so that
     // exceptions thrown by the handling methods terminate the process immediately
@@ -212,7 +212,7 @@ public class ProcessExecutor<E extends Exception> {
               try (BufferedReader reader =
                   new BufferedReader(
                       // platform charset is what processes usually use for communication
-                      new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
+                      new InputStreamReader(process.getInputStream(), IO.getNativeCharset()))) {
                 @Var String line;
                 while ((line = reader.readLine()) != null) {
                   handleOutput(line);
@@ -237,7 +237,7 @@ public class ProcessExecutor<E extends Exception> {
               try (BufferedReader reader =
                   new BufferedReader(
                       // platform charset is what processes usually use for communication
-                      new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
+                      new InputStreamReader(process.getErrorStream(), IO.getNativeCharset()))) {
                 @Var String line;
                 while ((line = reader.readLine()) != null) {
                   handleErrorOutput(line);

@@ -10,16 +10,21 @@ package org.sosy_lab.common.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.CharSource;
 import com.google.common.io.MoreFiles;
+import com.google.errorprone.annotations.Var;
 import java.io.BufferedWriter;
 import java.io.CharArrayWriter;
+import java.io.Console;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -35,6 +40,51 @@ public final class IO {
 
   private IO() {
     /* utility class */
+  }
+
+  private static final Charset NATIVE_CHARSET;
+
+  static {
+    String nativeEncoding = System.getProperty("native.encoding");
+    @Var Charset charset = Charset.defaultCharset();
+    if (nativeEncoding != null) {
+      // Java 17 or newer
+      try {
+        charset = Charset.forName(nativeEncoding);
+      } catch (IllegalCharsetNameException | UnsupportedCharsetException ignored) {
+        // unlikely that system property set by JVM has illegal charset,
+        // and fallback to Charset.defaultCharset() is better than crashing the whole application.
+      }
+    }
+    NATIVE_CHARSET = charset;
+  }
+
+  /**
+   * Return the {@link Charset} that is used by the underlying platform, i.e., configured as the OS
+   * default. On modern systems this is typically {@link Charsets#UTF_8} with the exception of
+   * Windows.
+   *
+   * <p>The native encoding should typically used when outputting something to the console (which is
+   * handled by Java automatically) and is also the common agreement when processes are
+   * communicating via pipes, i.e., for {@link Process#getInputStream()}, {@link
+   * Process#getOutputStream()}, and {@link Process#getErrorStream()}.
+   *
+   * <p>Note that Java 17 also provides {@link Console#charset()} which should always return the
+   * same value, this method is a convenience method for simplifying code that has to work with both
+   * old and new Java versions.
+   *
+   * <p>Before Java 18 the method {@link Charset#defaultCharset()} also returns the native charset,
+   * but it was <a href="https://openjdk.java.net/jeps/400">changed</a> to return UTF-8 in Java 18.
+   *
+   * <p>If the charset of the JVM is overwritten by setting some system properties like {@code
+   * file.encoding} this method may return the specified charset instead of the "real" native
+   * charset (just like {@link Charset#defaultCharset()} already did).
+   *
+   * <p>More information can be found in <a href="https://openjdk.java.net/jeps/400">JEP 400</a>.
+   */
+  @SuppressWarnings("javadoc") // reference to Console.charset does not exist before Java 17
+  public static Charset getNativeCharset() {
+    return NATIVE_CHARSET;
   }
 
   /** Read the full content of a {@link CharSource} to a new {@link StringBuilder}. */
