@@ -134,7 +134,7 @@ public enum BaseTypeConverter implements TypeConverter {
       m.setAccessible(true);
       return m.invoke(null, value);
 
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException e) {
+    } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new AssertionError(
           String.format(
               "Class %s without usable %s(%s) method.",

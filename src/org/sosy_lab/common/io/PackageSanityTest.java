@@ -27,7 +27,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     try {
       setDefault(Constructor.class, PackageSanityTest.class.getConstructor());
       setDefault(Method.class, PackageSanityTest.class.getDeclaredMethod("defaultMethod"));
-    } catch (NoSuchMethodException | SecurityException e) {
+    } catch (NoSuchMethodException e) {
       throw new AssertionError(e);
     }
   }
