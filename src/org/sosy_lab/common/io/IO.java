@@ -16,7 +16,6 @@ import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.Var;
 import java.io.BufferedWriter;
 import java.io.CharArrayWriter;
-import java.io.Console;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -69,7 +68,7 @@ public final class IO {
    * communicating via pipes, i.e., for {@link Process#getInputStream()}, {@link
    * Process#getOutputStream()}, and {@link Process#getErrorStream()}.
    *
-   * <p>Note that Java 17 also provides {@link Console#charset()} which should always return the
+   * <p>Note that Java 17 also provides {@code Console#charset()} which should always return the
    * same value, this method is a convenience method for simplifying code that has to work with both
    * old and new Java versions.
    *
@@ -82,7 +81,6 @@ public final class IO {
    *
    * <p>More information can be found in <a href="https://openjdk.java.net/jeps/400">JEP 400</a>.
    */
-  @SuppressWarnings("javadoc") // reference to Console.charset does not exist before Java 17
   public static Charset getNativeCharset() {
     return NATIVE_CHARSET;
   }
