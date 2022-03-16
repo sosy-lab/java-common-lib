@@ -154,12 +154,7 @@ public abstract class OrderStatisticMapTestSuite {
             ELEMS_ABOVE.get(2).getKey(), true);
 
     ImmutableMap<String, String> toAdd =
-        ImmutableMap.<String, String>builder()
-            .put(ELEMS.get(1))
-            .put(ELEMS_BELOW.get(2))
-            .put(ELEMS.get(2))
-            .put(ELEMS_ABOVE.get(3))
-            .build();
+        ImmutableMap.ofEntries(ELEMS.get(1), ELEMS_BELOW.get(2), ELEMS.get(2), ELEMS_ABOVE.get(3));
 
     Entry<String, String> firstEntry = ELEMS.get(0);
     Entry<String, String> fourthEntry = ELEMS.get(3);
@@ -185,11 +180,7 @@ public abstract class OrderStatisticMapTestSuite {
     assertThat(map).containsEntry(ELEMS.get(3).getKey(), ELEMS.get(3).getValue());
 
     ImmutableMap<String, String> toRemove =
-        ImmutableMap.<String, String>builder()
-            .put(ELEMS_BELOW.get(2))
-            .put(ELEMS.get(2))
-            .put(ELEMS.get(1))
-            .build();
+        ImmutableMap.ofEntries(ELEMS_BELOW.get(2), ELEMS.get(2), ELEMS.get(1));
     for (Entry<String, String> e : toRemove.entrySet()) {
       removeEntry(subMap, e);
     }
