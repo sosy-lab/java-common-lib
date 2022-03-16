@@ -126,6 +126,8 @@ public enum BaseTypeConverter implements TypeConverter {
     return invokeStaticMethod(type, "valueOf", String.class, value, optionName);
   }
 
+  @SuppressWarnings(
+      "RethrowReflectiveOperationExceptionAsLinkageError") // LinkageError does not fit
   public static <T> Object invokeStaticMethod(
       Class<?> type, String method, Class<T> paramType, T value, String optionName)
       throws InvalidConfigurationException {
