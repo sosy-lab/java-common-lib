@@ -88,7 +88,7 @@ public final class LinearExpression<T> implements Iterable<Map.Entry<T, Rational
         resultData.put(e.getKey(), e.getValue());
       }
     }
-    return new LinearExpression<>(resultData.build());
+    return new LinearExpression<>(resultData.buildOrThrow());
   }
 
   /** Subtract {@code other} linear expression. */

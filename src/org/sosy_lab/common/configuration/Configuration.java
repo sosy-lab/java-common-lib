@@ -150,7 +150,7 @@ public final class Configuration {
     putSafely(builder, ImmutableSortedSet.class, ImmutableSortedSet.class);
     putSafely(builder, ImmutableMultiset.class, ImmutableMultiset.class);
 
-    COLLECTIONS = builder.build();
+    COLLECTIONS = builder.buildOrThrow();
   }
 
   // using this method to put key-value pairs into the builder ensures that
