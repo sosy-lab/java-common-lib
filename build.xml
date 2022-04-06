@@ -36,6 +36,7 @@ SPDX-License-Identifier: Apache-2.0
         - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
         - ReturnMissingNullable: https://github.com/google/error-prone/issues/2910
+        - Varifier: We do not want "var" in most places.
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
@@ -49,6 +50,7 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
         -Xep:ReturnMissingNullable:OFF
+        -Xep:Varifier:OFF
         "/>
 
     <import file="build/build-version.xml"/>

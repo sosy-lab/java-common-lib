@@ -25,7 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @Immutable
 public final class ExtendedRational implements Comparable<ExtendedRational> {
-  @SuppressWarnings("hiding")
+  @SuppressWarnings({"hiding", "MemberName"})
   public enum NumberType {
     NEG_INFTY,
     RATIONAL, // Normal rational.
@@ -41,7 +41,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
   public static final ExtendedRational NEG_INFTY = new ExtendedRational(NumberType.NEG_INFTY);
   public static final ExtendedRational ZERO = new ExtendedRational(Rational.ZERO);
 
-  @SuppressWarnings("checkstyle:constantname")
+  @SuppressWarnings({"checkstyle:constantname", "MemberName"})
   public static final ExtendedRational NaN = new ExtendedRational(NumberType.NaN);
 
   public ExtendedRational(Rational pRational) {

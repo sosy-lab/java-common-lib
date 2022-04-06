@@ -54,7 +54,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "CheckReturnValue"})
   public void testNoExecution() {
     AtomicBoolean test = new AtomicBoolean(true);
 
@@ -65,7 +65,7 @@ public class LazyFutureTaskTest {
   }
 
   @Test
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "CheckReturnValue"})
   public void testExceptionNoExecution() {
     new LazyFutureTask<>(
         () -> {
