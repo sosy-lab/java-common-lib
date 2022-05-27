@@ -602,7 +602,10 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
 
   private void message(
       Diagnostic.Kind level, Element elem, Class<? extends Annotation> annotation, String message) {
-    message(level, elem, findAnnotationMirror(annotation, elem).orElse(null), message);
+    findAnnotationMirror(annotation, elem)
+        .ifPresentOrElse(
+            annotationMirror -> message(level, elem, annotationMirror, message),
+            () -> message(level, elem, message));
   }
 
   private void message(

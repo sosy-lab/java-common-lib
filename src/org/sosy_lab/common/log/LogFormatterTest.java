@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ public class LogFormatterTest {
     formatter = ConsoleLogFormatter.withoutColors();
   }
 
-  private static LogRecord createTestLogRecord(Level level, String msg) {
+  private static LogRecord createTestLogRecord(Level level, @Nullable String msg) {
     LogRecord record = new LogRecord(level, msg);
     record.setSourceClassName("package.SourceClass");
     record.setSourceMethodName("sourceMethod");

@@ -661,7 +661,7 @@ public class ConfigurationTest {
     abstract void privForMock(String s);
 
     @Option(secure = true, description = "test")
-    public abstract void none(String s);
+    public abstract void none(@Nullable String s);
   }
 
   @Test
