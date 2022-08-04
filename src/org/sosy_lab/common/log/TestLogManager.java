@@ -11,6 +11,7 @@ package org.sosy_lab.common.log;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.FormatMethod;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -34,6 +35,7 @@ public enum TestLogManager implements LogManager {
     return INSTANCE;
   }
 
+  @CanIgnoreReturnValue
   @Override
   public LogManager withComponentName(String pName) {
     checkArgument(!pName.isEmpty());

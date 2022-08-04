@@ -434,7 +434,6 @@ public final class Classes {
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
 
   /** A builder for class loaders with more features than {@link URLClassLoader}. */
-  @CanIgnoreReturnValue
   public abstract static class ClassLoaderBuilder<B extends ClassLoaderBuilder<B>> {
     ClassLoaderBuilder() {}
 
@@ -442,24 +441,28 @@ public final class Classes {
      * Set parent of new class loader. If not set the default delegation parent class loader will be
      * used (like {@link URLClassLoader#URLClassLoader(URL[])}.
      */
+    @CanIgnoreReturnValue
     public abstract B setParent(ClassLoader parent);
 
     /**
      * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
      * {@link #setUrls(URL...)} are required).
      */
+    @CanIgnoreReturnValue
     public abstract B setUrls(Iterable<URL> urls);
 
     /**
      * Set sources for classes of new class loader just like for {@link URLClassLoader} (this or
      * {@link #setUrls(Iterable)} are required).
      */
+    @CanIgnoreReturnValue
     public abstract B setUrls(URL... urls);
 
     /**
      * Set an {@link URLClassLoader} as parent and its URLs from {@link URLClassLoader#getURLs()} as
      * sources for new class loader.
      */
+    @CanIgnoreReturnValue
     public B setParentAndUrls(URLClassLoader parent) {
       return setParent(parent).setUrls(parent.getURLs());
     }
@@ -480,9 +483,11 @@ public final class Classes {
      * that it can be garbage collected independently, for example), but the parent class loader
      * also sees the classes.
      */
+    @CanIgnoreReturnValue
     public abstract B setDirectLoadClasses(Predicate<String> classes);
 
     /** See {@link #setDirectLoadClasses(Predicate)}. */
+    @CanIgnoreReturnValue
     public B setDirectLoadClasses(Pattern classes) {
       return setDirectLoadClasses(matching(classes));
     }
@@ -500,14 +505,17 @@ public final class Classes {
      * class(es) that do the loading. In this case, use {@link #setDirectLoadClasses(Predicate)} to
      * ensure the new class loader loads all relevant classes itself.
      */
+    @CanIgnoreReturnValue
     public abstract B setCustomLookupNativeLibraries(Predicate<String> libraries);
 
     /** See {@link #setCustomLookupNativeLibraries(Predicate)}. */
+    @CanIgnoreReturnValue
     public B setCustomLookupNativeLibraries(Pattern nativeLibraries) {
       return setCustomLookupNativeLibraries(matching(nativeLibraries));
     }
 
     /** See {@link #setCustomLookupNativeLibraries(Predicate)}. */
+    @CanIgnoreReturnValue
     public B setCustomLookupNativeLibraries(String... nativeLibraries) {
       return setCustomLookupNativeLibraries(ImmutableSet.copyOf(nativeLibraries)::contains);
     }

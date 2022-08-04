@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -212,6 +213,7 @@ public class Appenders {
             }
           }
 
+          @CanIgnoreReturnValue
           @Override
           public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
             sb.append(pCsq, pStart, pEnd);
@@ -219,6 +221,7 @@ public class Appenders {
             return this;
           }
 
+          @CanIgnoreReturnValue
           @Override
           public Appendable append(char pC) throws IOException {
             sb.append(pC);
@@ -226,6 +229,7 @@ public class Appenders {
             return this;
           }
 
+          @CanIgnoreReturnValue
           @Override
           public Appendable append(CharSequence pCsq) throws IOException {
             sb.append(pCsq);

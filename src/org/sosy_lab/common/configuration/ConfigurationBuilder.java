@@ -40,7 +40,6 @@ import org.sosy_lab.common.configuration.converters.TypeConverter;
 import org.sosy_lab.common.io.IO;
 
 /** Interface for constructing {@link Configuration} instances. */
-@CanIgnoreReturnValue
 public final class ConfigurationBuilder {
 
   private @Nullable Map<String, String> properties = null;
@@ -69,6 +68,7 @@ public final class ConfigurationBuilder {
   }
 
   /** Set a single option. */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder setOption(String name, String value) {
     checkNotNull(name);
     checkNotNull(value);
@@ -81,6 +81,7 @@ public final class ConfigurationBuilder {
   }
 
   /** Reset a single option to its default value. */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder clearOption(String name) {
     checkNotNull(name);
     setupProperties();
@@ -92,6 +93,7 @@ public final class ConfigurationBuilder {
   }
 
   /** Add all options from a map. */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder setOptions(Map<String, String> options) {
     checkNotNull(options);
     setupProperties();
@@ -103,6 +105,7 @@ public final class ConfigurationBuilder {
   }
 
   /** Set the optional prefix for new configuration. */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder setPrefix(String newPrefix) {
     checkNotNull(newPrefix);
 
@@ -123,6 +126,7 @@ public final class ConfigurationBuilder {
    * be used as converter in the new configuration, except if overridden with {@link
    * #addConverter(Class, TypeConverter)}.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder copyFrom(Configuration sourceConfig) {
     checkNotNull(sourceConfig);
     checkState(properties == null);
@@ -149,6 +153,7 @@ public final class ConfigurationBuilder {
    * @throws IllegalArgumentException If the given configuration does not specify a value for the
    *     given option.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder copyOptionFrom(Configuration sourceConfig, String option) {
     checkNotNull(sourceConfig);
     checkNotNull(option);
@@ -177,6 +182,7 @@ public final class ConfigurationBuilder {
    * @param sourceConfig A configuration instance.
    * @param option The name of a configuration option.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder copyOptionFromIfPresent(Configuration sourceConfig, String option) {
     checkNotNull(option);
     if (sourceConfig.properties.containsKey(option)) {
@@ -199,6 +205,7 @@ public final class ConfigurationBuilder {
    * @throws IOException If the stream cannot be read.
    * @throws InvalidConfigurationException If the stream contains an invalid format.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder loadFromSource(CharSource source, String basePath, String sourceName)
       throws IOException, InvalidConfigurationException {
     checkNotNull(source);
@@ -229,6 +236,7 @@ public final class ConfigurationBuilder {
    * @throws IOException If the file cannot be read.
    * @throws InvalidConfigurationException If the file contains an invalid format.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder loadFromFile(String filename)
       throws IOException, InvalidConfigurationException {
     return loadFromFile(Path.of(filename));
@@ -240,6 +248,7 @@ public final class ConfigurationBuilder {
    * @throws IOException If the file cannot be read.
    * @throws InvalidConfigurationException If the file contains an invalid format.
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder loadFromFile(Path file)
       throws IOException, InvalidConfigurationException {
     checkNotNull(file);
@@ -265,6 +274,7 @@ public final class ConfigurationBuilder {
    * @throws IllegalArgumentException If the resource cannot be found or read, or contains invalid
    *     syntax or #include directives.
    */
+  @CanIgnoreReturnValue
   @SuppressWarnings("try")
   public ConfigurationBuilder loadFromResource(Class<?> contextClass, String resourceName) {
     URL url = Resources.getResource(contextClass, resourceName);
@@ -347,6 +357,7 @@ public final class ConfigurationBuilder {
    * @param converter A converter instance.
    * @return this
    */
+  @CanIgnoreReturnValue
   public ConfigurationBuilder addConverter(Class<?> cls, TypeConverter converter) {
     checkNotNull(cls);
     checkNotNull(converter);

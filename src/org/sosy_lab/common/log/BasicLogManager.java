@@ -18,6 +18,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.common.io.MoreFiles;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -103,6 +104,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       truncateSize = pTruncateSize;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
       int length = pEnd - pStart;
@@ -115,12 +117,14 @@ public class BasicLogManager implements LogManager, AutoCloseable {
       return this;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public Appendable append(char pC) throws IOException {
       sb.append(pC);
       return this;
     }
 
+    @CanIgnoreReturnValue
     @Override
     public Appendable append(CharSequence pCsq) throws IOException {
       int length = pCsq.length();
