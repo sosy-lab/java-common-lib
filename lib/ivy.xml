@@ -63,8 +63,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.9" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.9" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.10" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.10" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.7.1" conf="runtime->default; contrib->sources"/>
