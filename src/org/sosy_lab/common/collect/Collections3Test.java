@@ -21,6 +21,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 
 public class Collections3Test {
@@ -64,14 +65,14 @@ public class Collections3Test {
   @Test
   @SuppressWarnings("JdkObsolete") // we want to test that method
   public void testSubMapWithPrefix() {
-    NavigableMap<String, Void> resultMap = new TreeMap<>();
+    NavigableMap<String, @Nullable Void> resultMap = new TreeMap<>();
     resultMap.put("b", null);
     resultMap.put("b" + 0, null);
     resultMap.put("b1", null);
     resultMap.put("b2", null);
     resultMap.put("b" + Character.MAX_VALUE, null);
 
-    NavigableMap<String, Void> testMap = new TreeMap<>();
+    NavigableMap<String, @Nullable Void> testMap = new TreeMap<>();
     testMap.putAll(resultMap);
     testMap.put("", null);
     testMap.put("a", null);
@@ -81,7 +82,7 @@ public class Collections3Test {
     testMap.put("ca", null);
 
     assertThat(Collections3.subMapWithPrefix(testMap, "b")).isEqualTo(resultMap);
-    assertThat(Collections3.subMapWithPrefix((SortedMap<String, Void>) testMap, "b"))
+    assertThat(Collections3.subMapWithPrefix((SortedMap<String, @Nullable Void>) testMap, "b"))
         .isEqualTo(resultMap);
   }
 

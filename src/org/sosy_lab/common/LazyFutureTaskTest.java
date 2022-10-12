@@ -17,6 +17,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 
 public class LazyFutureTaskTest {
@@ -58,7 +59,7 @@ public class LazyFutureTaskTest {
   public void testNoExecution() {
     AtomicBoolean test = new AtomicBoolean(true);
 
-    new LazyFutureTask<Void>(() -> test.set(false), null);
+    new LazyFutureTask<@Nullable Void>(() -> test.set(false), null);
 
     // no call to f.get()
     assertThat(test.get()).isTrue();
@@ -77,7 +78,7 @@ public class LazyFutureTaskTest {
 
   @Test
   public void testCancel() {
-    Future<Void> f = new LazyFutureTask<>(Runnables.doNothing(), null);
+    Future<@Nullable Void> f = new LazyFutureTask<>(Runnables.doNothing(), null);
 
     f.cancel(false);
 

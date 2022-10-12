@@ -35,12 +35,12 @@ SPDX-License-Identifier: Apache-2.0
         - UngroupedOverloads: not worth it
         - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
-        - ReturnMissingNullable: https://github.com/google/error-prone/issues/2910
         - Varifier: We do not want "var" in most places.
         - Interruption: Try again later, not well explained yet.
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
+        -XepOpt:Nullness:Conservative=false
         -Xep:StaticOrDefaultInterfaceMethod:OFF
         -Xep:AndroidJdkLibsChecker:OFF
         -Xep:Java7ApiChecker:OFF
@@ -50,7 +50,6 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:UngroupedOverloads:OFF
         -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
-        -Xep:ReturnMissingNullable:OFF
         -Xep:Varifier:OFF
         -Xep:Interruption:OFF
         "/>
