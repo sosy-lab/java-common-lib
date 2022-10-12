@@ -52,8 +52,7 @@ public class ExtendedURLClassLoaderTest {
 
   @Test
   public void testDelegationNonMatching() throws IOException, ClassNotFoundException {
-    try (URLClassLoader cl =
-        newDefaultBuilder().setDirectLoadClasses(TEST_DUMMY_PATTERN).build()) {
+    try (URLClassLoader cl = newDefaultBuilder().setDirectLoadClasses(TEST_DUMMY_PATTERN).build()) {
       assertThat(cl.loadClass(TEST_CLASS.getName())).isEqualTo(TEST_CLASS);
     }
   }
