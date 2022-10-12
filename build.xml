@@ -33,7 +33,6 @@ SPDX-License-Identifier: Apache-2.0
         - FieldCanBeFinal: not possible for our @Option fields
         - InconsistentOverloads: backwards compatibility
         - UngroupedOverloads: not worth it
-        - UnnecessarilyFullyQualified: https://github.com/google/error-prone/issues/2164
         - SuppressWarningsWithoutExplanation: TODO
         - Varifier: We do not want "var" in most places.
         - Interruption: Try again later, not well explained yet.
@@ -48,7 +47,6 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:FieldCanBeFinal:OFF
         -Xep:InconsistentOverloads:OFF
         -Xep:UngroupedOverloads:OFF
-        -Xep:UnnecessarilyFullyQualified:OFF
         -Xep:SuppressWarningsWithoutExplanation:OFF
         -Xep:Varifier:OFF
         -Xep:Interruption:OFF
