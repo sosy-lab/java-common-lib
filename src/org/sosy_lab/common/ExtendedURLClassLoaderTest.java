@@ -20,6 +20,7 @@ import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 
 public class ExtendedURLClassLoaderTest {
 
+  private static final Pattern TEST_DUMMY_PATTERN = Pattern.compile("dummy pattern");
   private static final Class<String> TEST_CLASS = String.class;
 
   private static ClassLoaderBuilder<?> newDefaultBuilder() {
@@ -52,7 +53,7 @@ public class ExtendedURLClassLoaderTest {
   @Test
   public void testDelegationNonMatching() throws IOException, ClassNotFoundException {
     try (URLClassLoader cl =
-        newDefaultBuilder().setDirectLoadClasses(Pattern.compile("dummy pattern")).build()) {
+        newDefaultBuilder().setDirectLoadClasses(TEST_DUMMY_PATTERN).build()) {
       assertThat(cl.loadClass(TEST_CLASS.getName())).isEqualTo(TEST_CLASS);
     }
   }
