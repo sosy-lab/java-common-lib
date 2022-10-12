@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Collection;
 import java.util.Comparator;
@@ -65,6 +66,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean add(T pE);
 
   /**
@@ -73,6 +75,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void add(int pIndex, T pElement);
 
   /**
@@ -81,6 +84,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean addAll(Collection<? extends T> pC);
 
   /**
@@ -89,6 +93,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean addAll(int pIndex, Collection<? extends T> pC);
 
   /**
@@ -97,6 +102,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void clear();
 
   /**
@@ -105,6 +111,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   T remove(int pIndex);
 
   /**
@@ -113,6 +120,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean remove(Object pO);
 
   /**
@@ -121,6 +129,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean removeAll(Collection<?> pC);
 
   /**
@@ -129,6 +138,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void replaceAll(UnaryOperator<T> pOperator);
 
   /**
@@ -137,6 +147,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean retainAll(Collection<?> pC);
 
   /**
@@ -145,6 +156,7 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   T set(int pIndex, T pElement);
 
   /**
@@ -153,5 +165,6 @@ public interface PersistentList<T> extends List<T> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void sort(Comparator<? super T> pC);
 }

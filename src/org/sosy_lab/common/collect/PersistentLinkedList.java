@@ -15,6 +15,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.InlineMe;
 import com.google.errorprone.annotations.Var;
@@ -403,12 +404,14 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
 
   @Deprecated
   @Override
+  @DoNotCall
   public void replaceAll(UnaryOperator<T> pOperator) {
     throw new UnsupportedOperationException();
   }
 
   @Deprecated
   @Override
+  @DoNotCall
   public void sort(Comparator<? super T> pC) {
     throw new UnsupportedOperationException();
   }

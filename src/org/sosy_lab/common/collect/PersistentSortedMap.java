@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
@@ -68,6 +69,7 @@ public interface PersistentSortedMap<K, V>
    */
   @Deprecated
   @Override
+  @DoNotCall
   Entry<K, V> pollFirstEntry();
 
   /**
@@ -76,5 +78,6 @@ public interface PersistentSortedMap<K, V>
    */
   @Deprecated
   @Override
+  @DoNotCall
   Entry<K, V> pollLastEntry();
 }

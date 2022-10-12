@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.CompatibleWith;
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -51,6 +52,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V put(K pKey, V pValue);
 
   /**
@@ -59,6 +61,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Deprecated
   @Override
+  @DoNotCall
   V putIfAbsent(K pKey, V pValue);
 
   /**
@@ -67,6 +70,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void putAll(Map<? extends K, ? extends V> pM);
 
   /**
@@ -75,6 +79,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V remove(Object pKey);
 
   /**
@@ -83,6 +88,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean remove(Object pKey, Object pValue);
 
   /**
@@ -91,6 +97,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void clear();
 
   /**
@@ -99,6 +106,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V compute(K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction);
 
   /**
@@ -107,6 +115,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V computeIfAbsent(K pKey, Function<? super K, ? extends V> pMappingFunction);
 
   /**
@@ -115,6 +124,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V computeIfPresent(K pKey, BiFunction<? super K, ? super V, ? extends V> pRemappingFunction);
 
   /**
@@ -123,6 +133,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V replace(K pKey, V pValue);
 
   /**
@@ -131,6 +142,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   boolean replace(K pKey, V pOldValue, V pNewValue);
 
   /**
@@ -139,6 +151,7 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   void replaceAll(BiFunction<? super K, ? super V, ? extends V> pFunction);
 
   /**
@@ -147,5 +160,6 @@ public interface PersistentMap<K, V> extends Map<K, V> {
    */
   @Override
   @Deprecated
+  @DoNotCall
   V merge(K pKey, V pValue, BiFunction<? super V, ? super V, ? extends V> pRemappingFunction);
 }

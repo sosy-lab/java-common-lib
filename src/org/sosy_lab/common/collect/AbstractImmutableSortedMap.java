@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Var;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -146,12 +147,16 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
     return descendingMap().navigableKeySet();
   }
 
+  @Deprecated
   @Override
+  @DoNotCall
   public final Entry<K, V> pollFirstEntry() {
     throw new UnsupportedOperationException();
   }
 
+  @Deprecated
   @Override
+  @DoNotCall
   public final Entry<K, V> pollLastEntry() {
     throw new UnsupportedOperationException();
   }
