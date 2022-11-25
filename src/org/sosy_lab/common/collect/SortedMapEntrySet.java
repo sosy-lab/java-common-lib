@@ -34,6 +34,7 @@ final class SortedMapEntrySet<K, V> extends AbstractSet<Entry<K, V>>
 
   private static final long serialVersionUID = 2891466632825409479L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if map is.
   private final OurSortedMap<K, V> map;
 
   SortedMapEntrySet(OurSortedMap<K, V> pMap) {

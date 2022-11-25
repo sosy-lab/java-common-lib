@@ -1285,9 +1285,14 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
     private final Node<K, V> root;
 
     // null if there is no according bound, in this case the "inclusive" boolean is irrelevant
+    @SuppressWarnings("serial") // This class only needs to be serializable if keys are.
     private final @Nullable K fromKey;
+
     private final boolean fromInclusive;
+
+    @SuppressWarnings("serial") // This class only needs to be serializable if keys are.
     private final @Nullable K toKey;
+
     private final boolean toInclusive;
 
     @LazyInit private transient int size;

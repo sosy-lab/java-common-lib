@@ -29,6 +29,7 @@ final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
 
   private static final long serialVersionUID = -3499934696704295393L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if map is.
   private final OurSortedMap<K, V> map;
 
   DescendingSortedMap(OurSortedMap<K, V> pMap) {

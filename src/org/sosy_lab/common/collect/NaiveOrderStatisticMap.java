@@ -39,6 +39,7 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
 
   private static final long serialVersionUID = -3542217590830996599L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if delegate is.
   private final NavigableMap<K, V> delegate;
 
   private NaiveOrderStatisticMap(NavigableMap<K, V> pNavigableMap) {

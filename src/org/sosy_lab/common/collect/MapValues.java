@@ -20,6 +20,7 @@ final class MapValues<E> extends AbstractCollection<E> implements Serializable {
 
   private static final long serialVersionUID = 9122264612662000623L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if delegate is.
   private final Map<?, E> delegate;
 
   MapValues(Map<?, E> pDelegate) {

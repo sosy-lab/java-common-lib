@@ -37,6 +37,7 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
 
   private static final long serialVersionUID = -1941093176613766876L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if delegate is.
   private final NavigableSet<E> delegate;
 
   private NaiveOrderStatisticSet(NavigableSet<E> pDelegate) {

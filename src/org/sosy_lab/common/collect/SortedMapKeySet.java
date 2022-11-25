@@ -35,6 +35,7 @@ final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>
 
   private static final long serialVersionUID = 8196534519512074110L;
 
+  @SuppressWarnings("serial") // This class only needs to be serializable if map is.
   private final OurSortedMap<K, ?> map;
 
   SortedMapKeySet(OurSortedMap<K, ?> pMap) {
