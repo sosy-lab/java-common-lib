@@ -1188,6 +1188,7 @@ public final class Configuration {
    * @throws InvalidConfigurationException On incorrect format or when configuration options for
    *     Configurations class are invalid
    */
+  @SuppressWarnings("AvoidObjectArrays") // for convenience in main methods
   public static Configuration fromCmdLineArguments(String[] args)
       throws InvalidConfigurationException {
     ConfigurationBuilder builder = Configuration.builder();

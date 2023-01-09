@@ -59,6 +59,7 @@ public final class Collections3 {
   public static boolean allElementsEqual(Iterable<?> iterable) {
     return allElementsEqual(iterable.iterator());
   }
+
   /**
    * Check whether all elements contained in the given array are equal to each other. For a
    * non-empty array, this is the same as {@code ImmutableSet.copyOf(array).size() == 1}, but more
@@ -66,9 +67,11 @@ public final class Collections3 {
    *
    * @throws IllegalArgumentException if the array is empty
    */
+  @SuppressWarnings("AvoidObjectArrays") // utility specifically for arrays
   public static boolean allElementsEqual(Object[] array) {
     return allElementsEqual(Iterators.forArray(array));
   }
+
   /**
    * Check whether all elements contained in the given stream are equal to each other. For a
    * non-empty stream, this is the same as {@code stream.distinct().count() == 1}, but more
@@ -111,6 +114,7 @@ public final class Collections3 {
    * <p>This function is more efficient than code doing the same using {@link Stream} or {@link
    * com.google.common.collect.FluentIterable}.
    */
+  @SuppressWarnings("AvoidObjectArrays") // utility specifically for arrays
   public static <T1, T2> ImmutableList<T2> transformedImmutableListCopy(
       T1[] input, Function<? super T1, T2> transformer) {
     return ImmutableList.copyOf(Lists.transform(Arrays.asList(input), transformer));

@@ -124,6 +124,7 @@ public final class Classes {
    * @throws InvocationTargetException If the constructor throws an exception.
    */
   @Deprecated
+  @SuppressWarnings("AvoidObjectArrays") // deprecated anyway
   public static <T> T createInstance(
       Class<? extends T> cls,
       Class<?> @Nullable [] argumentTypes,
@@ -157,6 +158,7 @@ public final class Classes {
    * @param argumentValues Array with the values that will be passed to the constructor.
    */
   @Deprecated
+  @SuppressWarnings("AvoidObjectArrays") // deprecated anyway
   public static <T> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
@@ -181,6 +183,7 @@ public final class Classes {
    * @param exceptionType An exception type the constructor is allowed to throw.
    */
   @Deprecated
+  @SuppressWarnings("AvoidObjectArrays") // deprecated anyway
   public static <T, X extends Exception> T createInstance(
       Class<T> type,
       Class<? extends T> cls,
