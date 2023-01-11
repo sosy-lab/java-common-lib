@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -324,7 +325,7 @@ public final class ConfigurationBuilder {
    * @return the opened file system of the JAR file if it was not open before or <code>null</code>.
    */
   private static @Nullable FileSystem getFileSystemForUriInJars(URI uri) throws IOException {
-    if ("jar".equals(uri.getScheme())) {
+    if (Objects.equals(uri.getScheme(), "jar")) {
       for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
         if (provider.getScheme().equalsIgnoreCase("jar")) {
           try {
