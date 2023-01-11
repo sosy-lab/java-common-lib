@@ -87,10 +87,17 @@ public class OptionCollector {
     @Var boolean verbose = false;
     @Var boolean includeLibraryOptions = false;
     for (String arg : args) {
-      if ("-v".equals(arg) || "-verbose".equals(arg)) {
-        verbose = true;
-      } else if ("-includeLibraryOptions".equals(arg)) {
-        includeLibraryOptions = true;
+      switch (arg) {
+        case "-v":
+        case "-verbose":
+          verbose = true;
+          break;
+        case "-includeLibraryOptions":
+          includeLibraryOptions = true;
+          break;
+        default:
+          System.err.println("Unexpected command-line argument: " + arg);
+          System.exit(1);
       }
     }
 
