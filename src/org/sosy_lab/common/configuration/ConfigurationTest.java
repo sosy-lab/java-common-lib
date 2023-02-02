@@ -233,7 +233,7 @@ public class ConfigurationTest {
 
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
-    verify(mockLogger).logf(eq(Level.WARNING), anyString(), any());
+    verify(mockLogger).logf(eq(Level.WARNING), anyString(), any(Object[].class));
     assertThat(opts.test).isEqualTo("myValue");
   }
 
@@ -254,7 +254,7 @@ public class ConfigurationTest {
     c.enableLogging(mockLogger);
     DeprecatedOptions opts = new DeprecatedOptions();
     c.inject(opts);
-    verify(mockLogger).logf(eq(Level.WARNING), anyString(), any());
+    verify(mockLogger).logf(eq(Level.WARNING), anyString(), any(Object[].class));
     assertThat(opts.test).isEqualTo("myNewValue");
   }
 

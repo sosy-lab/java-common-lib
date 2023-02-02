@@ -84,8 +84,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="4.6.1" conf="test->default; contrib->sources"/>
-        <dependency org="org.mockito" name="mockito-errorprone" rev="4.6.1" conf="build->default"/>
+        <dependency org="org.mockito" name="mockito-core" rev="5.1.1" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-errorprone" rev="5.1.1" conf="build->default"/>
+        <!-- Necessary dependency for running Mockito without a JDK -->
+        <dependency org="net.java.dev.jna" name="jna" rev="5.13.0" conf="test->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
