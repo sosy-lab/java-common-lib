@@ -468,10 +468,10 @@ public final class Configuration {
         cls.getName());
 
     Field[] fields = cls.getDeclaredFields();
-    AccessibleObject.setAccessible(fields, /*flag=*/ true);
+    AccessibleObject.setAccessible(fields, /* flag= */ true);
 
     Method[] methods = cls.getDeclaredMethods();
-    AccessibleObject.setAccessible(methods, /*flag=*/ true);
+    AccessibleObject.setAccessible(methods, /* flag= */ true);
 
     try {
       for (Field field : fields) {
@@ -566,7 +566,7 @@ public final class Configuration {
             type,
             option,
             field,
-            /*defaultIsFromOtherInstance=*/ obj != defaultsObject);
+            /* defaultIsFromOtherInstance= */ obj != defaultsObject);
 
     // options which were not changed need not to be set
     if (value == defaultValue && obj == defaultsObject) {
@@ -636,7 +636,7 @@ public final class Configuration {
     String name = getOptionName(options, method, option);
     Object value =
         getValue(
-            options, method, null, type, option, method, /*defaultIsFromOtherInstance=*/ false);
+            options, method, null, type, option, method, /* defaultIsFromOtherInstance= */ false);
 
     logger.logf(
         Level.CONFIG,

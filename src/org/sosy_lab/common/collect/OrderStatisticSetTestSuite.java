@@ -174,7 +174,7 @@ public abstract class OrderStatisticSetTestSuite {
   public void testSubsetView_subsetOfSubset() {
     OrderStatisticSet<String> set = createSet(ELEMS);
     NavigableSet<String> subSet =
-        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive=*/ true);
+        set.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive= */ true);
     @Var
     NavigableSet<String> subSubSet =
         subSet.subSet(
@@ -188,7 +188,7 @@ public abstract class OrderStatisticSetTestSuite {
 
     // make sure that the inclusive-flags are respected
     subSubSet =
-        subSet.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive=*/ true);
+        subSet.subSet(ELEMS[1], /* fromInclusive= */ true, ELEMS[3], /* toInclusive= */ true);
     assertThat(subSubSet).contains(ELEMS[1]);
     assertThat(subSubSet).contains(ELEMS[2]);
     assertThat(subSubSet).contains(ELEMS[3]);

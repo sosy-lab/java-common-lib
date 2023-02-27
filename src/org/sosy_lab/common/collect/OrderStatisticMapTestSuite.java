@@ -264,7 +264,7 @@ public abstract class OrderStatisticMapTestSuite {
     subSubMap =
         subMap.subMap(
             ELEMS.get(1).getKey(), /* fromInclusive= */ true,
-            ELEMS.get(3).getKey(), /* toInclusive=*/ true);
+            ELEMS.get(3).getKey(), /* toInclusive= */ true);
     assertThat(subSubMap).containsEntry(ELEMS.get(1).getKey(), ELEMS.get(1).getValue());
     assertThat(subSubMap).containsEntry(ELEMS.get(2).getKey(), ELEMS.get(2).getValue());
     assertThat(subSubMap).containsEntry(ELEMS.get(3).getKey(), ELEMS.get(3).getValue());

@@ -179,33 +179,36 @@ final class DescendingSortedMap<K, V> extends ForwardingNavigableMap<K, V>
   public OurSortedMap<K, V> subMap(
       @Nullable K pFromKey, boolean pFromInclusive, @Nullable K pToKey, boolean pToInclusive) {
     return map.subMap(
-            pToKey, /*pFromInclusive=*/ pToInclusive, pFromKey, /*pToInclusive=*/ pFromInclusive)
+            pToKey,
+            /* pFromInclusive= */ pToInclusive,
+            pFromKey,
+            /* pToInclusive= */ pFromInclusive)
         .descendingMap();
   }
 
   @Override
   public OurSortedMap<K, V> headMap(@Nullable K pToKey, boolean pInclusive) {
-    return map.tailMap(pToKey, /*pInclusive=*/ pInclusive).descendingMap();
+    return map.tailMap(pToKey, /* pInclusive= */ pInclusive).descendingMap();
   }
 
   @Override
   public OurSortedMap<K, V> tailMap(@Nullable K pFromKey, boolean pInclusive) {
-    return map.headMap(pFromKey, /*pInclusive=*/ pInclusive).descendingMap();
+    return map.headMap(pFromKey, /* pInclusive= */ pInclusive).descendingMap();
   }
 
   @Override
   public OurSortedMap<K, V> headMap(@Nullable K pToKey) {
-    return headMap(pToKey, /*pInclusive=*/ false);
+    return headMap(pToKey, /* pInclusive= */ false);
   }
 
   @Override
   public OurSortedMap<K, V> tailMap(@Nullable K pFromKey) {
-    return tailMap(pFromKey, /*pInclusive=*/ true);
+    return tailMap(pFromKey, /* pInclusive= */ true);
   }
 
   @Override
   public OurSortedMap<K, V> subMap(@Nullable K pFromKey, @Nullable K pToKey) {
-    return subMap(pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+    return subMap(pFromKey, /* pFromInclusive= */ true, pToKey, /* pToInclusive= */ false);
   }
 
   @Override

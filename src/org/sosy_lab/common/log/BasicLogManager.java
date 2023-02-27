@@ -241,7 +241,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
         MoreFiles.createParentDirectories(outputFile);
 
         Handler outfileHandler =
-            new FileHandler(outputFile.toAbsolutePath().toString(), /*append=*/ false);
+            new FileHandler(outputFile.toAbsolutePath().toString(), /* append= */ false);
         setupHandler(
             logger,
             outfileHandler,
@@ -532,7 +532,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     CharSequence exceptionMessage =
         e instanceof FileSystemException
             ? createFileSystemExceptionMessage(
-                (FileSystemException) e, /*asSuffix=*/ additionalMessage.endsWith("file"))
+                (FileSystemException) e, /* asSuffix= */ additionalMessage.endsWith("file"))
             : Strings.nullToEmpty(e.getMessage());
 
     if (additionalMessage.isEmpty()) {

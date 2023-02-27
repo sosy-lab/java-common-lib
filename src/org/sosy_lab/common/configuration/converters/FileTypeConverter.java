@@ -107,7 +107,7 @@ public final class FileTypeConverter implements TypeConverter {
 
   public static FileTypeConverter create(Configuration config)
       throws InvalidConfigurationException {
-    return new FileTypeConverter(config, /*pSafePathsOnly=*/ false);
+    return new FileTypeConverter(config, /* pSafePathsOnly= */ false);
   }
 
   /**
@@ -116,7 +116,7 @@ public final class FileTypeConverter implements TypeConverter {
    */
   public static FileTypeConverter createWithSafePathsOnly(Configuration config)
       throws InvalidConfigurationException {
-    return new FileTypeConverter(config, /*pSafePathsOnly=*/ true);
+    return new FileTypeConverter(config, /* pSafePathsOnly= */ true);
   }
 
   @Override
@@ -235,7 +235,7 @@ public final class FileTypeConverter implements TypeConverter {
         ((FileOption) secondaryOption).value(),
         type,
         Objects.requireNonNullElse(pSource, Path.of("")),
-        /*doResolve=*/ true);
+        /* doResolve= */ true);
   }
 
   @Override
@@ -244,7 +244,7 @@ public final class FileTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
 
     return convertDefaultValue(
-        optionName, pDefaultValue, pType, secondaryOption, /*doResolve=*/ true);
+        optionName, pDefaultValue, pType, secondaryOption, /* doResolve= */ true);
   }
 
   private <T> @Nullable T convertDefaultValue(
@@ -307,7 +307,7 @@ public final class FileTypeConverter implements TypeConverter {
     // However, we must do all other sanity and safety checks,
     // and we also must create new instances of e.g. PathCounterTemplate.
     return convertDefaultValue(
-        optionName, pDefaultValue, pType, secondaryOption, /*doResolve=*/ false);
+        optionName, pDefaultValue, pType, secondaryOption, /* doResolve= */ false);
   }
 
   /**

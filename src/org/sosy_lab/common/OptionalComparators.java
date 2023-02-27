@@ -28,9 +28,9 @@ final class OptionalComparators {
   private OptionalComparators() {}
 
   static final Ordering<OptionalInt> INT_EMPTY_FIRST =
-      new OptionalIntComparator(/*pEmptyFirst=*/ true);
+      new OptionalIntComparator(/* pEmptyFirst= */ true);
   static final Ordering<OptionalInt> INT_EMPTY_LAST =
-      new OptionalIntComparator(/*pEmptyFirst=*/ false);
+      new OptionalIntComparator(/* pEmptyFirst= */ false);
 
   private static final class OptionalIntComparator extends Ordering<OptionalInt>
       implements Serializable {
@@ -71,9 +71,9 @@ final class OptionalComparators {
   }
 
   static final Ordering<OptionalLong> LONG_EMPTY_FIRST =
-      new OptionalLongComparator(/*pEmptyFirst=*/ true);
+      new OptionalLongComparator(/* pEmptyFirst= */ true);
   static final Ordering<OptionalLong> LONG_EMPTY_LAST =
-      new OptionalLongComparator(/*pEmptyFirst=*/ false);
+      new OptionalLongComparator(/* pEmptyFirst= */ false);
 
   private static final class OptionalLongComparator extends Ordering<OptionalLong>
       implements Serializable {
@@ -114,9 +114,9 @@ final class OptionalComparators {
   }
 
   static final Ordering<OptionalDouble> DOUBLE_EMPTY_FIRST =
-      new OptionalDoubleComparator(/*pEmptyFirst=*/ true);
+      new OptionalDoubleComparator(/* pEmptyFirst= */ true);
   static final Ordering<OptionalDouble> DOUBLE_EMPTY_LAST =
-      new OptionalDoubleComparator(/*pEmptyFirst=*/ false);
+      new OptionalDoubleComparator(/* pEmptyFirst= */ false);
 
   private static final class OptionalDoubleComparator extends Ordering<OptionalDouble>
       implements Serializable {

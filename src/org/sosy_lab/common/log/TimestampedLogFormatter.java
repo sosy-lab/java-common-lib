@@ -54,10 +54,10 @@ public class TimestampedLogFormatter extends AbstractColoredLogFormatter {
   }
 
   public static Formatter withoutColors() {
-    return new TimestampedLogFormatter(/*useColors=*/ false);
+    return new TimestampedLogFormatter(/* useColors= */ false);
   }
 
   public static Formatter withColorsIfPossible() {
-    return new TimestampedLogFormatter(/*useColors=*/ true);
+    return new TimestampedLogFormatter(/* useColors= */ true);
   }
 }

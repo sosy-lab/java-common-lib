@@ -24,11 +24,11 @@ public class ConsoleLogFormatter extends AbstractColoredLogFormatter {
   }
 
   public static Formatter withoutColors() {
-    return new ConsoleLogFormatter(/*useColors=*/ false);
+    return new ConsoleLogFormatter(/* useColors= */ false);
   }
 
   public static Formatter withColorsIfPossible() {
-    return new ConsoleLogFormatter(/*useColors=*/ true);
+    return new ConsoleLogFormatter(/* useColors= */ true);
   }
 
   @Override

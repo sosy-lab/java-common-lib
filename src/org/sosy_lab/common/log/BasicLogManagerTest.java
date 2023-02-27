@@ -158,7 +158,7 @@ public class BasicLogManagerTest {
     tearDown(); // close logger because we need to recreate it
     logger =
         BasicLogManager.createWithHandler(
-            testHandler, /*truncateSize=*/ 0); // 0 disables truncation
+            testHandler, /* truncateSize= */ 0); // 0 disables truncation
     logger.log(Level.SEVERE, "|", longMessage, "|");
     List<LogRecord> records = testHandler.getStoredLogRecords();
     assertThat(records).hasSize(1);

@@ -119,17 +119,17 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
 
   @Override
   public final OurSortedMap<K, V> headMap(K pToKey) {
-    return headMap(pToKey, /*pInclusive=*/ false);
+    return headMap(pToKey, /* pInclusive= */ false);
   }
 
   @Override
   public final OurSortedMap<K, V> tailMap(K pFromKey) {
-    return tailMap(pFromKey, /*pInclusive=*/ true);
+    return tailMap(pFromKey, /* pInclusive= */ true);
   }
 
   @Override
   public final OurSortedMap<K, V> subMap(K pFromKey, K pToKey) {
-    return subMap(pFromKey, /*pFromInclusive=*/ true, pToKey, /*pToInclusive=*/ false);
+    return subMap(pFromKey, /* pFromInclusive= */ true, pToKey, /* pToInclusive= */ false);
   }
 
   @Override
