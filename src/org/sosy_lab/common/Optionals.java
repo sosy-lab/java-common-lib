@@ -41,6 +41,7 @@ public final class Optionals {
       replacement = "com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional))",
       staticImports = "com.google.common.base.Preconditions.checkNotNull")
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+  @SuppressWarnings("checkstyle:IllegalType")
   public static <T> com.google.common.base.Optional<T> toGuavaOptional(Optional<T> optional) {
     return com.google.common.base.Optional.fromJavaUtil(checkNotNull(optional));
   }
@@ -52,6 +53,7 @@ public final class Optionals {
    */
   @Deprecated
   @InlineMe(replacement = "optional.toJavaUtil()")
+  @SuppressWarnings("checkstyle:IllegalType")
   public static <T> Optional<T> fromGuavaOptional(com.google.common.base.Optional<T> optional) {
     return optional.toJavaUtil();
   }
