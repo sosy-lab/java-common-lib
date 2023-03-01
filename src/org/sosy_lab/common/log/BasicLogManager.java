@@ -70,7 +70,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     void setConsoleLevel(String newLevel);
   }
 
-  private class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
+  private final class LogManagerBean extends AbstractMBean implements LogManagerMXBean {
 
     private final Level fileLevel;
     private final Handler consoleHandler;

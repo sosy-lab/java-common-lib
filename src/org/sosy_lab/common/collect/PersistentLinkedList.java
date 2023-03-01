@@ -291,7 +291,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return it;
   }
 
-  private static class Iter<T> extends UnmodifiableListIterator<T> {
+  private static final class Iter<T> extends UnmodifiableListIterator<T> {
 
     private PersistentLinkedList<T> list;
     private int nextIndex = 0;

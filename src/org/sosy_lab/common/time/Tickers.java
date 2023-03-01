@@ -22,7 +22,7 @@ import javax.management.ObjectName;
 import javax.management.RuntimeErrorException;
 
 /** Class providing several convenient {@link Ticker} implementations. */
-public class Tickers {
+public final class Tickers {
 
   public abstract static class TickerWithUnit extends Ticker {
 

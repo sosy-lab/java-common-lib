@@ -939,7 +939,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class EntryInOrderIterator<K extends Comparable<? super K>, V>
+  private static final class EntryInOrderIterator<K extends Comparable<? super K>, V>
       extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:
@@ -1067,7 +1067,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static class DescendingEntryInOrderIterator<K extends Comparable<? super K>, V>
+  private static final class DescendingEntryInOrderIterator<K extends Comparable<? super K>, V>
       extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:

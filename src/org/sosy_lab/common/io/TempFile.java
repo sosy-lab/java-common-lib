@@ -27,7 +27,7 @@ import java.nio.file.attribute.FileAttribute;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utilities for temporary files. */
-public class TempFile {
+public final class TempFile {
 
   private static final Path TMPDIR = Path.of(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 

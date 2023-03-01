@@ -26,7 +26,7 @@ import java.util.Map;
  * are the corresponding values of the input maps as long as they are not differing. Differing
  * values for one key are resolved by passing them to a callback function.
  */
-public class PersistentSortedMaps {
+public final class PersistentSortedMaps {
 
   private PersistentSortedMaps() {} // utility class
 

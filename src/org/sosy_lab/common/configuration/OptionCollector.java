@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** This class collects all {@link Option}s of a program. */
-public class OptionCollector {
+public final class OptionCollector {
 
   private static final String OPTIONS_FILE = "ConfigurationOptions.txt";
   private static final Pattern IGNORED_CLASSES =

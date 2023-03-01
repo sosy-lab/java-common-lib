@@ -20,7 +20,7 @@ import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility class providing {@link Appender}s for various cases. */
-public class Appenders {
+public final class Appenders {
 
   private Appenders() {}
 

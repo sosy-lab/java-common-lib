@@ -65,9 +65,9 @@ import org.sosy_lab.common.io.IO;
  *       included files. Circular inclusions are now allowed.
  * </ul>
  */
-class Parser {
+final class Parser {
 
-  static class InvalidConfigurationFileException extends InvalidConfigurationException {
+  static final class InvalidConfigurationFileException extends InvalidConfigurationException {
 
     private static final long serialVersionUID = 8146907093750189669L;
 

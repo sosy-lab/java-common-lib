@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 /** Utilities for handling differences between maps. */
-public class MapsDifference {
+public final class MapsDifference {
 
   private MapsDifference() {}
 
