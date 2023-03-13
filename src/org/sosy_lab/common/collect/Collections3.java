@@ -181,6 +181,49 @@ public final class Collections3 {
     return filterByClass(Streams.stream(iterable), cls);
   }
 
+  /** Return a list that contains the given element and the given collection. */
+  public static <T> ImmutableList<? super T> elementAndList(T elem, Collection<? extends T> coll) {
+    return ImmutableList.builderWithExpectedSize(coll.size() + 1).add(elem).addAll(coll).build();
+  }
+
+  /** Return a list that contains the given collection and the given element. */
+  public static <T> ImmutableList<? super T> listAndElement(Collection<? extends T> coll, T elem) {
+    return ImmutableList.builderWithExpectedSize(coll.size() + 1).addAll(coll).add(elem).build();
+  }
+
+  /** Return a list that contains the given elements and the given collection. */
+  public static <T> ImmutableList<? super T> elementsAndList(
+      T elem1, T elem2, Collection<? extends T> coll) {
+    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+        .add(elem1)
+        .add(elem2)
+        .addAll(coll)
+        .build();
+  }
+
+  /**
+   * Return a list that contains the given collection and the given elements, one before the
+   * collection and one after.
+   */
+  public static <T> ImmutableList<? super T> listAndSurroundingElements(
+      T elem1, Collection<? extends T> coll, T elem2) {
+    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+        .add(elem1)
+        .addAll(coll)
+        .add(elem2)
+        .build();
+  }
+
+  /** Return a list that contains the given collection and the given elements. */
+  public static <T> ImmutableList<? super T> listAndElements(
+      Collection<? extends T> coll, T elem1, T elem2) {
+    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+        .addAll(coll)
+        .add(elem1)
+        .add(elem2)
+        .build();
+  }
+
   /**
    * Given a {@link NavigableMap} with {@link String}s as key, return a partial map (similar to
    * {@link NavigableMap#subMap(Object, Object)}) of all keys that have a given prefix.
