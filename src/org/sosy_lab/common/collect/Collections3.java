@@ -182,19 +182,19 @@ public final class Collections3 {
   }
 
   /** Return a list that contains the given element and the given collection. */
-  public static <T> ImmutableList<? super T> elementAndList(T elem, Collection<? extends T> coll) {
-    return ImmutableList.builderWithExpectedSize(coll.size() + 1).add(elem).addAll(coll).build();
+  public static <T> ImmutableList<T> elementAndList(T elem, Collection<? extends T> coll) {
+    return ImmutableList.<T>builderWithExpectedSize(coll.size() + 1).add(elem).addAll(coll).build();
   }
 
   /** Return a list that contains the given collection and the given element. */
-  public static <T> ImmutableList<? super T> listAndElement(Collection<? extends T> coll, T elem) {
-    return ImmutableList.builderWithExpectedSize(coll.size() + 1).addAll(coll).add(elem).build();
+  public static <T> ImmutableList<T> listAndElement(Collection<? extends T> coll, T elem) {
+    return ImmutableList.<T>builderWithExpectedSize(coll.size() + 1).addAll(coll).add(elem).build();
   }
 
   /** Return a list that contains the given elements and the given collection. */
-  public static <T> ImmutableList<? super T> elementsAndList(
+  public static <T> ImmutableList<T> elementsAndList(
       T elem1, T elem2, Collection<? extends T> coll) {
-    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+    return ImmutableList.<T>builderWithExpectedSize(coll.size() + 2)
         .add(elem1)
         .add(elem2)
         .addAll(coll)
@@ -205,9 +205,9 @@ public final class Collections3 {
    * Return a list that contains the given collection and the given elements, one before the
    * collection and one after.
    */
-  public static <T> ImmutableList<? super T> listAndSurroundingElements(
+  public static <T> ImmutableList<T> listAndSurroundingElements(
       T elem1, Collection<? extends T> coll, T elem2) {
-    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+    return ImmutableList.<T>builderWithExpectedSize(coll.size() + 2)
         .add(elem1)
         .addAll(coll)
         .add(elem2)
@@ -215,9 +215,9 @@ public final class Collections3 {
   }
 
   /** Return a list that contains the given collection and the given elements. */
-  public static <T> ImmutableList<? super T> listAndElements(
+  public static <T> ImmutableList<T> listAndElements(
       Collection<? extends T> coll, T elem1, T elem2) {
-    return ImmutableList.builderWithExpectedSize(coll.size() + 2)
+    return ImmutableList.<T>builderWithExpectedSize(coll.size() + 2)
         .addAll(coll)
         .add(elem1)
         .add(elem2)
