@@ -490,8 +490,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   @Override
   public void logUserException(Level priority, Throwable e, @Nullable String pAdditionalMessage) {
     checkNotNull(e);
-    Supplier<String> additinalMessageSupplier = () -> Strings.nullToEmpty(pAdditionalMessage);
-    log0UserException(priority, e, additinalMessageSupplier);
+    if (wouldBeLogged(priority) || wouldBeLogged(EXCEPTION_DEBUG_LEVEL)) {
+      log0UserException(priority, e, Strings.nullToEmpty(pAdditionalMessage));
+    }
   }
 
   /** {@inheritDoc} */
@@ -499,24 +500,19 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   public void logfUserException(Level priority, Throwable e, String format, Object... args) {
     checkNotNull(e);
     checkFormatStringParameters(format, args);
-    Supplier<String> additionalMessageSupplier = () -> formatAdditionalMessage(format, args);
-    log0UserException(priority, e, additionalMessageSupplier);
+    if (wouldBeLogged(priority) || wouldBeLogged(EXCEPTION_DEBUG_LEVEL)) {
+      log0UserException(priority, e, formatAdditionalMessage(format, args));
+    }
   }
 
-  private void log0UserException(
-      Level priority, Throwable e, Supplier<String> additionalMessageSupplier) {
-
-    if (wouldBeLogged(priority) || wouldBeLogged(EXCEPTION_DEBUG_LEVEL)) {
-      // build additionalMessage only if actually logged
-      String additionalMessage = additionalMessageSupplier.get();
-      if (wouldBeLogged(priority)) {
-        StringBuilder logMessage =
-            buildUserExceptionLogMessage(priority, e, Strings.nullToEmpty(additionalMessage));
-        @Nullable StackTraceElement frame = locateStackTraceElement(e);
-        log0(priority, frame, logMessage.toString());
-      }
-      logDebugException(e, additionalMessage);
+  private void log0UserException(Level priority, Throwable e, String additionalMessage) {
+    if (wouldBeLogged(priority)) {
+      StringBuilder logMessage =
+          buildUserExceptionLogMessage(priority, e, Strings.nullToEmpty(additionalMessage));
+      @Nullable StackTraceElement frame = locateStackTraceElement(e);
+      log0(priority, frame, logMessage.toString());
     }
+    logDebugException(e, additionalMessage);
   }
 
   private static StringBuilder buildUserExceptionLogMessage(
@@ -675,8 +671,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   @Override
   public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
     checkNotNull(pE);
-    Supplier<String> additionalMessageSupplier = () -> Strings.emptyToNull(pAdditionalMessage);
-    log0Exception(pPriority, pE, additionalMessageSupplier);
+    if (wouldBeLogged(pPriority)) {
+      log0Exception(pPriority, pE, Strings.emptyToNull(pAdditionalMessage));
+    }
   }
 
   /** {@inheritDoc} */
@@ -684,17 +681,14 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   public void logfException(Level priority, Throwable e, String format, Object... args) {
     checkNotNull(e);
     checkFormatStringParameters(format, args);
-    Supplier<String> additionalMessageSupplier = () -> formatAdditionalMessage(format, args);
-    log0Exception(priority, e, additionalMessageSupplier);
+    if (wouldBeLogged(priority)) {
+      log0Exception(priority, e, formatAdditionalMessage(format, args));
+    }
   }
 
-  private void log0Exception(
-      Level priority, Throwable e, Supplier<String> additionalMessageSupplier) {
-    if (wouldBeLogged(priority)) {
-      String additionalMessage = additionalMessageSupplier.get();
-      StringBuilder logMessage = buildExceptionLogMessage(e, additionalMessage);
-      log0(priority, findCallingMethod(), logMessage.toString());
-    }
+  private void log0Exception(Level priority, Throwable e, String additionalMessage) {
+    StringBuilder logMessage = buildExceptionLogMessage(e, additionalMessage);
+    log0(priority, findCallingMethod(), logMessage.toString());
   }
 
   private static StringBuilder buildExceptionLogMessage(Throwable e, String additionalMessage) {
