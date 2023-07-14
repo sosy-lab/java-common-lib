@@ -12,6 +12,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.regex.Pattern;
@@ -43,8 +45,8 @@ public class ExtendedURLClassLoaderTest {
   }
 
   @Test
-  public void testCreateWithURLs() throws IOException {
-    URL testUrl = new URL("file:///");
+  public void testCreateWithURLs() throws IOException, URISyntaxException {
+    URL testUrl = new URI("file:///").toURL();
     try (URLClassLoader cl = newDefaultBuilder().setUrls(testUrl).build()) {
       assertThat(cl.getURLs()).asList().containsExactly(testUrl);
     }
