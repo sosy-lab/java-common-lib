@@ -390,7 +390,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return toPersistentLinkedList();
   }
 
-  private static class PersistentLinkedListBuilder<T> {
+  private static final class PersistentLinkedListBuilder<T> {
     private PersistentLinkedList<T> list = PersistentLinkedList.of();
 
     void add(T e) {

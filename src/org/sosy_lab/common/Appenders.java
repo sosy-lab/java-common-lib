@@ -186,7 +186,7 @@ public final class Appenders {
     return appendTo(new StringBuilder(), a).toString();
   }
 
-  private static class SizeLimitReachedException extends IOException {
+  private static final class SizeLimitReachedException extends IOException {
     private static final long serialVersionUID = 1855247676627224183L;
   }
 
