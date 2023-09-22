@@ -18,6 +18,7 @@ import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -134,6 +135,7 @@ public final class FileTypeConverter implements TypeConverter {
    * path.
    */
   @VisibleForTesting
+  @CanIgnoreReturnValue
   Path checkSafePath(Path pPath, String optionName) throws InvalidConfigurationException {
     if (!safePathsOnly) {
       return pPath; // any path allowed

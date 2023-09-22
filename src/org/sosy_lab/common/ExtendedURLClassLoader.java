@@ -24,6 +24,7 @@ import java.util.function.Predicate;
  * Extension of {@link URLClassLoader} with an optional child-first strategy and optional overriding
  * of the search path for native libraries.
  */
+@SuppressWarnings("BanClassLoader")
 final class ExtendedURLClassLoader extends URLClassLoader {
 
   private final ExtendedURLClassLoaderConfiguration config;

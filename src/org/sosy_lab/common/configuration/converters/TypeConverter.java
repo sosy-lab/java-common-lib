@@ -76,6 +76,7 @@ public interface TypeConverter {
    * @throws UnsupportedOperationException If the option specification in the source code is invalid
    *     (e.g., a missing annotation).
    */
+  @SuppressWarnings("CanIgnoreReturnValueSuggester")
   default <T> @Nullable T convertDefaultValue(
       String optionName, @Nullable T value, TypeToken<T> type, @Nullable Annotation secondaryOption)
       throws InvalidConfigurationException {

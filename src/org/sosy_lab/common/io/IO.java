@@ -121,6 +121,7 @@ public final class IO {
    * @param file The file.
    * @param content The content which shall be written.
    */
+  @SuppressWarnings("MemberName")
   public static void writeGZIPFile(Path file, Charset charset, Object content) throws IOException {
     checkNotNull(content);
     checkNotNull(charset);

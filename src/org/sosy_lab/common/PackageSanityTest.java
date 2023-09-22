@@ -19,6 +19,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
 
+@SuppressWarnings("BanClassLoader")
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {

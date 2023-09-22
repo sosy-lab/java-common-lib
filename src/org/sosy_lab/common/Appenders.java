@@ -66,6 +66,7 @@ public final class Appenders {
    * @param a The Appender to dump into the StringBuilder.
    * @return The passed StringBuilder to allow for method chaining.
    */
+  @CanIgnoreReturnValue
   public static StringBuilder appendTo(StringBuilder sb, Appender a) {
     checkNotNull(sb);
     try {

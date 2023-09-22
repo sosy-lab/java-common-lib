@@ -174,6 +174,7 @@ public class FileTypeConverterTest {
 
     abstract boolean isAllowed(boolean isInFile);
 
+    @SuppressWarnings("MemberName")
     private void assertThrowsICE(ThrowingRunnable code, String... msgParts) {
       InvalidConfigurationException thrown =
           assertThrows(InvalidConfigurationException.class, code);

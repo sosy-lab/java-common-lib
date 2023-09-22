@@ -304,6 +304,7 @@ public class ProcessExecutor<E extends Exception> {
   }
 
   /** Sends the EOF (end of file) signal to stdin of the process. */
+  @SuppressWarnings("MemberName")
   public void sendEOF() throws IOException {
     checkState(!finished, "Cannot write to process that has already terminated.");
 

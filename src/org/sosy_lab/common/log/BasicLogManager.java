@@ -669,6 +669,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   }
 
   @Override
+  @SuppressWarnings("ParameterMissingNullable") // false alarm
   public void logException(Level pPriority, Throwable pE, @Nullable String pAdditionalMessage) {
     checkNotNull(pE);
     if (wouldBeLogged(pPriority)) {

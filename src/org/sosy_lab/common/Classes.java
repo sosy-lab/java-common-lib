@@ -538,6 +538,7 @@ public final class Classes {
    * Create a class loader that is based on an {@link URLClassLoader} but implements some additional
    * features. This method returns a builder that can be used to configure the new class loader.
    */
+  @SuppressWarnings("MemberName")
   public static ClassLoaderBuilder<?> makeExtendedURLClassLoader() {
     return ExtendedURLClassLoaderConfiguration.builder()
         .setDirectLoadClasses(c -> false)

@@ -189,6 +189,7 @@ public final class MoreFiles {
   @InlineMe(
       replacement = "IO.writeGZIPFile(file, charset, content)",
       imports = "org.sosy_lab.common.io.IO")
+  @SuppressWarnings("MemberName")
   public static void writeGZIPFile(Path file, Charset charset, Object content) throws IOException {
     IO.writeGZIPFile(file, charset, content);
   }

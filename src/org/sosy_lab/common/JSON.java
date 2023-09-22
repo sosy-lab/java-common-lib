@@ -27,6 +27,7 @@ import org.sosy_lab.common.io.IO;
  *
  * <p>Significant performance improvements were made compared to the library.
  */
+@SuppressWarnings("MemberName")
 public final class JSON {
 
   private JSON() {}
@@ -152,7 +153,7 @@ public final class JSON {
           break;
         default:
           // Reference: http://www.unicode.org/versions/Unicode5.1.0/
-          if ((ch >= '\u0000' && ch <= '\u001F')
+          if ((ch <= '\u001F')
               || (ch >= '\u007F' && ch <= '\u009F')
               || (ch >= '\u2000' && ch <= '\u20FF')) {
             String ss = Ascii.toUpperCase(Integer.toHexString(ch));

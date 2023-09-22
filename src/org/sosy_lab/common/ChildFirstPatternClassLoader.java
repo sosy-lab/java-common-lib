@@ -33,7 +33,10 @@ import java.util.regex.Pattern;
  *     Classes.ClassLoaderBuilder#setDirectLoadClasses(Predicate)}.
  */
 @Deprecated
-@SuppressWarnings("AvoidObjectArrays") // deprecated class, usage inherited from super class
+@SuppressWarnings({
+  "AvoidObjectArrays",
+  "BanClassLoader"
+}) // deprecated class, usage inherited from super class
 public class ChildFirstPatternClassLoader extends URLClassLoader {
 
   private final Predicate<String> loadInChild;

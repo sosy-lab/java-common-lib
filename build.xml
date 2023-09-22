@@ -50,6 +50,7 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:SuppressWarningsWithoutExplanation:OFF
         -Xep:Varifier:OFF
         -Xep:Interruption:OFF
+        -Xep:UnnecessaryTestMethodPrefix:OFF
         "/>
 
     <import file="build/build-version.xml"/>

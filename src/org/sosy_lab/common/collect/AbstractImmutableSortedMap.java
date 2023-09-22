@@ -80,6 +80,7 @@ abstract class AbstractImmutableSortedMap<K, V> extends AbstractImmutableMap<K, 
     return entry == null ? null : entry.getKey();
   }
 
+  @SuppressWarnings("MemberName")
   private K keyOrNSE(@Nullable Entry<K, V> entry) {
     if (entry == null) {
       throw new NoSuchElementException();

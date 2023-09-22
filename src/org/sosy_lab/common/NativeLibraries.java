@@ -56,6 +56,7 @@ public final class NativeLibraries {
     MACOSX,
     WINDOWS;
 
+    @SuppressWarnings("MemberName")
     private static @Nullable OS currentOS = null;
 
     public static OS guessOperatingSystem() {
