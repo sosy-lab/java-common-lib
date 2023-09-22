@@ -58,13 +58,13 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google Auto-Service
              Library for easy registration of services for java.util.ServiceLoader. -->
-        <dependency org="com.google.auto.service" name="auto-service" rev="1.0.1" conf="build->default"/>
-        <dependency org="com.google.auto.service" name="auto-service-annotations" rev="1.0.1" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.service" name="auto-service" rev="1.1.1" conf="build->default"/>
+        <dependency org="com.google.auto.service" name="auto-service-annotations" rev="1.1.1" conf="build->default; contrib->sources"/>
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.10" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.10" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.10.4" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.10.4" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.7.1" conf="runtime->default; contrib->sources"/>
@@ -75,7 +75,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.8" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.10" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -84,15 +84,15 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Mockito
              Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="5.1.1" conf="test->default; contrib->sources"/>
-        <dependency org="org.mockito" name="mockito-errorprone" rev="5.1.1" conf="build->default"/>
+        <dependency org="org.mockito" name="mockito-core" rev="5.5.0" conf="test->default; contrib->sources"/>
+        <dependency org="org.mockito" name="mockito-errorprone" rev="5.5.0" conf="build->default"/>
         <!-- Necessary dependency for running Mockito without a JDK -->
         <dependency org="net.java.dev.jna" name="jna" rev="5.13.0" conf="test->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="1.1.3" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.1.3" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="1.1.4" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.1.4" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
@@ -106,11 +106,11 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.16.0" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.17.0" conf="format-source->default"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.8.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.12.3" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.7.3" conf="spotbugs->default"/>

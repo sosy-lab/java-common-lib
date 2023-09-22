@@ -103,6 +103,7 @@ public final class LinearExpression<T> implements Iterable<Map.Entry<T, Rational
     }
     return new LinearExpression<>(Maps.transformValues(data, value -> value.times(constant)));
   }
+
   /** Negate the linear expression. */
   public LinearExpression<T> negate() {
     return multByConst(Rational.NEG_ONE);
