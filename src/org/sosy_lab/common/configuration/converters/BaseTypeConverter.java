@@ -106,15 +106,6 @@ public enum BaseTypeConverter implements TypeConverter {
     }
   }
 
-  @Override
-  @SuppressWarnings("CheckedExceptionNotThrown") // for overriding
-  public <T> T convertDefaultValue(
-      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption)
-      throws InvalidConfigurationException {
-
-    return pValue;
-  }
-
   @SuppressWarnings({"unchecked", "rawtypes"})
   private static Object convertEnum(Class<?> cls, String value) {
     return Enum.valueOf((Class) cls, value);

@@ -59,11 +59,4 @@ public class IntegerTypeConverter implements TypeConverter {
 
     return value;
   }
-
-  @Override
-  public <T> T convertDefaultValue(
-      String pOptionName, T pValue, TypeToken<T> pType, Annotation pSecondaryOption) {
-
-    return pValue;
-  }
 }
