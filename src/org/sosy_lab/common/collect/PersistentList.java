@@ -58,6 +58,7 @@ public interface PersistentList<T> extends List<T> {
 
   /** Returns a new list with the elements in the reverse order. */
   @CheckReturnValue
+  @SuppressWarnings("all") // Only for @Override on Java 21, but ECJ has no fine-granular way.
   PersistentList<T> reversed();
 
   /**
