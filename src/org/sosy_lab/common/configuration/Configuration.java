@@ -76,6 +76,7 @@ public final class Configuration {
   /** Signal for the processor that the deprecated-prefix feature is not used. */
   static final String NO_DEPRECATED_PREFIX = "<NO_DEPRECATION>";
 
+  @SuppressWarnings("NonFinalStaticField")
   private static boolean secureMode = false;
 
   /** Create a new Builder instance. */

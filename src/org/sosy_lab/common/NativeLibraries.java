@@ -46,6 +46,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Classes.ClassLoaderBuilder#setCustomLookupNativeLibraries(java.util.function.Predicate)} if
  * third-party code loads the library.
  */
+@SuppressWarnings("NonFinalStaticField")
 public final class NativeLibraries {
 
   private NativeLibraries() {}
