@@ -304,7 +304,7 @@ public final class OptionCollector {
     // check the folders known as source, depending on the current folder
     // structure for the class files
 
-    if (basePath.endsWith("bin")) {
+    if (basePath.endsWith("bin") || basePath.endsWith("classes")) {
       // this could be a usual eclipse environment, therefore src is the appropriate
       // folder to search for sources
       basePath = basePath.getParent();
