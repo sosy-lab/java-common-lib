@@ -150,7 +150,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     } else {
 
       // Take the ordering provided by the enum.
-      return us.ordinal() - them.ordinal();
+      return us.compareTo(them);
     }
   }
 
