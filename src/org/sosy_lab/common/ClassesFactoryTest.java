@@ -155,7 +155,7 @@ public class ClassesFactoryTest {
   }
 
   @Test
-  @SuppressWarnings("ParameterMissingNullable")
+  @SuppressWarnings({"ParameterMissingNullable", "NullArgumentForNonNullParameter"})
   public void nullParameter() throws Exception {
     TestFactory generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory.class), ParameterTestClass.class);
@@ -163,7 +163,7 @@ public class ClassesFactoryTest {
   }
 
   @Test
-  @SuppressWarnings("ParameterMissingNullable")
+  @SuppressWarnings({"ParameterMissingNullable", "NullArgumentForNonNullParameter"})
   public void nullParameter2() throws Exception {
     TestFactory2 generatedFactory =
         Classes.createFactory(TypeToken.of(TestFactory2.class), ParameterTestClass.class);
