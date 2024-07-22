@@ -812,8 +812,9 @@ public final class Configuration {
    * return an empty string).
    */
   private String getOptionSourceForLogging(String optionDeprecatedName) {
-    if (sources.containsKey(optionDeprecatedName)) {
-      String source = sources.get(optionDeprecatedName).toString();
+    Path sourcePath = sources.get(optionDeprecatedName);
+    if (sourcePath != null) {
+      String source = sourcePath.toString();
       if (!source.isEmpty()) {
         return " in file " + source;
       }
