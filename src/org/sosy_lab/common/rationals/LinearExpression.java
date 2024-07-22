@@ -141,8 +141,8 @@ public final class LinearExpression<T> implements Iterable<Map.Entry<T, Rational
       return Optional.empty();
     }
     @Var Rational multiplier = null;
-    for (T key : data.keySet()) {
-      Rational div = other.getCoeff(key).divides(data.get(key)).reciprocal();
+    for (Map.Entry<T, Rational> entry : data.entrySet()) {
+      Rational div = other.getCoeff(entry.getKey()).divides(entry.getValue()).reciprocal();
       if (multiplier == null) {
         multiplier = div;
       } else if (!multiplier.equals(div)) {
