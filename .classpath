@@ -22,7 +22,6 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/build/auto-service-annotations.jar" sourcepath="lib/java-contrib/auto-service-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar" sourcepath="lib/java-contrib/auto-value-annotations-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/byte-buddy.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
