@@ -104,7 +104,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Newer versions would not work on Java > 11.
              In the future we can decide to accept this
              (only affects developers and CI of this project, not users). -->
-        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.25" conf="build->default"/>
+        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.32-sosy0" conf="build->default"/>
 
         <!-- google-java-format
              A source-code formatter for Java -->

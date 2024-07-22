@@ -16,7 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 
-@SuppressWarnings("BanClassLoader")
+@SuppressWarnings({"BanClassLoader", "resource"})
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
