@@ -15,9 +15,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Immutable(containerOf = {"K", "V"})
-abstract class AbstractImmutableMap<K, V> implements Map<K, V> {
+abstract class AbstractImmutableMap<K, V extends @Nullable Object> implements Map<K, V> {
 
   @Deprecated
   @Override

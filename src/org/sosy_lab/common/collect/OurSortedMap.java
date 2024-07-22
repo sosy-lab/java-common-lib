@@ -24,7 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Extension of {@link NavigableMap} that specifies {@link NavigableSet} as type of some collection
  * views (instead of {@link java.util.Set}).
  */
-interface OurSortedMap<K, V> extends NavigableMap<K, V> {
+interface OurSortedMap<K, V extends @Nullable Object> extends NavigableMap<K, V> {
 
   Iterator<Entry<K, V>> entryIterator();
 
@@ -61,7 +61,8 @@ interface OurSortedMap<K, V> extends NavigableMap<K, V> {
 
   @Immutable(containerOf = {"K", "V"})
   @SuppressWarnings("AvoidDefaultSerializableInInnerClasses") // class is (implicitly) static
-  final class EmptyImmutableOurSortedMap<K extends Comparable<? super K>, V>
+  final class EmptyImmutableOurSortedMap<
+          K extends Comparable<? super K>, V extends @Nullable Object>
       extends AbstractImmutableSortedMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = -4621218089650593459L;

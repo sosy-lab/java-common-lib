@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.SortedMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link NavigableMap} that allows two additional operations: receiving (and deleting) an entry
@@ -40,7 +41,7 @@ import java.util.SortedMap;
  * @see java.util.Map
  * @see java.util.SortedMap
  */
-public interface OrderStatisticMap<K, V> extends NavigableMap<K, V> {
+public interface OrderStatisticMap<K, V extends @Nullable Object> extends NavigableMap<K, V> {
 
   /**
    * Returns the key of this map with the given rank. The lowest key in the map has rank == 0, the

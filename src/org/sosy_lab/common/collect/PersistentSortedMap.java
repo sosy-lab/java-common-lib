@@ -13,6 +13,7 @@ import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Sub-interface of {@link PersistentMap} analog to {@link NavigableMap}.
@@ -21,7 +22,7 @@ import java.util.NavigableSet;
  * @param <V> The type of values.
  */
 @Immutable(containerOf = {"K", "V"})
-public interface PersistentSortedMap<K, V>
+public interface PersistentSortedMap<K, V extends @Nullable Object>
     extends PersistentSortedMapBridge<K, V>, NavigableMap<K, V> {
 
   @Override

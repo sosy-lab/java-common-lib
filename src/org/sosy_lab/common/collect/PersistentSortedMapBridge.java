@@ -12,6 +12,7 @@ import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Interface that forces generation of bridge methods that return {@link SortedSet} for binary
@@ -19,7 +20,8 @@ import java.util.SortedSet;
  */
 @SuppressWarnings("JdkObsolete")
 @Immutable(containerOf = {"K", "V"})
-interface PersistentSortedMapBridge<K, V> extends PersistentMap<K, V>, SortedMap<K, V> {
+interface PersistentSortedMapBridge<K, V extends @Nullable Object>
+    extends PersistentMap<K, V>, SortedMap<K, V> {
   @Override
   SortedSet<K> keySet();
 

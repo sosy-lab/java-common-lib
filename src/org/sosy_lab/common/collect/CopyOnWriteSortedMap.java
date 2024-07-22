@@ -47,7 +47,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  */
-public final class CopyOnWriteSortedMap<K, V> extends ForwardingNavigableMap<K, V> {
+public final class CopyOnWriteSortedMap<K, V extends @Nullable Object>
+    extends ForwardingNavigableMap<K, V> {
 
   private final AtomicReference<PersistentSortedMap<K, V>> map;
 

@@ -15,6 +15,7 @@ import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Interface for persistent map. A persistent data structure is immutable, but provides cheap
@@ -32,7 +33,7 @@ import java.util.function.Function;
  * @param <V> The type of values.
  */
 @Immutable(containerOf = {"K", "V"})
-public interface PersistentMap<K, V> extends Map<K, V> {
+public interface PersistentMap<K, V extends @Nullable Object> extends Map<K, V> {
 
   /** Replacement for {{@link #put(Object, Object)} that returns a fresh instance. */
   @CheckReturnValue

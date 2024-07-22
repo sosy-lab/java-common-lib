@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An {@link OrderStatisticMap} with naive implementations of its functions.
@@ -34,8 +35,8 @@ import java.util.TreeMap;
  * @param <V> type of the values of this map
  * @see OrderStatisticMap
  */
-final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
-    implements OrderStatisticMap<K, V>, Serializable {
+final class NaiveOrderStatisticMap<K, V extends @Nullable Object>
+    extends ForwardingNavigableMap<K, V> implements OrderStatisticMap<K, V>, Serializable {
 
   private static final long serialVersionUID = -3542217590830996599L;
 
@@ -47,12 +48,13 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
   }
 
   /** Creates a new empty OrderStatisticMap using natural ordering. */
-  static <K, V> NaiveOrderStatisticMap<K, V> createMap() {
+  static <K, V extends @Nullable Object> NaiveOrderStatisticMap<K, V> createMap() {
     return new NaiveOrderStatisticMap<>(new TreeMap<>());
   }
 
   /** Creates a new empty OrderStatisticMap using the given comparator over its keys. */
-  static <K, V> NaiveOrderStatisticMap<K, V> createMap(Comparator<? super K> pComparator) {
+  static <K, V extends @Nullable Object> NaiveOrderStatisticMap<K, V> createMap(
+      Comparator<? super K> pComparator) {
     return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pComparator)));
   }
 
@@ -60,7 +62,7 @@ final class NaiveOrderStatisticMap<K, V> extends ForwardingNavigableMap<K, V>
    * Creates a new OrderStatisticSet containing the same entries as the given map, using natural
    * ordering over its keys.
    */
-  static <K, V> NaiveOrderStatisticMap<K, V> createMapWithNaturalOrder(
+  static <K, V extends @Nullable Object> NaiveOrderStatisticMap<K, V> createMapWithNaturalOrder(
       Map<? extends K, ? extends V> pMap) {
     return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pMap)));
   }

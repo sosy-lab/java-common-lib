@@ -15,8 +15,10 @@ import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.Iterator;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-final class MapValues<E> extends AbstractCollection<E> implements Serializable {
+final class MapValues<E extends @Nullable Object> extends AbstractCollection<E>
+    implements Serializable {
 
   private static final long serialVersionUID = 9122264612662000623L;
 

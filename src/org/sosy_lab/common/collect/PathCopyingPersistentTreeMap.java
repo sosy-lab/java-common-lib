@@ -71,7 +71,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @Immutable(containerOf = {"K", "V"})
 @SuppressFBWarnings(value = "SING_SINGLETON_IMPLEMENTS_SERIALIZABLE", justification = "false alarm")
-public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
+public final class PathCopyingPersistentTreeMap<
+        K extends Comparable<? super K>, V extends @Nullable Object>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 
   private static final long serialVersionUID = 1041711151457528188L;
@@ -81,7 +82,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       value = "EQ_DOESNT_OVERRIDE_EQUALS",
       justification = "Inherits equals() according to specification.")
   @Immutable(containerOf = {"K", "V"})
-  private static final class Node<K, V> extends SimpleImmutableEntry<K, V> {
+  private static final class Node<K, V extends @Nullable Object>
+      extends SimpleImmutableEntry<K, V> {
 
     // Constants for isRed field
     private static final boolean RED = true;
@@ -167,12 +169,13 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
       new PathCopyingPersistentTreeMap<String, Object>(null);
 
   @SuppressWarnings("unchecked")
-  public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> of() {
+  public static <K extends Comparable<? super K>, V extends @Nullable Object>
+      PersistentSortedMap<K, V> of() {
     return (PersistentSortedMap<K, V>) EMPTY_MAP;
   }
 
-  public static <K extends Comparable<? super K>, V> PersistentSortedMap<K, V> copyOf(
-      Map<K, V> map) {
+  public static <K extends Comparable<? super K>, V extends @Nullable Object>
+      PersistentSortedMap<K, V> copyOf(Map<K, V> map) {
     checkNotNull(map);
 
     if (map instanceof PathCopyingPersistentTreeMap<?, ?>) {
@@ -191,7 +194,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * PathCopyingPersistentTreeMap}. Keys and values are the result of the respective functions. If
    * duplicate keys appear, the collector throws an {@link IllegalArgumentException}.
    */
-  public static <T, K extends Comparable<? super K>, V>
+  public static <T, K extends Comparable<? super K>, V extends @Nullable Object>
       Collector<T, ?, PersistentSortedMap<K, V>> toPathCopyingPersistentTreeMap(
           Function<? super T, ? extends K> keyFunction,
           Function<? super T, ? extends V> valueFunction) {
@@ -208,7 +211,7 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * PathCopyingPersistentTreeMap}. Keys and values are the result of the respective functions.
    * Duplicate keys are resolved using the given merge function.
    */
-  public static <T, K extends Comparable<? super K>, V>
+  public static <T, K extends Comparable<? super K>, V extends @Nullable Object>
       Collector<T, ?, PersistentSortedMap<K, V>> toPathCopyingPersistentTreeMap(
           Function<? super T, ? extends K> keyFunction,
           Function<? super T, ? extends V> valueFunction,
@@ -940,7 +943,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static final class EntryInOrderIterator<K extends Comparable<? super K>, V>
+  private static final class EntryInOrderIterator<
+          K extends Comparable<? super K>, V extends @Nullable Object>
       extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:
@@ -1068,7 +1072,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <K> The type of keys.
    * @param <V> The type of values.
    */
-  private static final class DescendingEntryInOrderIterator<K extends Comparable<? super K>, V>
+  private static final class DescendingEntryInOrderIterator<
+          K extends Comparable<? super K>, V extends @Nullable Object>
       extends UnmodifiableIterator<Map.Entry<K, V>> {
 
     // invariants:
@@ -1198,7 +1203,8 @@ public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>,
    * @param <V> The type of values.
    */
   @Immutable(containerOf = {"K", "V"})
-  private static final class PartialSortedMap<K extends Comparable<? super K>, V>
+  private static final class PartialSortedMap<
+          K extends Comparable<? super K>, V extends @Nullable Object>
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V>, Serializable {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> create(
