@@ -9,20 +9,17 @@
 package org.sosy_lab.common;
 
 import com.google.common.collect.Ordering;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link Comparator} implementations for {@link Optional}, {@link OptionalInt}, {@link
  * OptionalLong}, and {@link OptionalDouble}.
  */
-@SuppressFBWarnings("NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION")
 final class OptionalComparators {
 
   private OptionalComparators() {}
@@ -43,7 +40,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@NonNull OptionalInt left, @NonNull OptionalInt right) {
+    public int compare(OptionalInt left, OptionalInt right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -86,7 +83,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@NonNull OptionalLong left, @NonNull OptionalLong right) {
+    public int compare(OptionalLong left, OptionalLong right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
@@ -129,7 +126,7 @@ final class OptionalComparators {
     }
 
     @Override
-    public int compare(@NonNull OptionalDouble left, @NonNull OptionalDouble right) {
+    public int compare(OptionalDouble left, OptionalDouble right) {
       if (!left.isPresent()) {
         if (right.isPresent()) {
           // left no, right yes
