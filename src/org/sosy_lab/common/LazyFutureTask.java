@@ -8,7 +8,6 @@
 
 package org.sosy_lab.common;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -30,16 +29,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>Canceling this future works as expected.
  */
-public class LazyFutureTask<V> extends FutureTask<V> {
+public class LazyFutureTask<V extends @Nullable Object> extends FutureTask<V> {
 
   public LazyFutureTask(Callable<V> pCallable) {
     super(pCallable);
   }
 
-  @SuppressFBWarnings(
-      value = "NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION",
-      justification = "bogus warning because JDK class does not has @Nullable annotations")
-  public LazyFutureTask(Runnable pRunnable, @Nullable V pResult) {
+  public LazyFutureTask(Runnable pRunnable, V pResult) {
     super(pRunnable, pResult);
   }
 
@@ -49,7 +45,7 @@ public class LazyFutureTask<V> extends FutureTask<V> {
   }
 
   @Override
-  public @Nullable V get() throws InterruptedException, ExecutionException {
+  public V get() throws InterruptedException, ExecutionException {
     if (!isDone()) {
       // Note that two threads calling this method at the same time is safe
       // (the task won't actually be executed twice)
