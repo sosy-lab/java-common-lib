@@ -70,6 +70,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <V> The type of values.
  */
 @Immutable(containerOf = {"K", "V"})
+@SuppressFBWarnings(value = "SING_SINGLETON_IMPLEMENTS_SERIALIZABLE", justification = "false alarm")
 public final class PathCopyingPersistentTreeMap<K extends Comparable<? super K>, V>
     extends AbstractImmutableSortedMap<K, V> implements PersistentSortedMap<K, V>, Serializable {
 

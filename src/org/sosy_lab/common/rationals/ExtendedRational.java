@@ -179,7 +179,7 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
     if (this == NaN || b == NaN) {
       return NaN;
     }
-    if (equals(ExtendedRational.ZERO) || b.equals(ExtendedRational.ZERO)) {
+    if (this.equals(ExtendedRational.ZERO) || b.equals(ExtendedRational.ZERO)) {
       return ExtendedRational.ZERO;
     } else if (this == NEG_INFTY && b == NEG_INFTY) {
       return INFTY;
