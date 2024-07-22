@@ -10,6 +10,7 @@ package org.sosy_lab.common.log;
 
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Var;
+import java.io.Console;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -19,6 +20,26 @@ import java.util.logging.LogRecord;
  * Level#SEVERE} and {@link Level#WARNING} red.
  */
 abstract class AbstractColoredLogFormatter extends Formatter {
+
+  /**
+   * Check whether {@link System#console()} represents a terminal. Java <= 21 and Java >= 22
+   * represent this differently.
+   *
+   * <p>Cf. the <a href="https://errorprone.info/bugpattern/SystemConsoleNull">Error Prone docs</a>,
+   * where this code is taken from.
+   */
+  @SuppressWarnings("SystemConsoleNull")
+  private static boolean systemConsoleIsTerminal() {
+    Console systemConsole = System.console();
+    if (Runtime.version().feature() < 22) {
+      return systemConsole != null;
+    }
+    try {
+      return (Boolean) Console.class.getMethod("isTerminal").invoke(systemConsole);
+    } catch (ReflectiveOperationException e) {
+      throw new LinkageError(e.getMessage(), e);
+    }
+  }
 
   private final boolean useColors;
 
@@ -30,7 +51,7 @@ abstract class AbstractColoredLogFormatter extends Formatter {
       // is a way to determine whether stdout is connected to a terminal.
       // We assume that most users only redirect stderr if they also redirect
       // stdout, so this should be ok.
-      if ((System.console() == null)
+      if (systemConsoleIsTerminal()
           // Windows terminal does not support colors
           || System.getProperty("os.name", "").startsWith("Windows")
           // https://no-color.org/
