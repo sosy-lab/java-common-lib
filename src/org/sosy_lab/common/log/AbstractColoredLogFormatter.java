@@ -9,6 +9,7 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Var;
 import java.io.Console;
 import java.util.logging.Formatter;
@@ -55,7 +56,7 @@ abstract class AbstractColoredLogFormatter extends Formatter {
           // Windows terminal does not support colors
           || System.getProperty("os.name", "").startsWith("Windows")
           // https://no-color.org/
-          || System.getenv("NO_COLOR") != null) {
+          || !Strings.isNullOrEmpty(System.getenv("NO_COLOR"))) {
         pUseColors = false;
       }
     }
