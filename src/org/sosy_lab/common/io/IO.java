@@ -96,13 +96,17 @@ public final class IO {
   @SuppressWarnings("SystemConsoleNull")
   static boolean systemConsoleIsTerminal() {
     Console systemConsole = System.console();
-    if (Runtime.version().feature() < 22) {
-      return systemConsole != null;
+    if (systemConsole == null) {
+      return false;
     }
-    try {
-      return (Boolean) Console.class.getMethod("isTerminal").invoke(systemConsole);
-    } catch (ReflectiveOperationException e) {
-      throw new LinkageError(e.getMessage(), e);
+    if (Runtime.version().feature() < 22) {
+      return true;
+    } else {
+      try {
+        return (Boolean) Console.class.getMethod("isTerminal").invoke(systemConsole);
+      } catch (ReflectiveOperationException e) {
+        throw new LinkageError(e.getMessage(), e);
+      }
     }
   }
 
