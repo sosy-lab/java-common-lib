@@ -9,8 +9,6 @@
 package org.sosy_lab.common.log;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
-import com.google.errorprone.annotations.Var;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -24,23 +22,8 @@ abstract class AbstractColoredLogFormatter extends Formatter {
 
   private final boolean useColors;
 
-  protected AbstractColoredLogFormatter(@Var boolean pUseColors) {
-    if (pUseColors) {
-      // Using colors is only good if stderr is connected to a terminal and not
-      // redirected into a file.
-      // AFAIK there is no way to determine this from Java, but at least there
-      // is a way to determine whether stdout is connected to a terminal.
-      // We assume that most users only redirect stderr if they also redirect
-      // stdout, so this should be ok.
-      if (!IO.systemConsoleIsTerminal()
-          // Windows terminal does not support colors
-          || System.getProperty("os.name", "").startsWith("Windows")
-          // https://no-color.org/
-          || !Strings.isNullOrEmpty(System.getenv("NO_COLOR"))) {
-        pUseColors = false;
-      }
-    }
-    useColors = pUseColors;
+  protected AbstractColoredLogFormatter(boolean pUseColors) {
+    useColors = pUseColors && IO.mayUseColorForOutput();
   }
 
   @Override

@@ -11,6 +11,7 @@ package org.sosy_lab.common.io;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.Var;
@@ -108,6 +109,25 @@ public final class IO {
         throw new LinkageError(e.getMessage(), e);
       }
     }
+  }
+
+  /**
+   * Determine whether it is advisable to use color (via escape sequences) for output on
+   * stdout/stderr. This method checks for output redirection, the OS, and the NO_COLOR environment
+   * variable.
+   */
+  public static boolean mayUseColorForOutput() {
+    // Using colors is only good if both stdout/stderr are connected to a terminal and not
+    // redirected into a file.
+    // AFAIK there is no way to determine this from Java, but at least there
+    // is a way to determine whether stdout is connected to a terminal.
+    // We assume that most users only redirect stderr if they also redirect
+    // stdout, so this should be ok.
+    return IO.systemConsoleIsTerminal()
+        // Windows terminal does not support colors
+        && !System.getProperty("os.name", "").startsWith("Windows")
+        // https://no-color.org/
+        && Strings.isNullOrEmpty(System.getenv("NO_COLOR"));
   }
 
   /** Read the full content of a {@link CharSource} to a new {@link StringBuilder}. */
