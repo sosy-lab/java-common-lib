@@ -16,6 +16,7 @@ import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.Var;
 import java.io.BufferedWriter;
 import java.io.CharArrayWriter;
+import java.io.Console;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -83,6 +84,26 @@ public final class IO {
    */
   public static Charset getNativeCharset() {
     return NATIVE_CHARSET;
+  }
+
+  /**
+   * Check whether {@link System#console()} represents a terminal. Java until version 21 and Java
+   * 22+ represent this differently and this method works for all Java versions.
+   *
+   * <p>Cf. the <a href="https://errorprone.info/bugpattern/SystemConsoleNull">Error Prone docs</a>,
+   * where this code is taken from.
+   */
+  @SuppressWarnings("SystemConsoleNull")
+  static boolean systemConsoleIsTerminal() {
+    Console systemConsole = System.console();
+    if (Runtime.version().feature() < 22) {
+      return systemConsole != null;
+    }
+    try {
+      return (Boolean) Console.class.getMethod("isTerminal").invoke(systemConsole);
+    } catch (ReflectiveOperationException e) {
+      throw new LinkageError(e.getMessage(), e);
+    }
   }
 
   /** Read the full content of a {@link CharSource} to a new {@link StringBuilder}. */
