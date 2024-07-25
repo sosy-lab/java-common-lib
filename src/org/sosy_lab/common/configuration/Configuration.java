@@ -685,8 +685,7 @@ public final class Configuration {
    * @param option the @Option annotation
    * @param isDeprecated flag specifying whether the deprecated prefix should be used.
    */
-  private static String getOptionName(
-      Options options, Member member, Option option, boolean isDeprecated) {
+  static String getOptionName(Options options, Member member, Option option, boolean isDeprecated) {
     @Var String name = "";
     if (isDeprecated) {
       name = option.deprecatedName();
@@ -802,7 +801,7 @@ public final class Configuration {
     }
 
     if (printUsedOptions != null) {
-      printOptionInfos(member, optionName, valueStr, defaultValue);
+      printOptionInfos(member, option, optionName, valueStr, defaultValue);
     }
     return value;
   }
@@ -911,15 +910,17 @@ public final class Configuration {
 
   private void printOptionInfos(
       AnnotatedElement element,
+      Option option,
       String name,
       @Nullable String valueStr,
       @Nullable Object defaultValue) {
 
     StringBuilder optionInfo = new StringBuilder();
-    optionInfo
-        .append(OptionPlainTextWriter.getOptionDescription(element))
-        .append(name)
-        .append('\n');
+    @Var String description = option.description();
+    if (element.isAnnotationPresent(Deprecated.class)) {
+      description = "DEPRECATED: " + description;
+    }
+    optionInfo.append(OptionPlainTextWriter.formatText(description)).append(name).append('\n');
 
     if (defaultValue != null) {
       String defaultStr;

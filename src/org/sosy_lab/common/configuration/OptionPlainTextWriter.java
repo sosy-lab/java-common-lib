@@ -72,7 +72,7 @@ class OptionPlainTextWriter {
   void writeOption(Iterable<AnnotationInfo> allInstances) {
     @Var boolean first = true;
     for (AnnotationInfo annotation : allInstances) {
-      String description = getOptionDescription(annotation.element());
+      String description = formatText(annotation.description());
       if (!description.isEmpty() && !lastDescription.equals(description)) {
         if (first) {
           out.append('\n');
@@ -89,28 +89,6 @@ class OptionPlainTextWriter {
         lastInfo = infoText;
       }
     }
-  }
-
-  /**
-   * This function returns the formatted description of an {@link Option}.
-   *
-   * @param element field with the option
-   */
-  static String getOptionDescription(AnnotatedElement element) {
-    @Var String text;
-    if (element.isAnnotationPresent(Option.class)) {
-      text = element.getAnnotation(Option.class).description();
-    } else if (element.isAnnotationPresent(Options.class)) {
-      text = element.getAnnotation(Options.class).description();
-    } else {
-      throw new AssertionError();
-    }
-
-    if (element.isAnnotationPresent(Deprecated.class)) {
-      text = "DEPRECATED: " + text;
-    }
-
-    return formatText(text);
   }
 
   /** This function returns the formatted information about an {@link Option}. */
@@ -158,7 +136,7 @@ class OptionPlainTextWriter {
    * This function formats text and splits lines, if they are too long. This functions adds "#"
    * before each line.
    */
-  private static String formatText(String text) {
+  static String formatText(String text) {
     return formatText(text, COMMENT_PREFIX, /* useLineStartInFirstLine= */ true);
   }
 

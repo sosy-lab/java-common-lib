@@ -244,25 +244,39 @@ public final class OptionCollector {
 
     Options classOption = c.getAnnotation(Options.class);
     verifyNotNull(classOption, "Class without @Options annotation");
-    result.accept(OptionsInfo.create(c, classOption.prefix()));
+    result.accept(OptionsInfo.create(classOption, c));
 
     for (Field field : c.getDeclaredFields()) {
       if (field.isAnnotationPresent(Option.class)) {
         Option option = field.getAnnotation(Option.class);
-        String optionName = Configuration.getOptionName(classOption, field, option);
         String defaultValue = getDefaultValue(field, classSource);
-        result.accept(OptionInfo.createForField(field, optionName, defaultValue));
+        result.accept(OptionInfo.createForField(field, option, defaultValue, classOption));
+
+        if (hasDeprecatedAlias(option, classOption)) {
+          result.accept(
+              OptionInfo.createDeprecatedAliasForField(field, option, defaultValue, classOption));
+        }
       }
     }
 
     for (Method method : c.getDeclaredMethods()) {
       if (method.isAnnotationPresent(Option.class)) {
         Option option = method.getAnnotation(Option.class);
-        String optionName = Configuration.getOptionName(classOption, method, option);
-        result.accept(OptionInfo.createForMethod(method, optionName));
+        result.accept(OptionInfo.createForMethod(method, option, classOption));
+
+        if (hasDeprecatedAlias(option, classOption)) {
+          result.accept(OptionInfo.createDeprecatedAliasForMethod(method, option, classOption));
+        }
       }
     }
     return result.build();
+  }
+
+  /** Returns whether the given option has a second alias that is marked as deprecated. */
+  private static boolean hasDeprecatedAlias(Option option, Options classOption) {
+    return !option.deprecatedName().isEmpty()
+        || (!classOption.deprecatedPrefix().equals(Configuration.NO_DEPRECATED_PREFIX)
+            && !classOption.deprecatedPrefix().equals(classOption.prefix()));
   }
 
   /**
@@ -514,18 +528,58 @@ public final class OptionCollector {
     abstract String name();
 
     abstract Class<?> owningClass();
+
+    abstract String description();
   }
 
   @AutoValue
   abstract static class OptionInfo extends AnnotationInfo {
 
-    static OptionInfo createForField(Field field, String name, String defaultValue) {
-      return new AutoValue_OptionCollector_OptionInfo(field, name, field.getType(), defaultValue);
+    static OptionInfo createForField(
+        Field field, Option option, String defaultValue, Options classOption) {
+      String name = Configuration.getOptionName(classOption, field, option);
+      String description = createRegularDescription(field, option);
+      return new AutoValue_OptionCollector_OptionInfo(
+          field, name, description, field.getType(), defaultValue);
     }
 
-    static OptionInfo createForMethod(Method method, String name) {
+    static OptionInfo createForMethod(Method method, Option option, Options classOption) {
+      String name = Configuration.getOptionName(classOption, method, option);
+      String description = createRegularDescription(method, option);
       // methods with @Option have no usable default value
-      return new AutoValue_OptionCollector_OptionInfo(method, name, method.getReturnType(), "");
+      return new AutoValue_OptionCollector_OptionInfo(
+          method, name, description, method.getReturnType(), "");
+    }
+
+    static OptionInfo createDeprecatedAliasForField(
+        Field field, Option option, String defaultValue, Options classOption) {
+      String name =
+          Configuration.getOptionName(classOption, field, option, /* isDeprecated= */ true);
+      String description = createDeprecatedAliasDescription(field, option, classOption);
+      return new AutoValue_OptionCollector_OptionInfo(
+          field, name, description, field.getType(), defaultValue);
+    }
+
+    static OptionInfo createDeprecatedAliasForMethod(
+        Method method, Option option, Options classOption) {
+      String name =
+          Configuration.getOptionName(classOption, method, option, /* isDeprecated= */ true);
+      String description = createDeprecatedAliasDescription(method, option, classOption);
+      return new AutoValue_OptionCollector_OptionInfo(
+          method, name, description, method.getReturnType(), "");
+    }
+
+    private static String createRegularDescription(AnnotatedElement element, Option option) {
+      if (element.isAnnotationPresent(Deprecated.class)) {
+        return "DEPRECATED: " + option.description();
+      } else {
+        return option.description();
+      }
+    }
+
+    private static String createDeprecatedAliasDescription(
+        Member member, Option option, Options classOption) {
+      return "deprecated name for " + Configuration.getOptionName(classOption, member, option);
     }
 
     abstract Class<?> type();
@@ -541,9 +595,11 @@ public final class OptionCollector {
   @AutoValue
   abstract static class OptionsInfo extends AnnotationInfo {
 
-    static OptionsInfo create(Class<?> c, String prefix) {
-      return new AutoValue_OptionCollector_OptionsInfo(prefix, c);
+    static OptionsInfo create(Options options, Class<?> c) {
+      return new AutoValue_OptionCollector_OptionsInfo(options.prefix(), options, c);
     }
+
+    abstract Options options();
 
     @Override
     abstract Class<?> element();
@@ -551,6 +607,11 @@ public final class OptionCollector {
     @Override
     final Class<?> owningClass() {
       return element();
+    }
+
+    @Override
+    String description() {
+      return options().description();
     }
   }
 }
