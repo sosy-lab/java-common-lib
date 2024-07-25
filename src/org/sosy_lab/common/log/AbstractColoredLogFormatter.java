@@ -51,7 +51,7 @@ abstract class AbstractColoredLogFormatter extends Formatter {
       // is a way to determine whether stdout is connected to a terminal.
       // We assume that most users only redirect stderr if they also redirect
       // stdout, so this should be ok.
-      if (systemConsoleIsTerminal()
+      if (!systemConsoleIsTerminal()
           // Windows terminal does not support colors
           || System.getProperty("os.name", "").startsWith("Windows")
           // https://no-color.org/
