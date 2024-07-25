@@ -51,10 +51,26 @@ public @interface Option {
   String name() default "";
 
   /**
-   * When the prefix needs to be renamed, often it is desirable to maintain the backwards
+   * When the option needs to be renamed, often it is desirable to maintain the backwards
    * compatibility with the previous config. In that case, the previous name can be moved to the
    * field {@code deprecatedName}. Both normal and deprecated name would work, with latter printing
    * the deprecation warning.
+   *
+   * <p>Note that this field only works if the {@link Options} annotations on the class defines a
+   * {@link Options#deprecatedPrefix()} and only with that deprecated prefix. The combination of the
+   * current prefix and the deprecated option name will not work.
+   *
+   * <p>Furthermore, if a deprecated option name is defined, only the combinations "current prefix +
+   * current option name" and "deprecated prefix + deprecated option name" will work.
+   *
+   * <p>Summary what works if {@link Options#deprecatedPrefix()} is set:
+   *
+   * <ul>
+   *   <li>If deprecated option name is set, then "current prefix + current option name" and
+   *       "deprecated prefix + deprecated option name" work.
+   *   <li>If deprecated option name is not set, then "current prefix + current option name" and
+   *       "deprecated prefix + current option name" work.
+   * </ul>
    */
   String deprecatedName() default "";
 

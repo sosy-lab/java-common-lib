@@ -211,7 +211,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     Option option = elem.getAnnotation(Option.class);
 
     Element cls = elem.getEnclosingElement();
-    if (cls.getAnnotation(Options.class) == null) {
+    Options options = cls.getAnnotation(Options.class);
+    if (options == null) {
       message(
           ERROR,
           elem,
@@ -220,6 +221,17 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
               + " that does not use configuration-option injection."
               + " Add @Options to surrounding class"
               + " and call Configuration.inject(Object) in constructor.");
+    } else {
+      if (!option.deprecatedName().isEmpty()
+          && options.deprecatedPrefix().equals(Configuration.NO_DEPRECATED_PREFIX)) {
+        message(
+            ERROR,
+            elem,
+            Option.class,
+            "Defining a deprecatedName for an @Option is only possible if deprecatedPrefix is set"
+                + " for the @Options annotation on the respective class."
+                + " Please refer to the documentation of these two fields.");
+      }
     }
 
     switch (elem.getKind()) {

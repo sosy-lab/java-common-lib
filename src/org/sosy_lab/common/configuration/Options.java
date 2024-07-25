@@ -29,6 +29,18 @@ public @interface Options {
    * compatibility with the previous config. In that case, the previous prefix can be moved to the
    * field {@code deprecatedPrefix}. Both normal and deprecated prefixes would work, with latter
    * printing the deprecation warning.
+   *
+   * <p>However, note that if a {@link Option#deprecatedName()} is defined for an option, then the
+   * deprecated prefix works only in combination with that deprecated name.
+   *
+   * <p>Summary what works if a deprecated prefix is set:
+   *
+   * <ul>
+   *   <li>If {@link Option#deprecatedName()} is set, then "current prefix + current option name"
+   *       and "deprecated prefix + deprecated option name" work.
+   *   <li>If d{@link Option#deprecatedName()} is not set, then "current prefix + current option
+   *       name" and "deprecated prefix + current option name" work.
+   * </ul>
    */
   String deprecatedPrefix() default Configuration.NO_DEPRECATED_PREFIX;
 
