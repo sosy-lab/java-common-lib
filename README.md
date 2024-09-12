@@ -36,7 +36,7 @@ copyright [Dirk Beyer](https://www.sosy-lab.org/people/beyer/) and others.
 
 ### Using ANT and Ivy
 
-If we use ANT with Ivy in your build process, you can download latest version of
+If we use ANT with Ivy in your build process, you can download the latest version of
 SoSy-Lab Common from our repositories directly.
 The updates to the Ivy repository are very frequent, and the latest version can
 be easily found.
