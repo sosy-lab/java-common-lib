@@ -9,6 +9,7 @@
 package org.sosy_lab.common;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.nullToEmpty;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
@@ -16,6 +17,7 @@ import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -49,6 +51,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @SuppressWarnings("NonFinalStaticField")
 public final class NativeLibraries {
 
+  private static final String REPORT_MESSAGE =
+      ", please report this together with information "
+          + "about your system (OS, architecture, JVM).";
+
   private NativeLibraries() {}
 
   @Deprecated // will become private
@@ -67,10 +73,7 @@ public final class NativeLibraries {
 
       @Var String prop = StandardSystemProperty.OS_NAME.value();
       if (isNullOrEmpty(prop)) {
-        throw new UnsatisfiedLinkError(
-            "No value for os.name, "
-                + "please report this together with information about your system "
-                + "(OS, architecture, JVM).");
+        throw new UnsatisfiedLinkError("No value for os.name" + REPORT_MESSAGE);
       }
 
       prop = Ascii.toLowerCase(prop.replace(" ", ""));
@@ -85,8 +88,8 @@ public final class NativeLibraries {
         throw new UnsatisfiedLinkError(
             "Unknown value for os.name: '"
                 + StandardSystemProperty.OS_NAME.value()
-                + "', please report this together with information about your system "
-                + "(OS, architecture, JVM).");
+                + "'"
+                + REPORT_MESSAGE);
       }
 
       return currentOS;
@@ -95,65 +98,68 @@ public final class NativeLibraries {
 
   @Deprecated // will become private
   public enum Architecture {
+    // We only consider the mainly used architectures and ignore older ones like PPC or MIPS.
     X86,
-    X86_64;
+    X86_64,
+    ARM64;
 
     private static @Nullable Architecture currentArch = null;
 
+    /**
+     * Get the architecture of the current JVM, e.g., as required to load binary libraries.
+     *
+     * <p>In most cases, the JVM architecture matches system architecture. In some cases, the system
+     * architecture is not sufficient. For example, we could execute a 32bit JVM on a 64bit system.
+     * We cannot check each possible combination, but check only the important ones like X86_64.
+     */
     public static Architecture guessVmArchitecture() {
       if (currentArch != null) {
         return currentArch;
       }
 
-      @Var String prop = System.getProperty("os.arch.data.model");
-      if (isNullOrEmpty(prop)) {
-        prop = System.getProperty("sun.arch.data.model");
-      }
-
-      if (!isNullOrEmpty(prop)) {
-        switch (prop) {
-          case "32":
-            currentArch = Architecture.X86;
-            break;
-          case "64":
-            currentArch = Architecture.X86_64;
-            break;
-          default:
-            throw new UnsatisfiedLinkError(
-                "Unknown value for os.arch.data.model: '"
-                    + prop
-                    + "', please report this together with information about your system "
-                    + "(OS, architecture, JVM).");
-        }
+      Architecture osArch = guessOsArchitecture();
+      if (osArch == X86_64 && isVm32Bit()) {
+        currentArch = X86;
       } else {
-
-        prop = StandardSystemProperty.JAVA_VM_NAME.value();
-        if (!isNullOrEmpty(prop)) {
-          prop = Ascii.toLowerCase(prop);
-
-          if (prop.contains("32-bit") || prop.contains("32bit") || prop.contains("i386")) {
-
-            currentArch = Architecture.X86;
-          } else if (prop.contains("64-bit")
-              || prop.contains("64bit")
-              || prop.contains("x64")
-              || prop.contains("x86_64")
-              || prop.contains("amd64")) {
-
-            currentArch = Architecture.X86_64;
-          } else {
-            throw new UnsatisfiedLinkError(
-                "Unknown value for java.vm.name: '"
-                    + prop
-                    + "', please report this together with information about your system "
-                    + "(OS, architecture, JVM).");
-          }
-        } else {
-          throw new UnsatisfiedLinkError("Could not detect system architecture");
-        }
+        currentArch = osArch;
       }
 
       return currentArch;
+    }
+
+    private static Architecture guessOsArchitecture() {
+      @Var String osArch = StandardSystemProperty.OS_ARCH.value();
+      if (isNullOrEmpty(osArch)) {
+        throw new UnsatisfiedLinkError("No value for os.arch" + REPORT_MESSAGE);
+      }
+
+      osArch = Ascii.toLowerCase(osArch.replace(" ", ""));
+
+      switch (osArch) {
+        case "i386":
+        case "i686":
+        case "x86":
+          return Architecture.X86;
+        case "amd64":
+        case "x86_64":
+          return Architecture.X86_64;
+        case "aarch64":
+          return Architecture.ARM64;
+        default:
+          throw new UnsatisfiedLinkError(
+              "Unknown value for os.arch: '"
+                  + StandardSystemProperty.OS_ARCH.value()
+                  + "'"
+                  + REPORT_MESSAGE);
+      }
+    }
+
+    /** Check whether the JVM is executing in 32 bit version. */
+    private static boolean isVm32Bit() {
+      return Ascii.toLowerCase(nullToEmpty(StandardSystemProperty.JAVA_VM_NAME.value()))
+              .matches(".*(32-?bit|i386).*")
+          || Objects.equals(System.getProperty("os.arch.data.model"), "32")
+          || Objects.equals(System.getProperty("sun.arch.data.model"), "32");
     }
   }
 
