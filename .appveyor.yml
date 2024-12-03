@@ -46,10 +46,3 @@ on_finish:
 cache:
   - C:\ant
   - C:\ivy
-
-notifications:
-  - provider: Email
-    to:
-      - common-java-dev@googlegroups.com
-    on_build_success: false
-    on_build_status_changed: true
