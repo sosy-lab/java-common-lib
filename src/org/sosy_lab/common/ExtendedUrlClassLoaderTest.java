@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 
-public class ExtendedURLClassLoaderTest {
+public class ExtendedUrlClassLoaderTest {
 
   private static final Pattern TEST_DUMMY_PATTERN = Pattern.compile("dummy pattern");
   private static final Class<String> TEST_CLASS = String.class;

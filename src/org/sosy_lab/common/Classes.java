@@ -52,7 +52,7 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
+import org.sosy_lab.common.ExtendedUrlClassLoader.ExtendedUrlClassLoaderConfiguration;
 import org.sosy_lab.common.annotations.Unmaintained;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
@@ -528,7 +528,7 @@ public final class Classes {
       return s -> pattern.matcher(s).matches();
     }
 
-    abstract ExtendedURLClassLoaderConfiguration autoBuild();
+    abstract ExtendedUrlClassLoaderConfiguration autoBuild();
 
     @CheckReturnValue
     public abstract URLClassLoader build();
@@ -540,7 +540,7 @@ public final class Classes {
    */
   @SuppressWarnings("MemberName")
   public static ClassLoaderBuilder<?> makeExtendedURLClassLoader() {
-    return ExtendedURLClassLoaderConfiguration.builder()
+    return ExtendedUrlClassLoaderConfiguration.builder()
         .setDirectLoadClasses(c -> false)
         .setCustomLookupNativeLibraries(l -> false);
   }

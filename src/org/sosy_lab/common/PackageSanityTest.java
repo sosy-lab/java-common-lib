@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import org.sosy_lab.common.ExtendedURLClassLoader.ExtendedURLClassLoaderConfiguration;
+import org.sosy_lab.common.ExtendedUrlClassLoader.ExtendedUrlClassLoaderConfiguration;
 
 @SuppressWarnings({"BanClassLoader", "resource"})
 public class PackageSanityTest extends AbstractPackageSanityTests {
@@ -27,7 +27,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(Joiner.MapJoiner.class, Joiner.on(",").withKeyValueSeparator("="));
     setDefault(ClassLoader.class, new URLClassLoader(new URL[0]));
     setDefault(
-        ExtendedURLClassLoaderConfiguration.class,
+        ExtendedUrlClassLoaderConfiguration.class,
         Classes.makeExtendedURLClassLoader().setUrls().autoBuild());
     setDefault(Path.class, Path.of(""));
     try {

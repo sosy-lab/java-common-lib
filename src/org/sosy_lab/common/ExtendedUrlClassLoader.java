@@ -25,11 +25,11 @@ import java.util.function.Predicate;
  * of the search path for native libraries.
  */
 @SuppressWarnings("BanClassLoader")
-final class ExtendedURLClassLoader extends URLClassLoader {
+final class ExtendedUrlClassLoader extends URLClassLoader {
 
-  private final ExtendedURLClassLoaderConfiguration config;
+  private final ExtendedUrlClassLoaderConfiguration config;
 
-  private ExtendedURLClassLoader(ExtendedURLClassLoaderConfiguration pConfig) {
+  private ExtendedUrlClassLoader(ExtendedUrlClassLoaderConfiguration pConfig) {
     super(
         pConfig.urls().toArray(new URL[0]),
         pConfig.parent().orElseGet(ClassLoader::getSystemClassLoader));
@@ -38,7 +38,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
 
   @AutoValue
   @SuppressWarnings("NoFunctionalReturnType")
-  abstract static class ExtendedURLClassLoaderConfiguration {
+  abstract static class ExtendedUrlClassLoaderConfiguration {
     abstract Optional<ClassLoader> parent();
 
     abstract ImmutableList<URL> urls();
@@ -48,7 +48,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
     abstract Predicate<String> customLookupNativeLibraries();
 
     static AutoBuilder builder() {
-      return new AutoValue_ExtendedURLClassLoader_ExtendedURLClassLoaderConfiguration.Builder();
+      return new AutoValue_ExtendedUrlClassLoader_ExtendedUrlClassLoaderConfiguration.Builder();
     }
 
     @AutoValue.Builder
@@ -58,7 +58,7 @@ final class ExtendedURLClassLoader extends URLClassLoader {
       @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
       @Override
       public final URLClassLoader build() {
-        return new ExtendedURLClassLoader(autoBuild());
+        return new ExtendedUrlClassLoader(autoBuild());
       }
     }
   }
