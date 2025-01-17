@@ -8,4 +8,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /** Tests for the rationals package. */
+@com.google.errorprone.annotations.CheckReturnValue
+@javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 package org.sosy_lab.common.rationals.tests;
