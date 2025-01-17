@@ -63,6 +63,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
   private static final String CONFIGURATION_PACKAGE_NAME =
       Configuration.class.getPackage().getName();
 
+  @SuppressWarnings("IdentifierName") // backwards compatibility
   public interface LogManagerMXBean {
 
     String getConsoleLevel();

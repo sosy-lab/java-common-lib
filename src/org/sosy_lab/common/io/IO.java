@@ -37,6 +37,7 @@ import org.sosy_lab.common.Appenders;
  * Provides helper functions for file access, in addition to {@link Files} and {@link
  * com.google.common.io.MoreFiles}.
  */
+@SuppressWarnings("IdentifierName") // backwards compatibility
 public final class IO {
 
   private IO() {

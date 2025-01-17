@@ -58,6 +58,7 @@ public final class NativeLibraries {
   private NativeLibraries() {}
 
   @Deprecated // will become private
+  @SuppressWarnings("IdentifierName") // cannot rename while public
   public enum OS {
     LINUX,
     MACOSX,
