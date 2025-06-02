@@ -133,8 +133,9 @@ public final class ShutdownNotifier {
   }
 
   /**
-   * Check whether a shutdown was previously requested. This method returns false immediately after
-   * this instance was constructed, and may return true later on. After it returned true once it
+   * Check whether a shutdown was previously requested. This method returns false as long as no
+   * shutdown was requested from the {@link ShutdownManager} that handed out this {@link
+   * ShutdownNotifier} instance. After such a shutdown was requested, this method returns true and
    * will always keep returning true, and never return false again. Calling this method is very
    * cheap.
    */
@@ -144,8 +145,10 @@ public final class ShutdownNotifier {
 
   /**
    * Check whether a shutdown was previously requested, and throw an {@link InterruptedException} in
-   * this case. Once a shutdown was requested, every call to this method will throw an exception. In
-   * the common case that no shutdown was yet requested, calling this method is very cheap.
+   * this case. Otherwise, do nothing. Once a shutdown was requested from the {@link
+   * ShutdownManager} that handed out this {@link ShutdownNotifier} instance, every call to this
+   * method will throw an exception. In the common case that no shutdown was yet requested, calling
+   * this method is very cheap.
    *
    * @throws InterruptedException If a shutdown was requested.
    */

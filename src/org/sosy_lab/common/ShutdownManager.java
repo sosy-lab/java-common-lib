@@ -23,6 +23,12 @@ import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
  * check the {@link ShutdownNotifier} instance that is associated with this instance regularly. This
  * ensures that the running code is not left in an unclean state.
  *
+ * <p>A {@link ShutdownManager} can only be used for one shutdown request: After creation it starts
+ * in the fresh "no shutdown requested" state. After the first call to {@link
+ * #requestShutdown(String)} is in the "shutdown requested" state and remains there forever. All
+ * subsequent calls to <code>getNotifier().shouldShutdown()</code> will return true, and further
+ * calls to {@link #requestShutdown(String)} are ignored.
+ *
  * <p>This class is the entry point and allows issuing shutdown requests with {@link
  * #requestShutdown(String)}. All components that need to get these requests or check whether the
  * should terminate should get the {@link ShutdownNotifier} instance that is returned by {@link
