@@ -58,7 +58,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- Error Prone does not support running on Java 11 anymore. -->
     <condition property="errorprone.disable">
-      <javaversion atmost="11"/>
+      <javaversion exactly="11"/>
     </condition>
 
     <import file="build/build-version.xml"/>
