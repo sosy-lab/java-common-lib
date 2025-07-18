@@ -37,13 +37,13 @@ SPDX-License-Identifier: Apache-2.0
         - Varifier: We do not want "var" in most places.
         - Interruption: Try again later, not well explained yet.
         - DefaultLocale: TODO: think about whether we want it
+        - AddNullMarkedToPackageInfo: TODO: use JSpecify and apply nullability everywhere
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
         -XepOpt:Nullness:Conservative=false
         -Xep:StaticOrDefaultInterfaceMethod:OFF
         -Xep:AndroidJdkLibsChecker:OFF
-        -Xep:Java7ApiChecker:OFF
         -Xep:Java8ApiChecker:OFF
         -Xep:FieldCanBeFinal:OFF
         -Xep:InconsistentOverloads:OFF
@@ -53,7 +53,13 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:Interruption:OFF
         -Xep:UnnecessaryTestMethodPrefix:OFF
         -Xep:DefaultLocale:OFF
+        -Xep:AddNullMarkedToPackageInfo:OFF
         "/>
+
+    <!-- Error Prone does not support running on Java 11 anymore. -->
+    <condition property="errorprone.disable">
+      <javaversion atmost="11"/>
+    </condition>
 
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>

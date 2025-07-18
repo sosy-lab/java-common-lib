@@ -29,7 +29,7 @@ public class SortedMapKeySetTest {
     protected SortedSet<String> create(String[] pStrings) {
       @Var PersistentSortedMap<String, Boolean> map = PathCopyingPersistentTreeMap.of();
       for (String s : pStrings) {
-        map = map.putAndCopy(s, Boolean.TRUE);
+        map = map.putAndCopy(s, true);
       }
       return new SortedMapKeySet<>((OurSortedMap<String, ?>) map);
     }

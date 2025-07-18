@@ -378,7 +378,7 @@ public final class Collections3 {
     }
   }
 
-  /* This method implements {@link SortedSet#containsAll} */
+  /** This method implements {@link SortedSet#containsAll}. */
   @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
   @SuppressFBWarnings(
       value = "DCN_NULLPOINTER_EXCEPTION",
