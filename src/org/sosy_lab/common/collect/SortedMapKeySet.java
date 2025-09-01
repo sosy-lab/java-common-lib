@@ -11,7 +11,6 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Iterators;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -28,9 +27,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>This implementation forwards all methods to the underlying map.
  */
-@SuppressFBWarnings(
-    value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
-    justification = "nullability depends on underlying map")
 final class SortedMapKeySet<K> extends AbstractSet<K> implements NavigableSet<K>, Serializable {
 
   private static final long serialVersionUID = 8196534519512074110L;

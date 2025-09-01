@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Ascii;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.time.Tickers.TickerWithUnit;
@@ -23,6 +24,9 @@ import org.sosy_lab.common.time.Tickers.TickerWithUnit;
  *
  * <p>This class is not thread-safe and may be used only from within a single thread.
  */
+@SuppressFBWarnings(
+    value = {"AT_NONATOMIC_OPERATIONS_ON_SHARED_VARIABLE", "AT_NONATOMIC_64BIT_PRIMITIVE"},
+    justification = "Class is not supposed to be thread-safe.")
 public final class Timer {
 
   private static final String DEFAULT_CLOCK_PROPERTY_NAME =

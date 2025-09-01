@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -37,6 +38,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <p>This class is not thread-safe and may be used only from within a single thread.
  */
+@SuppressFBWarnings(
+    value = {"AT_NONATOMIC_OPERATIONS_ON_SHARED_VARIABLE", "AT_NONATOMIC_64BIT_PRIMITIVE"},
+    justification = "Class is not supposed to be thread-safe.")
 public final class NestedTimer {
 
   private final Timer totalTimer = new Timer();

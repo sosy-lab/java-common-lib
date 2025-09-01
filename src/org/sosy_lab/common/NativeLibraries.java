@@ -14,7 +14,6 @@ import static com.google.common.base.Strings.nullToEmpty;
 import com.google.common.base.Ascii;
 import com.google.common.base.StandardSystemProperty;
 import com.google.errorprone.annotations.Var;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -172,7 +171,6 @@ public final class NativeLibraries {
    *
    * <p>It is usually recommended to use the high-level method {@link #loadLibrary(String)} instead.
    */
-  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public static Path getNativeLibraryPath() {
     if (nativePath == null) {
       String arch = Ascii.toLowerCase(Architecture.guessVmArchitecture().name());

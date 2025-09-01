@@ -88,6 +88,9 @@ public final class Configuration {
    * Enable a secure mode, i.e., allow only injection of configuration options marked as secure.
    * Once enabled, this can not be disabled.
    */
+  @SuppressFBWarnings(
+      value = "AT_STALE_THREAD_WRITE_OF_PRIMITIVE",
+      justification = "operation only for initialization before threads are started")
   public static void enableSecureModeGlobally() {
     secureMode = true;
   }
