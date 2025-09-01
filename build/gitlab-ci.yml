@@ -105,6 +105,7 @@ check-format:
 
 checkstyle:
   <<: *source_check
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
   script:
     - "ant $ANT_PROPS_CHECKS checkstyle"
     - "ant $ANT_PROPS_CHECKS run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && test $(cat Checkstyle*xml | grep -vic audit) -eq 0"
