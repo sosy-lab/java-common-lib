@@ -408,7 +408,7 @@ public class ConfigurationTest {
   @Options
   private static class OptionsSuperclass {
     @Option(secure = true, description = "blah")
-    protected String test = "oldValue";
+    String test = "oldValue";
 
     void callInjectSuperclassBug(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
@@ -650,7 +650,7 @@ public class ConfigurationTest {
   @Options
   private abstract static class SetterOptions {
     @Option(secure = true, description = "test")
-    public abstract void pub(String s);
+    abstract void pub(String s);
 
     @Option(secure = true, description = "test")
     private void priv(String s) {
@@ -661,7 +661,7 @@ public class ConfigurationTest {
     abstract void privForMock(String s);
 
     @Option(secure = true, description = "test")
-    public abstract void none(@Nullable String s);
+    abstract void none(@Nullable String s);
   }
 
   @Test
