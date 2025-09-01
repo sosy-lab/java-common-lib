@@ -77,8 +77,6 @@ build:jdk-24:
 # For checks that only need the source code, not the binaries
 .source_check: &source_check
   stage: checks
-  dependencies:
-    - build-dependencies
   needs:
     - build-dependencies
   interruptible: true
@@ -118,9 +116,6 @@ checkstyle:
 javadoc:
   <<: *binary_check
   script: "ant $ANT_PROPS_CHECKS javadoc"
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -133,9 +128,6 @@ spotbugs:
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'test \! -f SpotBugs.html'
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -158,9 +150,6 @@ spotbugs:
 
 unit-tests:jdk-11:
   <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -168,9 +157,6 @@ unit-tests:jdk-11:
 
 unit-tests:jdk-17:
   <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-17
   needs:
     - build-dependencies
     - build:jdk-17
@@ -178,9 +164,6 @@ unit-tests:jdk-17:
 
 unit-tests:jdk-21:
   <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-21
   needs:
     - build-dependencies
     - build:jdk-21
@@ -188,9 +171,6 @@ unit-tests:jdk-21:
 
 unit-tests:jdk-24:
   <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-24
   needs:
     - build-dependencies
     - build:jdk-24
@@ -241,9 +221,6 @@ reuse:
 deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
-  dependencies:
-    - build:jdk-11
-    - javadoc
   needs:
     - build:jdk-11
     - javadoc
