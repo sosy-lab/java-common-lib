@@ -56,6 +56,11 @@ SPDX-License-Identifier: Apache-2.0
       <javaversion atleast="21"/>
     </condition>
 
+    <!-- Current versions of Error Prone do not support running on Java 11 anymore. -->
+    <condition property="errorprone.disable">
+      <javaversion exactly="11"/>
+    </condition>
+
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
     <target name="build-project" unless="skipBuild" depends="build-dependencies">
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>

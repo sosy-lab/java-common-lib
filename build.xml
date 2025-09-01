@@ -56,11 +56,6 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:AddNullMarkedToPackageInfo:OFF
         "/>
 
-    <!-- Error Prone does not support running on Java 11 anymore. -->
-    <condition property="errorprone.disable">
-      <javaversion exactly="11"/>
-    </condition>
-
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
