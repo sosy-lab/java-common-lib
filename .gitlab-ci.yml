@@ -12,6 +12,6 @@ variables:
   PROJECT_PATH: "sosy-lab/software/java-common-lib"
   GH_REF: "github.com/sosy-lab/java-common-lib"
   # Version of https://gitlab.com/sosy-lab/software/refaster/ to use
-  REFASTER_REPO_REVISION: 99adb756917eb594944c3ff127a850d628700417
+  REFASTER_REPO_REVISION: 26c8309d1023e4dfcb0e8d24dcf7ec12e621314e
   # Needs to be synchronized with Error Prone version in lib/ivy.xml
-  REFASTER_VERSION: "2.40.0"
+  REFASTER_VERSION: "2.41.0"
