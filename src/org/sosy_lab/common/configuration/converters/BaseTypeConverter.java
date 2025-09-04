@@ -12,7 +12,6 @@ import com.google.common.primitives.Primitives;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -123,9 +122,7 @@ public enum BaseTypeConverter implements TypeConverter {
       Class<?> type, String method, Class<T> paramType, T value, String optionName)
       throws InvalidConfigurationException {
     try {
-      Method m = type.getMethod(method, paramType);
-      m.setAccessible(true);
-      return m.invoke(null, value);
+      return type.getMethod(method, paramType).invoke(null, value);
 
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new AssertionError(
