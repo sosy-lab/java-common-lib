@@ -994,25 +994,24 @@ public final class Configuration {
     }
     assert collectionClass != null;
 
-    if (collectionClass == EnumSet.class) {
-      assert componentType.getRawType().isEnum();
-      return createEnumSetUnchecked(componentType.getRawType(), values);
+    if (componentType.getRawType().isEnum()) {
+      EnumSet<?> enumSet = createEnumSetUnchecked(componentType.getRawType(), values);
+      if (collectionClass == EnumSet.class) {
+        return enumSet;
 
-    } else if (componentType.getRawType().isEnum()
-        && (collectionClass == Set.class || collectionClass == ImmutableSet.class)) {
-      // There is a specialized ImmutableSet for enums in Guava that is more efficient.
-      // We use it if we can.
-      return BaseTypeConverter.invokeStaticMethod(
-          Sets.class, "immutableEnumSet", Iterable.class, values, optionName);
-
-    } else {
-      // we know that it's a Collection<componentType> / Set<? extends componentType> etc.,
-      // so we can safely assign to it
-
-      // invoke ImmutableSet.copyOf(Iterable) etc.
-      return BaseTypeConverter.invokeStaticMethod(
-          collectionClass, "copyOf", Iterable.class, values, optionName);
+      } else if (collectionClass == Set.class || collectionClass == ImmutableSet.class) {
+        // There is a specialized ImmutableSet for enums in Guava that is more efficient.
+        // We use it if we can.
+        return Sets.immutableEnumSet(enumSet);
+      }
     }
+
+    // we know that it's a Collection<componentType> / Set<? extends componentType> etc.,
+    // so we can safely assign to it
+
+    // invoke ImmutableSet.copyOf(Iterable) etc.
+    return BaseTypeConverter.invokeStaticMethod(
+        collectionClass, "copyOf", Iterable.class, values, optionName);
   }
 
   /**
