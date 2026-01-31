@@ -213,7 +213,7 @@ public final class NativeLibraries {
    * NativeLibraries}.
    *
    * @param libraryName A library name as for {@link System#loadLibrary(String)}.
-   * @return Found path or {@code Optional.absent()}
+   * @return Found path or {@link Optional#empty()}
    */
   @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
