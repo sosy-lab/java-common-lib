@@ -217,15 +217,26 @@ public final class NativeLibraries {
    */
   @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
+    @Var Path p;
+    try {
+      // Try to get the native library path
+      p = getNativeLibraryPath();
+    } catch (UnsatisfiedLinkError e) {
+      // Return Optional.empty if operating system or architecture are unknown to us
+      return Optional.empty();
+    }
     String osLibName = System.mapLibraryName(libraryName);
-    @Var Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
+    // Look for the library in the native library path
+    p = p.resolve(osLibName).toAbsolutePath();
     if (Files.exists(p)) {
       return Optional.of(p);
     }
+    // Look for the library next to the *.jar file
     p = Classes.getCodeLocation(NativeLibraries.class).resolveSibling(osLibName).toAbsolutePath();
     if (Files.exists(p)) {
       return Optional.of(p);
     }
+    // If nothing was found, return Optional.empty
     return Optional.empty();
   }
 }
