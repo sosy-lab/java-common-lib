@@ -219,13 +219,7 @@ public final class NativeLibraries {
   public static void loadLibrary(String name) {
     Optional<Path> path = findPathForLibrary(name);
     if (path.isPresent()) {
-      try {
-        System.load(path.orElseThrow().toAbsolutePath().toString());
-      } catch (UnsatisfiedLinkError e) {
-        // Revert to the system loader if we could not load the library that was found
-        System.loadLibrary(name);
-      }
-
+      System.load(path.orElseThrow().toAbsolutePath().toString());
     } else {
       System.loadLibrary(name);
     }
