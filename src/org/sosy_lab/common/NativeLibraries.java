@@ -47,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *         <li>netbsd
  *         <li>openbsd
  *       </ul>
- *   <li>the same directory as the JAR file of this library
+ *   <li>the same directory as the JAR file of this library. (Only on Linux, Windows and MacOS)
  * </ul>
  *
  * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary} with the library
@@ -239,9 +239,12 @@ public final class NativeLibraries {
     if (Files.exists(p)) {
       return Optional.of(p);
     }
-    p = Classes.getCodeLocation(NativeLibraries.class).resolveSibling(osLibName).toAbsolutePath();
-    if (Files.exists(p)) {
-      return Optional.of(p);
+    var system = OS.guessOperatingSystem();
+    if (system == OS.LINUX || system == OS.WINDOWS || system == OS.MACOSX) {
+      p = Classes.getCodeLocation(NativeLibraries.class).resolveSibling(osLibName).toAbsolutePath();
+      if (Files.exists(p)) {
+        return Optional.of(p);
+      }
     }
     return Optional.empty();
   }
