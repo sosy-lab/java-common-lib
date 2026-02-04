@@ -29,8 +29,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * <ul>
  *   <li>the "native library path" as returned by {@link #getNativeLibraryPath()}, which is the
- *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library,
- *       where {@literal <arch>} stands for your processor architecture and {@literal <os>} for the
+ *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library, where
+ *       {@literal <arch>} stands for your processor architecture and {@literal <os>} for the
  *       operating system.
  *       <p>Possible values for {@literal <arch>} include:
  *       <ul>
