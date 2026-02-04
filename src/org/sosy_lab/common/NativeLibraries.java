@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *       <p>Possible values for {@literal <arch>} include:
  *       <ul>
  *         <li>arm64
- *         <li>x86-64
+ *         <li>x86_64
  *         <li>x86
  *       </ul>
  *       <p>Possible values for {@literal <os>} include:
