@@ -1355,8 +1355,7 @@ public final class PathCopyingPersistentTreeMap<
     @Override
     @SuppressWarnings("ReferenceEquality") // comparing nodes with equals would not suffice
     public boolean equals(@Nullable Object pObj) {
-      if (pObj instanceof PartialSortedMap<?, ?>) {
-        PartialSortedMap<?, ?> other = (PartialSortedMap<?, ?>) pObj;
+      if (pObj instanceof PartialSortedMap<?, ?> other) {
         if (root == other.root
             && Objects.equals(fromKey, other.fromKey)
             && fromInclusive == other.fromInclusive

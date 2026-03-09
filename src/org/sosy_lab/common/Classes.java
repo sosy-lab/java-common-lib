@@ -393,8 +393,7 @@ public final class Classes {
    */
   public static Type extractUpperBoundFromType(@Var Type type) {
     checkNotNull(type);
-    if (type instanceof WildcardType) {
-      WildcardType wcType = (WildcardType) type;
+    if (type instanceof WildcardType wcType) {
       if (wcType.getLowerBounds().length > 0) {
         throw new UnsupportedOperationException(
             "Currently wildcard types with a lower bound like \"" + type + "\" are not supported ");
