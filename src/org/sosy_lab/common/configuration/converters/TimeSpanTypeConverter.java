@@ -45,11 +45,10 @@ public class TimeSpanTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
     Class<?> type = pType.getRawType();
 
-    if (!(pOption instanceof TimeSpanOption)) {
+    if (!(pOption instanceof TimeSpanOption option)) {
       throw new UnsupportedOperationException(
           "Time span options need to be annotated with @TimeSpanOption");
     }
-    TimeSpanOption option = (TimeSpanOption) pOption;
 
     // find unit in input string
     @Var int i = valueStr.length() - 1;

@@ -928,8 +928,8 @@ public final class Configuration {
     if (defaultValue != null) {
       String defaultStr;
 
-      if (defaultValue instanceof Object[]) {
-        defaultStr = Arrays.deepToString((Object[]) defaultValue);
+      if (defaultValue instanceof Object[] array) {
+        defaultStr = Arrays.deepToString(array);
       } else {
         defaultStr = defaultValue.toString();
       }

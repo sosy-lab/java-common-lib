@@ -33,11 +33,10 @@ public class IntegerTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
     Class<?> type = pType.getRawType();
 
-    if (!(pOption instanceof IntegerOption)) {
+    if (!(pOption instanceof IntegerOption option)) {
       throw new UnsupportedOperationException(
           "IntegerTypeConverter needs options annotated with @IntegerOption");
     }
-    IntegerOption option = (IntegerOption) pOption;
 
     assert type.equals(Integer.class) || type.equals(Long.class);
 

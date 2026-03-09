@@ -37,13 +37,11 @@ public class ClassTypeConverter implements TypeConverter {
 
     // get optional package prefix
     if (secondaryOption != null) {
-      if (!(secondaryOption instanceof ClassOption)) {
+      if (!(secondaryOption instanceof ClassOption classOption)) {
         throw new UnsupportedOperationException(
             "Options of type Class may not be annotated with " + secondaryOption);
       }
-      packagePrefixes =
-          FluentIterable.from(packagePrefixes)
-              .append(((ClassOption) secondaryOption).packagePrefix());
+      packagePrefixes = FluentIterable.from(packagePrefixes).append(classOption.packagePrefix());
     }
 
     // get class object

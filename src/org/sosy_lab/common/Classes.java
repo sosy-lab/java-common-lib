@@ -674,8 +674,8 @@ public final class Classes {
         }
 
         try {
-          if (target instanceof Method) {
-            return ((Method) target).invoke(null, targetArgs);
+          if (target instanceof Method method) {
+            return method.invoke(null, targetArgs);
           } else if (target instanceof Constructor<?>) {
             return ((Constructor<?>) target).newInstance(targetArgs);
           } else {

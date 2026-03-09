@@ -396,10 +396,10 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof TimeSpan)) {
+    if (!(obj instanceof TimeSpan other)) {
       return false;
     }
-    TimeSpan other = (TimeSpan) obj;
+
     if (unit == other.unit) {
       return span == other.span;
     }

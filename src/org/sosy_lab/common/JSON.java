@@ -45,20 +45,20 @@ public final class JSON {
     if (value == null) {
       out.append("null");
 
-    } else if (value instanceof CharSequence) {
+    } else if (value instanceof CharSequence charSequence) {
       out.append('\"');
-      escape((CharSequence) value, out);
+      escape(charSequence, out);
       out.append('\"');
 
-    } else if (value instanceof Double) {
-      if (((Double) value).isInfinite() || ((Double) value).isNaN()) {
+    } else if (value instanceof Double d) {
+      if (d.isInfinite() || d.isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
       }
 
-    } else if (value instanceof Float) {
-      if (((Float) value).isInfinite() || ((Float) value).isNaN()) {
+    } else if (value instanceof Float f) {
+      if (f.isInfinite() || f.isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
