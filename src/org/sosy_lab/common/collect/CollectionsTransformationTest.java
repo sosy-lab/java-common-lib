@@ -40,6 +40,7 @@ public class CollectionsTransformationTest {
    * copies of a collection the transformation is applied only once (i.e., only one pass is made
    * over the input collection).
    */
+  @SuppressWarnings("DuplicateAssertion")
   private static void testTransformCalledOnlyOnce(
       Function<List<AtomicInteger>, Collection<AtomicInteger>> inputSupplier,
       BiFunction<Collection<AtomicInteger>, Function<AtomicInteger, String>, Collection<String>>
@@ -90,6 +91,7 @@ public class CollectionsTransformationTest {
         (input, transformer) -> new TreeSet<>(Collections2.transform(input, transformer)));
   }
 
+  @SuppressWarnings("DuplicateAssertion")
   private static void testMapTransformCalledOnlyOnce(
       Function<Map<String, AtomicInteger>, Map<String, AtomicInteger>> inputSupplier,
       BiFunction<Map<String, AtomicInteger>, Function<AtomicInteger, String>, Map<String, String>>

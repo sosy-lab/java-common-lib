@@ -38,12 +38,12 @@ SPDX-License-Identifier: Apache-2.0
         - Interruption: Try again later, not well explained yet.
         - DefaultLocale: TODO: think about whether we want it
         - AddNullMarkedToPackageInfo: TODO: use JSpecify and apply nullability everywhere
+        - AddNullMarkedToClass: We prefer the annotations in package-info.java
     -->
     <property name="errorprone.options" value="
         -XepAllDisabledChecksAsWarnings
         -XepOpt:Nullness:Conservative=false
         -Xep:StaticOrDefaultInterfaceMethod:OFF
-        -Xep:AndroidJdkLibsChecker:OFF
         -Xep:Java8ApiChecker:OFF
         -Xep:FieldCanBeFinal:OFF
         -Xep:InconsistentOverloads:OFF
@@ -54,6 +54,7 @@ SPDX-License-Identifier: Apache-2.0
         -Xep:UnnecessaryTestMethodPrefix:OFF
         -Xep:DefaultLocale:OFF
         -Xep:AddNullMarkedToPackageInfo:OFF
+        -Xep:AddNullMarkedToClass:OFF
         "/>
 
     <import file="build/build-version.xml"/>

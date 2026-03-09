@@ -19,6 +19,7 @@ import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -368,6 +369,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param args The arguments for the format string.
    */
   @Override
+  @FormatMethod
   public void logf(Level priority, String format, Object... args) {
     checkFormatStringParameters(format, args);
     if (wouldBeLogged(priority)) {
@@ -382,6 +384,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
    * @param args The arguments for the format string.
    * @return Additional message as string
    */
+  @FormatMethod
   private String formatAdditionalMessage(String format, Object... args) {
     checkFormatStringParameters(format, args);
 
@@ -498,6 +501,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   /** {@inheritDoc} */
   @Override
+  @FormatMethod
   public void logfUserException(Level priority, Throwable e, String format, Object... args) {
     checkNotNull(e);
     checkFormatStringParameters(format, args);
@@ -665,6 +669,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   /** {@inheritDoc} */
   @Override
+  @FormatMethod
   public void logfDebugException(Throwable e, String format, Object... args) {
     logfException(EXCEPTION_DEBUG_LEVEL, e, format, args);
   }
@@ -680,6 +685,7 @@ public class BasicLogManager implements LogManager, AutoCloseable {
 
   /** {@inheritDoc} */
   @Override
+  @FormatMethod
   public void logfException(Level priority, Throwable e, String format, Object... args) {
     checkNotNull(e);
     checkFormatStringParameters(format, args);
