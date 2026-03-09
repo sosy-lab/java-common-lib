@@ -45,7 +45,7 @@ final class SortedMapEntrySet<K, V extends @Nullable Object> extends AbstractSet
   public boolean equals(@Nullable Object pO) {
     if (pO instanceof SortedMapEntrySet<?, ?>
         && Collections3.guaranteedSameOrder(
-            this.map.comparator(), ((SortedMapEntrySet<?, ?>) pO).map.comparator())) {
+            map.comparator(), ((SortedMapEntrySet<?, ?>) pO).map.comparator())) {
       // Map has a linear comparison for this case
       return map.equals(((SortedMapEntrySet<?, ?>) pO).map);
     }

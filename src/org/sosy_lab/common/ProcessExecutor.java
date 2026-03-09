@@ -138,7 +138,7 @@ public class ProcessExecutor<E extends Exception> {
 
     this.logger = checkNotNull(logger);
     this.exceptionClass = checkNotNull(exceptionClass);
-    this.name = cmd[0];
+    name = cmd[0];
 
     ProcessBuilder proc = new ProcessBuilder(cmd);
     proc.directory(executionDirectory);
@@ -155,7 +155,7 @@ public class ProcessExecutor<E extends Exception> {
     logger.log(Level.FINEST, executingMsgSupplier);
 
     Process process = proc.start();
-    this.pid = process.pid();
+    pid = process.pid();
 
     Supplier<String> startedMsgSupplier =
         () -> String.format("Started '%s' with pid [%d]", Joiner.on(" ").join(cmd), pid);
