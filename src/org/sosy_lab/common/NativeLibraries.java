@@ -28,18 +28,26 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <p>The searched directories are:
  *
  * <ul>
- *   <li>the same directory as the JAR file of this library
  *   <li>the "native library path" as returned by {@link #getNativeLibraryPath()}, which is the
- *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library, with
- *       {@literal <arch>-<os>} being one of the following values depending on your system:
+ *       directory {@literal ../native/<arch>-<os>/} relative to the JAR file of this library, where
+ *       {@literal <arch>} stands for your processor architecture and {@literal <os>} for the
+ *       operating system.
+ *       <p>Possible values for {@literal <arch>} include:
  *       <ul>
- *         <li>x86_64-linux
- *         <li>x86-linux
- *         <li>x86-windows
- *         <li>x86_64-windows
- *         <li>x86-macosx
- *         <li>x86_64-macosx
+ *         <li>arm64
+ *         <li>x86_64
+ *         <li>x86
  *       </ul>
+ *       <p>Possible values for {@literal <os>} include:
+ *       <ul>
+ *         <li>linux
+ *         <li>windows
+ *         <li>macosx
+ *         <li>freebsd
+ *         <li>netbsd
+ *         <li>openbsd
+ *       </ul>
+ *   <li>the same directory as the JAR file of this library
  * </ul>
  *
  * <p>Standard usage is by calling the method {@link NativeLibraries#loadLibrary} with the library
@@ -61,7 +69,10 @@ public final class NativeLibraries {
   public enum OS {
     LINUX,
     MACOSX,
-    WINDOWS;
+    WINDOWS,
+    FREEBSD,
+    NETBSD,
+    OPENBSD;
 
     @SuppressWarnings("MemberName")
     private static @Nullable OS currentOS = null;
@@ -84,6 +95,12 @@ public final class NativeLibraries {
         currentOS = WINDOWS;
       } else if (prop.startsWith("macosx")) {
         currentOS = MACOSX;
+      } else if (prop.startsWith("freebsd")) {
+        currentOS = FREEBSD;
+      } else if (prop.startsWith("netbsd")) {
+        currentOS = NETBSD;
+      } else if (prop.startsWith("openbsd")) {
+        currentOS = OPENBSD;
       } else {
         throw new UnsatisfiedLinkError(
             "Unknown value for os.name: '"
@@ -213,7 +230,7 @@ public final class NativeLibraries {
    * NativeLibraries}.
    *
    * @param libraryName A library name as for {@link System#loadLibrary(String)}.
-   * @return Found path or {@code Optional.absent()}
+   * @return Found path or {@link Optional#empty()}
    */
   @Deprecated // will become private
   public static Optional<Path> findPathForLibrary(String libraryName) {
