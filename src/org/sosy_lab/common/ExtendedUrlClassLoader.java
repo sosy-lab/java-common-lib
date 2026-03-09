@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Var;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -55,7 +54,6 @@ final class ExtendedUrlClassLoader extends URLClassLoader {
     abstract static class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder> {
       AutoBuilder() {}
 
-      @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
       @Override
       public final URLClassLoader build() {
         return new ExtendedUrlClassLoader(autoBuild());
