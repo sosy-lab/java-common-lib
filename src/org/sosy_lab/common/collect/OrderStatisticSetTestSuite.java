@@ -215,13 +215,13 @@ public abstract class OrderStatisticSetTestSuite {
 
     try {
       set.getByRank(-1);
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       set.getByRank(ELEMS.length);
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }

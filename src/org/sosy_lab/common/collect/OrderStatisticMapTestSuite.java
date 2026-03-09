@@ -225,12 +225,12 @@ public abstract class OrderStatisticMapTestSuite {
                 ELEMS.get(2).getKey(), /* toInclusive= */ true)
             .descendingMap();
 
-    assertThat(ELEMS.get(2)).isEqualTo(subMap.firstEntry());
-    assertThat(ELEMS.get(1)).isEqualTo(subMap.lastEntry());
+    assertThat(subMap.firstEntry()).isEqualTo(ELEMS.get(2));
+    assertThat(subMap.lastEntry()).isEqualTo(ELEMS.get(1));
 
     subMap = subMap.descendingMap();
-    assertThat(ELEMS.get(1)).isEqualTo(subMap.firstEntry());
-    assertThat(ELEMS.get(2)).isEqualTo(subMap.lastEntry());
+    assertThat(subMap.firstEntry()).isEqualTo(ELEMS.get(1));
+    assertThat(subMap.lastEntry()).isEqualTo(ELEMS.get(2));
   }
 
   @Test
@@ -293,13 +293,13 @@ public abstract class OrderStatisticMapTestSuite {
 
     try {
       map.getEntryByRank(-1);
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       map.getEntryByRank(ELEMS.size());
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
@@ -381,13 +381,13 @@ public abstract class OrderStatisticMapTestSuite {
 
     try {
       map.getKeyByRank(-1);
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
     try {
       map.getKeyByRank(ELEMS.size());
-      assertWithMessage("Expected " + IndexOutOfBoundsException.class.getSimpleName()).fail();
+      assertWithMessage("Expected IndexOutOfBoundsException").fail();
     } catch (IndexOutOfBoundsException expected) {
       // expected outcome
     }
