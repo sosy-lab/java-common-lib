@@ -56,11 +56,6 @@ SPDX-License-Identifier: Apache-2.0
       <javaversion atleast="21"/>
     </condition>
 
-    <!-- Current versions of Error Prone do not support running on Java 11 anymore. -->
-    <condition property="errorprone.disable">
-      <javaversion exactly="11"/>
-    </condition>
-
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
     <target name="build-project" unless="skipBuild" depends="build-dependencies">
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>
@@ -85,9 +80,9 @@ SPDX-License-Identifier: Apache-2.0
             <compilerarg value="-Xlint:-options"/> <!-- suppress warning about bootclasspath on newer JDK -->
             <compilerarg value="-Xlint:-this-escape" if:set="java21"/> <!-- false alarm for every use of configuration injection -->
             <compilerarg value="-Werror" unless:set="compile.warn"/>
-            <compilerarg line="${errorprone.options.required}" unless:set="errorprone.disable"/>
+            <compilerarg line="${errorprone.options.required}" if:set="java21" unless:set="errorprone.disable"/>
             <compilerarg value="-XDaddTypeAnnotationsToSymbol=true" if:set="java21" unless:set="errorprone.disable"/> <!-- necessary for Error Prone on Java 21, can be removed once minimal version is Java 22 -->
-            <compilerarg value="-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${errorprone.options}" unless:set="errorprone.disable"/>
+            <compilerarg value="-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${errorprone.options}" if:set="java21" unless:set="errorprone.disable"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
             <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
         </javac>
