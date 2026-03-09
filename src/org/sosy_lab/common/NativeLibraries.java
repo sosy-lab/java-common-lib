@@ -152,23 +152,17 @@ public final class NativeLibraries {
 
       osArch = Ascii.toLowerCase(osArch.replace(" ", ""));
 
-      switch (osArch) {
-        case "i386":
-        case "i686":
-        case "x86":
-          return Architecture.X86;
-        case "amd64":
-        case "x86_64":
-          return Architecture.X86_64;
-        case "aarch64":
-          return Architecture.ARM64;
-        default:
-          throw new UnsatisfiedLinkError(
-              "Unknown value for os.arch: '"
-                  + StandardSystemProperty.OS_ARCH.value()
-                  + "'"
-                  + REPORT_MESSAGE);
-      }
+      return switch (osArch) {
+        case "i386", "i686", "x86" -> Architecture.X86;
+        case "amd64", "x86_64" -> Architecture.X86_64;
+        case "aarch64" -> Architecture.ARM64;
+        default ->
+            throw new UnsatisfiedLinkError(
+                "Unknown value for os.arch: '"
+                    + StandardSystemProperty.OS_ARCH.value()
+                    + "'"
+                    + REPORT_MESSAGE);
+      };
     }
 
     /** Check whether the JVM is executing in 32 bit version. */

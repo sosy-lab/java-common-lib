@@ -656,15 +656,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
   static {
     String format =
         Ascii.toUpperCase(System.getProperty(DEFAULT_FORMAT_PROPERTY_NAME, "SIMPLE").trim());
-    switch (format) {
-      case "HUMAN_READABLE_LARGE":
-        DEFAULT_FORMAT = TimeSpan::formatHumanReadableLarge;
-        break;
-      case "SIMPLE":
-        DEFAULT_FORMAT = TimeSpan::formatSimple;
-        break;
-      default:
-        DEFAULT_FORMAT = TimeSpan::formatSimple;
-    }
+    DEFAULT_FORMAT =
+        switch (format) {
+          case "HUMAN_READABLE_LARGE" -> TimeSpan::formatHumanReadableLarge;
+          case "SIMPLE" -> TimeSpan::formatSimple;
+          default -> TimeSpan::formatSimple;
+        };
   }
 }

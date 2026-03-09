@@ -39,25 +39,15 @@ public final class Timer {
     String clockToUse =
         Ascii.toUpperCase(
             System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").trim());
-    switch (clockToUse) {
-      case "WALLTIME_MILLIS":
-        DEFAULT_CLOCK = Tickers.getWalltimeMillis();
-        break;
-      case "WALLTIME_NANOS":
-        DEFAULT_CLOCK = Tickers.getWalltimeNanos();
-        break;
-      case "THREAD_CPUTIME":
-        DEFAULT_CLOCK = Tickers.getCurrentThreadCputime();
-        break;
-      case "PROCESS_CPUTIME":
-        DEFAULT_CLOCK = Tickers.getProcessCputime();
-        break;
-      case "NONE":
-        DEFAULT_CLOCK = Tickers.getNullTicker();
-        break;
-      default:
-        DEFAULT_CLOCK = null;
-    }
+    DEFAULT_CLOCK =
+        switch (clockToUse) {
+          case "WALLTIME_MILLIS" -> Tickers.getWalltimeMillis();
+          case "WALLTIME_NANOS" -> Tickers.getWalltimeNanos();
+          case "THREAD_CPUTIME" -> Tickers.getCurrentThreadCputime();
+          case "PROCESS_CPUTIME" -> Tickers.getProcessCputime();
+          case "NONE" -> Tickers.getNullTicker();
+          default -> null;
+        };
   }
 
   // Visible for NestedTimer

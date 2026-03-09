@@ -120,16 +120,12 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
    * @return New {@link ExtendedRational}.
    */
   public static ExtendedRational ofString(String s) {
-    switch (s) {
-      case "Infinity":
-        return ExtendedRational.INFTY;
-      case "-Infinity":
-        return ExtendedRational.NEG_INFTY;
-      case "NaN":
-        return ExtendedRational.NaN;
-      default:
-        return new ExtendedRational(Rational.ofString(s));
-    }
+    return switch (s) {
+      case "Infinity" -> ExtendedRational.INFTY;
+      case "-Infinity" -> ExtendedRational.NEG_INFTY;
+      case "NaN" -> ExtendedRational.NaN;
+      default -> new ExtendedRational(Rational.ofString(s));
+    };
   }
 
   @Override
