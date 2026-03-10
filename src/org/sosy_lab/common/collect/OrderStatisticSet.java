@@ -151,6 +151,7 @@ public interface OrderStatisticSet<E> extends NavigableSet<E> {
    * @return a new OrderStatisticSet containing the same elements and using the same order as the
    *     given set
    */
+  @SuppressWarnings("IllegalType") // handling SortedSet is more general
   static <E> OrderStatisticSet<E> createWithSameOrder(SortedSet<E> pSortedSet) {
     return NaiveOrderStatisticSet.createSetWithSameOrder(pSortedSet);
   }

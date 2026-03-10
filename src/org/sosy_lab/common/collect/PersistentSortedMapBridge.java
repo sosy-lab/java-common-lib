@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Interface that forces generation of bridge methods that return {@link SortedSet} for binary
  * backwards compatibility.
  */
-@SuppressWarnings("JdkObsolete")
+@SuppressWarnings({"JdkObsolete", "IllegalType"}) // on purpose in this "bridge" class
 @Immutable(containerOf = {"K", "V"})
 interface PersistentSortedMapBridge<K, V extends @Nullable Object>
     extends PersistentMap<K, V>, SortedMap<K, V> {

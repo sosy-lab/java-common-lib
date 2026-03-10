@@ -251,7 +251,7 @@ public final class Collections3 {
    * @param prefix The prefix that all keys in the result need to have.
    * @return A partial map of the input.
    */
-  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressWarnings({"JdkObsolete", "IllegalType"}) // handling SortedSet is more general
   public static <V> SortedMap<String, V> subMapWithPrefix(SortedMap<String, V> map, String prefix) {
     checkNotNull(map);
     checkArgument(!prefix.isEmpty());
@@ -288,7 +288,7 @@ public final class Collections3 {
    * @param prefix The prefix that all keys in the result need to have.
    * @return A subset of the input.
    */
-  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressWarnings({"JdkObsolete", "IllegalType"}) // handling SortedSet is more general
   public static SortedSet<String> subSetWithPrefix(SortedSet<String> set, String prefix) {
     checkNotNull(set);
     checkArgument(!prefix.isEmpty());
@@ -329,7 +329,7 @@ public final class Collections3 {
   }
 
   /** An implementation of {@link SortedSet#equals(Object)}. */
-  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressWarnings({"JdkObsolete", "IllegalType"}) // handling SortedSet is more general
   @SuppressFBWarnings(
       value = "DCN_NULLPOINTER_EXCEPTION",
       justification = "handle null even if one of the collections does not")
@@ -379,7 +379,7 @@ public final class Collections3 {
   }
 
   /** This method implements {@link SortedSet#containsAll}. */
-  @SuppressWarnings("JdkObsolete") // handling SortedSet is more general
+  @SuppressWarnings({"JdkObsolete", "IllegalType"}) // handling SortedSet is more general
   @SuppressFBWarnings(
       value = "DCN_NULLPOINTER_EXCEPTION",
       justification = "handle null even if comparator does not")

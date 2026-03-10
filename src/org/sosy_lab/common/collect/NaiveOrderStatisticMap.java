@@ -71,6 +71,7 @@ final class NaiveOrderStatisticMap<K, V extends @Nullable Object>
    * Creates a new OrderStatisticMap containing the sames entries as the given map and using the
    * same ordering over its keys as the given map.
    */
+  @SuppressWarnings("IllegalType") // handling SortedSet is more general
   static <K, V> NaiveOrderStatisticMap<K, V> createMapWithSameOrder(
       SortedMap<K, ? extends V> pSortedMap) {
     return new NaiveOrderStatisticMap<>(new TreeMap<>(checkNotNull(pSortedMap)));

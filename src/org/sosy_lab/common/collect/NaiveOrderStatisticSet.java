@@ -73,6 +73,7 @@ final class NaiveOrderStatisticSet<E> extends ForwardingNavigableSet<E>
    * @return a new OrderStatisticSet containing the same elements and using the same order as the
    *     given set
    */
+  @SuppressWarnings("IllegalType") // handling SortedSet is more general
   static <E> NaiveOrderStatisticSet<E> createSetWithSameOrder(SortedSet<E> pSortedSet) {
     return new NaiveOrderStatisticSet<>(new TreeSet<>(checkNotNull(pSortedSet)));
   }

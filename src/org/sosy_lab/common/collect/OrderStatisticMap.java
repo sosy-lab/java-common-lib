@@ -183,6 +183,7 @@ public interface OrderStatisticMap<K, V extends @Nullable Object> extends Naviga
    * @return a new OrderStatisticMap containing the same entries and using the same order over keys
    *     as the given map
    */
+  @SuppressWarnings("IllegalType") // handling SortedSet is more general
   static <K, V> OrderStatisticMap<K, V> createWithSameOrder(SortedMap<K, ? extends V> pSortedMap) {
     return NaiveOrderStatisticMap.createMapWithSameOrder(pSortedMap);
   }
