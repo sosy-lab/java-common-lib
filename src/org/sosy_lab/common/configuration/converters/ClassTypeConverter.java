@@ -66,9 +66,8 @@ public class ClassTypeConverter implements TypeConverter {
       // check type
       if (!targetType.isSupertypeOf(cls)) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Class %s specified in option %s is not an instance of %s",
-                value, optionName, targetType));
+            "Class %s specified in option %s is not an instance of %s"
+                .formatted(value, optionName, targetType));
       }
 
       result = cls;
@@ -80,9 +79,8 @@ public class ClassTypeConverter implements TypeConverter {
         result = Classes.createFactory(type, cls);
       } catch (UnsuitedClassException e) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Class %s specified in option %s is invalid (%s)",
-                value, optionName, e.getMessage()));
+            "Class %s specified in option %s is invalid (%s)"
+                .formatted(value, optionName, e.getMessage()));
       }
       Classes.produceClassLoadingWarning(logger, cls, type.getRawType());
     }

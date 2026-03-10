@@ -88,10 +88,10 @@ public final class Timer {
   public Timer() {
     if (DEFAULT_CLOCK == null) {
       throw new IllegalArgumentException(
-          String.format(
-              "Invalid value \'%s\' for property %s,"
-                  + "cannot create Timer without explicitly specified clock.",
-              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
+          ("Invalid value \'%s\' for property %s, "
+                  + "cannot create Timer without explicitly specified clock.")
+              .formatted(
+                  System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
     }
     clock = DEFAULT_CLOCK;
   }
@@ -243,11 +243,11 @@ public final class Timer {
   /** Syntax sugar method: pretty-format the timer output into a string in seconds. */
   public String prettyFormat() {
     TimeUnit t = TimeUnit.SECONDS;
-    return String.format(
-        "%s (Max: %s), (Avg: %s), (#intervals = %s)",
-        getSumTime().formatAs(t),
-        getMaxTime().formatAs(t),
-        getAvgTime().formatAs(t),
-        getNumberOfIntervals());
+    return "%s (Max: %s), (Avg: %s), (#intervals = %s)"
+        .formatted(
+            getSumTime().formatAs(t),
+            getMaxTime().formatAs(t),
+            getAvgTime().formatAs(t),
+            getNumberOfIntervals());
   }
 }

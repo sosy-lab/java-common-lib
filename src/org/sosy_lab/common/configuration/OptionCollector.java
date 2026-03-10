@@ -218,9 +218,8 @@ public final class OptionCollector {
       // actually never occur, e.g., ExceptionInInitializerError and UnsatisfiedLinkError.
       // Currently no case is known why a LinkageError would occur..
       errorMessages.add(
-          String.format(
-              "INFO: Could not load '%s' for getting Option annotations: %s: %s",
-              cls.getResourceName(), e.getClass().getName(), e.getMessage()));
+          "INFO: Could not load '%s' for getting Option annotations: %s: %s"
+              .formatted(cls.getResourceName(), e.getClass().getName(), e.getMessage()));
       return Stream.empty();
     }
   }

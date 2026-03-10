@@ -612,7 +612,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
     long hours = getChecked(HOURS) - years * 365 * 24 - days * 24;
     if (started || hours > 0) {
       started = true;
-      result.append(String.format("%02dh ", hours));
+      result.append("%02dh ".formatted(hours));
     }
     if (unit.equals(HOURS)) {
       return result.toString().trim();
@@ -620,7 +620,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
 
     long minutes = getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
     if (started || minutes > 0) {
-      result.append(String.format("%02dmin ", minutes));
+      result.append("%02dmin ".formatted(minutes));
     }
     if (unit.equals(MINUTES)) {
       started = true;
@@ -633,7 +633,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
             - days * 24 * 60 * 60
             - hours * 60 * 60
             - minutes * 60;
-    result.append(String.format("%02ds", seconds));
+    result.append("%02ds".formatted(seconds));
 
     return result.toString();
   }

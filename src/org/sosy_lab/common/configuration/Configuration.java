@@ -664,9 +664,9 @@ public final class Configuration {
         // this is an expected exception if the value is wrong,
         // so create a nice message for the user
         throw new InvalidConfigurationException(
-            String.format(
-                "Invalid value in configuration file: \"%s = %s\"%s",
-                name, value, (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
+            "Invalid value in configuration file: \"%s = %s\"%s"
+                .formatted(
+                    name, value, (t.getMessage() != null ? " (" + t.getMessage() + ")" : "")),
             t);
       }
 
@@ -850,18 +850,16 @@ public final class Configuration {
     String[] allowedValues = option.values();
     if (allowedValues.length > 0 && !Arrays.asList(allowedValues).contains(valueStr)) {
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)",
-              name, valueStr));
+          "Invalid value in configuration file: \"%s = %s\" (not listed as allowed value)"
+              .formatted(name, valueStr));
     }
 
     // check if it matches the specification regexp
     String regexp = option.regexp();
     if (!regexp.isEmpty() && !valueStr.matches(regexp)) {
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid value in configuration file: \"%s = %s\" (does not match RegExp \"%s\").",
-              name, valueStr, regexp));
+          "Invalid value in configuration file: \"%s = %s\" (does not match RegExp \"%s\")."
+              .formatted(name, valueStr, regexp));
     }
 
     return valueStr;
@@ -906,8 +904,8 @@ public final class Configuration {
 
     if (!applicableTypes.isEmpty() && !applicableTypes.contains(optionType.getRawType())) {
       throw new UnsupportedOperationException(
-          String.format(
-              "Annotation %s is not applicable for options of type %s.", annotation, optionType));
+          "Annotation %s is not applicable for options of type %s."
+              .formatted(annotation, optionType));
     }
   }
 

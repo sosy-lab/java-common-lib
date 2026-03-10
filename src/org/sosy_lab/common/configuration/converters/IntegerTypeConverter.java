@@ -51,9 +51,8 @@ public class IntegerTypeConverter implements TypeConverter {
               : Range.all();
 
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid value in configuration file: \"%s = %s\" (not in range %s).",
-              optionName, value, bound.intersection(typeBound)));
+          "Invalid value in configuration file: \"%s = %s\" (not in range %s)."
+              .formatted(optionName, value, bound.intersection(typeBound)));
     }
 
     return value;

@@ -410,9 +410,12 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
             ERROR,
             elem,
             am,
-            String.format(
-                "%s %s for annotation %s, this annotation is only for types %s.",
-                msgPrefix, optionType, annotationName, Joiner.on(", ").join(acceptedTypeNames)));
+            "%s %s for annotation %s, this annotation is only for types %s."
+                .formatted(
+                    msgPrefix,
+                    optionType,
+                    annotationName,
+                    Joiner.on(", ").join(acceptedTypeNames)));
       }
     }
 

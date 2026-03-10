@@ -178,9 +178,9 @@ public final class FileTypeConverter implements TypeConverter {
       String reason, String optionName, Path path, Object... args)
       throws InvalidConfigurationException {
     throw new InvalidConfigurationException(
-        String.format(
-            "The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".",
-            FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
+        ("The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".")
+            .formatted(
+                FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
   }
 
   public String getOutputDirectory() {
@@ -222,7 +222,7 @@ public final class FileTypeConverter implements TypeConverter {
       path = Path.of(pValue);
     } catch (InvalidPathException e) {
       throw new InvalidConfigurationException(
-          String.format("Invalid file name in option %s: %s", optionName, e.getMessage()), e);
+          "Invalid file name in option %s: %s".formatted(optionName, e.getMessage()), e);
     }
 
     return handleFileOption(

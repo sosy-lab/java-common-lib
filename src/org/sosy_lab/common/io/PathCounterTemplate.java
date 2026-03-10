@@ -42,7 +42,7 @@ public final class PathCounterTemplate {
   @SuppressWarnings("ReturnValueIgnored")
   @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
   private static void checkPatternValidity(String pTemplate) {
-    String.format(pTemplate, 0);
+    pTemplate.formatted(0);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class PathCounterTemplate {
    *     template.
    */
   public Path getFreshPath() {
-    return Path.of(String.format(template, counter.getAndIncrement()));
+    return Path.of(template.formatted(counter.getAndIncrement()));
   }
 
   /** Returns the raw template of this instance. */

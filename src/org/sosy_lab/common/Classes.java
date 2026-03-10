@@ -216,9 +216,8 @@ public final class Classes {
         Classes.verifyDeclaredExceptions(ct, exceptionType, InvalidConfigurationException.class);
     if (exception != null) {
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid %s %s, constructor declares unsupported checked exception %s.",
-              typeName, className, exception));
+          "Invalid %s %s, constructor declares unsupported checked exception %s."
+              .formatted(typeName, className, exception));
     }
 
     // instantiate
@@ -227,9 +226,8 @@ public final class Classes {
 
     } catch (InstantiationException e) {
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid %s %s, class cannot be instantiated (%s).",
-              typeName, className, e.getMessage()),
+          "Invalid %s %s, class cannot be instantiated (%s)."
+              .formatted(typeName, className, e.getMessage()),
           e);
 
     } catch (IllegalAccessException e) {
@@ -665,9 +663,8 @@ public final class Classes {
           Object value = parameterMapping[i] == -1 ? null : pActualArgs[parameterMapping[i]];
           if (value == null && !parameterNullability[i]) {
             throw new NullPointerException(
-                String.format(
-                    "Value null for parameter %d of type %s in %s",
-                    i, interfaceMethod.getGenericParameterTypes()[i], this));
+                "Value null for parameter %d of type %s in %s"
+                    .formatted(i, interfaceMethod.getGenericParameterTypes()[i], this));
           }
           targetArgs[i] = value;
         }
@@ -759,7 +756,7 @@ public final class Classes {
 
     @FormatMethod
     UnsuitedClassException(String msg, Object... args) {
-      super(String.format(msg, args));
+      super(msg.formatted(args));
     }
   }
 }
