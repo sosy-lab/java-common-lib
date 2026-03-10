@@ -8,9 +8,9 @@
 
 package org.sosy_lab.common.configuration;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verifyNotNull;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -514,36 +514,43 @@ public final class OptionCollector {
     return Collectors.groupingBy(classifier, () -> new TreeMap<>(keyComparator), toSortedList);
   }
 
-  abstract static class AnnotationInfo {
+  interface AnnotationInfo {
 
     /** The annotated element or class. */
-    abstract AnnotatedElement element();
+    AnnotatedElement element();
 
     /** The name for this annotation. */
-    abstract String name();
+    String name();
 
-    abstract Class<?> owningClass();
+    Class<?> owningClass();
 
-    abstract String description();
+    String description();
   }
 
-  @AutoValue
-  abstract static class OptionInfo extends AnnotationInfo {
+  record OptionInfo(
+      AnnotatedElement element, String name, String description, Class<?> type, String defaultValue)
+      implements AnnotationInfo {
+
+    OptionInfo {
+      checkNotNull(element);
+      checkNotNull(name);
+      checkNotNull(description);
+      checkNotNull(type);
+      checkNotNull(defaultValue);
+    }
 
     static OptionInfo createForField(
         Field field, Option option, String defaultValue, Options classOption) {
       String name = Configuration.getOptionName(classOption, field, option);
       String description = createRegularDescription(field, option);
-      return new AutoValue_OptionCollector_OptionInfo(
-          field, name, description, field.getType(), defaultValue);
+      return new OptionInfo(field, name, description, field.getType(), defaultValue);
     }
 
     static OptionInfo createForMethod(Method method, Option option, Options classOption) {
       String name = Configuration.getOptionName(classOption, method, option);
       String description = createRegularDescription(method, option);
       // methods with @Option have no usable default value
-      return new AutoValue_OptionCollector_OptionInfo(
-          method, name, description, method.getReturnType(), "");
+      return new OptionInfo(method, name, description, method.getReturnType(), "");
     }
 
     static OptionInfo createDeprecatedAliasForField(
@@ -551,8 +558,7 @@ public final class OptionCollector {
       String name =
           Configuration.getOptionName(classOption, field, option, /* isDeprecated= */ true);
       String description = createDeprecatedAliasDescription(field, option, classOption);
-      return new AutoValue_OptionCollector_OptionInfo(
-          field, name, description, field.getType(), defaultValue);
+      return new OptionInfo(field, name, description, field.getType(), defaultValue);
     }
 
     static OptionInfo createDeprecatedAliasForMethod(
@@ -560,8 +566,7 @@ public final class OptionCollector {
       String name =
           Configuration.getOptionName(classOption, method, option, /* isDeprecated= */ true);
       String description = createDeprecatedAliasDescription(method, option, classOption);
-      return new AutoValue_OptionCollector_OptionInfo(
-          method, name, description, method.getReturnType(), "");
+      return new OptionInfo(method, name, description, method.getReturnType(), "");
     }
 
     private static String createRegularDescription(AnnotatedElement element, Option option) {
@@ -577,35 +582,32 @@ public final class OptionCollector {
       return "deprecated name for " + Configuration.getOptionName(classOption, member, option);
     }
 
-    abstract Class<?> type();
-
-    abstract String defaultValue();
-
     @Override
-    final Class<?> owningClass() {
+    public Class<?> owningClass() {
       return ((Member) element()).getDeclaringClass();
     }
   }
 
-  @AutoValue
-  abstract static class OptionsInfo extends AnnotationInfo {
+  private record OptionsInfo(String name, Options options, Class<?> element)
+      implements AnnotationInfo {
 
-    static OptionsInfo create(Options options, Class<?> c) {
-      return new AutoValue_OptionCollector_OptionsInfo(options.prefix(), options, c);
+    OptionsInfo {
+      checkNotNull(name);
+      checkNotNull(options);
+      checkNotNull(element);
     }
 
-    abstract Options options();
+    static OptionsInfo create(Options options, Class<?> c) {
+      return new OptionsInfo(options.prefix(), options, c);
+    }
 
     @Override
-    abstract Class<?> element();
-
-    @Override
-    final Class<?> owningClass() {
+    public Class<?> owningClass() {
       return element();
     }
 
     @Override
-    String description() {
+    public String description() {
       return options().description();
     }
   }
