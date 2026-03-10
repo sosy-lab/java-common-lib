@@ -270,8 +270,8 @@ build-docker:test:jdk-21:
     DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-21
     IMAGE: /test:jdk-21
 
-build-docker:test:jdk-24:
+build-docker:test:jdk-25:
   extends: .build-docker
   variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-24
-    IMAGE: /test:jdk-24
+    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-25
+    IMAGE: /test:jdk-25
