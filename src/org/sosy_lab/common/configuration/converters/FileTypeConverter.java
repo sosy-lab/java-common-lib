@@ -161,15 +161,9 @@ public final class FileTypeConverter implements TypeConverter {
     @Var int depth = 0;
     for (String component : Splitter.on(File.separator).split(path)) {
       switch (component) {
-        case "":
-        case ".":
-          break;
-        case "..":
-          depth--;
-          break;
-        default:
-          depth++;
-          break;
+        case "", "." -> {}
+        case ".." -> depth--;
+        default -> depth++;
       }
 
       if (depth < 0) {

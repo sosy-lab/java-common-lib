@@ -88,16 +88,12 @@ public final class OptionCollector {
     @Var boolean includeLibraryOptions = false;
     for (String arg : args) {
       switch (arg) {
-        case "-v":
-        case "-verbose":
-          verbose = true;
-          break;
-        case "-includeLibraryOptions":
-          includeLibraryOptions = true;
-          break;
-        default:
+        case "-v", "-verbose" -> verbose = true;
+        case "-includeLibraryOptions" -> includeLibraryOptions = true;
+        default -> {
           System.err.println("Unexpected command-line argument: " + arg);
           System.exit(1);
+        }
       }
     }
 

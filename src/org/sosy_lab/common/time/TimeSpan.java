@@ -157,41 +157,31 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
 
       String unit = it.next();
       switch (unit) {
-        case "day":
-        case "days":
-        case "d":
+        case "day", "days", "d" -> {
           if (days != 0) {
             throw new IllegalArgumentException("Days set twice: " + unit);
           }
           days = value;
-          break;
-
-        case "h":
-        case "hour":
-        case "hours":
+        }
+        case "h", "hour", "hours" -> {
           if (hours != 0) {
             throw new IllegalArgumentException("Hours set twice: " + unit);
           }
           hours = value;
-          break;
-
-        case "min":
-        case "m":
+        }
+        case "min", "m" -> {
           if (minutes != 0) {
             throw new IllegalArgumentException("Minutes set twice: " + unit);
           }
           minutes = value;
-          break;
-
-        case "s":
+        }
+        case "s" -> {
           if (seconds != 0) {
             throw new IllegalArgumentException("Seconds set twice: " + unit);
           }
           seconds = value;
-          break;
-
-        default:
-          throw new IllegalArgumentException("Unknown unit: " + unit);
+        }
+        default -> throw new IllegalArgumentException("Unknown unit: " + unit);
       }
     }
 
