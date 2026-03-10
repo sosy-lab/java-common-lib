@@ -434,7 +434,9 @@ public final class Classes {
       pInput -> pInput.getSimpleName().startsWith("AutoValue_");
 
   /** A builder for class loaders with more features than {@link URLClassLoader}. */
-  public abstract static class ClassLoaderBuilder<B extends ClassLoaderBuilder<B>> {
+  public abstract static sealed class ClassLoaderBuilder<B extends ClassLoaderBuilder<B>>
+      permits ExtendedUrlClassLoader.ExtendedUrlClassLoaderConfiguration.AutoBuilder {
+
     ClassLoaderBuilder() {}
 
     /**

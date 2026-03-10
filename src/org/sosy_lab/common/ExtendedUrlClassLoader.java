@@ -37,7 +37,9 @@ final class ExtendedUrlClassLoader extends URLClassLoader {
 
   @AutoValue
   @SuppressWarnings("NoFunctionalReturnType")
-  abstract static class ExtendedUrlClassLoaderConfiguration {
+  abstract static sealed class ExtendedUrlClassLoaderConfiguration
+      permits AutoValue_ExtendedUrlClassLoader_ExtendedUrlClassLoaderConfiguration {
+
     abstract Optional<ClassLoader> parent();
 
     abstract ImmutableList<URL> urls();
@@ -51,7 +53,9 @@ final class ExtendedUrlClassLoader extends URLClassLoader {
     }
 
     @AutoValue.Builder
-    abstract static class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder> {
+    abstract static sealed class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder>
+        permits AutoValue_ExtendedUrlClassLoader_ExtendedUrlClassLoaderConfiguration.Builder {
+
       AutoBuilder() {}
 
       @Override

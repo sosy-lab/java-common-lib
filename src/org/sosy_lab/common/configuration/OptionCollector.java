@@ -514,7 +514,7 @@ public final class OptionCollector {
     return Collectors.groupingBy(classifier, () -> new TreeMap<>(keyComparator), toSortedList);
   }
 
-  interface AnnotationInfo {
+  sealed interface AnnotationInfo {
 
     /** The annotated element or class. */
     AnnotatedElement element();

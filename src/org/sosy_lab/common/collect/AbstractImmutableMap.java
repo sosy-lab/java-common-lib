@@ -18,7 +18,8 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Immutable(containerOf = {"K", "V"})
-abstract class AbstractImmutableMap<K, V extends @Nullable Object> implements Map<K, V> {
+abstract sealed class AbstractImmutableMap<K, V extends @Nullable Object> implements Map<K, V>
+    permits AbstractImmutableSortedMap {
 
   @Deprecated
   @Override
