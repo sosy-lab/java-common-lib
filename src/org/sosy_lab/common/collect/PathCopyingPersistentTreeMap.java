@@ -130,7 +130,7 @@ public final class PathCopyingPersistentTreeMap<
       return n != null && !n.isRed;
     }
 
-    private static int size(Node<?, ?> n) {
+    private static int size(@Nullable Node<?, ?> n) {
       return n == null ? 0 : n.subtreeSize;
     }
 
