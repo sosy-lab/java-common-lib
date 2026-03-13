@@ -20,13 +20,9 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
-import java.util.Collection;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+
+import java.util.*;
+
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -433,5 +429,138 @@ public class PathCopyingPersistentTreeMapTest {
     // instead of letting Truth check containment (which is not guaranteed to call containsAll).
     assertThat(second.entrySet().containsAll(first.entrySet())).isFalse();
     assertThat(first.entrySet().containsAll(second.entrySet())).isFalse();
+  }
+
+  // Test cases for size tracking
+
+  @Test
+  public void testEmptyMapHasSizeZero() {
+    // Verify that a newly created map has no entries and size 0
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map.isEmpty()).isTrue();
+    assertThat(map.containsKey(1)).isFalse();
+    assertThat(map.get(1)).isNull();
+    assertThat(map.firstEntry()).isNull();
+    assertThat(map.lastEntry()).isNull();
+  }
+
+  @Test
+  public void testSizeTracksMultipleInsertionsAcrossAllVersions() {
+    // Insert keys in non-ascending order and verify that size() reflects the number of entries for all versions
+    // after each insertion
+    PersistentSortedMap<String, String> map2 = map.putAndCopy("6", "A");
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map2.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map3 = map2.putAndCopy("3", "B");
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map2.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(2);
+    PersistentSortedMap<String, String> map4 = map3.putAndCopy("9", "C");
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map2.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(2);
+    assertThat(map4.size()).isEqualTo(3);
+    PersistentSortedMap<String, String> map5 = map4.putAndCopy("2", "D");
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map2.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(2);
+    assertThat(map4.size()).isEqualTo(3);
+    assertThat(map5.size()).isEqualTo(4);
+    PersistentSortedMap<String, String> map6 = map5.putAndCopy("5", "E");
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map2.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(2);
+    assertThat(map4.size()).isEqualTo(3);
+    assertThat(map5.size()).isEqualTo(4);
+    assertThat(map6.size()).isEqualTo(5);
+  }
+
+  @Test
+  public void testSizeTracksMultipleDeletionsAcrossAllVersions() {
+    // Insert keys in non-ascending order and verify that size() reflects the number of entries for all versions
+    // after each key deletion
+    map = map.putAndCopy("6", "A").putAndCopy("3", "B").
+            putAndCopy("9", "C").putAndCopy("2", "D").putAndCopy("5", "E");
+    PersistentSortedMap<String, String> map2 = map.removeAndCopy("6");
+    assertThat(map.size()).isEqualTo(5);
+    assertThat(map2.size()).isEqualTo(4);
+    PersistentSortedMap<String, String> map3 = map2.removeAndCopy("3");
+    assertThat(map.size()).isEqualTo(5);
+    assertThat(map2.size()).isEqualTo(4);
+    assertThat(map3.size()).isEqualTo(3);
+    PersistentSortedMap<String, String> map4 = map3.removeAndCopy("9");
+    assertThat(map.size()).isEqualTo(5);
+    assertThat(map2.size()).isEqualTo(4);
+    assertThat(map3.size()).isEqualTo(3);
+    assertThat(map4.size()).isEqualTo(2);
+    PersistentSortedMap<String, String> map5 = map4.removeAndCopy("2");
+    assertThat(map.size()).isEqualTo(5);
+    assertThat(map2.size()).isEqualTo(4);
+    assertThat(map3.size()).isEqualTo(3);
+    assertThat(map4.size()).isEqualTo(2);
+    assertThat(map5.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map6 = map5.removeAndCopy("5");
+    assertThat(map.size()).isEqualTo(5);
+    assertThat(map2.size()).isEqualTo(4);
+    assertThat(map3.size()).isEqualTo(3);
+    assertThat(map4.size()).isEqualTo(2);
+    assertThat(map5.size()).isEqualTo(1);
+    assertThat(map6.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void testSizeTracksDuplicateKeyInsertions() {
+    // Verify that inserting duplicate keys does not change size() regardless of value
+    map = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map2 = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    assertThat(map2.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map3 = map.putAndCopy("3", "B");
+    assertThat(map.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(1);
+  }
+
+  @Test
+  public void testSizeTracksMissingKeyInsertions() {
+    // Verify that deleting missing keys does not change size()
+    map = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    map = map.removeAndCopy("2");
+    assertThat(map.size()).isEqualTo(1);
+  }
+
+  @Test
+  public void testSizeTracksAscendingInsertionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct number of entries for each version
+    // after every insertion
+    int insertionAmount = 1000;
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+    versions.add(map);
+    for (int i = 1; i <= insertionAmount; i++) {
+      PersistentSortedMap<String, String> previousVersion = versions.get(i - 1);
+      PersistentSortedMap<String, String> version = previousVersion.putAndCopy(Integer.toString(i), Integer.toString(i));
+      versions.add(version);
+      for (int j = 0; j < versions.size(); j++) {
+        assertThat(versions.get(j).size()).isEqualTo(j);
+      }
+    }
+  }
+
+  @Test
+  public void testSizeTracksDescendingInsertionsAcrossAllVersions() {
+    // Insert keys in descending order and verify that size() reflects the correct number of entries for each version
+    // after every insertion
+    int insertionAmount = 1000;
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+    PersistentSortedMap<String, String> current = map;
+    versions.add(current);
+    for (int i = insertionAmount; i >= 1; i--) {
+      current = current.putAndCopy(Integer.toString(i), Integer.toString(i));
+      versions.add(current);
+      for (int j = 0; j < versions.size(); j++) {
+        assertThat(versions.get(j).size()).isEqualTo(j);
+      }
+    }
   }
 }
