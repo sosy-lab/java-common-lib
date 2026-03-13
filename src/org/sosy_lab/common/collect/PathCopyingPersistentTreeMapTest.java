@@ -20,15 +20,15 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.List;
-import java.util.ArrayList;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -485,8 +485,8 @@ public class PathCopyingPersistentTreeMapTest {
   public void testSizeTracksMultipleDeletionsAcrossAllVersions() {
     // Insert keys in non-ascending order and verify that size() reflects
     // the number of entries for all versions after each key deletion
-    map = map.putAndCopy("6", "A").putAndCopy("3", "B").
-            putAndCopy("9", "C").putAndCopy("2", "D").putAndCopy("5", "E");
+    map = map.putAndCopy("6", "A").putAndCopy("3", "B").putAndCopy("9", "C")
+    .putAndCopy("2", "D").putAndCopy("5", "E");
     PersistentSortedMap<String, String> map2 = map.removeAndCopy("6");
     assertThat(map.size()).isEqualTo(5);
     assertThat(map2.size()).isEqualTo(4);
@@ -545,8 +545,8 @@ public class PathCopyingPersistentTreeMapTest {
     versions.add(map);
     for (int i = 1; i <= insertionAmount; i++) {
       PersistentSortedMap<String, String> previousVersion = versions.get(i - 1);
-      PersistentSortedMap<String, String> version = previousVersion.
-              putAndCopy(Integer.toString(i), Integer.toString(i));
+      PersistentSortedMap<String, String> version = previousVersion
+      .putAndCopy(Integer.toString(i), Integer.toString(i));
       versions.add(version);
       for (int j = 0; j < versions.size(); j++) {
         assertThat(versions.get(j).size()).isEqualTo(j);
