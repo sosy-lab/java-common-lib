@@ -473,7 +473,7 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(map.size()).isEqualTo(1);
   }
 
-  private String[] shuffleKeyOrder(int size) {
+  private static String[] shuffleKeyOrder(int size) {
     // Helper method that randomly shuffles key insertion/deletion order
     int[] keyOrder = new int[size];
 
