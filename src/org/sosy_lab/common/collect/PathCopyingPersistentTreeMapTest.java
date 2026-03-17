@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -569,5 +570,108 @@ public class PathCopyingPersistentTreeMapTest {
         assertThat(versions.get(j).size()).isEqualTo(j);
       }
     }
+  }
+
+  private void runDeletionOrder(int n, String[] keyDeletionOrder) {
+    // Helper method for test cases that verify correct key deletion and size tracking
+    // across all versions
+    Set<String> oracle = new TreeSet<>();
+    List<Integer> expectedVersionSizes = new ArrayList<>();
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+
+    for (int i = 1; i <= n; i++) {
+      map = map.putAndCopy(Integer.toString(i), Integer.toString(i));
+      oracle.add(Integer.toString(i));
+    }
+
+    versions.add(map);
+    expectedVersionSizes.add(map.size());
+
+    for (String key : keyDeletionOrder) {
+      map = map.removeAndCopy(key);
+      oracle.remove(key);
+
+      versions.add(map);
+      expectedVersionSizes.add(map.size());
+
+      assertThat(map.size()).isEqualTo(oracle.size());
+
+      for (int i = 1; i <= n; i++) {
+        assertThat(map.containsKey(Integer.toString(i)))
+                .isEqualTo(oracle.contains(Integer.toString(i)));
+
+        int count = 0;
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+          count++;
+        }
+
+        assertThat(map.size()).isEqualTo(count);
+
+        for (int j = 0; j < versions.size(); j++) {
+          assertThat(versions.get(j).size()).isEqualTo(expectedVersionSizes.get(j));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testSizeTracksAscendingDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in ascending order
+    int keyAmount = 100;
+    String[] keyDeletionOrder = new String[keyAmount];
+
+    for (int i = 1; i <= keyAmount; i++) {
+      keyDeletionOrder[i - 1] = Integer.toString(i);
+    }
+
+    runDeletionOrder(keyAmount, keyDeletionOrder);
+  }
+
+  @Test
+  public void testSizeTracksDescendingDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in descending order
+    int keyAmount = 100;
+    String[] keyDeletionOrder = new String[keyAmount];
+
+    for (int i = keyAmount; i > 0; i--) {
+      keyDeletionOrder[i - 1] = Integer.toString(i);
+    }
+
+    runDeletionOrder(keyAmount, keyDeletionOrder);
+  }
+
+  @Test
+  public void testSizeTracksRandomDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in random order
+    int keyAmount = 100;
+    int[] keyDeletionOrder = new int[keyAmount];
+
+    for (int i = 0; i < keyAmount; i++) {
+      keyDeletionOrder[i] = i + 1;
+    }
+
+    // Randomize deletion order using Fisher-Yates shuffle
+
+    Random random = new Random();
+
+    for (int i = keyAmount - 1; i > 0; i--) {
+      int j = random.nextInt(i + 1);
+
+      int temp = keyDeletionOrder[i];
+      keyDeletionOrder[i] = keyDeletionOrder[j];
+      keyDeletionOrder[j] = temp;
+    }
+
+    String[] stringDeletionOrder = new String[keyAmount];
+
+    for (int i = 0; i < keyAmount; i++) {
+      stringDeletionOrder[i] = Integer.toString(keyDeletionOrder[i]);
+    }
+
+    runDeletionOrder(keyAmount, stringDeletionOrder);
   }
 }
