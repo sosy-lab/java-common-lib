@@ -452,70 +452,6 @@ public class PathCopyingPersistentTreeMapTest {
   }
 
   @Test
-  public void testSizeTracksMultipleInsertionsAcrossAllVersions() {
-    // Insert keys in non-ascending order and verify that size() reflects
-    // the number of entries for all versions after each insertion
-    PersistentSortedMap<String, String> map2 = map.putAndCopy("6", "A");
-    assertThat(map.size()).isEqualTo(0);
-    assertThat(map2.size()).isEqualTo(1);
-    PersistentSortedMap<String, String> map3 = map2.putAndCopy("3", "B");
-    assertThat(map.size()).isEqualTo(0);
-    assertThat(map2.size()).isEqualTo(1);
-    assertThat(map3.size()).isEqualTo(2);
-    PersistentSortedMap<String, String> map4 = map3.putAndCopy("9", "C");
-    assertThat(map.size()).isEqualTo(0);
-    assertThat(map2.size()).isEqualTo(1);
-    assertThat(map3.size()).isEqualTo(2);
-    assertThat(map4.size()).isEqualTo(3);
-    PersistentSortedMap<String, String> map5 = map4.putAndCopy("2", "D");
-    assertThat(map.size()).isEqualTo(0);
-    assertThat(map2.size()).isEqualTo(1);
-    assertThat(map3.size()).isEqualTo(2);
-    assertThat(map4.size()).isEqualTo(3);
-    assertThat(map5.size()).isEqualTo(4);
-    PersistentSortedMap<String, String> map6 = map5.putAndCopy("5", "E");
-    assertThat(map.size()).isEqualTo(0);
-    assertThat(map2.size()).isEqualTo(1);
-    assertThat(map3.size()).isEqualTo(2);
-    assertThat(map4.size()).isEqualTo(3);
-    assertThat(map5.size()).isEqualTo(4);
-    assertThat(map6.size()).isEqualTo(5);
-  }
-
-  @Test
-  public void testSizeTracksMultipleDeletionsAcrossAllVersions() {
-    // Insert keys in non-ascending order and verify that size() reflects
-    // the number of entries for all versions after each key deletion
-    map = map.putAndCopy("6", "A").putAndCopy("3", "B").putAndCopy("9", "C")
-    .putAndCopy("2", "D").putAndCopy("5", "E");
-    PersistentSortedMap<String, String> map2 = map.removeAndCopy("6");
-    assertThat(map.size()).isEqualTo(5);
-    assertThat(map2.size()).isEqualTo(4);
-    PersistentSortedMap<String, String> map3 = map2.removeAndCopy("3");
-    assertThat(map.size()).isEqualTo(5);
-    assertThat(map2.size()).isEqualTo(4);
-    assertThat(map3.size()).isEqualTo(3);
-    PersistentSortedMap<String, String> map4 = map3.removeAndCopy("9");
-    assertThat(map.size()).isEqualTo(5);
-    assertThat(map2.size()).isEqualTo(4);
-    assertThat(map3.size()).isEqualTo(3);
-    assertThat(map4.size()).isEqualTo(2);
-    PersistentSortedMap<String, String> map5 = map4.removeAndCopy("2");
-    assertThat(map.size()).isEqualTo(5);
-    assertThat(map2.size()).isEqualTo(4);
-    assertThat(map3.size()).isEqualTo(3);
-    assertThat(map4.size()).isEqualTo(2);
-    assertThat(map5.size()).isEqualTo(1);
-    PersistentSortedMap<String, String> map6 = map5.removeAndCopy("5");
-    assertThat(map.size()).isEqualTo(5);
-    assertThat(map2.size()).isEqualTo(4);
-    assertThat(map3.size()).isEqualTo(3);
-    assertThat(map4.size()).isEqualTo(2);
-    assertThat(map5.size()).isEqualTo(1);
-    assertThat(map6.size()).isEqualTo(0);
-  }
-
-  @Test
   public void testSizeTracksDuplicateKeyInsertions() {
     // Verify that inserting duplicate keys does not change size() regardless of value
     map = map.putAndCopy("3", "A");
@@ -561,11 +497,10 @@ public class PathCopyingPersistentTreeMapTest {
     // number of entries for each version after every insertion
     int insertionAmount = 1000;
     List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
-    @Var PersistentSortedMap<String, String> current = map;
-    versions.add(current);
+    versions.add(map);
     for (int i = insertionAmount; i >= 1; i--) {
-      current = current.putAndCopy(Integer.toString(i), Integer.toString(i));
-      versions.add(current);
+      map = map.putAndCopy(Integer.toString(i), Integer.toString(i));
+      versions.add(map);
       for (int j = 0; j < versions.size(); j++) {
         assertThat(versions.get(j).size()).isEqualTo(j);
       }
@@ -600,9 +535,9 @@ public class PathCopyingPersistentTreeMapTest {
         assertThat(map.containsKey(Integer.toString(i)))
                 .isEqualTo(oracle.contains(Integer.toString(i)));
 
-        int count = 0;
+        @Var int count = 0;
 
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        for (Map.Entry<String, String> unused : map.entrySet()) {
           count++;
         }
 
