@@ -522,9 +522,9 @@ public class PathCopyingPersistentTreeMapTest {
     versions.add(map);
     expectedVersionSizes.add(map.size());
 
-    for (String key : keyDeletionOrder) {
-      map = map.removeAndCopy(key);
-      oracle.remove(key);
+    for (String keyToDelete : keyDeletionOrder) {
+      map = map.removeAndCopy(keyToDelete);
+      oracle.remove(keyToDelete);
 
       versions.add(map);
       expectedVersionSizes.add(map.size());
@@ -537,7 +537,8 @@ public class PathCopyingPersistentTreeMapTest {
 
         @Var int count = 0;
 
-        for (Map.Entry<String, String> unused : map.entrySet()) {
+        for (String key : map.keySet()) {
+          assertThat(oracle.contains(key)).isTrue();
           count++;
         }
 
