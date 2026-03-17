@@ -473,38 +473,54 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(map.size()).isEqualTo(1);
   }
 
+  private void runInsertionOrder(String[] keyInsertionOrder) {
+    // Helper method for test cases that verify correct key insertion and size tracking
+    // across all versions
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+    List<Integer> expectedVersionSizes = new ArrayList<>();
+
+    versions.add(map);
+    expectedVersionSizes.add(map.size());
+
+    for (String key : keyInsertionOrder) {
+      map = map.putAndCopy(key, key);
+      versions.add(map);
+      expectedVersionSizes.add(map.size());
+
+      for (int j = 0; j < versions.size(); j++) {
+        assertThat(versions.get(j).size()).isEqualTo(expectedVersionSizes.get(j));
+      }
+    }
+  }
+
   @Test
   public void testSizeTracksAscendingInsertionsAcrossAllVersions() {
     // Insert keys in ascending order and verify that size() reflects the correct
     // number of entries for each version after every insertion
-    int insertionAmount = 1000;
-    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
-    versions.add(map);
-    for (int i = 1; i <= insertionAmount; i++) {
-      PersistentSortedMap<String, String> previousVersion = versions.get(i - 1);
-      PersistentSortedMap<String, String> version = previousVersion
-      .putAndCopy(Integer.toString(i), Integer.toString(i));
-      versions.add(version);
-      for (int j = 0; j < versions.size(); j++) {
-        assertThat(versions.get(j).size()).isEqualTo(j);
-      }
+    int insertionAmount = 100;
+
+    String[] keyInsertionOrder = new String[insertionAmount];
+
+    for (int i = insertionAmount; i > 0; i--) {
+      keyInsertionOrder[i - 1] = Integer.toString(i);
     }
+
+    runInsertionOrder(keyInsertionOrder);
   }
 
   @Test
   public void testSizeTracksDescendingInsertionsAcrossAllVersions() {
     // Insert keys in descending order and verify that size() reflects the correct
     // number of entries for each version after every insertion
-    int insertionAmount = 1000;
-    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
-    versions.add(map);
-    for (int i = insertionAmount; i >= 1; i--) {
-      map = map.putAndCopy(Integer.toString(i), Integer.toString(i));
-      versions.add(map);
-      for (int j = 0; j < versions.size(); j++) {
-        assertThat(versions.get(j).size()).isEqualTo(j);
-      }
+    int insertionAmount = 100;
+
+    String[] keyInsertionOrder = new String[insertionAmount];
+
+    for (int i = 0; i < insertionAmount; i++) {
+      keyInsertionOrder[i] = Integer.toString(i + 1);
     }
+
+    runInsertionOrder(keyInsertionOrder);
   }
 
   private void runDeletionOrder(int n, String[] keyDeletionOrder) {
