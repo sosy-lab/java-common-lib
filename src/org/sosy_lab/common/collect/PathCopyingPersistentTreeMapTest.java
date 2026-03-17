@@ -473,6 +473,35 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(map.size()).isEqualTo(1);
   }
 
+  private String[] shuffleKeyOrder(int size) {
+    // Helper method that randomly shuffles key insertion/deletion order
+    int[] keyOrder = new int[size];
+
+    for (int i = 0; i < size; i++) {
+      keyOrder[i] = i + 1;
+    }
+
+    // Randomize insertion order using Fisher-Yates shuffle
+
+    Random random = new Random();
+
+    for (int i = size - 1; i > 0; i--) {
+      int j = random.nextInt(i + 1);
+
+      int temp = keyOrder[i];
+      keyOrder[i] = keyOrder[j];
+      keyOrder[j] = temp;
+    }
+
+    String[] stringKeyOrder = new String[size];
+
+    for (int i = 0; i < size; i++) {
+      stringKeyOrder[i] = Integer.toString(keyOrder[i]);
+    }
+
+    return stringKeyOrder;
+  }
+
   private void runInsertionOrder(String[] keyInsertionOrder) {
     // Helper method for test cases that verify correct key insertion and size tracking
     // across all versions
@@ -521,6 +550,15 @@ public class PathCopyingPersistentTreeMapTest {
     }
 
     runInsertionOrder(keyInsertionOrder);
+  }
+
+  @Test
+  public void testSizeTracksRandomInsertionsAcrossAllVersions() {
+    // Insert keys in random order and verify that size() reflects the correct
+    // number of entries for each version after every insertion
+    int insertionAmount = 100;
+
+    runInsertionOrder(shuffleKeyOrder(insertionAmount));
   }
 
   private void runDeletionOrder(int n, String[] keyDeletionOrder) {
@@ -600,30 +638,7 @@ public class PathCopyingPersistentTreeMapTest {
     // Insert keys in ascending order and verify that size() reflects the correct
     // number of entries for each version after every deletion in random order
     int keyAmount = 100;
-    int[] keyDeletionOrder = new int[keyAmount];
 
-    for (int i = 0; i < keyAmount; i++) {
-      keyDeletionOrder[i] = i + 1;
-    }
-
-    // Randomize deletion order using Fisher-Yates shuffle
-
-    Random random = new Random();
-
-    for (int i = keyAmount - 1; i > 0; i--) {
-      int j = random.nextInt(i + 1);
-
-      int temp = keyDeletionOrder[i];
-      keyDeletionOrder[i] = keyDeletionOrder[j];
-      keyDeletionOrder[j] = temp;
-    }
-
-    String[] stringDeletionOrder = new String[keyAmount];
-
-    for (int i = 0; i < keyAmount; i++) {
-      stringDeletionOrder[i] = Integer.toString(keyDeletionOrder[i]);
-    }
-
-    runDeletionOrder(keyAmount, stringDeletionOrder);
+    runDeletionOrder(keyAmount, shuffleKeyOrder(keyAmount));
   }
 }
