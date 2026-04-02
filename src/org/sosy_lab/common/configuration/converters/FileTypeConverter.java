@@ -178,6 +178,7 @@ public final class FileTypeConverter implements TypeConverter {
       String reason, String optionName, Path path, Object... args)
       throws InvalidConfigurationException {
     throw new InvalidConfigurationException(
+        // reason can be a format string and needs to be appended before string formatting
         ("The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".")
             .formatted(
                 FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
