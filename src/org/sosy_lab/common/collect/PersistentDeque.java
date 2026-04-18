@@ -25,6 +25,10 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     this.bottom = bottom;
   }
 
+  public static PersistentDeque createEmptyPersistentDeque() {
+    return new PersistentDeque<>();
+  }
+
   @Override
   public boolean isEmpty() {
     return top.isEmpty() && bottom.isEmpty();
