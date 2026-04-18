@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 @Immutable(containerOf = "T")
 public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
@@ -37,21 +38,11 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   @Override
   public T getTop() {
-    if (top.isEmpty()) {
-      return null;
-      //TODO add exception handling
-    }
-
     return top.head();
   }
 
   @Override
   public T getBottom() {
-    if (bottom.isEmpty()) {
-      return null;
-      //TODO add exception handling
-    }
-
     return bottom.head();
   }
 
@@ -90,14 +81,12 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     return this;
   }
 
-  //TODO integrate deque rebalancing into remove operations
-
   private PersistentDeque<T> split(PersistentLinkedList<T> list) {
     int size = list.size();
     int halfSize = size / 2;
 
     if (size <= 0) {
-      //TODO throw suitable exception
+      throw new IllegalArgumentException("Cannot split empty list!");
     } else if (size == 1) {
       return this;
     }
