@@ -64,4 +64,9 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   public PersistentDeque<T> deleteTop() {
     return new PersistentDeque<>(top.tail(), bottom);
   }
+
+  @Override
+  public PersistentDeque<T> deleteBottom() {
+    return new PersistentDeque<>(top, bottom.tail());
+  }
 }
