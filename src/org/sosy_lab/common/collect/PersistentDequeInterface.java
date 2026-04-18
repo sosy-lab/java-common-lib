@@ -11,7 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.Immutable;
 
 @Immutable(containerOf = "T")
-public interface PersistentDequeInterface {
+public interface PersistentDequeInterface<T> {
   boolean isEmpty();
   T getTop();
   T getBottom();

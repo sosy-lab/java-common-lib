@@ -27,6 +27,16 @@ public final class PersistentDeque<T> implements PersistentDequeInterface {
 
   @Override
   public boolean isEmpty() {
-    return !((top.size() > 0) && (bottom.size() > 0));
+    return top.isEmpty() && bottom.isEmpty();
+  }
+
+  @Override
+  public T getTop() {
+    if(top.isEmpty()) {
+      return null;
+      //TODO add exception handling
+    }
+
+    return top.head();
   }
 }
