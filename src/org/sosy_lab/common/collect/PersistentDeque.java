@@ -67,12 +67,12 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   @Override
   public PersistentDeque<T> deleteTop() {
-    return new PersistentDeque<>(top.tail(), bottom);
+    return (new PersistentDeque<>(top.tail(), bottom)).rebalanceDeque();
   }
 
   @Override
   public PersistentDeque<T> deleteBottom() {
-    return new PersistentDeque<>(top, bottom.tail());
+    return (new PersistentDeque<>(top, bottom.tail())).rebalanceDeque();
   }
 
   private PersistentDeque<T> rebalanceDeque() {
@@ -90,7 +90,6 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     return this;
   }
 
-  //TODO handle case when Deque only contains one more element
   //TODO integrate deque rebalancing into remove operations
 
   private PersistentDeque<T> split(PersistentLinkedList<T> list) {
