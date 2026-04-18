@@ -59,4 +59,9 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   public PersistentDeque<T> insertBottom(T value) {
     return new PersistentDeque<>(top, bottom.with(value));
   }
+
+  @Override
+  public PersistentDeque<T> deleteTop() {
+    return new PersistentDeque<>(top.tail(), bottom);
+  }
 }
