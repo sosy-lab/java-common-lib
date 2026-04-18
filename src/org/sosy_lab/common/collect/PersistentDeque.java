@@ -12,6 +12,26 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.Iterator;
 
+/**
+ * A persistent implementation of a deque on the basis of {@link PersistentLinkedList}.
+ *
+ * To avoid O(n) runtime complexity when accessing the bottom of the deque, two separate
+ * {@link PersistentLinkedList}s are used. {@code top} represents the top part of the deque,
+ * while {@code bottom} forms the lower part of the deque. If one were to reverse {@code bottom}
+ * and then add it to the bottom of {@code top}, one would receive one list representing the
+ * whole deque in correct order.
+ *
+ * It provides operations to show the top- and bottom-most elements of the deque, as well as ones
+ * to remove them or add new items to the deque in either places.
+ * In most cases, these will complete in O(1). Occasionally, these operations will require more
+ * time, as the deque might need to be rebalanced (i.e. when one of the lists becomes empty, the
+ * other list is split up into top and bottom to further guarantee access to both ends of
+ * the deque).
+ *
+ * Currently, it is only possible to create an empty deque and then add new elements one at a time.
+ *
+ * @param <T> type of elements to be stored in deque
+ */
 @Immutable(containerOf = "T")
 public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   final PersistentLinkedList<T> top;
@@ -27,36 +47,73 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     this.bottom = bottom;
   }
 
+  /**
+   * Checks both sublists and returns true if both are empty, false if at least one is not.
+   *
+   * @return true if {@code top} and {@code bottom} are both empty, false if at least one is not
+   */
   @Override
   public boolean isEmpty() {
     return top.isEmpty() && bottom.isEmpty();
   }
 
+  /**
+   * Returns element at the top of the deque.
+   *
+   * @return element at top of deque
+   */
   @Override
   public T getTop() {
     return top.head();
   }
 
+  /**
+   * Returns element at the bottom of the deque.
+   *
+   * @return element at bottom of deque
+   */
   @Override
   public T getBottom() {
     return bottom.head();
   }
 
+  /**
+   * Places new element on top of the deque.
+   *
+   * @param value element to be added to deque
+   * @return deque instance with new element added on top
+   */
   @Override
   public PersistentDeque<T> insertTop(T value) {
     return new PersistentDeque<>(top.with(value), bottom);
   }
 
+  /**
+   * Places new element at the bottom of the deque.
+   *
+   * @param value element to be added to deque
+   * @return deque instance with new element added at the bottom
+   */
   @Override
   public PersistentDeque<T> insertBottom(T value) {
     return new PersistentDeque<>(top, bottom.with(value));
   }
 
+  /**
+   * Removes element at the top of the deque from deque.
+   *
+   * @return deque instance after top element has been removed
+   */
   @Override
   public PersistentDeque<T> deleteTop() {
     return new PersistentDeque<>(top.tail(), bottom).rebalanceDeque();
   }
 
+  /**
+   * Removes element at the bottom of the deque from deque.
+   *
+   * @return deque instance after bottom element has been removed
+   */
   @Override
   public PersistentDeque<T> deleteBottom() {
     return new PersistentDeque<>(top, bottom.tail()).rebalanceDeque();
