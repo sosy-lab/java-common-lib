@@ -10,8 +10,23 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
 
-@Immutable(containerOf = {})
-public final class PersistentDeque implements PersistentDequeInterface {
+@Immutable(containerOf = "T")
+public final class PersistentDeque<T> implements PersistentDequeInterface {
+  final PersistentLinkedList<T> top;
+  final PersistentLinkedList<T> bottom;
 
+  private PersistentDeque() {
+    top = PersistentLinkedList.of();
+    bottom = PersistentLinkedList.of();
+  }
 
+  private PersistentDeque(PersistentLinkedList<T> top, PersistentLinkedList<T> bottom) {
+    this.top = top;
+    this.bottom = bottom;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return !((top.size() > 0) && (bottom.size() > 0));
+  }
 }
