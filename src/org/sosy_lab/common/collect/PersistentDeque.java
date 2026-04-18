@@ -15,20 +15,23 @@ import java.util.Iterator;
 /**
  * A persistent implementation of a deque on the basis of {@link PersistentLinkedList}.
  *
- * To avoid O(n) runtime complexity when accessing the bottom of the deque, two separate
+ * <p>To avoid O(n) runtime complexity when accessing the bottom of the deque, two separate
  * {@link PersistentLinkedList}s are used. {@code top} represents the top part of the deque,
  * while {@code bottom} forms the lower part of the deque. If one were to reverse {@code bottom}
  * and then add it to the bottom of {@code top}, one would receive one list representing the
  * whole deque in correct order.
  *
- * It provides operations to show the top- and bottom-most elements of the deque, as well as ones
+ * <p>It provides operations to show the top- and bottom-most elements of the deque, as well as
+ * ones
  * to remove them or add new items to the deque in either places.
  * In most cases, these will complete in O(1). Occasionally, these operations will require more
  * time, as the deque might need to be rebalanced (i.e. when one of the lists becomes empty, the
  * other list is split up into top and bottom to further guarantee access to both ends of
  * the deque).
  *
- * Currently, it is only possible to create an empty deque and then add new elements one at a time.
+ * <p>Currently, it is only possible to create an empty deque and then add new elements one
+ * at a
+ * time.
  *
  * @param <T> type of elements to be stored in deque
  */
