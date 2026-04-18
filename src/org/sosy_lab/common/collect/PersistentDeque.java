@@ -9,15 +9,15 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.Var;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 @Immutable(containerOf = "T")
 public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   final PersistentLinkedList<T> top;
   final PersistentLinkedList<T> bottom;
 
-  private PersistentDeque() {
+  public PersistentDeque() {
     top = PersistentLinkedList.of();
     bottom = PersistentLinkedList.of();
   }
@@ -25,10 +25,6 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   private PersistentDeque(PersistentLinkedList<T> top, PersistentLinkedList<T> bottom) {
     this.top = top;
     this.bottom = bottom;
-  }
-
-  public static PersistentDeque createEmptyPersistentDeque() {
-    return new PersistentDeque<>();
   }
 
   @Override
@@ -58,12 +54,12 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   @Override
   public PersistentDeque<T> deleteTop() {
-    return (new PersistentDeque<>(top.tail(), bottom)).rebalanceDeque();
+    return new PersistentDeque<>(top.tail(), bottom).rebalanceDeque();
   }
 
   @Override
   public PersistentDeque<T> deleteBottom() {
-    return (new PersistentDeque<>(top, bottom.tail())).rebalanceDeque();
+    return new PersistentDeque<>(top, bottom.tail()).rebalanceDeque();
   }
 
   private PersistentDeque<T> rebalanceDeque() {
@@ -91,8 +87,8 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
       return this;
     }
 
-    PersistentLinkedList<T> newTop = PersistentLinkedList.of();
-    PersistentLinkedList<T> newBottom = PersistentLinkedList.of();
+    @Var PersistentLinkedList<T> newTop = PersistentLinkedList.of();
+    @Var PersistentLinkedList<T> newBottom = PersistentLinkedList.of();
     Iterator<T> iterator = list.iterator();
 
     for (int i = 0; i < size; i++) {
