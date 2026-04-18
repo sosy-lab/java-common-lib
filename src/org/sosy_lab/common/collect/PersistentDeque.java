@@ -11,7 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.Immutable;
 
 @Immutable(containerOf = "T")
-public final class PersistentDeque<T> implements PersistentDequeInterface {
+public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   final PersistentLinkedList<T> top;
   final PersistentLinkedList<T> bottom;
 
@@ -48,5 +48,10 @@ public final class PersistentDeque<T> implements PersistentDequeInterface {
     }
 
     return bottom.head();
+  }
+
+  @Override
+  public PersistentDeque<T> insertTop(T value) {
+    return new PersistentDeque<>(top.with(value), bottom);
   }
 }
