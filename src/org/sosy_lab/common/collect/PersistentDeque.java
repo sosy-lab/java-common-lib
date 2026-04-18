@@ -9,6 +9,8 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
+import java.util.Iterator;
+import java.util.List;
 
 @Immutable(containerOf = "T")
 public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
@@ -72,5 +74,49 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   @Override
   public PersistentDeque<T> deleteBottom() {
     return new PersistentDeque<>(top, bottom.tail());
+  }
+
+  private PersistentDeque<T> rebalanceDeque() {
+    boolean topEmpty = top.isEmpty();
+    boolean bottomEmpty = bottom.isEmpty();
+
+    if(topEmpty && bottomEmpty) {
+      return this;
+    } else if (topEmpty && !bottomEmpty) {
+      return split(bottom.reversed());
+    } else if(!topEmpty && bottomEmpty) {
+      return split(top);
+    }
+
+    return this;
+  }
+
+  //TODO handle case when Deque only contains one more element
+  //TODO integrate deque rebalancing into remove operations
+
+  private PersistentDeque<T> split(PersistentLinkedList<T> list) {
+    int size = list.size();
+    int halfSize = size/2;
+
+    if(size <= 0) {
+      //TODO throw suitable exception
+    } else if(size == 1) {
+      //TODO throw suitable exception
+    }
+
+    PersistentLinkedList<T> newTop = PersistentLinkedList.of();
+    PersistentLinkedList<T> newBottom = PersistentLinkedList.of();
+    Iterator<T> iterator = list.iterator();
+
+    for(int i = 0; i < size; i++) {
+      T element = iterator.next();
+      if(i < halfSize) {
+        newTop = newTop.with(element);
+      } else {
+        newBottom = newBottom.with(element);
+      }
+    }
+    newTop = newTop.reversed();
+    return new PersistentDeque<>(newTop, newBottom);
   }
 }
