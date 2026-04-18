@@ -8,7 +8,15 @@
 
 package org.sosy_lab.common.collect;
 
-import java.util.Deque;
+import com.google.errorprone.annotations.Immutable;
 
-public interface PersistentDequeInterface extends Deque {
+@Immutable(containerOf = "T")
+public interface PersistentDequeInterface {
+  boolean isEmpty();
+  T getTop();
+  T getBottom();
+  PersistentDeque<T> insertTop(T value);
+  PersistentDeque<T> insertBottom(T value);
+  PersistentDeque<T> deleteTop();
+  PersistentDeque<T> deleteBottom();
 }
