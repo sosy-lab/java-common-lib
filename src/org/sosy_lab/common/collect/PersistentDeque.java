@@ -39,4 +39,14 @@ public final class PersistentDeque<T> implements PersistentDequeInterface {
 
     return top.head();
   }
+
+  @Override
+  public T getBottom() {
+    if(bottom.isEmpty()) {
+      return null;
+      //TODO add exception handling
+    }
+
+    return bottom.head();
+  }
 }
