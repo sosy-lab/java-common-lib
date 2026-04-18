@@ -10,7 +10,6 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Immutable;
 import java.util.Iterator;
-import java.util.List;
 
 @Immutable(containerOf = "T")
 public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
@@ -38,7 +37,7 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   @Override
   public T getTop() {
-    if(top.isEmpty()) {
+    if (top.isEmpty()) {
       return null;
       //TODO add exception handling
     }
@@ -48,7 +47,7 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   @Override
   public T getBottom() {
-    if(bottom.isEmpty()) {
+    if (bottom.isEmpty()) {
       return null;
       //TODO add exception handling
     }
@@ -80,11 +79,11 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     boolean topEmpty = top.isEmpty();
     boolean bottomEmpty = bottom.isEmpty();
 
-    if(topEmpty && bottomEmpty) {
+    if (topEmpty && bottomEmpty) {
       return this;
     } else if (topEmpty && !bottomEmpty) {
       return split(bottom.reversed());
-    } else if(!topEmpty && bottomEmpty) {
+    } else if (!topEmpty && bottomEmpty) {
       return split(top);
     }
 
@@ -96,21 +95,21 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
 
   private PersistentDeque<T> split(PersistentLinkedList<T> list) {
     int size = list.size();
-    int halfSize = size/2;
+    int halfSize = size / 2;
 
-    if(size <= 0) {
+    if (size <= 0) {
       //TODO throw suitable exception
-    } else if(size == 1) {
-      //TODO throw suitable exception
+    } else if (size == 1) {
+      return this;
     }
 
     PersistentLinkedList<T> newTop = PersistentLinkedList.of();
     PersistentLinkedList<T> newBottom = PersistentLinkedList.of();
     Iterator<T> iterator = list.iterator();
 
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       T element = iterator.next();
-      if(i < halfSize) {
+      if (i < halfSize) {
         newTop = newTop.with(element);
       } else {
         newBottom = newBottom.with(element);
