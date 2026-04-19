@@ -74,10 +74,10 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
       return top.head();
-    } catch(IllegalStateException e1) {
+    } catch (IllegalStateException e1) {
       try {
         return bottom.head();
-      } catch(IllegalStateException e2) {
+      } catch (IllegalStateException e2) {
         return null;
       }
     }
@@ -96,10 +96,10 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
     // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
       return bottom.head();
-    } catch(IllegalStateException e1) {
+    } catch (IllegalStateException e1) {
       try {
         return top.head();
-      } catch(IllegalStateException e2) {
+      } catch (IllegalStateException e2) {
         return null;
       }
     }
