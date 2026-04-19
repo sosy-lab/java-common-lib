@@ -69,6 +69,9 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   @Nullable
   @Override
   public T getTop() {
+    //If deque contains only one element, one of the lists will be empty. Calling head() on an
+    // empty list throws an exception, so this needs to be caught. Further, the one element in
+    // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
       return top.head();
     } catch(IllegalStateException e1) {
@@ -88,6 +91,9 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   @Nullable
   @Override
   public T getBottom() {
+    //If deque contains only one element, one of the lists will be empty. Calling head() on an
+    // empty list throws an exception, so this needs to be caught. Further, the one element in
+    // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
       return bottom.head();
     } catch(IllegalStateException e1) {
