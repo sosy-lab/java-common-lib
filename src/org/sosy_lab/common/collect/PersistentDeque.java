@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.Iterator;
+import javax.annotation.Nullable;
 
 /**
  * A persistent implementation of a deque on the basis of {@link PersistentLinkedList}.
@@ -63,21 +64,39 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
   /**
    * Returns element at the top of the deque.
    *
-   * @return element at top of deque
+   * @return element at top of deque; null if deque empty
    */
+  @Nullable
   @Override
   public T getTop() {
-    return top.head();
+    try {
+      return top.head();
+    } catch(IllegalStateException e1) {
+      try {
+        return bottom.head();
+      } catch(IllegalStateException e2) {
+        return null;
+      }
+    }
   }
 
   /**
    * Returns element at the bottom of the deque.
    *
-   * @return element at bottom of deque
+   * @return element at bottom of deque; null if deque empty
    */
+  @Nullable
   @Override
   public T getBottom() {
-    return bottom.head();
+    try {
+      return bottom.head();
+    } catch(IllegalStateException e1) {
+      try {
+        return top.head();
+      } catch(IllegalStateException e2) {
+        return null;
+      }
+    }
   }
 
   /**
