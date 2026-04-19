@@ -131,7 +131,15 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
    */
   @Override
   public PersistentDeque<T> deleteTop() {
-    return new PersistentDeque<>(top.tail(), bottom).rebalanceDeque();
+    // top should only ever be empty if only one element in bottom or deque completely empty
+    try {
+      if (top.isEmpty()) {
+        return new PersistentDeque<>(top, bottom.tail()).rebalanceDeque();
+      }
+      return new PersistentDeque<>(top.tail(), bottom).rebalanceDeque();
+    } catch (IllegalStateException e) {
+      return this;
+    }
   }
 
   /**
@@ -141,7 +149,15 @@ public final class PersistentDeque<T> implements PersistentDequeInterface<T> {
    */
   @Override
   public PersistentDeque<T> deleteBottom() {
-    return new PersistentDeque<>(top, bottom.tail()).rebalanceDeque();
+    // bottom should only ever be empty if only one element in top or deque completely empty
+    try {
+      if (bottom.isEmpty()) {
+        return new PersistentDeque<>(top.tail(), bottom).rebalanceDeque();
+      }
+      return new PersistentDeque<>(top, bottom.tail()).rebalanceDeque();
+    } catch (IllegalStateException e) {
+      return this;
+    }
   }
 
   private PersistentDeque<T> rebalanceDeque() {
