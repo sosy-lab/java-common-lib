@@ -9,7 +9,6 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -157,8 +156,11 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return The value at the start of the list
    */
   public T head() {
-    checkState(!isEmpty());
-    return head;
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    } else {
+      return head;
+    }
   }
 
   /**
@@ -167,8 +169,11 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
    * @return The remainder of the list without the first element
    */
   public PersistentLinkedList<T> tail() {
-    checkState(!isEmpty());
-    return tail;
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    } else {
+      return tail;
+    }
   }
 
   /**
