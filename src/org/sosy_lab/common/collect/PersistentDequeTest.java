@@ -9,10 +9,6 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,15 +46,15 @@ public class PersistentDequeTest {
 
   @Test
   public void testEmptyDeque() {
-    assertTrue(emptyDeque.isEmpty());
+    assertThat(emptyDeque.isEmpty()).isTrue();
 
-    assertNull(emptyDeque.getTop());
-    assertNull(emptyDeque.getBottom());
+    assertThat(emptyDeque.getTop()).isNull();
+    assertThat(emptyDeque.getBottom()).isNull();
   }
 
   @Test
   public void testInsert() {
-    assertTrue(emptyDeque.isEmpty());
+    assertThat(emptyDeque.isEmpty()).isTrue();
 
     emptyDeque = emptyDeque.insertTop(o2);
     emptyDeque = emptyDeque.insertTop(o1);
@@ -71,15 +67,15 @@ public class PersistentDequeTest {
 
   @Test
   public void testFullDeque() {
-    assertFalse(fullDeque.isEmpty());
+    assertThat(fullDeque.isEmpty()).isFalse();
 
-    assertEquals(o1, fullDeque.getTop());
-    assertEquals(o4, fullDeque.getBottom());
+    assertThat(fullDeque.getTop()).isEqualTo(o1);
+    assertThat(fullDeque.getBottom()).isEqualTo(o4);
   }
 
   @Test
   public void testRemove() {
-    assertFalse(fullDeque.isEmpty());
+    assertThat(fullDeque.isEmpty()).isFalse();
 
     fullDeque = fullDeque.deleteTop();
     assertThat(fullDeque.top).containsExactly(o2);
@@ -93,14 +89,14 @@ public class PersistentDequeTest {
     assertThat(fullDeque.top).containsExactly(o3);
 
     fullDeque = fullDeque.deleteBottom();
-    assertTrue(fullDeque.isEmpty());
+    assertThat(fullDeque.isEmpty()).isTrue();
   }
 
   @Test
   public void testDequeOfSize1() {
-    assertFalse(size1Deque.isEmpty());
+    assertThat(size1Deque.isEmpty()).isFalse();
 
-    assertEquals(o5, size1Deque.getTop());
-    assertEquals(o5, size1Deque.getBottom());
+    assertThat(size1Deque.getTop()).isEqualTo(o5);
+    assertThat(size1Deque.getBottom()).isEqualTo(o5);
   }
 }
