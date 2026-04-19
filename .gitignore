@@ -32,6 +32,7 @@
 # /.idea/
 /.idea/workspace.xml
 /.idea/uiDesigner.xml
+/.idea/copilot*
 
 # /lib/
 /lib/java
