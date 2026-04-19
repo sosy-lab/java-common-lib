@@ -11,13 +11,10 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.Immutable;
 
 /**
- * Interface for persistent deques. A persistent data structure is immutable, but provides cheap
- *  * copy-and-write operations. Thus, all write operations
- *  ({@link #insertTop(Object)}, {@link #insertBottom(Object)}, {@link #deleteTop()},
- *  {@link #deleteBottom()}) will
- *  not modify the current
- *  instance,
- *  but return a new instance instead.
+ * Interface for persistent deques. A persistent data structure is immutable, but provides cheap *
+ * copy-and-write operations. Thus, all write operations ({@link #insertTop(Object)}, {@link
+ * #insertBottom(Object)}, {@link #deleteTop()}, {@link #deleteBottom()}) will not modify the
+ * current instance, but return a new instance instead.
  *
  * @param <T> type of elements stored in deque
  */
