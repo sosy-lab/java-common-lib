@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-This file is part of SoSy-Lab Common,
-a library of useful utilities:
-https://github.com/sosy-lab/java-common-lib
-
-SPDX-FileCopyrightText: 2007-2020 Dirk Beyer <https://www.sosy-lab.org>
-
-SPDX-License-Identifier: Apache-2.0
--->
-
 <project version="4">
   <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="javax.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="javax.annotation.Nonnull" />
+    <option name="myDefaultNullable" value="org.checkerframework.checker.nullness.qual.Nullable" />
+    <option name="myDefaultNotNull" value="org.checkerframework.checker.nullness.qual.NonNull" />
     <option name="myNullables">
       <value>
         <list size="12">
@@ -49,6 +38,9 @@ SPDX-License-Identifier: Apache-2.0
         </list>
       </value>
     </option>
+    <instrumentedNotNulls>
+      <option value="org.checkerframework.checker.nullness.qual.NonNull" />
+    </instrumentedNotNulls>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="false" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/bin" />
