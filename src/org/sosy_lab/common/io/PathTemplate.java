@@ -49,7 +49,7 @@ public final class PathTemplate {
   public Path getPath(Object... args) {
     checkArgument(!Arrays.asList(args).contains(null), "Values for PathTemplate may not be null");
 
-    return Path.of(String.format(template, args));
+    return Path.of(template.formatted(args));
   }
 
   /** Returns the raw template of this instance. */

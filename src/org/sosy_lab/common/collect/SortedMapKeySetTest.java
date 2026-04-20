@@ -31,7 +31,7 @@ public class SortedMapKeySetTest {
       for (String s : pStrings) {
         map = map.putAndCopy(s, true);
       }
-      return new SortedMapKeySet<>((OurSortedMap<String, ?>) map);
+      return new SortedMapKeySet<>((PathCopyingPersistentTreeMap<String, ?>) map);
     }
   }
 

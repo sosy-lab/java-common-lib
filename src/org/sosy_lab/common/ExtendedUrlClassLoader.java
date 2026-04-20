@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Var;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -38,7 +37,9 @@ final class ExtendedUrlClassLoader extends URLClassLoader {
 
   @AutoValue
   @SuppressWarnings("NoFunctionalReturnType")
-  abstract static class ExtendedUrlClassLoaderConfiguration {
+  abstract static sealed class ExtendedUrlClassLoaderConfiguration
+      permits AutoValue_ExtendedUrlClassLoader_ExtendedUrlClassLoaderConfiguration {
+
     abstract Optional<ClassLoader> parent();
 
     abstract ImmutableList<URL> urls();
@@ -52,10 +53,11 @@ final class ExtendedUrlClassLoader extends URLClassLoader {
     }
 
     @AutoValue.Builder
-    abstract static class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder> {
+    abstract static sealed class AutoBuilder extends Classes.ClassLoaderBuilder<AutoBuilder>
+        permits AutoValue_ExtendedUrlClassLoader_ExtendedUrlClassLoaderConfiguration.Builder {
+
       AutoBuilder() {}
 
-      @SuppressFBWarnings("DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED")
       @Override
       public final URLClassLoader build() {
         return new ExtendedUrlClassLoader(autoBuild());

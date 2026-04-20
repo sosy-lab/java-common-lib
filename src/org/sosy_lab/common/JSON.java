@@ -45,20 +45,20 @@ public final class JSON {
     if (value == null) {
       out.append("null");
 
-    } else if (value instanceof CharSequence) {
+    } else if (value instanceof CharSequence charSequence) {
       out.append('\"');
-      escape((CharSequence) value, out);
+      escape(charSequence, out);
       out.append('\"');
 
-    } else if (value instanceof Double) {
-      if (((Double) value).isInfinite() || ((Double) value).isNaN()) {
+    } else if (value instanceof Double d) {
+      if (d.isInfinite() || d.isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
       }
 
-    } else if (value instanceof Float) {
-      if (((Float) value).isInfinite() || ((Float) value).isNaN()) {
+    } else if (value instanceof Float f) {
+      if (f.isInfinite() || f.isNaN()) {
         out.append("null");
       } else {
         out.append(value.toString());
@@ -127,31 +127,15 @@ public final class JSON {
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);
       switch (ch) {
-        case '"':
-          out.append("\\\"");
-          break;
-        case '\\':
-          out.append("\\\\");
-          break;
-        case '\b':
-          out.append("\\b");
-          break;
-        case '\f':
-          out.append("\\f");
-          break;
-        case '\n':
-          out.append("\\n");
-          break;
-        case '\r':
-          out.append("\\r");
-          break;
-        case '\t':
-          out.append("\\t");
-          break;
-        case '/':
-          out.append("\\/");
-          break;
-        default:
+        case '"' -> out.append("\\\"");
+        case '\\' -> out.append("\\\\");
+        case '\b' -> out.append("\\b");
+        case '\f' -> out.append("\\f");
+        case '\n' -> out.append("\\n");
+        case '\r' -> out.append("\\r");
+        case '\t' -> out.append("\\t");
+        case '/' -> out.append("\\/");
+        default -> {
           // Reference: http://www.unicode.org/versions/Unicode5.1.0/
           if ((ch <= '\u001F')
               || (ch >= '\u007F' && ch <= '\u009F')
@@ -162,6 +146,7 @@ public final class JSON {
           } else {
             out.append(ch);
           }
+        }
       }
     }
   }

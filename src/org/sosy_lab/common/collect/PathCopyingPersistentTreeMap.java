@@ -1203,8 +1203,7 @@ public final class PathCopyingPersistentTreeMap<
    * @param <V> The type of values.
    */
   @Immutable(containerOf = {"K", "V"})
-  private static final class PartialSortedMap<
-          K extends Comparable<? super K>, V extends @Nullable Object>
+  static final class PartialSortedMap<K extends Comparable<? super K>, V extends @Nullable Object>
       extends AbstractImmutableSortedMap<K, V> implements OurSortedMap<K, V>, Serializable {
 
     static <K extends Comparable<? super K>, V> OurSortedMap<K, V> create(
@@ -1355,8 +1354,7 @@ public final class PathCopyingPersistentTreeMap<
     @Override
     @SuppressWarnings("ReferenceEquality") // comparing nodes with equals would not suffice
     public boolean equals(@Nullable Object pObj) {
-      if (pObj instanceof PartialSortedMap<?, ?>) {
-        PartialSortedMap<?, ?> other = (PartialSortedMap<?, ?>) pObj;
+      if (pObj instanceof PartialSortedMap<?, ?> other) {
         if (root == other.root
             && Objects.equals(fromKey, other.fromKey)
             && fromInclusive == other.fromInclusive

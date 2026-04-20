@@ -84,9 +84,8 @@ public enum BaseTypeConverter implements TypeConverter {
         return Pattern.compile(valueStr);
       } catch (PatternSyntaxException e) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Illegal regular expression %s in option  %s (%s).",
-                valueStr, optionName, e.getMessage()),
+            "Illegal regular expression %s in option  %s (%s)."
+                .formatted(valueStr, optionName, e.getMessage()),
             e);
       }
     } else if (type.equals(Rational.class)) {
@@ -94,8 +93,8 @@ public enum BaseTypeConverter implements TypeConverter {
         return Rational.of(valueStr);
       } catch (IllegalArgumentException e) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Illegal rational %s in option  %s (%s).", valueStr, optionName, e.getMessage()),
+            "Illegal rational %s in option  %s (%s)."
+                .formatted(valueStr, optionName, e.getMessage()),
             e);
       }
 
@@ -126,15 +125,13 @@ public enum BaseTypeConverter implements TypeConverter {
 
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new AssertionError(
-          String.format(
-              "Class %s without usable %s(%s) method.",
-              type.getSimpleName(), method, paramType.getSimpleName()),
+          "Class %s without usable %s(%s) method."
+              .formatted(type.getSimpleName(), method, paramType.getSimpleName()),
           e);
     } catch (InvocationTargetException e) {
       throw new InvalidConfigurationException(
-          String.format(
-              "Could not parse \"%s = %s\" (%s).",
-              optionName, value, e.getTargetException().getMessage()),
+          "Could not parse \"%s = %s\" (%s)."
+              .formatted(optionName, value, e.getTargetException().getMessage()),
           e);
     }
   }
