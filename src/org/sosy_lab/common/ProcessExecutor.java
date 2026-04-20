@@ -151,14 +151,14 @@ public class ProcessExecutor<E extends Exception> {
       }
     }
     Supplier<String> executingMsgSupplier =
-        () -> String.format("Executing '%s'", Joiner.on(" ").join(cmd));
+        () -> "Executing '%s'".formatted(Joiner.on(" ").join(cmd));
     logger.log(Level.FINEST, executingMsgSupplier);
 
     Process process = proc.start();
     pid = process.pid();
 
     Supplier<String> startedMsgSupplier =
-        () -> String.format("Started '%s' with pid [%d]", Joiner.on(" ").join(cmd), pid);
+        () -> "Started '%s' with pid [%d]".formatted(Joiner.on(" ").join(cmd), pid);
     logger.log(Level.FINEST, startedMsgSupplier);
 
     processFuture =
@@ -366,7 +366,7 @@ public class ProcessExecutor<E extends Exception> {
       Throwable t = e.getCause();
       Throwables.propagateIfPossible(t, IOException.class, exceptionClass);
       throw new UnexpectedCheckedException(
-          String.format("output handling of external process %s[%d]", name, pid), t);
+          "output handling of external process %s[%d]".formatted(name, pid), t);
 
     } finally {
       // cleanup

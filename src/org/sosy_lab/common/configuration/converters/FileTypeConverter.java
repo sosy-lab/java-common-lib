@@ -161,15 +161,9 @@ public final class FileTypeConverter implements TypeConverter {
     @Var int depth = 0;
     for (String component : Splitter.on(File.separator).split(path)) {
       switch (component) {
-        case "":
-        case ".":
-          break;
-        case "..":
-          depth--;
-          break;
-        default:
-          depth++;
-          break;
+        case "", "." -> {}
+        case ".." -> depth--;
+        default -> depth++;
       }
 
       if (depth < 0) {
@@ -184,9 +178,10 @@ public final class FileTypeConverter implements TypeConverter {
       String reason, String optionName, Path path, Object... args)
       throws InvalidConfigurationException {
     throw new InvalidConfigurationException(
-        String.format(
-            "The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".",
-            FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
+        // reason can be a format string and needs to be appended before string formatting
+        ("The option %s specifies the path '%s' that is forbidden in safe mode " + reason + ".")
+            .formatted(
+                FluentIterable.<Object>of(optionName, path).append(args).toArray(Object.class)));
   }
 
   public String getOutputDirectory() {
@@ -228,7 +223,7 @@ public final class FileTypeConverter implements TypeConverter {
       path = Path.of(pValue);
     } catch (InvalidPathException e) {
       throw new InvalidConfigurationException(
-          String.format("Invalid file name in option %s: %s", optionName, e.getMessage()), e);
+          "Invalid file name in option %s: %s".formatted(optionName, e.getMessage()), e);
     }
 
     return handleFileOption(

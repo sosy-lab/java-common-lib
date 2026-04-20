@@ -19,8 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-abstract class AbstractImmutableSortedMap<K, V extends @Nullable Object>
-    extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V> {
+abstract sealed class AbstractImmutableSortedMap<K, V extends @Nullable Object>
+    extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V>
+    permits OurSortedMap.EmptyImmutableOurSortedMap,
+        PathCopyingPersistentTreeMap,
+        PathCopyingPersistentTreeMap.PartialSortedMap {
 
   @Override
   public boolean equals(@Nullable Object pObj) {
