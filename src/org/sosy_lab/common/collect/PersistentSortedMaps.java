@@ -60,8 +60,8 @@ public final class PersistentSortedMaps {
   public static <K, V> MergeConflictHandler<K, V> getExceptionMergeConflictHandler() {
     return (key, value1, value2) -> {
       throw new IllegalArgumentException(
-          String.format(
-              "Conflicting value when merging maps for key %s: %s and %s", key, value1, value2));
+          "Conflicting value when merging maps for key %s: %s and %s"
+              .formatted(key, value1, value2));
     };
   }
 

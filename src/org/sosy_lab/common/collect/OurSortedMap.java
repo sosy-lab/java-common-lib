@@ -24,7 +24,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Extension of {@link NavigableMap} that specifies {@link NavigableSet} as type of some collection
  * views (instead of {@link java.util.Set}).
  */
-interface OurSortedMap<K, V extends @Nullable Object> extends NavigableMap<K, V> {
+sealed interface OurSortedMap<K, V extends @Nullable Object> extends NavigableMap<K, V>
+    permits AbstractImmutableSortedMap,
+        DescendingSortedMap,
+        PathCopyingPersistentTreeMap.PartialSortedMap {
 
   Iterator<Entry<K, V>> entryIterator();
 

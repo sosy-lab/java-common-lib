@@ -39,25 +39,15 @@ public final class Timer {
     String clockToUse =
         Ascii.toUpperCase(
             System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME, "WALLTIME_MILLIS").trim());
-    switch (clockToUse) {
-      case "WALLTIME_MILLIS":
-        DEFAULT_CLOCK = Tickers.getWalltimeMillis();
-        break;
-      case "WALLTIME_NANOS":
-        DEFAULT_CLOCK = Tickers.getWalltimeNanos();
-        break;
-      case "THREAD_CPUTIME":
-        DEFAULT_CLOCK = Tickers.getCurrentThreadCputime();
-        break;
-      case "PROCESS_CPUTIME":
-        DEFAULT_CLOCK = Tickers.getProcessCputime();
-        break;
-      case "NONE":
-        DEFAULT_CLOCK = Tickers.getNullTicker();
-        break;
-      default:
-        DEFAULT_CLOCK = null;
-    }
+    DEFAULT_CLOCK =
+        switch (clockToUse) {
+          case "WALLTIME_MILLIS" -> Tickers.getWalltimeMillis();
+          case "WALLTIME_NANOS" -> Tickers.getWalltimeNanos();
+          case "THREAD_CPUTIME" -> Tickers.getCurrentThreadCputime();
+          case "PROCESS_CPUTIME" -> Tickers.getProcessCputime();
+          case "NONE" -> Tickers.getNullTicker();
+          default -> null;
+        };
   }
 
   // Visible for NestedTimer
@@ -98,10 +88,10 @@ public final class Timer {
   public Timer() {
     if (DEFAULT_CLOCK == null) {
       throw new IllegalArgumentException(
-          String.format(
-              "Invalid value \'%s\' for property %s,"
-                  + "cannot create Timer without explicitly specified clock.",
-              System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
+          ("Invalid value \'%s\' for property %s, "
+                  + "cannot create Timer without explicitly specified clock.")
+              .formatted(
+                  System.getProperty(DEFAULT_CLOCK_PROPERTY_NAME), DEFAULT_CLOCK_PROPERTY_NAME));
     }
     clock = DEFAULT_CLOCK;
   }
@@ -253,11 +243,11 @@ public final class Timer {
   /** Syntax sugar method: pretty-format the timer output into a string in seconds. */
   public String prettyFormat() {
     TimeUnit t = TimeUnit.SECONDS;
-    return String.format(
-        "%s (Max: %s), (Avg: %s), (#intervals = %s)",
-        getSumTime().formatAs(t),
-        getMaxTime().formatAs(t),
-        getAvgTime().formatAs(t),
-        getNumberOfIntervals());
+    return "%s (Max: %s), (Avg: %s), (#intervals = %s)"
+        .formatted(
+            getSumTime().formatAs(t),
+            getMaxTime().formatAs(t),
+            getAvgTime().formatAs(t),
+            getNumberOfIntervals());
   }
 }

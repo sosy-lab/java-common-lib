@@ -415,8 +415,8 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     for (int i = 0; i < args.length; i++) {
       Object o = Objects.requireNonNullElse(args[i], "null");
       @Var String arg;
-      if (o instanceof Appender && truncateSize > 0) {
-        arg = Appenders.toStringWithTruncation((Appender) o, truncateSize + 1);
+      if (o instanceof Appender appender && truncateSize > 0) {
+        arg = Appenders.toStringWithTruncation(appender, truncateSize + 1);
       } else {
         arg = o.toString();
       }
@@ -531,9 +531,9 @@ public class BasicLogManager implements LogManager, AutoCloseable {
     }
 
     CharSequence exceptionMessage =
-        e instanceof FileSystemException
+        e instanceof FileSystemException fileSystemException
             ? createFileSystemExceptionMessage(
-                (FileSystemException) e, /* asSuffix= */ additionalMessage.endsWith("file"))
+                fileSystemException, /* asSuffix= */ additionalMessage.endsWith("file"))
             : Strings.nullToEmpty(e.getMessage());
 
     if (additionalMessage.isEmpty()) {

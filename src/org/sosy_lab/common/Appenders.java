@@ -33,8 +33,8 @@ public final class Appenders {
    * @return an {@link Appender} instance
    */
   public static Appender createAppender(@Nullable Object o) {
-    if (o instanceof Appender) {
-      return (Appender) o;
+    if (o instanceof Appender appender) {
+      return appender;
     } else {
       return fromToStringMethod(o);
     }
@@ -50,8 +50,8 @@ public final class Appenders {
    * @throws IOException If the appendable throws an IOException
    */
   public static void appendTo(Appendable output, @Nullable Object o) throws IOException {
-    if (o instanceof Appender) {
-      ((Appender) o).appendTo(output);
+    if (o instanceof Appender appender) {
+      appender.appendTo(output);
     } else {
       output.append(Objects.toString(o));
     }

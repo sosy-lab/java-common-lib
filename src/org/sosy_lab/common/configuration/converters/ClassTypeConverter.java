@@ -37,13 +37,11 @@ public class ClassTypeConverter implements TypeConverter {
 
     // get optional package prefix
     if (secondaryOption != null) {
-      if (!(secondaryOption instanceof ClassOption)) {
+      if (!(secondaryOption instanceof ClassOption classOption)) {
         throw new UnsupportedOperationException(
             "Options of type Class may not be annotated with " + secondaryOption);
       }
-      packagePrefixes =
-          FluentIterable.from(packagePrefixes)
-              .append(((ClassOption) secondaryOption).packagePrefix());
+      packagePrefixes = FluentIterable.from(packagePrefixes).append(classOption.packagePrefix());
     }
 
     // get class object
@@ -68,9 +66,8 @@ public class ClassTypeConverter implements TypeConverter {
       // check type
       if (!targetType.isSupertypeOf(cls)) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Class %s specified in option %s is not an instance of %s",
-                value, optionName, targetType));
+            "Class %s specified in option %s is not an instance of %s"
+                .formatted(value, optionName, targetType));
       }
 
       result = cls;
@@ -82,9 +79,8 @@ public class ClassTypeConverter implements TypeConverter {
         result = Classes.createFactory(type, cls);
       } catch (UnsuitedClassException e) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Class %s specified in option %s is invalid (%s)",
-                value, optionName, e.getMessage()));
+            "Class %s specified in option %s is invalid (%s)"
+                .formatted(value, optionName, e.getMessage()));
       }
       Classes.produceClassLoadingWarning(logger, cls, type.getRawType());
     }

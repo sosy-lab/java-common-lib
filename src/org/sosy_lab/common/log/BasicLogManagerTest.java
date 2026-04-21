@@ -122,17 +122,17 @@ public class BasicLogManagerTest {
     if (knownSize) {
       assertThat(records.get(0).getMessage())
           .isEqualTo(
-              String.format(
-                  "| %s... <REMAINING ARGUMENT OMITTED BECAUSE %d CHARACTERS LONG> |",
-                  LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
-                  LONG_STRING.length()));
+              "| %s... <REMAINING ARGUMENT OMITTED BECAUSE %d CHARACTERS LONG> |"
+                  .formatted(
+                      LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
+                      LONG_STRING.length()));
     } else {
       assertThat(records.get(0).getMessage())
           .isEqualTo(
-              String.format(
-                  "| %s... <REMAINING ARGUMENT OMITTED BECAUSE >= %d CHARACTERS LONG> |",
-                  LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
-                  TRUNCATE_SIZE));
+              "| %s... <REMAINING ARGUMENT OMITTED BECAUSE >= %d CHARACTERS LONG> |"
+                  .formatted(
+                      LONG_STRING.substring(0, BasicLogManager.TRUNCATE_REMAINING_SIZE),
+                      TRUNCATE_SIZE));
     }
   }
 

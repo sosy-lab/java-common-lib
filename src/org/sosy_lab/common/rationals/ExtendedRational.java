@@ -77,18 +77,15 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
    * <p>The method works, because the Java Double class also supports Infinity/-Infinity/NaN.
    */
   public double toDouble() {
-    switch (numberType) {
-      case NEG_INFTY:
-        return Double.NEGATIVE_INFINITY;
-      case RATIONAL:
+    return switch (numberType) {
+      case NEG_INFTY -> Double.NEGATIVE_INFINITY;
+      case RATIONAL -> {
         assert rational != null;
-        return rational.doubleValue();
-      case INFTY:
-        return Double.POSITIVE_INFINITY;
-      case NaN:
-        return Double.NaN;
-    }
-    throw new UnsupportedOperationException("Unexpected number type");
+        yield rational.doubleValue();
+      }
+      case INFTY -> Double.POSITIVE_INFINITY;
+      case NaN -> Double.NaN;
+    };
   }
 
   /**
@@ -97,13 +94,13 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
    */
   @Override
   public String toString() {
-    switch (numberType) {
-      case RATIONAL:
+    return switch (numberType) {
+      case RATIONAL -> {
         assert rational != null;
-        return rational.toString();
-      default:
-        return Double.toString(toDouble());
-    }
+        yield rational.toString();
+      }
+      default -> Double.toString(toDouble());
+    };
   }
 
   /**
@@ -123,16 +120,12 @@ public final class ExtendedRational implements Comparable<ExtendedRational> {
    * @return New {@link ExtendedRational}.
    */
   public static ExtendedRational ofString(String s) {
-    switch (s) {
-      case "Infinity":
-        return ExtendedRational.INFTY;
-      case "-Infinity":
-        return ExtendedRational.NEG_INFTY;
-      case "NaN":
-        return ExtendedRational.NaN;
-      default:
-        return new ExtendedRational(Rational.ofString(s));
-    }
+    return switch (s) {
+      case "Infinity" -> ExtendedRational.INFTY;
+      case "-Infinity" -> ExtendedRational.NEG_INFTY;
+      case "NaN" -> ExtendedRational.NaN;
+      default -> new ExtendedRational(Rational.ofString(s));
+    };
   }
 
   @Override

@@ -33,11 +33,10 @@ public class IntegerTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
     Class<?> type = pType.getRawType();
 
-    if (!(pOption instanceof IntegerOption)) {
+    if (!(pOption instanceof IntegerOption option)) {
       throw new UnsupportedOperationException(
           "IntegerTypeConverter needs options annotated with @IntegerOption");
     }
-    IntegerOption option = (IntegerOption) pOption;
 
     assert type.equals(Integer.class) || type.equals(Long.class);
 
@@ -52,9 +51,8 @@ public class IntegerTypeConverter implements TypeConverter {
               : Range.all();
 
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid value in configuration file: \"%s = %s\" (not in range %s).",
-              optionName, value, bound.intersection(typeBound)));
+          "Invalid value in configuration file: \"%s = %s\" (not in range %s)."
+              .formatted(optionName, value, bound.intersection(typeBound)));
     }
 
     return value;
