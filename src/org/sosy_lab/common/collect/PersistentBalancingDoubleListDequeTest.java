@@ -13,11 +13,11 @@ import static com.google.common.truth.Truth.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PersistentDequeTest {
+public class PersistentBalancingDoubleListDequeTest {
 
-  PersistentDeque<Object> emptyDeque;
-  PersistentDeque<Object> size1Deque;
-  PersistentDeque<Object> fullDeque;
+  PersistentBalancingDoubleListDeque<Object> emptyDeque;
+  PersistentBalancingDoubleListDeque<Object> size1Deque;
+  PersistentBalancingDoubleListDeque<Object> fullDeque;
   Object o1;
   Object o2;
   Object o3;
@@ -27,13 +27,13 @@ public class PersistentDequeTest {
   @Before
   public void setup() {
 
-    emptyDeque = new PersistentDeque<>();
+    emptyDeque = new PersistentBalancingDoubleListDeque<>();
 
-    size1Deque = new PersistentDeque<>();
+    size1Deque = new PersistentBalancingDoubleListDeque<>();
     o5 = new Object();
     size1Deque = size1Deque.insertTop(o5);
 
-    fullDeque = new PersistentDeque<>();
+    fullDeque = new PersistentBalancingDoubleListDeque<>();
     o1 = new Object();
     o2 = new Object();
     o3 = new Object();
