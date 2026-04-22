@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -151,8 +153,10 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns the value at the start of the list.
+   * Returns the value at the start of the list for non-empty lists. A non-throwing version exists
+   * in {@link #headOptional()}.
    *
+   * @throws NoSuchElementException if the list is empty.
    * @return The value at the start of the list
    */
   public T head() {
@@ -164,16 +168,37 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns the remainder of the list without the first element.
+   * Returns an {@link Optional} with the value at the start of the list for a non-empty list. Empty
+   * {@link Optional} else. Safe (non-throwing) version of {@link #head()}.
    *
+   * @return {@link Optional} with the value at the start of the list for a non-empty list. Empty
+   *     {@link Optional} else.
+   */
+  public Optional<T> headOptional() {
+    return Optional.ofNullable(head);
+  }
+
+  /**
+   * Returns the remainder of the list without the first element for non-empty lists. A non-throwing
+   * version exists in {@link #tailOptional()}.
+   *
+   * @throws IllegalStateException if the list is empty.
    * @return The remainder of the list without the first element
    */
   public PersistentLinkedList<T> tail() {
-    if (isEmpty()) {
-      throw new NoSuchElementException();
-    } else {
-      return tail;
-    }
+    checkState(!isEmpty());
+    return tail;
+  }
+
+  /**
+   * Returns an {@link Optional} with the remainder of the list without the first element for a
+   * non-empty list. Empty {@link Optional} else. Safe (non-throwing) version of {@link #tail()}.
+   *
+   * @return {@link Optional} with the remainder of the list without the first element for a
+   *     non-empty list. Empty {@link Optional} else.
+   */
+  public Optional<PersistentLinkedList<T>> tailOptional() {
+    return Optional.ofNullable(tail);
   }
 
   /**
