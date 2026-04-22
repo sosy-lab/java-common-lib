@@ -45,11 +45,10 @@ public class TimeSpanTypeConverter implements TypeConverter {
       throws InvalidConfigurationException {
     Class<?> type = pType.getRawType();
 
-    if (!(pOption instanceof TimeSpanOption)) {
+    if (!(pOption instanceof TimeSpanOption option)) {
       throw new UnsupportedOperationException(
           "Time span options need to be annotated with @TimeSpanOption");
     }
-    TimeSpanOption option = (TimeSpanOption) pOption;
 
     // find unit in input string
     @Var int i = valueStr.length() - 1;
@@ -83,9 +82,8 @@ public class TimeSpanTypeConverter implements TypeConverter {
     if (option.min() > value || value > option.max()) {
       String codeUnitStr = TIME_UNITS.inverse().get(codeUnit);
       throw new InvalidConfigurationException(
-          String.format(
-              "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])",
-              optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
+          "Invalid value in configuration file: \"%s = %s (not in range [%d %s, %d %s])"
+              .formatted(optionName, value, option.min(), codeUnitStr, option.max(), codeUnitStr));
     }
 
     Object result;

@@ -39,8 +39,8 @@ public class TimestampedLogFormatter extends AbstractColoredLogFormatter {
     DATE_FORMAT.formatTo(lr.getInstant(), sb);
     sb.append('\t').append(lr.getLevel()).append('\t');
 
-    if (lr instanceof ExtendedLogRecord) {
-      String component = ((ExtendedLogRecord) lr).getSourceComponentName();
+    if (lr instanceof ExtendedLogRecord extendedLogRecord) {
+      String component = extendedLogRecord.getSourceComponentName();
       if (!component.isEmpty()) {
         sb.append(component).append(':');
       }

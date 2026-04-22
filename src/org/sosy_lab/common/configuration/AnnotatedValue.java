@@ -8,30 +8,29 @@
 
 package org.sosy_lab.common.configuration;
 
-import com.google.auto.value.AutoValue;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.errorprone.annotations.Immutable;
 import java.util.Optional;
 
 /** Immutable container that stores a value and an optional string. */
 @Immutable(containerOf = "T")
-@AutoValue
-public abstract class AnnotatedValue<T> {
+public record AnnotatedValue<T>(T value, Optional<String> annotation) {
 
-  AnnotatedValue() {}
+  public AnnotatedValue {
+    checkNotNull(value);
+    checkNotNull(annotation);
+  }
 
   public static <T> AnnotatedValue<T> create(T value) {
-    return new AutoValue_AnnotatedValue<>(value, Optional.empty());
+    return new AnnotatedValue<>(value, Optional.empty());
   }
 
   public static <T> AnnotatedValue<T> create(T value, String annotation) {
-    return new AutoValue_AnnotatedValue<>(value, Optional.of(annotation));
+    return new AnnotatedValue<>(value, Optional.of(annotation));
   }
 
   public static <T> AnnotatedValue<T> create(T value, Optional<String> annotation) {
-    return new AutoValue_AnnotatedValue<>(value, annotation);
+    return new AnnotatedValue<>(value, annotation);
   }
-
-  public abstract T value();
-
-  public abstract Optional<String> annotation();
 }
