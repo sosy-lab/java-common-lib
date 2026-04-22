@@ -157,41 +157,31 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
 
       String unit = it.next();
       switch (unit) {
-        case "day":
-        case "days":
-        case "d":
+        case "day", "days", "d" -> {
           if (days != 0) {
             throw new IllegalArgumentException("Days set twice: " + unit);
           }
           days = value;
-          break;
-
-        case "h":
-        case "hour":
-        case "hours":
+        }
+        case "h", "hour", "hours" -> {
           if (hours != 0) {
             throw new IllegalArgumentException("Hours set twice: " + unit);
           }
           hours = value;
-          break;
-
-        case "min":
-        case "m":
+        }
+        case "min", "m" -> {
           if (minutes != 0) {
             throw new IllegalArgumentException("Minutes set twice: " + unit);
           }
           minutes = value;
-          break;
-
-        case "s":
+        }
+        case "s" -> {
           if (seconds != 0) {
             throw new IllegalArgumentException("Seconds set twice: " + unit);
           }
           seconds = value;
-          break;
-
-        default:
-          throw new IllegalArgumentException("Unknown unit: " + unit);
+        }
+        default -> throw new IllegalArgumentException("Unknown unit: " + unit);
       }
     }
 
@@ -396,10 +386,10 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof TimeSpan)) {
+    if (!(obj instanceof TimeSpan other)) {
       return false;
     }
-    TimeSpan other = (TimeSpan) obj;
+
     if (unit == other.unit) {
       return span == other.span;
     }
@@ -622,7 +612,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
     long hours = getChecked(HOURS) - years * 365 * 24 - days * 24;
     if (started || hours > 0) {
       started = true;
-      result.append(String.format("%02dh ", hours));
+      result.append("%02dh ".formatted(hours));
     }
     if (unit.equals(HOURS)) {
       return result.toString().trim();
@@ -630,7 +620,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
 
     long minutes = getChecked(MINUTES) - years * 365 * 24 * 60 - days * 24 * 60 - hours * 60;
     if (started || minutes > 0) {
-      result.append(String.format("%02dmin ", minutes));
+      result.append("%02dmin ".formatted(minutes));
     }
     if (unit.equals(MINUTES)) {
       started = true;
@@ -643,7 +633,7 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
             - days * 24 * 60 * 60
             - hours * 60 * 60
             - minutes * 60;
-    result.append(String.format("%02ds", seconds));
+    result.append("%02ds".formatted(seconds));
 
     return result.toString();
   }
@@ -656,15 +646,11 @@ public final class TimeSpan implements Comparable<TimeSpan>, Serializable, Tempo
   static {
     String format =
         Ascii.toUpperCase(System.getProperty(DEFAULT_FORMAT_PROPERTY_NAME, "SIMPLE").trim());
-    switch (format) {
-      case "HUMAN_READABLE_LARGE":
-        DEFAULT_FORMAT = TimeSpan::formatHumanReadableLarge;
-        break;
-      case "SIMPLE":
-        DEFAULT_FORMAT = TimeSpan::formatSimple;
-        break;
-      default:
-        DEFAULT_FORMAT = TimeSpan::formatSimple;
-    }
+    DEFAULT_FORMAT =
+        switch (format) {
+          case "HUMAN_READABLE_LARGE" -> TimeSpan::formatHumanReadableLarge;
+          case "SIMPLE" -> TimeSpan::formatSimple;
+          default -> TimeSpan::formatSimple;
+        };
   }
 }

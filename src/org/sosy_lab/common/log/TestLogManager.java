@@ -132,7 +132,7 @@ public enum TestLogManager implements LogManager {
   @FormatMethod
   private static void checkFormatParamsNotNull(String pFormat, Object... pArgs) {
     checkNotNull(pArgs);
-    checkArgument(!String.format(pFormat, pArgs).isEmpty());
+    checkArgument(!pFormat.formatted(pArgs).isEmpty());
   }
 
   private static void checkObjectArgsConcatenationParams(Object... pArgs) {

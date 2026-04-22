@@ -10,8 +10,8 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.auto.value.AutoValue;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -113,32 +113,46 @@ public final class MapsDifference {
    * @param <K> The type of the key.
    * @param <V> The type of the values.
    */
-  @AutoValue
   @Immutable(containerOf = {"K", "V"})
-  public abstract static class Entry<K, V> {
+  public record Entry<K, V>(K key, Optional<V> leftValue, Optional<V> rightValue) {
 
-    Entry() {}
+    public Entry {
+      checkNotNull(key);
+      checkNotNull(leftValue);
+      checkNotNull(rightValue);
+    }
 
     public static <K, V> Entry<K, V> forLeftValueOnly(K pKey, V pLeftValue) {
-      return new AutoValue_MapsDifference_Entry<>(pKey, Optional.of(pLeftValue), Optional.empty());
+      return new Entry<>(pKey, Optional.of(pLeftValue), Optional.empty());
     }
 
     public static <K, V> Entry<K, V> forRightValueOnly(K pKey, V pRightValue) {
-      return new AutoValue_MapsDifference_Entry<>(pKey, Optional.empty(), Optional.of(pRightValue));
+      return new Entry<>(pKey, Optional.empty(), Optional.of(pRightValue));
     }
 
     public static <K, V> Entry<K, V> forDifferingValues(K pKey, V pLeftValue, V pRightValue) {
-      return new AutoValue_MapsDifference_Entry<>(
-          pKey, Optional.of(pLeftValue), Optional.of(pRightValue));
+      return new Entry<>(pKey, Optional.of(pLeftValue), Optional.of(pRightValue));
     }
 
     /** Returns the map key. */
-    public abstract K getKey();
+    @Deprecated
+    @InlineMe(replacement = "this.key()")
+    public K getKey() {
+      return key();
+    }
 
     /** Returns the left value, if present. */
-    public abstract Optional<V> getLeftValue();
+    @Deprecated
+    @InlineMe(replacement = "this.leftValue()")
+    public Optional<V> getLeftValue() {
+      return leftValue();
+    }
 
     /** Returns the right value, if present. */
-    public abstract Optional<V> getRightValue();
+    @Deprecated
+    @InlineMe(replacement = "this.rightValue()")
+    public Optional<V> getRightValue() {
+      return rightValue();
+    }
   }
 }

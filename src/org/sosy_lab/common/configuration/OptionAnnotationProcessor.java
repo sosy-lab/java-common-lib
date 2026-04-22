@@ -235,7 +235,7 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
     }
 
     switch (elem.getKind()) {
-      case FIELD:
+      case FIELD -> {
         if (elem.getModifiers().contains(Modifier.FINAL)) {
           message(
               ERROR,
@@ -243,8 +243,8 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
               "Modifier final on field annotated with @Option is illegal,"
                   + " as it will be written via reflection.");
         }
-        break;
-      case METHOD:
+      }
+      case METHOD -> {
         // check signature (parameter count, declared exceptions)
         ExecutableElement method = (ExecutableElement) elem;
         if (method.getParameters().size() != 1) {
@@ -263,13 +263,13 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
                 "Methods annotated with @Option may not throw " + exceptionType + ".");
           }
         }
-        break;
-      default:
-        message(
-            ERROR,
-            elem,
-            Option.class,
-            "Annotation @Option is only allowed for fields and methods.");
+      }
+      default ->
+          message(
+              ERROR,
+              elem,
+              Option.class,
+              "Annotation @Option is only allowed for fields and methods.");
     }
 
     if (elem.getModifiers().contains(Modifier.STATIC)) {
@@ -322,18 +322,18 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
       // Determine type of option as declared in source.
       @Var TypeMirror optionType;
       switch (elem.getKind()) {
-        case FIELD:
-          optionType = elem.asType();
-          break;
-        case METHOD:
+        case FIELD -> optionType = elem.asType();
+        case METHOD -> {
           ExecutableElement method = (ExecutableElement) elem;
           if (method.getParameters().size() != 1) {
             continue; // error, already reported above
           }
           optionType = method.getParameters().get(0).asType();
-          break;
-        default:
-          continue; // error, prevented by compiler
+        }
+        default -> {
+          continue;
+          // error, prevented by compiler
+        }
       }
 
       // If this option is an array or a collection, get the component type.
@@ -410,9 +410,12 @@ public class OptionAnnotationProcessor extends AbstractProcessor {
             ERROR,
             elem,
             am,
-            String.format(
-                "%s %s for annotation %s, this annotation is only for types %s.",
-                msgPrefix, optionType, annotationName, Joiner.on(", ").join(acceptedTypeNames)));
+            "%s %s for annotation %s, this annotation is only for types %s."
+                .formatted(
+                    msgPrefix,
+                    optionType,
+                    annotationName,
+                    Joiner.on(", ").join(acceptedTypeNames)));
       }
     }
 
