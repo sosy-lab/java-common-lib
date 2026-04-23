@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
+import javax.annotation.Nullable;
 import java.util.Deque;
 import java.util.Iterator;
 
@@ -50,30 +51,33 @@ public interface PersistentDeque<T> extends Deque<T> {
   PersistentDeque<T> copyAndAddLast(T t);
 
   /**
-   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * Returns a copy of this deque from which the first element has been removed or null if the deque is empty. Replacement for
    * {@link #poll()}.
    *
-   * @return copy of this deque from which the first element has been removed
+   * @return copy of this deque from which the first element has been removed, null if deque empty
    */
   @CheckReturnValue
+  @Nullable
   PersistentDeque<T> copyAndPoll();
 
   /**
-   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * Returns a copy of this deque from which the first element has been removed or null if the deque is empty. Replacement for
    * {@link #pollFirst()}.
    *
-   * @return copy of this deque from which the first element has been removed
+   * @return copy of this deque from which the first element has been removed, null if deque empty
    */
   @CheckReturnValue
+  @Nullable
   PersistentDeque<T> copyAndPollFirst();
 
   /**
-   * Returns a copy of this deque from which the last element has been removed. Replacement for
+   * Returns a copy of this deque from which the last element has been removed or null if the deque is empty. Replacement for
    * {@link #pollLast()}.
    *
-   * @return copy of this deque from which the last element has been removed
+   * @return copy of this deque from which the last element has been removed, null if deque empty
    */
   @CheckReturnValue
+  @Nullable
   PersistentDeque<T> copyAndPollLast();
 
   /**
@@ -231,36 +235,6 @@ public interface PersistentDeque<T> extends Deque<T> {
    * @return element at bottom of deque; null if deque empty
    */
   T peekLast();
-
-  /**
-   * Inserts element at top of deque.
-   *
-   * @param value element to be inserted
-   * @return deque instance with new element at top of deque
-   */
-  PersistentBalancingDoubleListDeque<T> insertTop(T value);
-
-  /**
-   * Inserts element at bottom of deque.
-   *
-   * @param value element to be inserted
-   * @return deque instance with new element at bottom of deque
-   */
-  PersistentBalancingDoubleListDeque<T> insertBottom(T value);
-
-  /**
-   * Deletes element currently at top of deque.
-   *
-   * @return deque instance after top element has been removed
-   */
-  PersistentBalancingDoubleListDeque<T> deleteTop();
-
-  /**
-   * Deletes element currently at bottom of deque.
-   *
-   * @return deque instance after bottom element has been removed
-   */
-  PersistentBalancingDoubleListDeque<T> deleteBottom();
 
   /**
    * @throws UnsupportedOperationException Always.

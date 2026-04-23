@@ -48,7 +48,7 @@ public class PersistentBalancingDoubleListDequeTest {
   public void testEmptyDeque() {
     assertThat(emptyDeque.isEmpty()).isTrue();
 
-    assertThat(emptyDeque.getFirst()).isNull();
+    assertThat(emptyDeque.peekFirst()).isNull();
     assertThat(emptyDeque.getBottom()).isNull();
   }
 
@@ -69,7 +69,7 @@ public class PersistentBalancingDoubleListDequeTest {
   public void testFullDeque() {
     assertThat(fullDeque.isEmpty()).isFalse();
 
-    assertThat(fullDeque.getFirst()).isEqualTo(o1);
+    assertThat(fullDeque.peekFirst()).isEqualTo(o1);
     assertThat(fullDeque.getBottom()).isEqualTo(o4);
   }
 
@@ -96,7 +96,7 @@ public class PersistentBalancingDoubleListDequeTest {
   public void testDequeOfSize1() {
     assertThat(size1Deque.isEmpty()).isFalse();
 
-    assertThat(size1Deque.getFirst()).isEqualTo(o5);
+    assertThat(size1Deque.peekFirst()).isEqualTo(o5);
     assertThat(size1Deque.getBottom()).isEqualTo(o5);
   }
 }
