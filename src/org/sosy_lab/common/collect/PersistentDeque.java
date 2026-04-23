@@ -11,14 +11,15 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
-import javax.annotation.Nullable;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import javax.annotation.Nullable;
 
 /**
  * Interface for persistent deques. A persistent data structure is immutable, but provides cheap *
- * copy-and-write operations. Thus, all write operations will not modify the
- * current instance, but return a new instance instead.
+ * copy-and-write operations. Thus, all write operations will not modify the current instance, but
+ * return a new instance instead.
  *
  * @param <T> type of elements stored in deque
  */
@@ -31,6 +32,15 @@ public interface PersistentDeque<T> extends Deque<T> {
    * @return new, empty deque instance
    */
   PersistentDeque<T> empty();
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   * Replacement for {@link #add(Object)}.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndAdd(T t);
 
   /**
    * Returns a copy of the deque to which the provided element has been added in first place.
@@ -51,8 +61,35 @@ public interface PersistentDeque<T> extends Deque<T> {
   PersistentDeque<T> copyAndAddLast(T t);
 
   /**
-   * Returns a copy of this deque from which the first element has been removed or null if the deque is empty. Replacement for
-   * {@link #poll()}.
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   * Replacement for {@link #offer(Object)}.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndOffer(T t);
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in first place.
+   * Replacement for {@link #offerFirst(Object)}.
+   *
+   * @return copy of existing deque extended by new element in first place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndOfferFirst(T t);
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   * Replacement for {@link #offerLast(Object)}.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndOfferLast(T t);
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed or null if the deque
+   * is empty. Replacement for {@link #poll()}.
    *
    * @return copy of this deque from which the first element has been removed, null if deque empty
    */
@@ -61,8 +98,8 @@ public interface PersistentDeque<T> extends Deque<T> {
   PersistentDeque<T> copyAndPoll();
 
   /**
-   * Returns a copy of this deque from which the first element has been removed or null if the deque is empty. Replacement for
-   * {@link #pollFirst()}.
+   * Returns a copy of this deque from which the first element has been removed or null if the deque
+   * is empty. Replacement for {@link #pollFirst()}.
    *
    * @return copy of this deque from which the first element has been removed, null if deque empty
    */
@@ -71,8 +108,8 @@ public interface PersistentDeque<T> extends Deque<T> {
   PersistentDeque<T> copyAndPollFirst();
 
   /**
-   * Returns a copy of this deque from which the last element has been removed or null if the deque is empty. Replacement for
-   * {@link #pollLast()}.
+   * Returns a copy of this deque from which the last element has been removed or null if the deque
+   * is empty. Replacement for {@link #pollLast()}.
    *
    * @return copy of this deque from which the last element has been removed, null if deque empty
    */
@@ -84,6 +121,7 @@ public interface PersistentDeque<T> extends Deque<T> {
    * Returns a copy of this deque from which the first element has been removed. Replacement for
    * {@link #pop()}.
    *
+   * @throws NoSuchElementException if deque empty
    * @return copy of this deque from which the first element has been removed
    */
   @CheckReturnValue
@@ -93,6 +131,7 @@ public interface PersistentDeque<T> extends Deque<T> {
    * Returns a copy of this deque to which the provided object has been pushed onto the stack
    * represented by this deque. Replacement for {@link #push(Object)}.
    *
+   * @throws NullPointerException if provided object is null
    * @return copy of this deque to which the provided element has been added in first place
    */
   @CheckReturnValue
@@ -102,6 +141,7 @@ public interface PersistentDeque<T> extends Deque<T> {
    * Returns a copy of this deque from which the first element has been removed. Replacement for
    * {@link #remove()}.
    *
+   * @throws NoSuchElementException if deque empty
    * @return copy of this deque from which the first element has been removed
    */
   @CheckReturnValue
@@ -121,6 +161,7 @@ public interface PersistentDeque<T> extends Deque<T> {
    * Returns a copy of this deque from which the first element has been removed. Replacement for
    * {@link #removeFirst()}.
    *
+   * @throws NoSuchElementException if deque empty
    * @return copy of this deque from which the first element has been removed
    */
   @CheckReturnValue
@@ -140,6 +181,7 @@ public interface PersistentDeque<T> extends Deque<T> {
    * Returns a copy of this deque from which the last element has been removed. Replacement for
    * {@link #removeLast()}.
    *
+   * @throws NoSuchElementException if deque empty
    * @return copy of this deque from which the last element has been removed
    */
   @CheckReturnValue
@@ -181,6 +223,7 @@ public interface PersistentDeque<T> extends Deque<T> {
   /**
    * Retrieves element at top of deque.
    *
+   * @throws NoSuchElementException if deque empty
    * @return element at top of deque
    */
   T element();
@@ -204,6 +247,7 @@ public interface PersistentDeque<T> extends Deque<T> {
   /**
    * Retrieves element at top of deque.
    *
+   * @throws NoSuchElementException if deque empty
    * @return element at top of deque
    */
   T getFirst();
@@ -211,6 +255,7 @@ public interface PersistentDeque<T> extends Deque<T> {
   /**
    * Retrieves element at bottom of deque.
    *
+   * @throws NoSuchElementException if deque empty
    * @return element at bottom of deque
    */
   T getLast();
