@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
 
 /**
@@ -34,7 +35,8 @@ import javax.annotation.Nullable;
  * @param <T> type of elements to be stored in deque
  */
 @Immutable(containerOf = "T")
-public final class PersistentBalancingDoubleListDeque<T> implements PersistentDeque<T> {
+public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutableDeque<T>
+    implements PersistentDeque<T> {
   final PersistentLinkedList<T> top;
   final PersistentLinkedList<T> bottom;
 
@@ -56,7 +58,7 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
    */
   @SuppressWarnings({"unchecked"})
   @Override
-  public PersistentDeque<T> empty(){
+  public PersistentBalancingDoubleListDeque<T> empty() {
     return of();
   }
 
@@ -66,7 +68,7 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
    * @return new, empty deque instance
    */
   @SuppressWarnings("rawtypes")
-  public static PersistentBalancingDoubleListDeque of(){
+  public static PersistentBalancingDoubleListDeque of() {
     return new PersistentBalancingDoubleListDeque();
   }
 
@@ -81,6 +83,15 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
   }
 
   /**
+   * Retrieves element at top of deque or returns null in the case of an empty deque.
+   *
+   * @return element at top of deque; null if deque empty
+   */
+  public T peek() {
+    return peekFirst();
+  }
+
+  /**
    * Returns element at the top of the deque.
    *
    * @return element at top of deque; null if deque empty
@@ -92,14 +103,16 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
     // empty list throws an exception, so this needs to be caught. Further, the one element in
     // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
-      return top.head();
-    } catch (IllegalStateException e1) {
-      try {
+      if (!top.isEmpty()) {
+        return top.head();
+      } else if (!bottom.isEmpty()) {
         return bottom.head();
-      } catch (IllegalStateException e2) {
-        return null;
       }
+    } catch (IllegalStateException e) {
+      return null;
     }
+
+    return null;
   }
 
   /**
@@ -114,14 +127,26 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
     // empty list throws an exception, so this needs to be caught. Further, the one element in
     // the non-empty list should be returned, as it is both head and tail of the deque.
     try {
-      return bottom.head();
-    } catch (IllegalStateException e1) {
-      try {
+      if (!bottom.isEmpty()) {
+        return bottom.head();
+      } else if (!top.isEmpty()) {
         return top.head();
-      } catch (IllegalStateException e2) {
-        return null;
       }
+    } catch (IllegalStateException e) {
+      return null;
     }
+
+    return null;
+  }
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndAdd(T value) {
+    return copyAndAddLast(value);
   }
 
   /**
@@ -147,7 +172,109 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
   }
 
   /**
-   * Returns a copy of this deque from which the first element has been removed or null if the deque is empty.
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndOffer(T value) {
+    return copyAndOfferLast(value);
+  }
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in first place.
+   *
+   * @return copy of existing deque extended by new element in first place
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndOfferFirst(T value) {
+    return new PersistentBalancingDoubleListDeque<>(top.with(value), bottom);
+  }
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndOfferLast(T value) {
+    return new PersistentBalancingDoubleListDeque<>(top, bottom.with(value));
+  }
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return copy of this deque from which the first element has been removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemove() {
+    return copyAndRemoveFirst();
+  }
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return copy of this deque from which the first element has been removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveFirst() {
+    if (this.isEmpty()) {
+      throw new NoSuchElementException("Deque is empty!");
+    }
+
+    // top should only ever be empty if only one element in bottom or deque completely empty
+    try {
+      if (top.isEmpty()) {
+        return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
+      }
+      return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
+    } catch (IllegalStateException e) {
+      // should never be reached but to keep compiler happy
+      return this;
+    }
+  }
+
+  /**
+   * Returns a copy of this deque from which the last element has been removed.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return copy of this deque from which the last element has been removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveLast() {
+    if (this.isEmpty()) {
+      throw new NoSuchElementException("Deque is empty!");
+    }
+
+    // bottom should only ever be empty if only one element in top or deque completely empty
+    try {
+      if (bottom.isEmpty()) {
+        return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
+      }
+      return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
+    } catch (IllegalStateException e) {
+      // should never be reached but to keep compiler happy
+      return this;
+    }
+  }
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed or null if the deque
+   * is empty.
+   *
+   * @return copy of this deque from which the first element has been removed, null if deque empty
+   */
+  @Override
+  @Nullable
+  public PersistentBalancingDoubleListDeque<T> copyAndPoll() {
+    return copyAndPollFirst();
+  }
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed or null if the deque
+   * is empty.
    *
    * @return copy of this deque from which the first element has been removed, null if deque empty
    */
@@ -166,7 +293,8 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
   }
 
   /**
-   * Returns a copy of this deque from which the last element has been removed or null if the deque is empty.
+   * Returns a copy of this deque from which the last element has been removed or null if the deque
+   * is empty.
    *
    * @return copy of this deque from which the last element has been removed, null if deque empty
    */
@@ -182,6 +310,144 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
     } catch (IllegalStateException e) {
       return null;
     }
+  }
+
+  /**
+   * Retrieves element at top of deque.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return element at top of deque
+   */
+  @Override
+  public T getFirst() {
+    if (this.isEmpty()) {
+      throw new NoSuchElementException("Deque is empty!");
+    }
+
+    return peekFirst();
+  }
+
+  /**
+   * Retrieves element at bottom of deque.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return element at bottom of deque
+   */
+  @Override
+  public T getLast() {
+    if (this.isEmpty()) {
+      throw new NoSuchElementException("Deque is empty!");
+    }
+
+    return peekLast();
+  }
+
+  /**
+   * Returns a copy of this deque from which the first occurrence of the provided element has been
+   * removed.
+   *
+   * @return copy of this deque from which the first occurrence of the provided element has been
+   *     removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemove(T value) {
+    return copyAndRemoveFirstOccurrence(value);
+  }
+
+  /**
+   * Returns a copy of this deque from which the first occurrence of the provided element has been
+   * removed.
+   *
+   * @return copy of this deque from which the first occurrence of the provided element has been
+   *     removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveFirstOccurrence(T t) {
+    // TODO
+  }
+
+  /**
+   * Returns a copy of this deque from which the last occurrence of the provided element has been
+   * removed.
+   *
+   * @return copy of this deque from which the last occurrence of the provided element has been
+   *     removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveLastOccurrence(T t) {
+    // TODO
+  }
+
+  /**
+   * Retrieves element at top of deque.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return element at top of deque
+   */
+  public T element() {
+    return getFirst();
+  }
+
+  /**
+   * Returns a copy of this deque to which the provided object has been pushed onto the stack
+   * represented by this deque.
+   *
+   * @throws NullPointerException if provided object is null
+   * @return copy of this deque to which the provided element has been added in first place
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndPush(T value) {
+    return copyAndAddFirst(value);
+  }
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed.
+   *
+   * @throws NoSuchElementException if deque empty
+   * @return copy of this deque from which the first element has been removed
+   */
+  @Override
+  public PersistentBalancingDoubleListDeque<T> copyAndPop() {
+    return copyAndRemoveFirst();
+  }
+
+  /**
+   * Searches the deque for the provided object and returns true if it is found in the deque, false
+   * if not.
+   *
+   * @param o object to be searched for in the deque
+   * @return true if o in deque, false if not
+   */
+  public boolean contains(Object o) {
+    return (top.contains(o) | bottom.contains(o));
+  }
+
+  /**
+   * Calculates the no. of elements in the deque.
+   *
+   * @return no. of elements in deque
+   */
+  public int size() {
+    return top.size() + bottom.size();
+  }
+
+  /**
+   * Provides an iterator over all objects in the deque in proper sequence (from first to last).
+   *
+   * @return iterator over all objects in deque in proper sequence
+   */
+  public Iterator<T> iterator() {
+    // TODO
+  }
+
+  /**
+   * Provides an iterator over all objects in the deque in reverse sequential order (from last to
+   * first).
+   *
+   * @return iterator over all objects in deque in reverse sequential order
+   */
+  public Iterator<T> descendingIterator() {
+    // TODO
   }
 
   private PersistentBalancingDoubleListDeque<T> rebalanceDeque() {

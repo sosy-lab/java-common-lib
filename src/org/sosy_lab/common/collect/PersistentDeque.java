@@ -189,8 +189,7 @@ public interface PersistentDeque<T> extends Deque<T> {
 
   /**
    * Returns a copy of this deque from which the last occurrence of the provided element has been
-   * removed. Returns a copy of this deque from which the last occurrence of the provided element
-   * has been removed. Replacement for {@link #removeLastOccurrence(Object)}.
+   * removed. Replacement for {@link #removeLastOccurrence(Object)}.
    *
    * @return copy of this deque from which the last occurrence of the provided element has been
    *     removed
