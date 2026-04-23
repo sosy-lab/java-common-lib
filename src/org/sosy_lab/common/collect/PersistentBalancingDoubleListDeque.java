@@ -50,6 +50,27 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
   }
 
   /**
+   * Creates a new deque instance that is empty.
+   *
+   * @return new, empty deque instance
+   */
+  @SuppressWarnings({"unchecked"})
+  @Override
+  public PersistentDeque<T> empty(){
+    return of();
+  }
+
+  /**
+   * Creates a new deque instance that is empty.
+   *
+   * @return new, empty deque instance
+   */
+  @SuppressWarnings("rawtypes")
+  public static PersistentBalancingDoubleListDeque of(){
+    return new PersistentBalancingDoubleListDeque();
+  }
+
+  /**
    * Checks both sublists and returns true if both are empty, false if at least one is not.
    *
    * @return true if {@code top} and {@code bottom} are both empty, false if at least one is not
