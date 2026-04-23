@@ -43,7 +43,8 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
     bottom = PersistentLinkedList.of();
   }
 
-  private PersistentBalancingDoubleListDeque(PersistentLinkedList<T> top, PersistentLinkedList<T> bottom) {
+  private PersistentBalancingDoubleListDeque(
+      PersistentLinkedList<T> top, PersistentLinkedList<T> bottom) {
     this.top = top;
     this.bottom = bottom;
   }
@@ -65,7 +66,7 @@ public final class PersistentBalancingDoubleListDeque<T> implements PersistentDe
    */
   @Nullable
   @Override
-  public T getTop() {
+  public T getFirst() {
     // If deque contains only one element, one of the lists will be empty. Calling head() on an
     // empty list throws an exception, so this needs to be caught. Further, the one element in
     // the non-empty list should be returned, as it is both head and tail of the deque.
