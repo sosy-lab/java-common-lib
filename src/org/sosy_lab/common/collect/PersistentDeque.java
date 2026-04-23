@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -432,4 +433,49 @@ public interface PersistentDeque<T> extends Deque<T> {
   @Override
   @DoNotCall
   boolean removeLastOccurrence(Object o);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  boolean addAll(Collection<? extends T> c);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  void clear();
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  boolean containsAll(Collection<?> c);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  boolean removeAll(Collection<?> c);
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  boolean retainAll(Collection<?> c);
 }

@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
+import java.util.Collection;
 import java.util.Deque;
 
 @Immutable(containerOf = "T")
@@ -198,6 +199,61 @@ public abstract class AbstractImmutableDeque<T> implements Deque<T> {
   @Override
   @DoNotCall
   public final boolean removeLastOccurrence(Object o) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final boolean addAll(Collection<? extends T> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final void clear() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final boolean containsAll(Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final boolean removeAll(Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 }
