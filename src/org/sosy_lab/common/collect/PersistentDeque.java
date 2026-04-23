@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Deque;
@@ -23,6 +24,134 @@ import java.util.Iterator;
  */
 @Immutable(containerOf = "T")
 public interface PersistentDeque<T> extends Deque<T> {
+
+  /**
+   * Creates a new deque instance that is empty.
+   *
+   * @return new, empty deque instance
+   */
+  PersistentDeque<T> empty();
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in first place.
+   * Replacement for {@link #addFirst(Object)}.
+   *
+   * @return copy of existing deque extended by new element in first place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndAddFirst(T t);
+
+  /**
+   * Returns a copy of the deque to which the provided element has been added in last place.
+   * Replacement for {@link #addLast(Object)}.
+   *
+   * @return copy of existing deque extended by new element in last place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndAddLast(T t);
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * {@link #poll()}.
+   *
+   * @return copy of this deque from which the first element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndPoll();
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * {@link #pollFirst()}.
+   *
+   * @return copy of this deque from which the first element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndPollFirst();
+
+  /**
+   * Returns a copy of this deque from which the last element has been removed. Replacement for
+   * {@link #pollLast()}.
+   *
+   * @return copy of this deque from which the last element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndPollLast();
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * {@link #pop()}.
+   *
+   * @return copy of this deque from which the first element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndPop();
+
+  /**
+   * Returns a copy of this deque to which the provided object has been pushed onto the stack
+   * represented by this deque. Replacement for {@link #push(Object)}.
+   *
+   * @return copy of this deque to which the provided element has been added in first place
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndPush(T t);
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * {@link #remove()}.
+   *
+   * @return copy of this deque from which the first element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemove();
+
+  /**
+   * Returns a copy of this deque from which the first occurrence of the provided element has been
+   * removed. Replacement for {@link #remove(Object)}.
+   *
+   * @return copy of this deque from which the first occurrence of the provided element has been
+   *     removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemove(T t);
+
+  /**
+   * Returns a copy of this deque from which the first element has been removed. Replacement for
+   * {@link #removeFirst()}.
+   *
+   * @return copy of this deque from which the first element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemoveFirst();
+
+  /**
+   * Returns a copy of this deque from which the first occurrence of the provided element has been
+   * removed. Replacement for {@link #removeFirstOccurrence(Object)}.
+   *
+   * @return copy of this deque from which the first occurrence of the provided element has been
+   *     removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemoveFirstOccurrence(T t);
+
+  /**
+   * Returns a copy of this deque from which the last element has been removed. Replacement for
+   * {@link #removeLast()}.
+   *
+   * @return copy of this deque from which the last element has been removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemoveLast();
+
+  /**
+   * Returns a copy of this deque from which the last occurrence of the provided element has been
+   * removed. Returns a copy of this deque from which the last occurrence of the provided element
+   * has been removed. Replacement for {@link #removeLastOccurrence(Object)}.
+   *
+   * @return copy of this deque from which the last occurrence of the provided element has been
+   *     removed
+   */
+  @CheckReturnValue
+  PersistentDeque<T> copyAndRemoveLastOccurrence(T t);
 
   /**
    * Provides an iterator over all objects in the deque in reverse sequential order (from last to
