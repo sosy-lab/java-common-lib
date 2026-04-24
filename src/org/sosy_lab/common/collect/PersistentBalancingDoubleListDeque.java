@@ -362,8 +362,13 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
    *     removed
    */
   @Override
-  public PersistentBalancingDoubleListDeque<T> copyAndRemoveFirstOccurrence(T t) {
-    // TODO
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveFirstOccurrence(T value) {
+    // afaik without() will remove the first occurrence of the object
+    if (top.contains(value)) {
+      return new PersistentBalancingDoubleListDeque<>(top.without(value), bottom);
+    } else {
+      return new PersistentBalancingDoubleListDeque<>(top, bottom.without(value));
+    }
   }
 
   /**
@@ -374,8 +379,16 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
    *     removed
    */
   @Override
-  public PersistentBalancingDoubleListDeque<T> copyAndRemoveLastOccurrence(T t) {
-    // TODO
+  public PersistentBalancingDoubleListDeque<T> copyAndRemoveLastOccurrence(T value) {
+    // reverse deque; remove first occurrence; reverse again to have original order without object
+    PersistentBalancingDoubleListDeque<T> reversed = this.reversed();
+    reversed = reversed.copyAndRemoveFirstOccurrence(value);
+
+    return reversed.reversed();
+  }
+
+  private PersistentBalancingDoubleListDeque<T> reversed() {
+    return new PersistentBalancingDoubleListDeque<>(bottom, top);
   }
 
   /**
