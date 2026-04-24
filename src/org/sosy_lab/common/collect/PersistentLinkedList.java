@@ -152,18 +152,23 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns the value at the start of the list.
+   * Returns the value at the start of the list for non-empty lists.
    *
+   * @throws NoSuchElementException if the list is empty.
    * @return The value at the start of the list
    */
   public T head() {
-    checkState(!isEmpty());
-    return head;
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    } else {
+      return head;
+    }
   }
 
   /**
-   * Returns the remainder of the list without the first element.
+   * Returns the remainder of the list without the first element for non-empty lists.
    *
+   * @throws IllegalStateException if the list is empty.
    * @return The remainder of the list without the first element
    */
   public PersistentLinkedList<T> tail() {
