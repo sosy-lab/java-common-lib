@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -153,8 +152,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns the value at the start of the list for non-empty lists. A non-throwing version exists
-   * in {@link #headOptional()}.
+   * Returns the value at the start of the list for non-empty lists.
    *
    * @throws NoSuchElementException if the list is empty.
    * @return The value at the start of the list
@@ -168,19 +166,7 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   }
 
   /**
-   * Returns an {@link Optional} with the value at the start of the list for a non-empty list. Empty
-   * {@link Optional} else. Safe (non-throwing) version of {@link #head()}.
-   *
-   * @return {@link Optional} with the value at the start of the list for a non-empty list. Empty
-   *     {@link Optional} else.
-   */
-  public Optional<T> headOptional() {
-    return Optional.ofNullable(head);
-  }
-
-  /**
-   * Returns the remainder of the list without the first element for non-empty lists. A non-throwing
-   * version exists in {@link #tailOptional()}.
+   * Returns the remainder of the list without the first element for non-empty lists.
    *
    * @throws IllegalStateException if the list is empty.
    * @return The remainder of the list without the first element
@@ -188,17 +174,6 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
   public PersistentLinkedList<T> tail() {
     checkState(!isEmpty());
     return tail;
-  }
-
-  /**
-   * Returns an {@link Optional} with the remainder of the list without the first element for a
-   * non-empty list. Empty {@link Optional} else. Safe (non-throwing) version of {@link #tail()}.
-   *
-   * @return {@link Optional} with the remainder of the list without the first element for a
-   *     non-empty list. Empty {@link Optional} else.
-   */
-  public Optional<PersistentLinkedList<T>> tailOptional() {
-    return Optional.ofNullable(tail);
   }
 
   /**
