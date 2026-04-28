@@ -13,7 +13,6 @@ import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
 
@@ -199,50 +198,12 @@ public interface PersistentDeque<T> extends Deque<T> {
   PersistentDeque<T> copyAndRemoveLastOccurrence(T t);
 
   /**
-   * Provides an iterator over all objects in the deque in reverse sequential order (from last to
-   * first).
-   *
-   * @return iterator over all objects in deque in reverse sequential order
-   */
-  Iterator<T> descendingIterator();
-
-  /**
-   * Provides an iterator over all objects in the deque in proper sequence (from first to last).
-   *
-   * @return iterator over all objects in deque in proper sequence
-   */
-  Iterator<T> iterator();
-
-  /**
-   * Calculates the no. of elements in the deque.
-   *
-   * @return no. of elements in deque
-   */
-  int size();
-
-  /**
    * Retrieves element at top of deque.
    *
    * @throws NoSuchElementException if deque empty
    * @return element at top of deque
    */
   T element();
-
-  /**
-   * Searches the deque for the provided object and returns true if it is found in the deque, false
-   * if not.
-   *
-   * @param o object to be searched for in the deque
-   * @return true if o in deque, false if not
-   */
-  boolean contains(Object o);
-
-  /**
-   * Returns true if deque is empty, false if not.
-   *
-   * @return true if deque empty, else false
-   */
-  boolean isEmpty();
 
   /**
    * Retrieves element at top of deque.
