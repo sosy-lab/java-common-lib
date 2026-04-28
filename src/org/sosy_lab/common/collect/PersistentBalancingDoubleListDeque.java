@@ -445,6 +445,17 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
     // TODO
   }
 
+  /**
+   * Due to the two-list structure of this deque, adding and removing elements can quickly lead to
+   * one of the lists being empty while the other still contains multiple elements. To prevent this,
+   * this method is called after each remove or insert operation to even out the two lists if
+   * necessary. If one list is empty while the other contains at least two elements, the elements in
+   * the latter will be redistributed so both lists are (almost) the same size while still
+   * maintaining their original order (this is what split() does).
+   *
+   * @return deque with the same elements in the same order, but evenly distributed between both the
+   *     top and bottom list
+   */
   private PersistentBalancingDoubleListDeque<T> rebalanceDeque() {
     boolean topEmpty = top.isEmpty();
     boolean bottomEmpty = bottom.isEmpty();
