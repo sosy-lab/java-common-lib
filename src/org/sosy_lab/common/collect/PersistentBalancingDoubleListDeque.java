@@ -432,7 +432,7 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
    * @return iterator over all objects in deque in proper sequence
    */
   public Iterator<T> iterator() {
-    // TODO
+    return new DequeIterator(top, bottom.reversed());
   }
 
   /**
@@ -442,7 +442,7 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
    * @return iterator over all objects in deque in reverse sequential order
    */
   public Iterator<T> descendingIterator() {
-    // TODO
+    return new DequeIterator(bottom, top.reversed());
   }
 
   /**
@@ -495,5 +495,28 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
     }
     newTop = newTop.reversed();
     return new PersistentBalancingDoubleListDeque<>(newTop, newBottom);
+  }
+
+  private class DequeIterator implements Iterator<T> {
+    Iterator<T> topIterator;
+    Iterator<T> bottomIterator;
+
+    protected DequeIterator(PersistentLinkedList<T> top, PersistentLinkedList<T> bottom) {
+      topIterator = top.iterator();
+      bottomIterator = bottom.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return (topIterator.hasNext() || bottomIterator.hasNext());
+    }
+
+    @Override
+    public T next() {
+      if (topIterator.hasNext()) {
+        return topIterator.next();
+      }
+      return bottomIterator.next();
+    }
   }
 }
