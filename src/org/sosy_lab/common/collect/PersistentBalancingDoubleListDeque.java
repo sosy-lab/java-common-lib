@@ -219,17 +219,11 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
     if (this.isEmpty()) {
       throw new NoSuchElementException("Deque is empty!");
     }
-
     // top should only ever be empty if only one element in bottom or deque completely empty
-    try {
-      if (top.isEmpty()) {
-        return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
-      }
-      return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
-    } catch (IllegalStateException e) {
-      // should never be reached but to keep compiler happy
-      return this;
+    if (top.isEmpty()) {
+      return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
     }
+    return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
   }
 
   /**
@@ -243,17 +237,11 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
     if (this.isEmpty()) {
       throw new NoSuchElementException("Deque is empty!");
     }
-
     // bottom should only ever be empty if only one element in top or deque completely empty
-    try {
-      if (bottom.isEmpty()) {
-        return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
-      }
-      return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
-    } catch (IllegalStateException e) {
-      // should never be reached but to keep compiler happy
-      return this;
+    if (bottom.isEmpty()) {
+      return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
     }
+    return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
   }
 
   /**
@@ -277,15 +265,14 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
   @Override
   @Nullable
   public PersistentBalancingDoubleListDeque<T> copyAndPollFirst() {
-    // top should only ever be empty if only one element in bottom or deque completely empty
-    try {
-      if (top.isEmpty()) {
-        return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
-      }
-      return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
-    } catch (IllegalStateException e) {
+    if (isEmpty()) {
       return null;
     }
+    // top should only ever be empty if only one element in bottom or deque completely empty
+    if (top.isEmpty()) {
+      return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
+    }
+    return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
   }
 
   /**
@@ -297,15 +284,14 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
   @Override
   @Nullable
   public PersistentBalancingDoubleListDeque<T> copyAndPollLast() {
-    // bottom should only ever be empty if only one element in top or deque completely empty
-    try {
-      if (bottom.isEmpty()) {
-        return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
-      }
-      return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
-    } catch (IllegalStateException e) {
+    if (isEmpty()) {
       return null;
     }
+    // bottom should only ever be empty if only one element in top or deque completely empty
+    if (bottom.isEmpty()) {
+      return new PersistentBalancingDoubleListDeque<>(top.tail(), bottom).rebalanceDeque();
+    }
+    return new PersistentBalancingDoubleListDeque<>(top, bottom.tail()).rebalanceDeque();
   }
 
   /**
