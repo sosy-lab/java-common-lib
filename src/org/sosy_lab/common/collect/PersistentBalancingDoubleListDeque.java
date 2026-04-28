@@ -100,16 +100,14 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
   @Override
   public T peekFirst() {
     // If deque contains only one element, one of the lists will be empty. Calling head() on an
-    // empty list throws an exception, so this needs to be caught. Further, the one element in
+    // empty list throws an exception, which is why we check first with isEmpty(). Further, the one
+    // element in
     // the non-empty list should be returned, as it is both head and tail of the deque.
-    try {
-      if (!top.isEmpty()) {
-        return top.head();
-      } else if (!bottom.isEmpty()) {
-        return bottom.head();
-      }
-    } catch (IllegalStateException e) {
-      return null;
+
+    if (!top.isEmpty()) {
+      return top.head();
+    } else if (!bottom.isEmpty()) {
+      return bottom.head();
     }
 
     return null;
@@ -124,16 +122,14 @@ public final class PersistentBalancingDoubleListDeque<T> extends AbstractImmutab
   @Override
   public T peekLast() {
     // If deque contains only one element, one of the lists will be empty. Calling head() on an
-    // empty list throws an exception, so this needs to be caught. Further, the one element in
+    // empty list throws an exception, which is why we check first with isEmpty(). Further, the one
+    // element in
     // the non-empty list should be returned, as it is both head and tail of the deque.
-    try {
-      if (!bottom.isEmpty()) {
-        return bottom.head();
-      } else if (!top.isEmpty()) {
-        return top.head();
-      }
-    } catch (IllegalStateException e) {
-      return null;
+
+    if (!bottom.isEmpty()) {
+      return bottom.head();
+    } else if (!top.isEmpty()) {
+      return top.head();
     }
 
     return null;
