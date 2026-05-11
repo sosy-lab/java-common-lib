@@ -78,20 +78,20 @@ build:jdk-25:
   interruptible: true
 
 
-.build-project-ecj: &build-project-ecj
+.build-ecj: &build-ecj
   <<: *source_check
   script: "ant $ANT_PROPS_BUILD build-project-ecj"
 
-build-project-ecj:jdk-17:
-  <<: *build-project-ecj
+build-ecj:jdk-17:
+  <<: *build-ecj
   image: ${CI_REGISTRY_IMAGE}/test:jdk-17
 
-build-project-ecj:jdk-21:
-  <<: *build-project-ecj
+build-ecj:jdk-21:
+  <<: *build-ecj
   image: ${CI_REGISTRY_IMAGE}/test:jdk-21
 
-build-project-ecj:jdk-25:
-  <<: *build-project-ecj
+build-ecj:jdk-25:
+  <<: *build-ecj
   image: ${CI_REGISTRY_IMAGE}/test:jdk-25
 
 
@@ -200,7 +200,7 @@ reuse:
   dependencies: []
   needs: []
   image:
-    name: fsfe/reuse:3
+    name: fsfe/reuse:6
     entrypoint: [""]
   script:
     - reuse lint
@@ -225,18 +225,18 @@ deploy-gh-pages:
 
 
 # Build container images
-# following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 .build-docker:
   stage: images
   image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
+    name: quay.io/podman/stable
   variables:
-    EXTRA_ARGS: ""
+    BUILD_CONTEXT: "-"
+  before_script:
+    - podman login "$CI_REGISTRY" --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD"
   script:
-    - mkdir -p /root/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE$IMAGE $EXTRA_ARGS
+    - echo "Building $CI_REGISTRY_IMAGE/$IMAGE from $DOCKERFILE"
+    - podman build --pull -t $CI_REGISTRY_IMAGE/$IMAGE $BUILD_CONTEXT < $CI_PROJECT_DIR/$DOCKERFILE
+    - podman push $CI_REGISTRY_IMAGE/$IMAGE
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
