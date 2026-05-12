@@ -734,7 +734,8 @@ public final class PathCopyingPersistentAvlTreeMap<
 
   private static <K, V> Node<K, V> rebuildTrinode(Node<K, V> a, Node<K, V> b, Node<K, V> c,
                                                   @Nullable Node<K, V> t0, @Nullable Node<K, V> t1,
-                                                  @Nullable Node<K, V> t2, @Nullable Node<K, V> t3) {
+                                                  @Nullable Node<K, V> t2,
+                                                  @Nullable Node<K, V> t3) {
     Node<K, V> newA = new Node<>(a.getKey(), a.getValue(), t0, t1);
     Node<K, V> newC = new Node<>(c.getKey(), c.getValue(), t2, t3);
 
