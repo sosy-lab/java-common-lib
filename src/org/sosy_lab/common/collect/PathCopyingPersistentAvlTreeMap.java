@@ -148,8 +148,8 @@ public final class PathCopyingPersistentAvlTreeMap<
 
   /**
    * Return a {@link Collector} that accumulates elements into a {@link
-   * PathCopyingPersistentAvlTreeMap}. Keys and values are the result of the respective functions. If
-   * duplicate keys appear, the collector throws an {@link IllegalArgumentException}.
+   * PathCopyingPersistentAvlTreeMap}. Keys and values are the result of the respective functions.
+   * If duplicate keys appear, the collector throws an {@link IllegalArgumentException}.
    */
   public static <T, K extends Comparable<? super K>, V extends @Nullable Object>
   Collector<T, ?, PersistentSortedMap<K, V>> toPathCopyingPersistentAvlTreeMap(
@@ -656,10 +656,10 @@ public final class PathCopyingPersistentAvlTreeMap<
     Node<K, V> c;
 
     // Subtrees of the three nodes involved
-    Node<K, V> T0;
-    Node<K, V> T1;
-    Node<K, V> T2;
-    Node<K, V> T3;
+    Node<K, V> t0;
+    Node<K, V> t1;
+    Node<K, V> t2;
+    Node<K, V> t3;
 
     // Check if node is left-heavy or right-heavy
     if (Node.getBalanceFactor(z) > 1) {
@@ -670,10 +670,10 @@ public final class PathCopyingPersistentAvlTreeMap<
         y = z.left;
         x = y.left;
 
-        T0 = x.left;
-        T1 = x.right;
-        T2 = y.right;
-        T3 = z.right;
+        t0 = x.left;
+        t1 = x.right;
+        t2 = y.right;
+        t3 = z.right;
 
         a = x;
         b = y;
@@ -685,10 +685,10 @@ public final class PathCopyingPersistentAvlTreeMap<
         y = z.left;
         x = y.right;
 
-        T0 = y.left;
-        T1 = x.left;
-        T2 = x.right;
-        T3 = z.right;
+        t0 = y.left;
+        t1 = x.left;
+        t2 = x.right;
+        t3 = z.right;
 
         a = y;
         b = x;
@@ -703,10 +703,10 @@ public final class PathCopyingPersistentAvlTreeMap<
         y = z.right;
         x = y.left;
 
-        T0 = z.left;
-        T1 = x.left;
-        T2 = x.right;
-        T3 = y.right;
+        t0 = z.left;
+        t1 = x.left;
+        t2 = x.right;
+        t3 = y.right;
 
         a = z;
         b = x;
@@ -718,10 +718,10 @@ public final class PathCopyingPersistentAvlTreeMap<
         y = z.right;
         x = y.right;
 
-        T0 = z.left;
-        T1 = y.left;
-        T2 = x.left;
-        T3 = x.right;
+        t0 = z.left;
+        t1 = y.left;
+        t2 = x.left;
+        t3 = x.right;
 
         a = z;
         b = y;
@@ -729,14 +729,14 @@ public final class PathCopyingPersistentAvlTreeMap<
       }
     }
 
-    return rebuildTrinode(a, b, c, T0, T1, T2, T3);
+    return rebuildTrinode(a, b, c, t0, t1, t2, t3);
   }
 
   private static <K, V> Node<K, V> rebuildTrinode(Node<K, V> a, Node<K, V> b, Node<K, V> c,
                                                   @Nullable Node<K, V> T0, @Nullable Node<K, V> T1,
                                                   @Nullable Node<K, V> T2, @Nullable Node<K, V> T3) {
-    Node <K, V> newA = new Node<>(a.getKey(), a.getValue(), T0, T1);
-    Node <K, V> newC = new Node<>(c.getKey(), c.getValue(), T2, T3);
+    Node<K, V> newA = new Node<>(a.getKey(), a.getValue(), T0, T1);
+    Node<K, V> newC = new Node<>(c.getKey(), c.getValue(), T2, T3);
 
     return new Node<>(b.getKey(), b.getValue(), newA, newC);
   }
