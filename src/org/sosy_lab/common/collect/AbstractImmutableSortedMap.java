@@ -22,6 +22,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 abstract sealed class AbstractImmutableSortedMap<K, V extends @Nullable Object>
     extends AbstractImmutableMap<K, V> implements OurSortedMap<K, V>
     permits OurSortedMap.EmptyImmutableOurSortedMap,
+        PathCopyingPersistentAvlTreeMap,
+        PathCopyingPersistentAvlTreeMap.PartialSortedMap,
         PathCopyingPersistentTreeMap,
         PathCopyingPersistentTreeMap.PartialSortedMap {
 
