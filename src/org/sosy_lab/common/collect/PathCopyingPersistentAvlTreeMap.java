@@ -533,8 +533,6 @@ public final class PathCopyingPersistentAvlTreeMap<
       // recursively descent left child of current node
       Node<K, V> newLeft = removeAndCopy0(key, current.left);
       current = current.withLeftChild(newLeft);
-
-
     } else {
       // Target key is greater than or equal to current key
 
@@ -548,7 +546,6 @@ public final class PathCopyingPersistentAvlTreeMap<
         // recursively descent right child of current node
         Node<K, V> newRight = removeAndCopy0(key, current.right);
         current = current.withRightChild(newRight);
-        return rebalance(current);
       }
 
       if (comp == 0) {
