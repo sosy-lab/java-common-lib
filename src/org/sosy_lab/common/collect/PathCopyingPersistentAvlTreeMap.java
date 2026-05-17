@@ -91,8 +91,8 @@ public final class PathCopyingPersistentAvlTreeMap<
       return n == null ? -1 : n.height;
     }
 
-    static byte getBalanceFactor(Node<?, ?> n) {
-      return (byte) (getHeight(n.left) - getHeight(n.right));
+    static int getBalanceFactor(Node<?, ?> n) {
+      return (getHeight(n.left) - getHeight(n.right));
     }
 
     // Methods used for path copying
