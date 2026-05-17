@@ -439,7 +439,9 @@ public final class PathCopyingPersistentAvlTreeMap<
             + "right height: %s", current.getKey(), Node.getHeight(current),leftHeight,
         rightHeight);
     checkState(Node.getHeight(current) == 1 + Math.max(leftHeight,
-        rightHeight));
+        rightHeight), "Wrong height at key %s: stored=%s, expected=%s, " +
+        "leftHeight=%s, rightHeight=%s", current.getKey(),
+        Node.getHeight(current), 1 + Math.max(leftHeight, rightHeight), leftHeight, rightHeight);
 
     return Node.getHeight(current);
   }
