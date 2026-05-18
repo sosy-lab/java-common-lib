@@ -41,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * This is an implementation of {@link PersistentSortedMap} that is based on the Adelson-Velsky and
  * Landis (AVL) tree and bottom-up path copying for copy-efficient persistency.
+ *
  * <p>
  * TODO: Finish documentation
  * It reuses structures of {@link PathCopyingPersistentTreeMap} that do not depend on...
@@ -436,11 +437,11 @@ public final class PathCopyingPersistentAvlTreeMap<
     // Check AVL invariants
     checkState(Math.abs(leftHeight - rightHeight) <= 1,
         "AVL imbalance at key %s: stored height: %s, left height: %s, "
-            + "right height: %s", current.getKey(), Node.getHeight(current),leftHeight,
+            + "right height: %s", current.getKey(), Node.getHeight(current), leftHeight,
         rightHeight);
     checkState(Node.getHeight(current) == 1 + Math.max(leftHeight,
-        rightHeight), "Wrong height at key %s: stored=%s, expected=%s, " +
-        "leftHeight=%s, rightHeight=%s", current.getKey(),
+        rightHeight), "Wrong height at key %s: stored=%s, expected=%s, "
+            + "leftHeight=%s, rightHeight=%s", current.getKey(),
         Node.getHeight(current), 1 + Math.max(leftHeight, rightHeight), leftHeight, rightHeight);
 
     return Node.getHeight(current);
