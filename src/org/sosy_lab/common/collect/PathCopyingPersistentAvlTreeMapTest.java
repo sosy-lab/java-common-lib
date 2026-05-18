@@ -67,6 +67,8 @@ public class PathCopyingPersistentAvlTreeMapTest {
   }
 
   private @Nullable PersistentSortedMap<String, String> map;
+  private @Nullable PersistentSortedMap<String, String> llrb;
+  private @Nullable NavigableMap<String, String> reference;
 
   @Before
   public void setUp() {
@@ -358,6 +360,68 @@ public class PathCopyingPersistentAvlTreeMapTest {
     testEmpty();
   }
 
+  @Test
+  public void checkEquivalentBehavior() {
+    int iterations = 100;
+    Random rnd = new Random(3987432434L); // static seed for reproducibility
+    map = PathCopyingPersistentAvlTreeMap.of();
+    llrb = PathCopyingPersistentTreeMap.of();
+    reference = new TreeMap<>();
+
+    // Insert nodes
+    for (int i = 0; i < iterations; i++) {
+      String key = Integer.toString(rnd.nextInt());
+      String value = Integer.toString(rnd.nextInt());
+
+      putAll(key, value);
+      assertEquivalence(rnd);
+    }
+
+    // random put/remove operations
+    for (int i = 0; i < iterations; i++) {
+      String key = Integer.toString(rnd.nextInt());
+
+      if (rnd.nextBoolean()) {
+        String value = Integer.toString(rnd.nextInt());
+
+        putAll(key, value);
+      } else {
+        removeAll(key);
+      }
+      assertEquivalence(rnd);
+    }
+
+    // clear map
+    while (!map.isEmpty()) {
+      boolean removeFirst = rnd.nextBoolean();
+      String key = removeFirst ? map.firstKey() : map.lastKey();
+
+      removeAll(key);
+      assertEquivalence(rnd);
+    }
+    testEmpty();
+  }
+
+  private void putAll(String key, String value) {
+    map = map.putAndCopy(key, value);
+    llrb = llrb.putAndCopy(key, value);
+    reference.put(key, value);
+  }
+
+  private void removeAll(String key) {
+    map = map.removeAndCopy(key);
+    llrb = llrb.removeAndCopy(key);
+    reference.remove(key);
+  }
+
+  private void assertEquivalence(Random rnd) {
+    checkEqualTo(llrb, map);
+    checkEqualTo(reference, map);
+    checkPartialMaps(llrb, rnd);
+
+    ((PathCopyingPersistentAvlTreeMap<?, ?>) map).checkAssertions();
+    ((PathCopyingPersistentTreeMap<?, ?>) llrb).checkAssertions();
+  }
 
   private void checkPartialMaps(NavigableMap<String, String> comparison, Random rnd) {
     String key1 = Integer.toString(rnd.nextInt());
