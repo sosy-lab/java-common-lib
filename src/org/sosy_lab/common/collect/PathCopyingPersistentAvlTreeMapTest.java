@@ -364,7 +364,8 @@ public class PathCopyingPersistentAvlTreeMapTest {
   public void checkEquivalentBehavior() {
     int iterations = 100;
     Random rnd = new Random(3987432434L); // static seed for reproducibility
-    map = PathCopyingPersistentAvlTreeMap.of();
+
+    // Setup
     llrb = PathCopyingPersistentTreeMap.of();
     reference = new TreeMap<>();
 
@@ -400,6 +401,10 @@ public class PathCopyingPersistentAvlTreeMapTest {
       assertEquivalence(rnd);
     }
     testEmpty();
+
+    // Teardown
+    llrb = null;
+    reference = null;
   }
 
   private void putAll(String key, String value) {
