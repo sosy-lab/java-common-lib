@@ -201,7 +201,7 @@ public interface LogManager {
   /**
    * Return a LogManager implementation intended for testing when nothing should actually be logged.
    *
-   * <p>Compared to {@link #createTestLogManager()}, it does check all the parameters for validity,
+   * <p>Compared to {@link #createNullLogManager()}, it does check all the parameters for validity,
    * i.e. non-nullness and correct string format.
    */
   @SuppressWarnings("deprecation")
