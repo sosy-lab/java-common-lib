@@ -70,11 +70,18 @@ build:jdk-25:
   stage: checks
   interruptible: true
 
-# For checks that only need the source code, not the binaries
+# For checks that only need build-dependencies and the source code, not the binaries
 .source_check: &source_check
   stage: checks
   needs:
     - build-dependencies
+  interruptible: true
+
+# For checks that only need the source, not even build-dependencies
+.check_without_dependencies:
+  stage: checks
+  dependencies: []
+  needs: []
   interruptible: true
 
 
@@ -170,12 +177,14 @@ unit-tests:jdk-25:
 refaster:
   <<: *source_check
   image: ${CI_REGISTRY_IMAGE}/test:jdk-21
+  variables:
+    REFASTER_SOURCE_PATTERN: "**/*.java"
   before_script:
     - 'test -d refaster || git clone https://gitlab.com/sosy-lab/software/refaster.git'
     - 'cd refaster'
     - 'git fetch'
     - 'git checkout $REFASTER_REPO_REVISION'
-    - 'ant build-refaster-rule -Drefaster.source.pattern=**/*.java -Drefaster.rule.file=../rule.refaster -Derrorprone.version=$REFASTER_VERSION'
+    - 'ant build-refaster-rule -Drefaster.source.pattern=$REFASTER_SOURCE_PATTERN -Drefaster.rule.file=../rule.refaster -Derrorprone.version=$REFASTER_VERSION'
     - 'cd -'
   script:
     - 'ant $ANT_PROPS_BUILD refaster -Drefaster.rule.file=rule.refaster'
@@ -196,9 +205,7 @@ refaster:
 
 # check license declarations etc.
 reuse:
-  stage: checks
-  dependencies: []
-  needs: []
+  extends: .check_without_dependencies
   image:
     name: fsfe/reuse:6
     entrypoint: [""]
@@ -231,12 +238,14 @@ deploy-gh-pages:
     name: quay.io/podman/stable
   variables:
     BUILD_CONTEXT: "-"
+  tags:
+    - podman
   before_script:
     - podman login "$CI_REGISTRY" --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD"
   script:
-    - echo "Building $CI_REGISTRY_IMAGE/$IMAGE from $DOCKERFILE"
-    - podman build --pull -t $CI_REGISTRY_IMAGE/$IMAGE $BUILD_CONTEXT < $CI_PROJECT_DIR/$DOCKERFILE
-    - podman push $CI_REGISTRY_IMAGE/$IMAGE
+    - echo "Building $CI_REGISTRY_IMAGE$IMAGE from $DOCKERFILE"
+    - podman build --pull -t $CI_REGISTRY_IMAGE$IMAGE $BUILD_CONTEXT -f - < $DOCKERFILE
+    - podman push $CI_REGISTRY_IMAGE$IMAGE
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
@@ -245,16 +254,16 @@ build-docker:test:jdk-17:
   extends: .build-docker
   variables:
     DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-17
-    IMAGE: test:jdk-17
+    IMAGE: /test:jdk-17
 
 build-docker:test:jdk-21:
   extends: .build-docker
   variables:
     DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-21
-    IMAGE: test:jdk-21
+    IMAGE: /test:jdk-21
 
 build-docker:test:jdk-25:
   extends: .build-docker
   variables:
     DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-25
-    IMAGE: test:jdk-25
+    IMAGE: /test:jdk-25
