@@ -66,9 +66,18 @@ build:jdk-25:
 
 
 # For checks that need the binaries
-.binary_check: &binary_check
+.check-binaries: &binary_check
   stage: checks
   interruptible: true
+
+.check-binaries-default-jdk:
+  extends: .check-binaries
+  dependencies:
+    - build-dependencies
+    - build:jdk-17
+  needs:
+    - build-dependencies
+    - build:jdk-17
 
 # For checks that only need build-dependencies and the source code, not the binaries
 .source_check: &source_check
@@ -78,7 +87,7 @@ build:jdk-25:
   interruptible: true
 
 # For checks that only need the source, not even build-dependencies
-.check_without_dependencies:
+.check-without-dependencies:
   stage: checks
   dependencies: []
   needs: []
@@ -118,23 +127,17 @@ checkstyle:
     when: on_failure
 
 javadoc:
-  <<: *binary_check
+  extends: .check-binaries-default-jdk
   script: "ant $ANT_PROPS_CHECKS javadoc"
-  needs:
-    - build-dependencies
-    - build:jdk-17
   artifacts:
     paths:
       - "Javadoc/"
 
 spotbugs:
-  <<: *binary_check
+  extends: .check-binaries-default-jdk
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'test \! -f SpotBugs.html'
-  needs:
-    - build-dependencies
-    - build:jdk-17
   artifacts:
     paths:
       - "SpotBugs.html"
@@ -205,7 +208,7 @@ refaster:
 
 # check license declarations etc.
 reuse:
-  extends: .check_without_dependencies
+  extends: .check-without-dependencies
   image:
     name: fsfe/reuse:6
     entrypoint: [""]
