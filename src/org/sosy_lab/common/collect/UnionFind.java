@@ -14,7 +14,7 @@ public interface UnionFind {
   <T> T find(T e);
   <T> void union(T e1, T e2);
 
-  UnionFind getEmptyUnionFind();
+  UnionFind getEmptyInstanceOf();
   void addSetOfSets(Set set);
   <T> void addElementToNewSet(T e);
   Set getAllSubsets();
