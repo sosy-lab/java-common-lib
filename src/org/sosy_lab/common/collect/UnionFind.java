@@ -8,11 +8,9 @@
 
 package org.sosy_lab.common.collect;
 
-public interface MutableUnionFind {
+public interface UnionFind {
   Object find(Object o);
   void union(Object o1, Object o2);
-  void addNew(Object o);
-  void addTo(Object o, Object root);
 }
 
 //possibly extend Set or Collection
