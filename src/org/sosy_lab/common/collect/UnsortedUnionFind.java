@@ -9,10 +9,11 @@
 package org.sosy_lab.common.collect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MutableUnionFind implements UnionFind {
+public class UnsortedUnionFind implements UnionFind {
 
   /*
    * CURRENT PROBLEMS:
@@ -23,11 +24,11 @@ public class MutableUnionFind implements UnionFind {
    * - addSetOfSets might be dangerous as it relies on user providing set with the correct type of values
    * - was trying to make one class work for both sorted and unsorted (defined by type of set user provides) but it's looking like they're going to be separate and this will be unsorted
    */
-  private HashSet setOfSets;
+  private HashSet setOfMaps;
   private ArrayList canonicalElements;
 
-  private MutableUnionFind() {
-    setOfSets = new HashSet<>();
+  private UnsortedUnionFind() {
+    setOfMaps = new HashSet<>();
     canonicalElements = new ArrayList<>();
   }
 
@@ -43,7 +44,7 @@ public class MutableUnionFind implements UnionFind {
 
   @Override
   public UnionFind getEmptyInstanceOf() {
-    return new MutableUnionFind();
+    return new UnsortedUnionFind();
   }
 
   @Override
@@ -54,16 +55,16 @@ public class MutableUnionFind implements UnionFind {
 
   @Override
   public <T> void addElementToNewSet(T e) {
-    //TODO
-    HashSet<T> newSet = new HashSet<>();
-    newSet.add(e);
+    //TODO check whether new element already in structure and handle case where it is
+    HashMap<T,T> newMap = new HashMap<>();
+    newMap.put(e, e);
 
-    setOfSets.add(newSet);
+    setOfMaps.add(newMap);
     canonicalElements.add(e);
   }
 
   @Override
   public Set getAllSubsets() {
-    return setOfSets;
+    return setOfMaps;
   }
 }
