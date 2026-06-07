@@ -8,9 +8,14 @@
 
 package org.sosy_lab.common.collect;
 
-public interface UnionFind {
-  Object find(Object o);
-  void union(Object o1, Object o2);
-}
+import java.util.Set;
 
-//possibly extend Set or Collection
+public interface UnionFind {
+  <T> T find(T e);
+  <T> void union(T e1, T e2);
+
+  UnionFind getEmptyUnionFind();
+  void addSetOfSets(Set set);
+  <T> void addElementToNewSet(T e);
+  Set getAllSubsets();
+}
