@@ -49,6 +49,6 @@ public class MutableUnionFind implements UnionFind {
 
   @Override
   public Set getAllSubsets() {
-    //TODO
+    return setOfSets;
   }
 }
