@@ -27,14 +27,25 @@ public class UnsortedUnionFind implements UnionFind {
   private HashSet setOfMaps;
   private ArrayList canonicalElements;
 
-  private UnsortedUnionFind() {
-    setOfMaps = new HashSet<>();
-    canonicalElements = new ArrayList<>();
+  private <T> UnsortedUnionFind() {
+    setOfMaps = new HashSet<HashMap<T,T>>();
+    canonicalElements = new ArrayList<T>();
   }
 
   @Override
   public <T> T find(T e) {
     //TODO
+
+    for(HashMap s : setOfMaps){
+      if(s.containsValue(e)) {
+        Set keySet = s.keySet();
+        if(keySet.size() >= 2) {
+          //error as not all elements of set mapped to same canonical element
+        } else {
+          return keySet.iterator().next();
+        }
+      }
+    }
   }
 
   @Override
@@ -49,8 +60,8 @@ public class UnsortedUnionFind implements UnionFind {
 
   @Override
   public void addSetOfSets(Set set) {
-    //TODO
-    //problem: extracting canonical elements to add to canonicalElements with current HashSet situation
+    //TODO currently laid out for set of sets instead of set of maps
+    //problem: extracting canonical elements to add to canonicalElements --> could call keySet() on each Map
   }
 
   @Override
