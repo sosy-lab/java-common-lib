@@ -114,8 +114,9 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
   @Override
   public void addSetOfSets(Set set) {
     // TODO currently laid out for set of sets instead of set of maps
-    // problem: extracting canonical elements to add to canonicalElements --> could call keySet() on
-    // each Map
+    // could take set of HashMaps and call addNewSet() on each map
+    // problem: would need to specify type more clearly here but then won't override interface (but
+    // also can't alter type in interface as it wouldn't be generally applicable anymore)
   }
 
   @Override
@@ -134,7 +135,7 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
   }
 
   @Override
-  public Set getAllSubsets() {
+  public Set<HashMap<T, T>> getAllSubsets() {
     return setOfMaps;
   }
 
