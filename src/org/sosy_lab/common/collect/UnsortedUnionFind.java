@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UnsortedUnionFind <T> implements UnionFind <T> {
+public class UnsortedUnionFind<T> implements UnionFind<T> {
 
   /*
    * CURRENT PROBLEMS:
@@ -23,8 +23,8 @@ public class UnsortedUnionFind <T> implements UnionFind <T> {
    * - addSetOfSets might be dangerous as it relies on user providing set with the correct type of values
    * - was trying to make one class work for both sorted and unsorted (defined by type of set user provides) but it's looking like they're going to be separate and this will be unsorted
    */
-  private HashSet<HashMap<T,T>> setOfMaps;
-  private ArrayList<T> canonicalElements; //TODO remove if continues to be unnecessary
+  private HashSet<HashMap<T, T>> setOfMaps;
+  private ArrayList<T> canonicalElements; // TODO remove if continues to be unnecessary
 
   private UnsortedUnionFind() {
     setOfMaps = new HashSet<>();
@@ -33,13 +33,13 @@ public class UnsortedUnionFind <T> implements UnionFind <T> {
 
   @Override
   public T find(T e) {
-    //TODO handle edge cases
+    // TODO handle edge cases
 
-    for(HashMap<T,T> s : setOfMaps){
-      if(s.containsValue(e)) {
+    for (HashMap<T, T> s : setOfMaps) {
+      if (s.containsValue(e)) {
         Set<T> keySet = s.keySet();
-        if(keySet.size() >= 2) {
-          //TODO error as not all elements of set mapped to same canonical element
+        if (keySet.size() >= 2) {
+          // TODO error as not all elements of set mapped to same canonical element
         } else {
           return keySet.iterator().next();
         }
@@ -47,39 +47,39 @@ public class UnsortedUnionFind <T> implements UnionFind <T> {
     }
   }
 
-  //currently only union by size supported for unsorted union-find
+  // currently only union by size supported for unsorted union-find
   @Override
   public void union(T e1, T e2) {
-    HashMap<T,T> map1 = null;
-    HashMap<T,T> map2 = null;
+    HashMap<T, T> map1 = null;
+    HashMap<T, T> map2 = null;
 
-    for(HashMap<T,T> current : setOfMaps) {
+    for (HashMap<T, T> current : setOfMaps) {
       Set<T> keySet = current.keySet();
       T e;
 
-      if(keySet.size() >= 2) {
-        //TODO error as not all elements of set mapped to same canonical element
+      if (keySet.size() >= 2) {
+        // TODO error as not all elements of set mapped to same canonical element
       } else {
         e = keySet.iterator().next();
 
-        if(e.equals(e1)) {
+        if (e.equals(e1)) {
           map1 = current;
-        } else if(e.equals(e2)) {
+        } else if (e.equals(e2)) {
           map2 = current;
         }
       }
 
-      if(map1!=null && map2!=null) {
+      if (map1 != null && map2 != null) {
         break;
       }
     }
-    if(map1.size() > map2.size()) {
-      for(T e : map2.values()) {
+    if (map1.size() > map2.size()) {
+      for (T e : map2.values()) {
         map1.put(e1, e);
       }
       canonicalElements.remove(e2);
     } else {
-      for(T e : map1.values()) {
+      for (T e : map1.values()) {
         map2.put(e2, e);
       }
       canonicalElements.remove(e1);
@@ -91,21 +91,42 @@ public class UnsortedUnionFind <T> implements UnionFind <T> {
     return new UnsortedUnionFind<T>();
   }
 
+  public void addNewSet(Set<T> input) throws IllegalArgumentException {
+    T canon = null;
+    HashMap<T, T> newMap = new HashMap<>();
+
+    for (T current : input) {
+      if (contains(current)) {
+        throw new IllegalArgumentException("Element already exists");
+      }
+
+      if (canon == null) {
+        canon = current;
+        canonicalElements.add(canon);
+      }
+
+      newMap.put(canon, current);
+    }
+
+    setOfMaps.add(newMap);
+  }
+
   @Override
   public void addSetOfSets(Set set) {
-    //TODO currently laid out for set of sets instead of set of maps
-    //problem: extracting canonical elements to add to canonicalElements --> could call keySet() on each Map
+    // TODO currently laid out for set of sets instead of set of maps
+    // problem: extracting canonical elements to add to canonicalElements --> could call keySet() on
+    // each Map
   }
 
   @Override
   public void addElementToNewSet(T e) throws IllegalArgumentException {
 
-      if (contains(e)) {
-        //throw exception: element already contained
-        throw new IllegalArgumentException("Element already exists");
-      }
+    if (contains(e)) {
+      // throw exception: element already contained
+      throw new IllegalArgumentException("Element already exists");
+    }
 
-    HashMap<T,T> newMap = new HashMap<>();
+    HashMap<T, T> newMap = new HashMap<>();
     newMap.put(e, e);
 
     setOfMaps.add(newMap);
@@ -117,9 +138,10 @@ public class UnsortedUnionFind <T> implements UnionFind <T> {
     return setOfMaps;
   }
 
+  // consider making public and adding to interface
   private boolean contains(T e) {
-    for(HashMap<T,T> current : setOfMaps) {
-      if(current.containsValue(e)) {
+    for (HashMap<T, T> current : setOfMaps) {
+      if (current.containsValue(e)) {
         return true;
       }
     }

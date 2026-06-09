@@ -10,12 +10,16 @@ package org.sosy_lab.common.collect;
 
 import java.util.Set;
 
-public interface UnionFind <T> {
+public interface UnionFind<T> {
   T find(T e);
+
   void union(T e1, T e2);
 
   UnionFind<T> getEmptyInstanceOf();
+
   void addSetOfSets(Set set);
+
   void addElementToNewSet(T e);
+
   Set getAllSubsets();
 }
