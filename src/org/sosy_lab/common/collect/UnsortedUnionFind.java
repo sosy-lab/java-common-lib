@@ -75,12 +75,12 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
     }
     if (map1.size() > map2.size()) {
       for (T e : map2.values()) {
-        map1.put(e1, e);
+        map1.putIfAbsent(e1, e);
       }
       canonicalElements.remove(e2);
     } else {
       for (T e : map1.values()) {
-        map2.put(e2, e);
+        map2.putIfAbsent(e2, e);
       }
       canonicalElements.remove(e1);
     }
@@ -105,7 +105,7 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
         canonicalElements.add(canon);
       }
 
-      newMap.put(canon, current);
+      newMap.putIfAbsent(canon, current);
     }
 
     setOfMaps.add(newMap);
@@ -128,7 +128,7 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
     }
 
     HashMap<T, T> newMap = new HashMap<>();
-    newMap.put(e, e);
+    newMap.putIfAbsent(e, e);
 
     setOfMaps.add(newMap);
     canonicalElements.add(e);
