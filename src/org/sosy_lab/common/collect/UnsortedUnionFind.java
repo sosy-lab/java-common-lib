@@ -112,14 +112,6 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
   }
 
   @Override
-  public void addSetOfSets(Set set) {
-    // TODO currently laid out for set of sets instead of set of maps
-    // could take set of HashMaps and call addNewSet() on each map
-    // problem: would need to specify type more clearly here but then won't override interface (but
-    // also can't alter type in interface as it wouldn't be generally applicable anymore)
-  }
-
-  @Override
   public void addElementToNewSet(T e) throws IllegalArgumentException {
 
     if (contains(e)) {
@@ -139,8 +131,8 @@ public class UnsortedUnionFind<T> implements UnionFind<T> {
     return setOfMaps;
   }
 
-  // consider making public and adding to interface
-  private boolean contains(T e) {
+  @Override
+  public boolean contains(T e) {
     for (HashMap<T, T> current : setOfMaps) {
       if (current.containsValue(e)) {
         return true;
