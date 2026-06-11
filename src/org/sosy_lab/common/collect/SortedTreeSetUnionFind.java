@@ -18,15 +18,18 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
   private HashSet<TreeSet<T>> setOfSets;
 
   private SortedTreeSetUnionFind() {
-    // TODO
-
     setOfSets = new HashSet<>();
   }
 
   @Override
-  public T find(T e) {
-    // TODO
-    return null;
+  public T find(T e) throws IllegalArgumentException {
+    for (TreeSet<T> current : setOfSets) {
+      if (current.contains(e)) {
+        return current.first();
+      }
+    }
+
+    throw new IllegalArgumentException("Element not contained");
   }
 
   /*
@@ -78,31 +81,31 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
   }
 
   private void mergeExistingSets(T e1, T e2) {
-    TreeSet<T> set1;
-    TreeSet<T> set2;
-    int size1;
-    int size2;
+    TreeSet<T> set1 = null;
+    TreeSet<T> set2 = null;
+
 
     for (TreeSet<T> current : setOfSets) {
       if (current.first().equals(e1)) {
         set1 = current;
-        size1 = set1.size();
       } else if (current.first().equals(e2)) {
         set2 = current;
-        size2 = set2.size();
       }
     }
 
-    // TODO potential problem: this could cause canon elem to not be the same as before (even though it needs to be)
+    assert set1 != null;
+    assert set2 != null;
+
+    int size1 = set1.size();
+    int size2 = set2.size();
+
+    // TODO potential problem: this could cause canon elem to not be the same as before (even though
+    // it needs to be)
     if (size1 > size2) {
-      for (T current : set2) {
-        set1.add(current);
-      }
+      set1.addAll(set2);
       setOfSets.remove(set2);
     } else {
-      for (T current : set1) {
-        set2.add(current);
-      }
+      set2.addAll(set1);
       setOfSets.remove(set1);
     }
   }
