@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SortedTreeSetUnionFind<T> implements UnionFind<T> {
+public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
   private HashSet<TreeSet<T>> setOfSets;
 
@@ -118,7 +118,7 @@ public class SortedTreeSetUnionFind<T> implements UnionFind<T> {
   }
 
   @Override
-  public UnionFind<T> getEmptyInstanceOf() {
+  public SortedUnionFind<T> getEmptyInstanceOf() {
     return new SortedTreeSetUnionFind<>();
   }
 
@@ -127,8 +127,8 @@ public class SortedTreeSetUnionFind<T> implements UnionFind<T> {
     return setOfSets;
   }
 
-  // consider making public and adding to interface
-  private boolean contains(T e) {
+  @Override
+  public boolean contains(T e) {
     for (TreeSet<T> current : setOfSets) {
       if (current.contains(e)) {
         return true;

@@ -19,5 +19,5 @@ public interface UnionFind<T> {
 
   Set getAllSubsets();
 
-  boolean contains();
+  boolean contains(T e);
 }
