@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SortedUnionFind<T> implements UnionFind<T> {
+public class SortedTreeSetUnionFind<T> implements UnionFind<T> {
 
   private HashSet<TreeSet<T>> setOfSets;
 
-  private SortedUnionFind() {
+  private SortedTreeSetUnionFind() {
     // TODO
 
     setOfSets = new HashSet<>();
@@ -119,7 +119,7 @@ public class SortedUnionFind<T> implements UnionFind<T> {
 
   @Override
   public UnionFind<T> getEmptyInstanceOf() {
-    return new SortedUnionFind<>();
+    return new SortedTreeSetUnionFind<>();
   }
 
   @Override
