@@ -18,4 +18,6 @@ public interface UnionFind<T> {
   UnionFind<T> getEmptyInstanceOf();
 
   Set getAllSubsets();
+
+  boolean contains();
 }
