@@ -17,7 +17,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
   private HashSet<TreeSet<T>> setOfSets;
 
-  private SortedTreeSetUnionFind() {
+  public SortedTreeSetUnionFind() {
     setOfSets = new HashSet<>();
   }
 
