@@ -54,6 +54,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
       } else if (canonicalElements.contains(e2)) {
         addElementToExistingSet(e1, e2);
       }
+      //TODO case where neither elements are contained but also not equal
     }
   }
 
@@ -120,10 +121,12 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     return list;
   }
 
+  /*
   @Override
   public SortedUnionFind<T> getEmptyInstanceOf() {
     return new SortedTreeSetUnionFind<>();
   }
+   */
 
   @Override
   public Set<TreeSet<T>> getAllSubsets() {

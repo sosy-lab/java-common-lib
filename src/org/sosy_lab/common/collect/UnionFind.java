@@ -15,7 +15,7 @@ public interface UnionFind<T> {
 
   void union(T e1, T e2);
 
-  UnionFind<T> getEmptyInstanceOf();
+  //UnionFind<T> getEmptyInstanceOf();
 
   Set getAllSubsets();
 

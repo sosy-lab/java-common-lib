@@ -15,7 +15,7 @@ public interface SortedUnionFind<T> {
 
   void union(T e1, T e2);
 
-  SortedUnionFind<T> getEmptyInstanceOf();
+  //SortedUnionFind<T> getEmptyInstanceOf();
 
   Set getAllSubsets();
 
