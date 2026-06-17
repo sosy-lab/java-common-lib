@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Var;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -63,8 +64,8 @@ public class SortedUnionFindTest {
 
     assertThat(unionFind.getAllSubsets().size() == 1).isTrue();
 
-    boolean canonUnknown = true;
-    Integer canon = null;
+    @Var boolean canonUnknown = true;
+    @Var Integer canon = null;
 
     for (int i = 0; i <= 9; i++) {
       if (canonUnknown) {
