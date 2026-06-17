@@ -11,7 +11,6 @@ package org.sosy_lab.common.collect;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.Range;
-import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,11 +47,31 @@ public class SortedUnionFindTest {
 
   @Test
   public void testUnion_CorrectCanonicalElementAndCorrectSubsetAfterUnionBySize() {
-    for(int i = 0; i <= 4; i++) {
+    assertThat(unionFind.getAllSubsets().size() == 2).isTrue();
+
+    for (int i = 0; i <= 4; i++) {
       assertThat(unionFind.find(i).equals(0)).isTrue();
     }
-    for(int i = 5; i <= 9; i++) {
+    for (int i = 5; i <= 9; i++) {
       assertThat(unionFind.find(i).equals(5)).isTrue();
+    }
+  }
+
+  @Test
+  public void testUnion_MergeExistingSubsets() {
+    unionFind.union(0, 5);
+
+    assertThat(unionFind.getAllSubsets().size() == 1).isTrue();
+
+    boolean canonUnknown = true;
+    Integer canon = null;
+
+    for (int i = 0; i <= 9; i++) {
+      if (canonUnknown) {
+        canon = unionFind.find(i);
+        canonUnknown = false;
+      }
+      assertThat(unionFind.find(i).equals(canon)).isTrue();
     }
   }
 }

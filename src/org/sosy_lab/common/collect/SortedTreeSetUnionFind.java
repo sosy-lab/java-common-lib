@@ -108,7 +108,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
       setOfSets.remove(set2);
     } else {
       set2.addAll(set1);
-      setOfSets.remove(set1);
+      setOfSets.remove(set1); // TODO it seems removal doesn't actually take place though it should
     }
   }
 
