@@ -44,4 +44,14 @@ public class SortedUnionFindTest {
     assertThat(LOW_NUMS.contains(unionFind.find(2))).isTrue();
     assertThat(HIGH_NUMS.contains(unionFind.find(8))).isTrue();
   }
+
+  @Test
+  public void testUnion_CorrectCanonicalElementAfterUnionBySize() {
+    for(int i = 0; i <= 4; i++) {
+      assertThat(unionFind.find(i).equals(0)).isTrue();
+    }
+    for(int i = 5; i <= 9; i++) {
+      assertThat(unionFind.find(i).equals(5)).isTrue();
+    }
+  }
 }
