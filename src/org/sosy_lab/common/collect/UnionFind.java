@@ -15,9 +15,7 @@ public interface UnionFind<T> {
 
   void union(T e1, T e2);
 
-  //UnionFind<T> getEmptyInstanceOf();
-
-  Set getAllSubsets();
+  Set<? extends Set<T>> getAllSubsets();
 
   boolean contains(T e);
 }

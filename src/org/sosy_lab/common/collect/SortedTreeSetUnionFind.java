@@ -8,21 +8,23 @@
 
 package org.sosy_lab.common.collect;
 
+import com.google.errorprone.annotations.Var;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
-  private HashSet<TreeSet<T>> setOfSets;
+  private final HashSet<TreeSet<T>> setOfSets;
 
   public SortedTreeSetUnionFind() {
     setOfSets = new HashSet<>();
   }
 
   @Override
-  public T find(T e) throws IllegalArgumentException {
+  public T find(T e) {
     for (TreeSet<T> current : setOfSets) {
       if (current.contains(e)) {
         return current.first();
@@ -39,11 +41,11 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
   - merge two existing sets: e1 and e2 canon. elem.s of sets to be merged
    */
   @Override
-  public void union(T e1, T e2) throws IllegalArgumentException {
+  public void union(T e1, T e2) {
     if (e1.equals(e2)) {
       addElementAsNewSet(e1);
     } else {
-      ArrayList<T> canonicalElements = getListOfCanonicalElements();
+      List<T> canonicalElements = getListOfCanonicalElements();
 
       if (canonicalElements.contains(e1)) {
         if (canonicalElements.contains(e2)) {
@@ -54,11 +56,11 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
       } else if (canonicalElements.contains(e2)) {
         addElementToExistingSet(e1, e2);
       }
-      //TODO case where neither elements are contained but also not equal
+      // TODO case where neither elements are contained but also not equal
     }
   }
 
-  private void addElementAsNewSet(T e) throws IllegalArgumentException {
+  private void addElementAsNewSet(T e) {
     if (!contains(e)) {
       TreeSet<T> newSet = new TreeSet<>();
       newSet.add(e);
@@ -68,7 +70,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     }
   }
 
-  private void addElementToExistingSet(T e, T canon) throws IllegalArgumentException {
+  private void addElementToExistingSet(T e, T canon) {
     if (!contains(e)) {
       for (TreeSet<T> treeSet : setOfSets) {
         if (treeSet.first().equals(canon)) {
@@ -82,9 +84,8 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
   }
 
   private void mergeExistingSets(T e1, T e2) {
-    TreeSet<T> set1 = null;
-    TreeSet<T> set2 = null;
-
+    @Var TreeSet<T> set1 = null;
+    @Var TreeSet<T> set2 = null;
 
     for (TreeSet<T> current : setOfSets) {
       if (current.first().equals(e1)) {
@@ -111,7 +112,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     }
   }
 
-  private ArrayList<T> getListOfCanonicalElements() {
+  private List<T> getListOfCanonicalElements() {
     ArrayList<T> list = new ArrayList<>();
 
     for (TreeSet<T> treeSet : setOfSets) {
@@ -121,15 +122,8 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     return list;
   }
 
-  /*
   @Override
-  public SortedUnionFind<T> getEmptyInstanceOf() {
-    return new SortedTreeSetUnionFind<>();
-  }
-   */
-
-  @Override
-  public Set<TreeSet<T>> getAllSubsets() {
+  public Set<? extends Set<T>> getAllSubsets() {
     return setOfSets;
   }
 
