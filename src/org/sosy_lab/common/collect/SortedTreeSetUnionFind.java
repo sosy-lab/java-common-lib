@@ -18,7 +18,7 @@ import java.util.TreeSet;
 
 public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
-  private final HashSet<NavigableSet<T>> setOfSets;
+  private final Set<NavigableSet<T>> setOfSets;
 
   public SortedTreeSetUnionFind() {
     setOfSets = new HashSet<>();
