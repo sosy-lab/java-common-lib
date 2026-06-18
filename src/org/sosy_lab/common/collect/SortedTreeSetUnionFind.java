@@ -56,8 +56,10 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
         }
       } else if (canonicalElements.contains(e2)) {
         addElementToExistingSet(e1, e2);
+      } else {
+        addElementAsNewSet(e1);
+        addElementToExistingSet(e2, e1);
       }
-      // TODO case where neither elements are contained but also not equal
     }
   }
 
