@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.collect;
 
+import java.util.Collection;
 import java.util.Set;
 
 public interface UnionFind<T> {
@@ -15,7 +16,7 @@ public interface UnionFind<T> {
 
   void union(T e1, T e2);
 
-  Set<? extends Set<T>> getAllSubsets();
+  Collection<? extends Set<T>> getAllSubsets();
 
   boolean contains(T e);
 }
