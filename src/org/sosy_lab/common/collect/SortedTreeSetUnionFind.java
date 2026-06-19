@@ -9,26 +9,30 @@
 package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.Var;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
-  private final Set<NavigableSet<T>> setOfSets;
+  private final Map<T, NavigableSet<T>> setOfSets;
 
   public SortedTreeSetUnionFind() {
-    setOfSets = new HashSet<>();
+    setOfSets = new HashMap<>();
   }
 
   @Override
   public T find(T e) {
-    for (NavigableSet<T> current : setOfSets) {
+    for (NavigableSet<T> current : setOfSets.values()) {
       if (current.contains(e)) {
-        return current.first();
+        for (T element : current) {
+          if (setOfSets.containsKey(element)) {
+            return element;
+          }
+        }
       }
     }
 
@@ -46,7 +50,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     if (e1.equals(e2)) {
       addElementAsNewSet(e1);
     } else {
-      List<T> canonicalElements = getListOfCanonicalElements();
+      Set<T> canonicalElements = setOfSets.keySet();
 
       if (canonicalElements.contains(e1)) {
         if (canonicalElements.contains(e2)) {
@@ -67,7 +71,7 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     if (!contains(e)) {
       NavigableSet<T> newSet = new TreeSet<>();
       newSet.add(e);
-      setOfSets.add(newSet);
+      setOfSets.put(e, newSet);
     } else {
       throw new IllegalArgumentException("Element already contained");
     }
@@ -75,11 +79,10 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
   private void addElementToExistingSet(T e, T canon) {
     if (!contains(e)) {
-      for (NavigableSet<T> treeSet : setOfSets) {
-        if (treeSet.first().equals(canon)) {
-          setOfSets.remove(treeSet);
-          treeSet.add(e);
-          setOfSets.add(treeSet);
+      for (NavigableSet<T> currentSet : setOfSets.values()) {
+        if (currentSet.contains(canon)) {
+          currentSet.add(e);
+          setOfSets.replace(canon, currentSet);
           break;
         }
       }
@@ -92,10 +95,10 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     @Var NavigableSet<T> set1 = null;
     @Var NavigableSet<T> set2 = null;
 
-    for (NavigableSet<T> current : setOfSets) {
-      if (current.first().equals(e1)) {
+    for (NavigableSet<T> current : setOfSets.values()) {
+      if (current.contains(e1)) {
         set1 = current;
-      } else if (current.first().equals(e2)) {
+      } else if (current.contains(e2)) {
         set2 = current;
       }
     }
@@ -110,31 +113,21 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     // it needs to be)
     if (size1 > size2) {
       set1.addAll(set2);
-      setOfSets.remove(set2);
+      setOfSets.remove(e2);
     } else {
       set2.addAll(set1);
-      setOfSets.remove(set1); // TODO it seems removal doesn't actually take place though it should
+      setOfSets.remove(e1); // TODO it seems removal doesn't actually take place though it should
     }
-  }
-
-  private List<T> getListOfCanonicalElements() {
-    List<T> list = new ArrayList<>();
-
-    for (NavigableSet<T> treeSet : setOfSets) {
-      list.add(treeSet.first());
-    }
-
-    return list;
   }
 
   @Override
-  public Set<? extends Set<T>> getAllSubsets() {
-    return setOfSets;
+  public Collection<? extends Set<T>> getAllSubsets() {
+    return setOfSets.values();
   }
 
   @Override
   public boolean contains(T e) {
-    for (NavigableSet<T> current : setOfSets) {
+    for (NavigableSet<T> current : setOfSets.values()) {
       if (current.contains(e)) {
         return true;
       }
