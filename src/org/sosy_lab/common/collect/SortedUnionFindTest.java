@@ -75,4 +75,29 @@ public class SortedUnionFindTest {
       assertThat(unionFind.find(i).equals(canon)).isTrue();
     }
   }
+
+  @Test
+  public void testUnion_ConstantCanonicalElementDuringNonlinearInsertion() {
+    SortedUnionFind<Integer> newUnionFind = new SortedTreeSetUnionFind<>();
+
+    newUnionFind.union(3, 3);
+    newUnionFind.union(3, 2);
+    newUnionFind.union(3, 5);
+    newUnionFind.union(3, 1);
+    newUnionFind.union(3, 8);
+    newUnionFind.union(3, 6);
+    newUnionFind.union(3, 9);
+    newUnionFind.union(3, 7);
+    newUnionFind.union(3, 4);
+
+    assertThat(newUnionFind.find(3)).isEqualTo(3);
+    assertThat(newUnionFind.find(2)).isEqualTo(3);
+    assertThat(newUnionFind.find(5)).isEqualTo(3);
+    assertThat(newUnionFind.find(1)).isEqualTo(3);
+    assertThat(newUnionFind.find(8)).isEqualTo(3);
+    assertThat(newUnionFind.find(6)).isEqualTo(3);
+    assertThat(newUnionFind.find(9)).isEqualTo(3);
+    assertThat(newUnionFind.find(7)).isEqualTo(3);
+    assertThat(newUnionFind.find(4)).isEqualTo(3);
+  }
 }
