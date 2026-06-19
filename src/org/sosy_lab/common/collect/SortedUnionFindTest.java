@@ -64,8 +64,10 @@ public class SortedUnionFindTest {
 
     assertThat(unionFind.getAllSubsets().size() == 1).isTrue();
 
-    @Var boolean canonUnknown = true;
-    @Var Integer canon = null;
+    @Var
+    boolean canonUnknown = true;
+    @Var
+    Integer canon = null;
 
     for (int i = 0; i <= 9; i++) {
       if (canonUnknown) {
@@ -74,5 +76,29 @@ public class SortedUnionFindTest {
       }
       assertThat(unionFind.find(i).equals(canon)).isTrue();
     }
+  }
+
+  @Test
+  public void testUnion_InsertingDuplicateElementFails() {
+    @Var
+    Exception exception = null;
+    try {
+      //case: attempting to insert into subset it is already in
+      unionFind.union(1, 0);
+    } catch (Exception e) {
+      exception = e;
+    }
+    assertThat(exception).isNotNull();
+    assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+
+    exception = null;
+    try {
+      //case: attempting to insert into subset it is not in
+      unionFind.union(1, 5);
+    } catch (Exception e) {
+      exception = e;
+    }
+    assertThat(exception).isNotNull();
+    assertThat(exception).isInstanceOf(IllegalArgumentException.class);
   }
 }
