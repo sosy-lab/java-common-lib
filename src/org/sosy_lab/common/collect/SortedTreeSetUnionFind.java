@@ -109,14 +109,12 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     int size1 = set1.size();
     int size2 = set2.size();
 
-    // TODO potential problem: this could cause canon elem to not be the same as before (even though
-    // it needs to be)
     if (size1 > size2) {
       set1.addAll(set2);
       setOfSets.remove(e2);
     } else {
       set2.addAll(set1);
-      setOfSets.remove(e1); // TODO it seems removal doesn't actually take place though it should
+      setOfSets.remove(e1);
     }
   }
 
