@@ -77,7 +77,9 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     if (!contains(e)) {
       for (NavigableSet<T> treeSet : setOfSets) {
         if (treeSet.first().equals(canon)) {
+          setOfSets.remove(treeSet);
           treeSet.add(e);
+          setOfSets.add(treeSet);
           break;
         }
       }
