@@ -16,14 +16,31 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * An implementation of {@link SortedUnionFind} using a {@link HashMap} of {@link TreeSet}s. In
+ * order to represent subsets by canonical elements, each one is mapped to its representative
+ * canonical element. This is always the first element added to the subset, unless it has changed
+ * due to union operations. The union is implemented as union by size.
+ *
+ * @param <T> type of elements added to the Union-Find. Must be {@link Comparable} to ensure correct
+ *     ordering.
+ */
 public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
 
   private final Map<T, NavigableSet<T>> setOfSets;
 
+  /** Generates an empty {@link SortedTreeSetUnionFind}. */
   public SortedTreeSetUnionFind() {
     setOfSets = new HashMap<>();
   }
 
+  /**
+   * Returns the canonical element of the set containing the provided element.
+   *
+   * @param e element for which set is to be found
+   * @return canonical element of the found set
+   * @throws IllegalArgumentException if element is not contained in any subset
+   */
   @Override
   public T find(T e) {
     for (NavigableSet<T> current : setOfSets.values()) {
@@ -39,11 +56,15 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     throw new IllegalArgumentException("Element not contained");
   }
 
-  /*
-  USE
-  - add new element to own new set: e1 and e2 both element to be added
-  - add new element to existing set: one e new element, other e canon. elem. of set to add to
-  - merge two existing sets: e1 and e2 canon. elem.s of sets to be merged
+  /**
+   * Merges the sets represented by the two input values according to standard Union-Find behaviour.
+   *
+   * <p>USES: Add new element as new set: pass it as both e1 and e2. Add new element to existing
+   * set: one input value is the new element, the other the canonical element of the set to be added
+   * to. Merge two existing sets: e1, e2 canonical elements of sets to be merged.
+   *
+   * @param e1 first element
+   * @param e2 second element
    */
   @Override
   public void union(T e1, T e2) {
@@ -118,11 +139,23 @@ public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
     }
   }
 
+  /**
+   * Provides a {@link Collection} containing all current subsets.
+   *
+   * @return {@link Collection} containing all current subsets
+   */
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
     return setOfSets.values();
   }
 
+  /**
+   * Checks whether the provided element is contained in any current subset and returns true or
+   * false accordingly.
+   *
+   * @param e element to be searched for
+   * @return true if contained, false if not
+   */
   @Override
   public boolean contains(T e) {
     for (NavigableSet<T> current : setOfSets.values()) {
