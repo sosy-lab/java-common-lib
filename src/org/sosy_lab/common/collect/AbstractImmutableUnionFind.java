@@ -1,0 +1,36 @@
+// This file is part of SoSy-Lab Common,
+// a library of useful utilities:
+// https://github.com/sosy-lab/java-common-lib
+//
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
+
+package org.sosy_lab.common.collect;
+
+import com.google.errorprone.annotations.DoNotCall;
+
+public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final T find(T e) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @throws UnsupportedOperationException Always.
+   * @deprecated Unsupported operation.
+   */
+  @Deprecated
+  @Override
+  @DoNotCall
+  public final void union(T e1, T e2) {
+    throw new UnsupportedOperationException();
+  }
+}
