@@ -9,6 +9,8 @@
 package org.sosy_lab.common.collect;
 
 import com.google.common.testing.AbstractPackageSanityTests;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import org.sosy_lab.common.Classes;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
@@ -24,4 +26,19 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
         OurSortedMap.class, OurSortedMap.EmptyImmutableOurSortedMap.of(), singletonMap);
     ignoreClasses(Classes.IS_GENERATED);
   }
+
+  {
+    setDefault(SortedTreeSetUnionFind.class, new SortedTreeSetUnionFind<>());
+    // ignoreClasses(Classes.IS_GENERATED);
+
+    try {
+      setDefault(Constructor.class, PackageSanityTest.class.getConstructor());
+      setDefault(Method.class, PackageSanityTest.class.getDeclaredMethod("defaultMethod"));
+    } catch (NoSuchMethodException e) {
+      throw new AssertionError(e);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private static void defaultMethod() {}
 }
