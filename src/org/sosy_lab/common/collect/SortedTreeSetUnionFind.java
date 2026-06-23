@@ -25,7 +25,7 @@ import java.util.TreeSet;
  * @param <T> type of elements added to the Union-Find. Must be {@link Comparable} to ensure correct
  *     ordering.
  */
-public class SortedTreeSetUnionFind<T> implements SortedUnionFind<T> {
+public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUnionFind<T> {
 
   private final Map<T, NavigableSet<T>> setOfSets;
 

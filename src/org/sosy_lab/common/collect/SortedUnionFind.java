@@ -18,7 +18,7 @@ import java.util.Set;
  * @param <T> type of elements added to the Union-Find. Must be {@link Comparable} to ensure correct
  *     ordering.
  */
-public interface SortedUnionFind<T> {
+public interface SortedUnionFind<T extends Comparable<T>> {
   /**
    * Returns the canonical element of the set containing the provided element.
    *
