@@ -10,10 +10,30 @@ package org.sosy_lab.common.collect;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
+import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 import java.util.NavigableSet;
 
-public interface PersistentUnionFind<T> extends UnionFind<T>{
+/**
+ * Interface for a persistent union-find. A persistent data structure is immutable, but provides
+ * cheap copy-and-write operations. Thus, all write operations ({@link #union(Object, Object)}) will
+ * not modify the current instance, but return a new instance instead.
+ *
+ * <p>All modifying operations inherited from {@link UnionFind} are not supported and will always
+ * throw {@link UnsupportedOperationException}.
+ *
+ * @param <T> The type of values.
+ */
+@Immutable(containerOf = "T")
+public interface PersistentUnionFind<T> extends UnionFind<T> {
+
+  /**
+   * Replacement for {@link #union(Object, Object)} that returns a fresh new instance.
+   *
+   * @param e1 first element
+   * @param e2 second element
+   * @return new instance that the desired changes have been applied to
+   */
   @CheckReturnValue
   Map<T, NavigableSet<T>> unionAndCopy(T e1, T e2);
 
