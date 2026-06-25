@@ -11,18 +11,6 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.DoNotCall;
 
 public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
-
-  /**
-   * @throws UnsupportedOperationException Always.
-   * @deprecated Unsupported operation.
-   */
-  @Deprecated
-  @Override
-  @DoNotCall
-  public final T find(T e) {
-    throw new UnsupportedOperationException();
-  }
-
   /**
    * @throws UnsupportedOperationException Always.
    * @deprecated Unsupported operation.

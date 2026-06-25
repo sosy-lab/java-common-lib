@@ -19,17 +19,6 @@ public abstract class AbstractImmutableSortedUnionFind<T extends Comparable<T>>
   @Deprecated
   @Override
   @DoNotCall
-  public final T find(T e) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @throws UnsupportedOperationException Always.
-   * @deprecated Unsupported operation.
-   */
-  @Deprecated
-  @Override
-  @DoNotCall
   public final void union(T e1, T e2) {
     throw new UnsupportedOperationException();
   }
