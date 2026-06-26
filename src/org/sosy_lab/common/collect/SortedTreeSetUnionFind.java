@@ -103,8 +103,6 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
       NavigableSet<T> newSet = new TreeSet<>();
       newSet.add(e);
       setOfSets.put(e, newSet);
-    } else {
-      throw new IllegalArgumentException("Element already contained");
     }
   }
 
@@ -119,7 +117,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
         }
       }
     } else {
-      throw new IllegalArgumentException("Element already contained");
+      mergeExistingSets(e, canon);
     }
   }
 
