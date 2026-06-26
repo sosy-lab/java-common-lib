@@ -59,8 +59,6 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     throw new IllegalArgumentException("Element not contained");
   }
 
-  // TODO merge instead of throwing exceptions
-
   /**
    * Merges the sets represented by the two input values according to standard Union-Find behaviour.
    *
