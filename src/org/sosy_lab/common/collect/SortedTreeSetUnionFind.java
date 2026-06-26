@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.collect;
 
+import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
    */
   @Override
   public T find(T e) {
+
+    Preconditions.checkNotNull(e);
     for (NavigableSet<T> current : setOfSets.values()) {
       if (current.contains(e)) {
         for (T element : current) {
@@ -56,6 +59,8 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     throw new IllegalArgumentException("Element not contained");
   }
 
+  // TODO merge instead of throwing exceptions
+
   /**
    * Merges the sets represented by the two input values according to standard Union-Find behaviour.
    *
@@ -68,6 +73,10 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
    */
   @Override
   public void union(T e1, T e2) {
+
+    Preconditions.checkNotNull(e1);
+    Preconditions.checkNotNull(e2);
+
     if (e1.equals(e2)) {
       addElementAsNewSet(e1);
     } else {
@@ -89,6 +98,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
   }
 
   private void addElementAsNewSet(T e) {
+
     if (!contains(e)) {
       NavigableSet<T> newSet = new TreeSet<>();
       newSet.add(e);
@@ -99,6 +109,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
   }
 
   private void addElementToExistingSet(T e, T canon) {
+
     if (!contains(e)) {
       for (NavigableSet<T> currentSet : setOfSets.values()) {
         if (currentSet.contains(canon)) {
@@ -113,6 +124,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
   }
 
   private void mergeExistingSets(T e1, T e2) {
+
     @Var NavigableSet<T> set1 = null;
     @Var NavigableSet<T> set2 = null;
 
@@ -158,6 +170,9 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
    */
   @Override
   public boolean contains(T e) {
+
+    Preconditions.checkNotNull(e);
+
     for (NavigableSet<T> current : setOfSets.values()) {
       if (current.contains(e)) {
         return true;
