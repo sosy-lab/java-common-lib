@@ -113,6 +113,8 @@ build-ecj:jdk-25:
 
 check-format:
   <<: *source_check
+  # google-java-format 1.29.0 and newer need Java 21+
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
   script: "ant $ANT_PROPS_CHECKS format-source && git diff -s --exit-code"
 
 checkstyle:
