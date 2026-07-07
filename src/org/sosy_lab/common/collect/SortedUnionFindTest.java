@@ -116,20 +116,25 @@ public class SortedUnionFindTest {
     for (int i = 6; i <= 8; i++) {
       unionFindString.union(Integer.toString(6), Integer.toString(i));
     }
+    // case: both elements the same; to be added as new subset
     unionFindString.union(Integer.toString(9), Integer.toString(9));
-    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(4);
+    assertThat(unionFindString.getAllSubsets()).hasSize(4);
 
+    // case: both canonical elements
     unionFindString.union(Integer.toString(0), Integer.toString(6));
-    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(3);
+    assertThat(unionFindString.getAllSubsets()).hasSize(3);
 
+    // case: one contained but not canonical, one not contained
     unionFindString.union(Integer.toString(7), Integer.toString(-1));
-    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(3);
+    assertThat(unionFindString.getAllSubsets()).hasSize(3);
 
-    unionFindString.union(Integer.toString(0), Integer.toString(3));
-    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(2);
+    // case: both contained but neither canonical elements
+    unionFindString.union(Integer.toString(1), Integer.toString(4));
+    assertThat(unionFindString.getAllSubsets()).hasSize(2);
 
+    // case: both canonical elements
     unionFindString.union(Integer.toString(0), Integer.toString(9));
-    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(1);
+    assertThat(unionFindString.getAllSubsets()).hasSize(1);
 
     @Var String result = "";
 
