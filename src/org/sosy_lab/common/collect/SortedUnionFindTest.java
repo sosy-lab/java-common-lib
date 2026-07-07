@@ -105,7 +105,7 @@ public class SortedUnionFindTest {
   @Test
   public void testUnion_Strings() {
     SortedUnionFind<String> unionFindString = new SortedTreeSetUnionFind<>();
-    String expected = ".-1..0..1..2..3..4..5..6..7..8..9.";
+    String expected = ".-1.0.1.2.3.4.5.6.7.8.9.";
 
     for (int i = 0; i <= 2; i++) {
       unionFindString.union(Integer.toString(0), Integer.toString(i));
@@ -136,11 +136,11 @@ public class SortedUnionFindTest {
     unionFindString.union(Integer.toString(0), Integer.toString(9));
     assertThat(unionFindString.getAllSubsets()).hasSize(1);
 
-    @Var String result = "";
+    @Var String result = ".";
 
     for (Collection<String> subset : unionFindString.getAllSubsets()) {
       for (String element : subset) {
-        result = result.concat("." + Integer.valueOf(element) + ".");
+        result = result + (Integer.valueOf(element) + ".");
       }
     }
     assertThat(result).isEqualTo(expected);
