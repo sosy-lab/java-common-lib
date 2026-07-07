@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.Range;
 import com.google.errorprone.annotations.Var;
+import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -101,32 +102,42 @@ public class SortedUnionFindTest {
     assertThat(newUnionFind.find(4)).isEqualTo(3);
   }
 
-  /*
   @Test
   public void testUnion_Strings() {
-    // TODO
+    SortedUnionFind<String> unionFindString = new SortedTreeSetUnionFind<>();
+    String expected = ".-1..0..1..2..3..4..5..6..7..8..9.";
 
-    Random random = new Random(1357111317L);
-    AuxiliarySortedUnionFind<String> expected = new AuxiliarySortedUnionFind<>();
-    SortedUnionFind<String> unionFind = new SortedTreeSetUnionFind<>();
+    for (int i = 0; i <= 2; i++) {
+      unionFindString.union(Integer.toString(0), Integer.toString(i));
+    }
+    for (int i = 3; i <= 5; i++) {
+      unionFindString.union(Integer.toString(3), Integer.toString(i));
+    }
+    for (int i = 6; i <= 8; i++) {
+      unionFindString.union(Integer.toString(6), Integer.toString(i));
+    }
+    unionFindString.union(Integer.toString(9), Integer.toString(9));
+    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(4);
 
-    int noOfSubsets = 5;
-    int sizeOfSubsets = 10;
+    unionFindString.union(Integer.toString(0), Integer.toString(6));
+    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(3);
 
-    for (int i = 0; i < noOfSubsets; i++) {
-      String canon = Integer.toString(random.nextInt());
+    unionFindString.union(Integer.toString(7), Integer.toString(-1));
+    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(3);
 
-      unionFind.union(canon, canon);
-      expected.union(canon, canon);
+    unionFindString.union(Integer.toString(0), Integer.toString(3));
+    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(2);
 
-      for (int j = 1; j < sizeOfSubsets; j++) {
-        String elem = Integer.toString(random.nextInt());
-        unionFind.union(canon, elem);
-        expected.union(canon, elem);
+    unionFindString.union(Integer.toString(0), Integer.toString(9));
+    assertThat(unionFindString.getAllSubsets().size()).isEqualTo(1);
+
+    @Var String result = "";
+
+    for (Collection<String> subset : unionFindString.getAllSubsets()) {
+      for (String element : subset) {
+        result = result.concat("." + Integer.valueOf(element) + ".");
       }
     }
-
-    // TODO now check they're the same
+    assertThat(result).isEqualTo(expected);
   }
-   */
 }
