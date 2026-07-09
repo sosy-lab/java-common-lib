@@ -136,6 +136,7 @@ public class SortedUnionFindTest {
     unionFindString.union(Integer.toString(0), Integer.toString(9));
     assertThat(unionFindString.getAllSubsets()).hasSize(1);
 
+    //TODO just realised this is currently comparing String to Integer... :S
     assertThat(unionFindString.getAllSubsets().iterator().next()).containsExactlyElementsIn(expected).inOrder();
   }
 }
