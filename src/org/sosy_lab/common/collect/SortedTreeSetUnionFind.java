@@ -109,13 +109,18 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     if (!contains(e)) {
       for (NavigableSet<T> currentSet : setOfSets.values()) {
         if (currentSet.contains(canon)) {
+          assert(setOfSets.remove(canon, currentSet));
           currentSet.add(e);
-          setOfSets.replace(canon, currentSet);
+          setOfSets.put(canon, currentSet);
           break;
         }
       }
     } else {
-      mergeExistingSets(e, canon);
+      for(T key : setOfSets.keySet()) {
+        for(NavigableSet<T> currentSet : setOfSets.values()) {
+          if(currentSet.contains(key) && currentSet.contains(e)) mergeExistingSets(key, canon);
+        }
+      }
     }
   }
 
@@ -138,12 +143,15 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     int size1 = set1.size();
     int size2 = set2.size();
 
+    assert(setOfSets.remove(e1, set1));
+    assert(setOfSets.remove(e2, set2));
+
     if (size1 > size2) {
       set1.addAll(set2);
-      setOfSets.remove(e2);
+      setOfSets.put(e1, set1);
     } else {
       set2.addAll(set1);
-      setOfSets.remove(e1);
+      setOfSets.put(e2, set2);
     }
   }
 
