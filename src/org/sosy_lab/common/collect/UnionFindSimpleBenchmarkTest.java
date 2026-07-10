@@ -115,7 +115,19 @@ public class UnionFindSimpleBenchmarkTest {
       }
     }
 
-    return removeTooSmallSets(allPermutations, size);
+    Set<Set<Set<Integer>>> filteredPermutations = new HashSet<>(allPermutations);
+    for (Set<Set<Integer>> currentSubset : allPermutations) {
+      int counter = 0;
+
+      for (Set<Integer> currentSubSubset : currentSubset) {
+        for (Integer e : currentSubSubset) {
+          counter++;
+        }
+      }
+      if (!(counter == size)) filteredPermutations.remove(currentSubset);
+    }
+
+    return filteredPermutations;
   }
 
   private Set<Set<Set<Integer>>> removeTooSmallSets(Set<Set<Set<Integer>>> pInput, int pN) {
