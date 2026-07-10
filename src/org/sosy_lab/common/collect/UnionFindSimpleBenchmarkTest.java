@@ -20,16 +20,16 @@ import org.junit.Test;
 
 public class UnionFindSimpleBenchmarkTest {
   final int lowerBound = 2;
-  final int factorForComparison = 10;
+  final int factorForComparison = 3;
 
   @Test
   public void unionBigOQuadraticEvaluationTest() {
     Set<SortedUnionFind<Integer>> allUnionFindsOfFirstLoop = new HashSet<>();
 
     Duration timeBeforeFirstLoop = Duration.ofNanos(System.nanoTime());
-    for (int i = 0; i < lowerBound; i++) {
+    for (int i = 1; i <= lowerBound; i++) {
       Set<Integer> values = new HashSet<>();
-      for (int j = 0; j <= i; j++) {
+      for (int j = 1; j <= i; j++) {
         values.add(j);
       }
 
@@ -39,15 +39,16 @@ public class UnionFindSimpleBenchmarkTest {
     Duration timeOfFirstLoop = timeAfterFirstLoop.minus(timeBeforeFirstLoop);
 
     final int higherBound = lowerBound * factorForComparison;
+    Set<SortedUnionFind<Integer>> allUnionFindsOfSecondLoop = new HashSet<>();
 
     Duration timeBeforeSecondLoop = Duration.ofNanos(System.nanoTime());
-    for (int i = 0; i < higherBound; i++) {
+    for (int i = 1; i <= higherBound; i++) {
       Set<Integer> values = new HashSet<>();
-      for (int j = 0; j <= i; j++) {
+      for (int j = 1; j <= i; j++) {
         values.add(j);
       }
 
-      allUnionFindsOfFirstLoop.addAll(generateUnionFinds(getPermutations(values)));
+      allUnionFindsOfSecondLoop.addAll(generateUnionFinds(getPermutations(values)));
     }
     Duration timeAfterSecondLoop = Duration.ofNanos(System.nanoTime());
     Duration timeOfSecondLoop = timeAfterSecondLoop.minus(timeBeforeSecondLoop);
@@ -96,6 +97,10 @@ public class UnionFindSimpleBenchmarkTest {
       Set<Integer> remainingValues = new HashSet<>(pInput);
       remainingValues.removeAll(currentSet);
 
+      if (currentSet.isEmpty()) {
+        continue;
+      }
+
       if (freeSlots > 1) {
         for (Set<Set<Integer>> combinationValues : getPermutations(remainingValues)) {
           Set<Set<Integer>> subPermutation = new HashSet<>();
@@ -115,6 +120,7 @@ public class UnionFindSimpleBenchmarkTest {
       }
     }
 
+    // reduce to those that contain all required numbers
     Set<Set<Set<Integer>>> filteredPermutations = new HashSet<>(allPermutations);
     for (Set<Set<Integer>> currentSubset : allPermutations) {
       int counter = 0;
@@ -128,31 +134,5 @@ public class UnionFindSimpleBenchmarkTest {
     }
 
     return filteredPermutations;
-  }
-
-  private Set<Set<Set<Integer>>> removeTooSmallSets(Set<Set<Set<Integer>>> pInput, int pN) {
-    Preconditions.checkNotNull(pInput);
-
-    Set<Set<Set<Integer>>> returnSet = new HashSet<>(pInput);
-
-    for (Set<Set<Integer>> currentSubset : pInput) {
-      if (!totalNoOfElemsInSubsetsEquals(currentSubset, pN)) returnSet.remove(currentSubset);
-    }
-
-    return returnSet;
-  }
-
-  private boolean totalNoOfElemsInSubsetsEquals(Set<Set<Integer>> pInput, int pN) {
-    Preconditions.checkNotNull(pInput);
-
-    int counter = 0;
-
-    for (Set<Integer> currentSubset : pInput) {
-      for (Integer e : currentSubset) {
-        counter++;
-      }
-    }
-
-    return counter == pN;
   }
 }
