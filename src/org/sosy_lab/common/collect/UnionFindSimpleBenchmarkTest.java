@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,8 +52,14 @@ public class UnionFindSimpleBenchmarkTest {
     Duration timeOfSecondLoop = timeAfterSecondLoop.minus(timeBeforeSecondLoop);
     // END of 2nd loop
 
-    assertThat(timeOfSecondLoop)
-        .isLessThan(timeOfFirstLoop.multipliedBy(factorForComparison * factorForComparison));
+    // will throw for larger n's as they won't fit into long
+    long bellOfLowerBound = getBellNoOfN(lowerBound).longValueExact();
+    long bellOfUpperBound = getBellNoOfN(upperBound).longValueExact();
+
+    assertThat(timeOfSecondLoop.dividedBy(bellOfUpperBound))
+        .isLessThan(
+            timeOfFirstLoop.multipliedBy(
+                (bellOfUpperBound * bellOfUpperBound) / (bellOfLowerBound * bellOfLowerBound)));
   }
 
   private static List<Set<Set<Integer>>> generatePartitions(int pHighestNumber) {
@@ -115,5 +122,27 @@ public class UnionFindSimpleBenchmarkTest {
 
       pSetOfUnionFinds.add(unionFind);
     }
+  }
+
+  // calculates the Bell Number of a given n>=0 using the Bell Triangle
+  // uses BigInteger because int/Integer would run out of space at comparatively small n's
+  private static BigInteger getBellNoOfN(int n) {
+    @Var List<BigInteger> previousRow = new ArrayList<>();
+
+    // initialise for n=0
+    previousRow.add(BigInteger.valueOf(1));
+
+    for (int i = 1; i < n; i++) {
+      List<BigInteger> currentRow = new ArrayList<>();
+      currentRow.add(previousRow.get(previousRow.size() - 1));
+
+      for (int j = 1; j <= i; j++) {
+        currentRow.add(previousRow.get(j - 1).add(currentRow.get(j - 1)));
+      }
+
+      previousRow = currentRow;
+    }
+
+    return previousRow.get(previousRow.size() - 1);
   }
 }
