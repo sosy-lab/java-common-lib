@@ -22,8 +22,8 @@ import java.util.Set;
 import org.junit.Test;
 
 public class UnionFindSimpleBenchmarkTest {
-  final int lowerBound = 2;
-  final int factorForComparison = 5;
+  final int lowerBound = 3;
+  final int factorForComparison = 4;
 
   @Test
   public void unionBigOQuadraticEvaluationTest() {
