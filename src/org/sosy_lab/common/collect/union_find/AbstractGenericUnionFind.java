@@ -72,7 +72,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
    * @param e1 first element
    * @param e2 second element
    */
-  @SuppressWarnings("unchecked cast")
+  @SuppressWarnings("unchecked")
   @Override
   public void union(T e1, T e2) {
 
@@ -108,7 +108,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     }
   }
 
-  @SuppressWarnings("unchecked cast")
+  @SuppressWarnings("unchecked")
   private void addElementAsNewSet(T e) {
 
     if (!contains(e)) {
