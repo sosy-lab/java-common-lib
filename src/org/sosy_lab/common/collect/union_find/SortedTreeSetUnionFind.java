@@ -28,11 +28,11 @@ import java.util.TreeSet;
  */
 public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUnionFind<T> {
 
-  private final Map<T, NavigableSet<T>> setOfSets;
+  private final Map<T, NavigableSet<T>> mapOfSets;
 
   /** Generates an empty {@link SortedTreeSetUnionFind}. */
   public SortedTreeSetUnionFind() {
-    setOfSets = new HashMap<>();
+    mapOfSets = new HashMap<>();
   }
 
   /**
@@ -46,10 +46,10 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
   public T find(T e) {
 
     Preconditions.checkNotNull(e);
-    for (NavigableSet<T> current : setOfSets.values()) {
+    for (NavigableSet<T> current : mapOfSets.values()) {
       if (current.contains(e)) {
         for (T element : current) {
-          if (setOfSets.containsKey(element)) {
+          if (mapOfSets.containsKey(element)) {
             return element;
           }
         }
@@ -78,7 +78,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     if (e1.equals(e2)) {
       addElementAsNewSet(e1);
     } else {
-      Set<T> canonicalElements = setOfSets.keySet();
+      Set<T> canonicalElements = mapOfSets.keySet();
 
       if (canonicalElements.contains(e1)) {
         if (canonicalElements.contains(e2)) {
@@ -109,18 +109,18 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     if (!contains(e)) {
       NavigableSet<T> newSet = new TreeSet<>();
       newSet.add(e);
-      setOfSets.put(e, newSet);
+      mapOfSets.put(e, newSet);
     }
   }
 
   private void addElementToExistingSet(T e, T canon) {
 
     if (!contains(e)) {
-      for (NavigableSet<T> currentSet : setOfSets.values()) {
+      for (NavigableSet<T> currentSet : mapOfSets.values()) {
         if (currentSet.contains(canon)) {
-          assert setOfSets.remove(canon, currentSet);
+          assert mapOfSets.remove(canon, currentSet);
           currentSet.add(e);
-          setOfSets.put(canon, currentSet);
+          mapOfSets.put(canon, currentSet);
           break;
         }
       }
@@ -134,7 +134,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     @Var NavigableSet<T> set1 = null;
     @Var NavigableSet<T> set2 = null;
 
-    for (NavigableSet<T> current : setOfSets.values()) {
+    for (NavigableSet<T> current : mapOfSets.values()) {
       if (current.contains(e1)) {
         set1 = current;
       } else if (current.contains(e2)) {
@@ -148,15 +148,15 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
     int size1 = set1.size();
     int size2 = set2.size();
 
-    assert setOfSets.remove(e1, set1);
-    assert setOfSets.remove(e2, set2);
+    assert mapOfSets.remove(e1, set1);
+    assert mapOfSets.remove(e2, set2);
 
     if (size1 > size2) {
       set1.addAll(set2);
-      setOfSets.put(e1, set1);
+      mapOfSets.put(e1, set1);
     } else {
       set2.addAll(set1);
-      setOfSets.put(e2, set2);
+      mapOfSets.put(e2, set2);
     }
   }
 
@@ -167,7 +167,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
    */
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
-    return setOfSets.values();
+    return mapOfSets.values();
   }
 
   /**
@@ -182,7 +182,7 @@ public class SortedTreeSetUnionFind<T extends Comparable<T>> implements SortedUn
 
     Preconditions.checkNotNull(e);
 
-    for (NavigableSet<T> current : setOfSets.values()) {
+    for (NavigableSet<T> current : mapOfSets.values()) {
       if (current.contains(e)) {
         return true;
       }
