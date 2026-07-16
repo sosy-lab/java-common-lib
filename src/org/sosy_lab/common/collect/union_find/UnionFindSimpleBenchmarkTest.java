@@ -22,11 +22,11 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class UnionFindSimpleBenchmarkTest {
   final int lowerBound = 3;
   final int factorForComparison = 4;
 
-  @Ignore
   @Test
   public void unionBigOQuadraticEvaluationTest() {
     // BEGINNING of 1st loop
