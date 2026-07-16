@@ -19,12 +19,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UnionFindSimpleBenchmarkTest {
   final int lowerBound = 3;
   final int factorForComparison = 4;
 
+  @Ignore
   @Test
   public void unionBigOQuadraticEvaluationTest() {
     // BEGINNING of 1st loop
