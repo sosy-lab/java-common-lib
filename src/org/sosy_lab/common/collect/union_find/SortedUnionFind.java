@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.common.collect;
+package org.sosy_lab.common.collect.union_find;
 
 import java.util.Collection;
 import java.util.Set;

@@ -6,12 +6,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.common.collect;
+package org.sosy_lab.common.collect.union_find;
 
 import com.google.errorprone.annotations.DoNotCall;
 
-public abstract class AbstractImmutableSortedUnionFind<T extends Comparable<T>>
-    implements SortedUnionFind<T> {
+public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
   /**
    * @throws UnsupportedOperationException Always.
    * @deprecated Unsupported operation.

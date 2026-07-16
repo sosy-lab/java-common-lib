@@ -12,6 +12,7 @@ import com.google.common.testing.AbstractPackageSanityTests;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.collect.union_find.SortedTreeSetUnionFind;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
