@@ -6,14 +6,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.common.collect;
+package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import org.sosy_lab.common.collect.union_find.UnionFind;
 
 /**
  * An abstract, generic implementation of {@link UnionFind} using a {@link Map} of {@link Set}s. In
