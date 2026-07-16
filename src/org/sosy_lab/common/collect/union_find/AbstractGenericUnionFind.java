@@ -25,7 +25,7 @@ import java.util.Set;
 public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Map<T, S>>
     implements UnionFind<T> {
 
-  private final M mapOfSets;
+  protected final M mapOfSets;
 
   /**
    * Takes an empty map of the desired kind and allocates it to the variable mapOfSets. This enables
