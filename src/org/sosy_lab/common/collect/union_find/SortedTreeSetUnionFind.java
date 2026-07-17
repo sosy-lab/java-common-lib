@@ -27,9 +27,7 @@ public class SortedTreeSetUnionFind<
     extends AbstractGenericUnionFind<T, Set<T>, Map<T, Set<T>>> implements SortedUnionFind<T> {
 
   /** Generates an empty {@link SortedTreeSetUnionFind}. */
-  public SortedTreeSetUnionFind() {
-    super();
-  }
+  public SortedTreeSetUnionFind() {}
 
   @Override
   protected Set<T> getEmptySet() {
