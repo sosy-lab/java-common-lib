@@ -7,8 +7,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * This package contains additional interfaces and implementations for collections, as well as
- * further collection utilities.
+ * This package contains all interfaces and classes related to union-find.
  */
 @com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
