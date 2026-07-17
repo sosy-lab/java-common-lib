@@ -31,11 +31,10 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
    * Takes an empty map of the desired kind and allocates it to the variable mapOfSets. This enables
    * child classes to simply pass an object of the desired kind without having to modify the
    * constructor and methods.
-   *
-   * @param emptyMapOfSets empty map of desired type
    */
-  public AbstractGenericUnionFind(M emptyMapOfSets) {
-    mapOfSets = emptyMapOfSets;
+  @SuppressWarnings("unchecked")
+  public AbstractGenericUnionFind() {
+    mapOfSets = (M) getEmptyMap();
   }
 
   /**
@@ -112,7 +111,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   private void addElementAsNewSet(T e) {
 
     if (!contains(e)) {
-      S newSet = (S) Set.of();
+      S newSet = (S) getEmptySet();
       newSet.add(e);
       mapOfSets.put(e, newSet);
     }
@@ -194,4 +193,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     }
     return false;
   }
+
+  protected abstract Set<T> getEmptySet();
+  protected abstract Map<T, Set<T>> getEmptyMap();
 }

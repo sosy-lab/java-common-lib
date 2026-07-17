@@ -9,6 +9,8 @@
 package org.sosy_lab.common.collect.union_find;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -21,12 +23,21 @@ import java.util.TreeSet;
  *     ordering.
  */
 public class SortedTreeSetUnionFind<
-        T extends Comparable<T>, S extends TreeSet<T>, M extends HashMap<T, S>>
-    extends AbstractGenericUnionFind<T, S, M> implements SortedUnionFind<T> {
+        T extends Comparable<T>>
+    extends AbstractGenericUnionFind<T, Set<T>, Map<T, Set<T>>> implements SortedUnionFind<T> {
 
   /** Generates an empty {@link SortedTreeSetUnionFind}. */
-  @SuppressWarnings("unchecked")
   public SortedTreeSetUnionFind() {
-    super((M) new HashMap<T, S>());
+    super();
+  }
+
+  @Override
+  protected Set<T> getEmptySet() {
+    return new TreeSet<>();
+  }
+
+  @Override
+  protected Map<T, Set<T>> getEmptyMap() {
+    return new HashMap<>();
   }
 }
