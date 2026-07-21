@@ -22,8 +22,7 @@ import java.util.TreeSet;
  * @param <T> type of elements added to the Union-Find. Must be {@link Comparable} to ensure correct
  *     ordering.
  */
-public class SortedTreeSetUnionFind<
-        T extends Comparable<T>>
+public class SortedTreeSetUnionFind<T extends Comparable<T>>
     extends AbstractGenericUnionFind<T, Set<T>, Map<T, Set<T>>> implements SortedUnionFind<T> {
 
   /** Generates an empty {@link SortedTreeSetUnionFind}. */

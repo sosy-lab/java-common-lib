@@ -6,9 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * This package contains all interfaces and classes related to union-find.
- */
+/** This package contains all interfaces and classes related to union-find. */
 @com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

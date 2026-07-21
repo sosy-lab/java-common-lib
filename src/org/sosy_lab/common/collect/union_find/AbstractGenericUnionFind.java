@@ -195,5 +195,6 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   }
 
   protected abstract Set<T> getEmptySet();
+
   protected abstract Map<T, Set<T>> getEmptyMap();
 }
