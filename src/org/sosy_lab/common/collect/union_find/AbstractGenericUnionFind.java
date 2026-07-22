@@ -122,9 +122,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     if (!contains(e)) {
       for (S currentSet : mapOfSets.values()) {
         if (currentSet.contains(canon)) {
-          assert mapOfSets.remove(canon, currentSet);
           currentSet.add(e);
-          mapOfSets.put(canon, currentSet);
           break;
         }
       }
@@ -152,15 +150,12 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     int size1 = set1.size();
     int size2 = set2.size();
 
-    assert mapOfSets.remove(e1, set1);
-    assert mapOfSets.remove(e2, set2);
-
     if (size1 > size2) {
       set1.addAll(set2);
-      mapOfSets.put(e1, set1);
+      assert mapOfSets.remove(e2, set2);
     } else {
       set2.addAll(set1);
-      mapOfSets.put(e2, set2);
+      assert mapOfSets.remove(e1, set1);
     }
   }
 
