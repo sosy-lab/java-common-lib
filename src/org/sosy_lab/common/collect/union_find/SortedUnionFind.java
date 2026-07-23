@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect.union_find;
 
 import java.util.Collection;
+import java.util.NavigableSet;
 import java.util.Set;
 
 /**
@@ -40,7 +41,7 @@ public interface SortedUnionFind<T extends Comparable<T>> {
    *
    * @return {@link Collection} containing all current subsets
    */
-  Collection<? extends Set<T>> getAllSubsets();
+  Collection<? extends NavigableSet<T>> getAllSubsets();
 
   /**
    * Checks whether the provided element is contained in any current subset and returns true or
