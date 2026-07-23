@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect.union_find;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Var;
 import java.math.BigInteger;
 import java.time.Duration;
@@ -21,11 +22,45 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Ignore
+@RunWith(Parameterized.class)
 public class UnionFindSimpleBenchmarkTest {
-  final int lowerBound = 3;
-  final int factorForComparison = 4;
+
+  private static final int maximumLower = 8;
+  private static final int maximumUpper = 10;
+
+  private final int lowerBound;
+  private final int upperBound;
+
+  /**
+   * Builds parameters for lowerBound and upperBound (as 2-Tuples). lowerBounds are computed from 1
+   * to maximumLower. And maximumUpper, for each lowerBound, from current lowerBound to
+   * maximumUpper.
+   */
+  @Parameters(name = "{index}: lowerBound {0}, upperBound {1}")
+  public static List<Object[]> getBounds() {
+    ImmutableList.Builder<Object[]> outer = ImmutableList.builder();
+    for (int lower = 1; lower <= maximumLower; lower++) {
+      for (int upper = 2; upper <= maximumUpper; upper++) {
+        if (upper > lower) {
+          Integer[] inner = new Integer[2];
+          inner[0] = lower;
+          inner[1] = upper;
+          outer.add(inner);
+        }
+      }
+    }
+    return outer.build();
+  }
+
+  public UnionFindSimpleBenchmarkTest(int lowerBound, int upperBound) {
+    this.lowerBound = lowerBound;
+    this.upperBound = upperBound;
+  }
 
   @Test
   public void unionBigOQuadraticEvaluationTest() {
@@ -40,9 +75,9 @@ public class UnionFindSimpleBenchmarkTest {
     Duration timeAfterFirstLoop = Duration.ofNanos(System.nanoTime());
     Duration timeOfFirstLoop = timeAfterFirstLoop.minus(timeBeforeFirstLoop);
     // END of 1st loop
+    // System.out.println("Time for first loop: " + timeOfFirstLoop.getSeconds() + "s" + "\n");
 
     // BEGINNING of 2nd loop
-    int upperBound = lowerBound * factorForComparison;
     Set<SortedUnionFind<Integer>> allUnionFindsOfSecondLoop = new HashSet<>();
 
     Duration timeBeforeSecondLoop = Duration.ofNanos(System.nanoTime());
@@ -53,6 +88,7 @@ public class UnionFindSimpleBenchmarkTest {
     Duration timeAfterSecondLoop = Duration.ofNanos(System.nanoTime());
     Duration timeOfSecondLoop = timeAfterSecondLoop.minus(timeBeforeSecondLoop);
     // END of 2nd loop
+    // System.out.println("Time for second loop: " + timeOfSecondLoop.getSeconds() + "s" + "\n");
 
     // will throw for larger n's as they won't fit into long
     long bellOfLowerBound = getBellNoOfN(lowerBound).longValueExact();
@@ -64,6 +100,10 @@ public class UnionFindSimpleBenchmarkTest {
                 (bellOfUpperBound * bellOfUpperBound) / (bellOfLowerBound * bellOfLowerBound)));
   }
 
+  // TODO: add a method that computes only permutations with n elements.
+
+  // TODO: this computes all permutations from 2 to pHighestNumber + 2 -> make it compute them only
+  // from 1 to pHighestNumber
   private static List<Set<Set<Integer>>> generatePartitions(int pHighestNumber) {
     @Var List<Set<Set<Integer>>> allPermutations = new ArrayList<>();
 
@@ -95,6 +135,14 @@ public class UnionFindSimpleBenchmarkTest {
         newSets.add(currentExistingSet);
       }
 
+      /*
+      // This prints all permutations that are added without duplicates
+      for (Set<Set<Integer>> newSet : newSets) {
+        if (!allPermutations.contains(newSet)) {
+          System.out.println(newSet);
+        }
+      }
+      */
       allPermutations = newSets;
     }
 
