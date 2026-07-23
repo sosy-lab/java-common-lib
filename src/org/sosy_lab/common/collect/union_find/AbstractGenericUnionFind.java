@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect.union_find;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -48,9 +49,9 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
 
     Preconditions.checkNotNull(e);
 
-    for (T key : mapOfSets.keySet()) {
-      if (mapOfSets.get(key).contains(e)) {
-        return key;
+    for (Entry<T, S> mapping : mapOfSets.entrySet()) {
+      if (mapping.getValue().contains(e)) {
+        return mapping.getKey();
       }
     }
 
