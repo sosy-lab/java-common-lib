@@ -9,7 +9,6 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -48,13 +47,10 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   public T find(T e) {
 
     Preconditions.checkNotNull(e);
-    for (S current : mapOfSets.values()) {
-      if (current.contains(e)) {
-        for (T element : current) {
-          if (mapOfSets.containsKey(element)) {
-            return element;
-          }
-        }
+
+    for (T key : mapOfSets.keySet()) {
+      if (mapOfSets.get(key).contains(e)) {
+        return key;
       }
     }
 
@@ -81,7 +77,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     if (e1.equals(e2)) {
       addElementAsNewSet(e1);
     } else {
-      S canonicalElements = (S) mapOfSets.keySet();
+      Set<T> canonicalElements = mapOfSets.keySet();
 
       if (canonicalElements.contains(e1)) {
         if (canonicalElements.contains(e2)) {
@@ -120,29 +116,17 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   private void addElementToExistingSet(T e, T canon) {
 
     if (!contains(e)) {
-      for (S currentSet : mapOfSets.values()) {
-        if (currentSet.contains(canon)) {
-          currentSet.add(e);
-          break;
-        }
-      }
+      mapOfSets.get(canon).add(e);
     } else {
       mergeExistingSets(find(e), canon);
     }
   }
 
+  // e1 will be new canonical element only if it's set is actually bigger, otherwise e2 new canon
   private void mergeExistingSets(T e1, T e2) {
 
-    @Var S set1 = null;
-    @Var S set2 = null;
-
-    for (S current : mapOfSets.values()) {
-      if (current.contains(e1)) {
-        set1 = current;
-      } else if (current.contains(e2)) {
-        set2 = current;
-      }
-    }
+    S set1 = mapOfSets.get(e1);
+    S set2 = mapOfSets.get(e2);
 
     assert set1 != null;
     assert set2 != null;
