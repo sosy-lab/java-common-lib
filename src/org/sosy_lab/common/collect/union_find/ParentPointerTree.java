@@ -37,13 +37,14 @@ public class ParentPointerTree<T> {
 
   public void addAsNewNode(T value) {
     TreeNode<T> node = TreeNode.getNewNode(listOfNodes.get(nextParentIndex), value);
+    listOfNodes.add(node);
     updateNextParent();
     size++;
   }
 
   // will currently create a binary tree as it increases counter every 2nd insert
   private void updateNextParent() {
-    if(!timeToMoveOn) {
+    if (!timeToMoveOn) {
       timeToMoveOn = true;
     } else {
       nextParentIndex++;

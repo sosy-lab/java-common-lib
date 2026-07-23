@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 public class TreeNode<T> {
 
-  @Nullable  TreeNode<T> parent;
+  @Nullable TreeNode<T> parent;
   T value;
 
   private TreeNode(T value) {
@@ -25,6 +25,7 @@ public class TreeNode<T> {
     this.value = value;
   }
 
+  @Nullable
   public TreeNode<T> getParent() {
     return parent;
   }
@@ -34,10 +35,10 @@ public class TreeNode<T> {
   }
 
   public static <V> TreeNode<V> getNewRootNode(V value) {
-    return new TreeNode<V>(value);
+    return new TreeNode<>(value);
   }
 
   public static <V> TreeNode<V> getNewNode(TreeNode<V> parent, V value) {
-    return new TreeNode<V>(parent, value);
+    return new TreeNode<>(parent, value);
   }
 }
