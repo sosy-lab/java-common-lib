@@ -8,15 +8,14 @@
 
 package org.sosy_lab.common.collect.union_find;
 
-import javax.annotation.Nullable;
 
 public class TreeNode<T> {
 
-  @Nullable private TreeNode<T> parent;
+  private TreeNode<T> parent;
   private final T value;
 
   private TreeNode(T value) {
-    this.parent = null;
+    this.parent = this;
     this.value = value;
   }
 
@@ -25,9 +24,12 @@ public class TreeNode<T> {
     this.value = value;
   }
 
-  @Nullable
   public TreeNode<T> getParent() {
     return parent;
+  }
+
+  public void setParent(TreeNode<T> parent) {
+    this.parent = parent;
   }
 
   public T getValue() {

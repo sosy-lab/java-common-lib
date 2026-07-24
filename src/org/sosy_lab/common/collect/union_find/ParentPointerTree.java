@@ -8,6 +8,7 @@
 
 package org.sosy_lab.common.collect.union_find;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +58,9 @@ public class ParentPointerTree<T> {
   public boolean appendTree(ParentPointerTree<T> tree) {
     TreeNode<T> rootToBeAdded = tree.getRoot();
 
-    assert rootToBeAdded.getParent() == listOfNodes.get(nextParentIndex);
+    TreeNode<T> parent = listOfNodes.get(nextParentIndex);
+    Preconditions.checkNotNull(parent);
+    rootToBeAdded.setParent(parent);
 
     size += tree.size;
     listOfNodes.addAll(tree.listOfNodes);
