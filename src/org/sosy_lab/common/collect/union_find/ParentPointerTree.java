@@ -35,11 +35,32 @@ public class ParentPointerTree<T> {
     return size;
   }
 
+  public boolean contains(T value) {
+    for (TreeNode<T> current : listOfNodes) {
+      if (current.value.equals(value)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public void addAsNewNode(T value) {
     TreeNode<T> node = TreeNode.getNewNode(listOfNodes.get(nextParentIndex), value);
     listOfNodes.add(node);
     updateNextParent();
     size++;
+  }
+
+  public boolean appendTree(ParentPointerTree<T> tree) {
+    TreeNode<T> rootToBeAdded = tree.getRoot();
+
+    assert rootToBeAdded.parent == listOfNodes.get(nextParentIndex);
+
+    size += tree.size;
+    listOfNodes.addAll(tree.listOfNodes);
+    updateNextParent();
+    return true;
   }
 
   // will currently create a binary tree as it increases counter every 2nd insert

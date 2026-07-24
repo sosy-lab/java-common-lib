@@ -123,7 +123,7 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
     }
   }
 
-  // e1 will be new canonical element only if it's set is actually bigger, otherwise e2 new canon
+  // e1 will be new canonical element only if its set is actually bigger, otherwise e2 new canon
   private void mergeExistingSets(T e1, T e2) {
 
     S set1 = mapOfSets.get(e1);
