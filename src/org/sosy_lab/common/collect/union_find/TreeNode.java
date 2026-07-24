@@ -12,8 +12,8 @@ import javax.annotation.Nullable;
 
 public class TreeNode<T> {
 
-  @Nullable TreeNode<T> parent;
-  T value;
+  @Nullable private TreeNode<T> parent;
+  private final T value;
 
   private TreeNode(T value) {
     this.parent = null;

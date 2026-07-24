@@ -9,7 +9,9 @@
 package org.sosy_lab.common.collect.union_find;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ParentPointerTree<T> {
   private final TreeNode<T> root;
@@ -37,7 +39,7 @@ public class ParentPointerTree<T> {
 
   public boolean contains(T value) {
     for (TreeNode<T> current : listOfNodes) {
-      if (current.value.equals(value)) {
+      if (current.getValue().equals(value)) {
         return true;
       }
     }
@@ -55,12 +57,23 @@ public class ParentPointerTree<T> {
   public boolean appendTree(ParentPointerTree<T> tree) {
     TreeNode<T> rootToBeAdded = tree.getRoot();
 
-    assert rootToBeAdded.parent == listOfNodes.get(nextParentIndex);
+    assert rootToBeAdded.getParent() == listOfNodes.get(nextParentIndex);
 
     size += tree.size;
     listOfNodes.addAll(tree.listOfNodes);
     updateNextParent();
     return true;
+  }
+
+  public Set<T> getSetOfNodeValues() {
+
+    Set<T> allNodeValues = new HashSet<>();
+
+    for (TreeNode<T> node : listOfNodes) {
+      allNodeValues.add(node.getValue());
+    }
+
+    return allNodeValues;
   }
 
   // will currently create a binary tree as it increases counter every 2nd insert

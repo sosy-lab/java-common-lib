@@ -10,8 +10,10 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -66,8 +68,14 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
-    // TODO
-    return null;
+
+    List<Set<T>> allSubsets = new ArrayList<>();
+
+    for (ParentPointerTree<T> tree : forest.values()) {
+      allSubsets.add(tree.getSetOfNodeValues());
+    }
+
+    return allSubsets;
   }
 
   @Override

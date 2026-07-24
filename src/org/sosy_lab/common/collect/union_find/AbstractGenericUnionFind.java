@@ -68,7 +68,6 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
    * @param e1 first element
    * @param e2 second element
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void union(T e1, T e2) {
 
