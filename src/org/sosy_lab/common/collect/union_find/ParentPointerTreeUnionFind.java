@@ -32,10 +32,8 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     Preconditions.checkNotNull(value);
 
     for (Entry<T, ParentPointerTree<T>> entry : forest.entrySet()) {
-      T key = entry.getKey();
-      ParentPointerTree<T> tree = entry.getValue();
-      if (key.equals(value) || tree.contains(value)) {
-        return key;
+      if (entry.getValue().contains(value)) {
+        return entry.getKey();
       }
     }
 

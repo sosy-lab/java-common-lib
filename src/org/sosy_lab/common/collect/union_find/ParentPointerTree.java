@@ -10,21 +10,25 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ParentPointerTree<T> {
   private final TreeNode<T> root;
   private final List<TreeNode<T>> listOfNodes;
+  private final Map<T, TreeNode<T>> mapOfNodes;
   private int nextParentIndex;
   private boolean timeToMoveOn;
   private int size;
 
   public ParentPointerTree(T rootValue) {
-    this.root = TreeNode.getNewRootNode(rootValue);
+    root = TreeNode.getNewRootNode(rootValue);
     listOfNodes = new ArrayList<>();
     listOfNodes.add(this.root);
+    mapOfNodes = new HashMap<>();
+    mapOfNodes.put(rootValue, root);
     nextParentIndex = 0;
     timeToMoveOn = false;
     size = 1;
@@ -39,23 +43,21 @@ public class ParentPointerTree<T> {
   }
 
   public boolean contains(T value) {
-    for (TreeNode<T> current : listOfNodes) {
-      if (current.getValue().equals(value)) {
-        return true;
-      }
-    }
 
-    return false;
+    return mapOfNodes.containsKey(value);
   }
 
   public void addAsNewNode(T value) {
+
     TreeNode<T> node = TreeNode.getNewNode(listOfNodes.get(nextParentIndex), value);
     listOfNodes.add(node);
+    mapOfNodes.put(value, node);
     updateNextParent();
     size++;
   }
 
   public boolean appendTree(ParentPointerTree<T> tree) {
+
     TreeNode<T> rootToBeAdded = tree.getRoot();
 
     TreeNode<T> parent = listOfNodes.get(nextParentIndex);
@@ -64,23 +66,20 @@ public class ParentPointerTree<T> {
 
     size += tree.size;
     listOfNodes.addAll(tree.listOfNodes);
+    mapOfNodes.putAll(tree.mapOfNodes);
     updateNextParent();
+
     return true;
   }
 
   public Set<T> getSetOfNodeValues() {
 
-    Set<T> allNodeValues = new HashSet<>();
-
-    for (TreeNode<T> node : listOfNodes) {
-      allNodeValues.add(node.getValue());
-    }
-
-    return allNodeValues;
+    return mapOfNodes.keySet();
   }
 
   // will currently create a binary tree as it increases counter every 2nd insert
   private void updateNextParent() {
+
     if (!timeToMoveOn) {
       timeToMoveOn = true;
     } else {
