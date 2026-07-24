@@ -42,7 +42,7 @@ public class UnionFindSimpleBenchmarkTest {
    * maximumUpper.
    */
   @Parameters(name = "{index}: lowerBound {0}, upperBound {1}")
-  public static List<Object[]> getBounds() {
+  public static ImmutableList<Object[]> getBounds() {
     ImmutableList.Builder<Object[]> outer = ImmutableList.builder();
     for (int lower = 1; lower <= maximumLower; lower++) {
       for (int upper = 2; upper <= maximumUpper; upper++) {
