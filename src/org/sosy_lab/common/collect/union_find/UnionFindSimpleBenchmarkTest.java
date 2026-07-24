@@ -101,6 +101,28 @@ public class UnionFindSimpleBenchmarkTest {
   }
 
   // TODO: add a method that computes only permutations with n elements.
+  /*
+  private static List<Set<Set<Integer>>> generatePartitionsNEW(int pHighestNumber) {
+    @Var List<Set<Set<Integer>>> allPartitions = new ArrayList<>();
+    final Set<Set<Integer>> singletonSet = new HashSet<>();
+
+    for (int i = 0; i <= pHighestNumber; i++) {
+      Set<Integer> singleNumberSet = Set.of(i);
+      singletonSet.add(singleNumberSet);
+    }
+    allPartitions.add(singletonSet);
+
+    for (int i = 2; i <= pHighestNumber; i++) {
+      // TODO
+      List<Set<Set<Integer>>> partitionsSoFar = new ArrayList<>(allPartitions);
+
+      for (Set<Set<Integer>> current : partitionsSoFar) {
+        // TODO
+      }
+    }
+
+    return allPartitions;
+  }*/
 
   // TODO: this computes all permutations from 2 to pHighestNumber + 2 -> make it compute them only
   // from 1 to pHighestNumber
