@@ -8,8 +8,7 @@
 
 package org.sosy_lab.common.collect.union_find;
 
-
-public class TreeNode<T> {
+public final class TreeNode<T> {
 
   private TreeNode<T> parent;
   private final T value;
