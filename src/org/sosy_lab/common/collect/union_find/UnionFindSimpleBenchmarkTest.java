@@ -105,7 +105,8 @@ public class UnionFindSimpleBenchmarkTest {
     Set<Set<Integer>> singletonSet = new HashSet<>();
 
     for (int i = 1; i <= pHighestNumber; i++) {
-      Set<Integer> singleNumberSet = Set.of(i);
+      Set<Integer> singleNumberSet = new HashSet<>();
+      singleNumberSet.add(i);
       singletonSet.add(singleNumberSet);
     }
     allPartitions.add(singletonSet);
