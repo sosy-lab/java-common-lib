@@ -100,75 +100,77 @@ public class UnionFindSimpleBenchmarkTest {
                 (bellOfUpperBound * bellOfUpperBound) / (bellOfLowerBound * bellOfLowerBound)));
   }
 
-  // TODO: add a method that computes only permutations with n elements.
-  /*
-  private static List<Set<Set<Integer>>> generatePartitionsNEW(int pHighestNumber) {
-    @Var List<Set<Set<Integer>>> allPartitions = new ArrayList<>();
-    final Set<Set<Integer>> singletonSet = new HashSet<>();
+  private static List<Set<Set<Integer>>> generatePartitions(int pHighestNumber) {
+    List<Set<Set<Integer>>> allPartitions = new ArrayList<>();
+    Set<Set<Integer>> singletonSet = new HashSet<>();
 
-    for (int i = 0; i <= pHighestNumber; i++) {
+    for (int i = 1; i <= pHighestNumber; i++) {
       Set<Integer> singleNumberSet = Set.of(i);
       singletonSet.add(singleNumberSet);
     }
     allPartitions.add(singletonSet);
+    // System.out.println("New loop with upper bound " + pHighestNumber + ":");
+    // System.out.println(singletonSet);
 
+    // biggest subset size currently being created
     for (int i = 2; i <= pHighestNumber; i++) {
-      // TODO
-      List<Set<Set<Integer>>> partitionsSoFar = new ArrayList<>(allPartitions);
+      // deep copy of allPartitions to iterate over
+      List<Set<Set<Integer>>> partitionsSoFar = new ArrayList<>();
+      for (Set<Set<Integer>> currentSet : allPartitions) {
+        partitionsSoFar.add(createDeepCopy(currentSet));
+      }
 
+      // iterate over all partitions that currently exist
       for (Set<Set<Integer>> current : partitionsSoFar) {
-        // TODO
+        // add no.s from 1 - pHighestNumber to subsets
+        for (int j = 1; j <= pHighestNumber; j++) {
+          // add j to each subset that doesn't contain it yet by merging with subset containing j
+          breaker:
+          for (Set<Integer> currentSubset : current) {
+            if (!currentSubset.contains(j)) {
+              Set<Set<Integer>> copyOfCurrent = createDeepCopy(current);
+
+              @Var Set<Integer> toBeAddedTo = new HashSet<>();
+              @Var Set<Integer> toRemove = new HashSet<>();
+
+              for (Set<Integer> subsetOfCopy : copyOfCurrent) {
+                if (subsetOfCopy.equals(currentSubset)) {
+                  toBeAddedTo = subsetOfCopy;
+                } else if (subsetOfCopy.contains(j)) {
+                  toRemove = subsetOfCopy;
+                }
+              }
+
+              copyOfCurrent.remove(toRemove);
+              copyOfCurrent.remove(toBeAddedTo);
+              toBeAddedTo.addAll(toRemove);
+              copyOfCurrent.add(toBeAddedTo);
+
+              for (Set<Set<Integer>> set : allPartitions) {
+                if (copyOfCurrent.equals(set)) {
+                  continue breaker;
+                }
+              }
+              allPartitions.add(copyOfCurrent);
+              // System.out.println(copyOfCurrent);
+            }
+          }
+        }
       }
     }
 
     return allPartitions;
-  }*/
+  }
 
-  // TODO: this computes all permutations from 2 to pHighestNumber + 2 -> make it compute them only
-  // from 1 to pHighestNumber
-  private static List<Set<Set<Integer>>> generatePartitions(int pHighestNumber) {
-    @Var List<Set<Set<Integer>>> allPermutations = new ArrayList<>();
+  private static Set<Set<Integer>> createDeepCopy(Set<Set<Integer>> pSets) {
+    Set<Set<Integer>> copy = new HashSet<>();
 
-    // initialise allPermutations
-    Set<Set<Integer>> init = new HashSet<>();
-    Set<Integer> initSubset = new HashSet<>();
-    initSubset.add(0);
-    init.add(initSubset);
-    allPermutations.add(init);
-
-    for (int i = 1; i <= pHighestNumber; i++) {
-
-      List<Set<Set<Integer>>> newSets = new ArrayList<>();
-
-      for (Set<Set<Integer>> existingSet : allPermutations) {
-        for (Set<Integer> existingSubset : existingSet) {
-          Set<Set<Integer>> setWithNumber = new HashSet<>(existingSet);
-          setWithNumber.remove(existingSubset);
-          Set<Integer> subsetWithNumber = new HashSet<>(existingSubset);
-          subsetWithNumber.add(i);
-          setWithNumber.add(subsetWithNumber);
-          newSets.add(setWithNumber);
-        }
-
-        Set<Set<Integer>> currentExistingSet = new HashSet<>(existingSet);
-        Set<Integer> subsetWithCurrentI = new HashSet<>();
-        subsetWithCurrentI.add(i);
-        currentExistingSet.add(subsetWithCurrentI);
-        newSets.add(currentExistingSet);
-      }
-
-      /*
-      // This prints all permutations that are added without duplicates
-      for (Set<Set<Integer>> newSet : newSets) {
-        if (!allPermutations.contains(newSet)) {
-          System.out.println(newSet);
-        }
-      }
-      */
-      allPermutations = newSets;
+    for (Set<Integer> subset : pSets) {
+      Set<Integer> copyOfSubset = new HashSet<>(subset);
+      copy.add(copyOfSubset);
     }
 
-    return allPermutations;
+    return copy;
   }
 
   private static void transformPartitionsToUnionFind(
