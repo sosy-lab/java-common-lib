@@ -109,7 +109,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="13.2.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="13.9.0" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.9.8" conf="spotbugs->default"/>
