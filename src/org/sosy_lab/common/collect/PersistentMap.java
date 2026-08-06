@@ -19,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Interface for persistent map. A persistent data structure is immutable, but provides cheap
- * copy-and-write operations. Thus all write operations ({{@link #putAndCopy(Object, Object)},
+ * copy-and-write operations. Thus, all write operations ({{@link #putAndCopy(Object, Object)},
  * {{@link #removeAndCopy(Object)}}) will not modify the current instance, but return a new instance
  * instead.
  *
