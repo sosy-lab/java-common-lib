@@ -94,6 +94,7 @@ public final class PathCopyingPersistentTreeMap<
     private final @Nullable Node<K, V> left;
     private final @Nullable Node<K, V> right;
     private final boolean isRed;
+    private final int subtreeSize;
 
     // Leaf node
     Node(K pKey, V pValue) {
@@ -101,6 +102,7 @@ public final class PathCopyingPersistentTreeMap<
       left = null;
       right = null;
       isRed = RED;
+      subtreeSize = 1;
     }
 
     // Any node
@@ -109,6 +111,7 @@ public final class PathCopyingPersistentTreeMap<
       left = pLeft;
       right = pRight;
       isRed = pRed;
+      subtreeSize = 1 + size(pLeft) + size(pRight);
     }
 
     boolean isLeaf() {
@@ -125,6 +128,10 @@ public final class PathCopyingPersistentTreeMap<
 
     static boolean isBlack(@Nullable Node<?, ?> n) {
       return n != null && !n.isRed;
+    }
+
+    private static int size(@Nullable Node<?, ?> n) {
+      return n == null ? 0 : n.subtreeSize;
     }
 
     // Methods for creating new nodes based on current node.
@@ -850,7 +857,7 @@ public final class PathCopyingPersistentTreeMap<
   @Override
   public int size() {
     if (size <= 0) {
-      size = Node.countNodes(root);
+      size = Node.size(root);
     }
     return size;
   }

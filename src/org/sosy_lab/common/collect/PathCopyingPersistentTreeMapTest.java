@@ -20,13 +20,16 @@ import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -433,5 +436,209 @@ public class PathCopyingPersistentTreeMapTest {
     // instead of letting Truth check containment (which is not guaranteed to call containsAll).
     assertThat(second.entrySet().containsAll(first.entrySet())).isFalse();
     assertThat(first.entrySet().containsAll(second.entrySet())).isFalse();
+  }
+
+  // Test cases for size tracking
+
+  @Test
+  public void testEmptyMapHasSizeZero() {
+    // Verify that a newly created map has no entries and size 0
+    assertThat(map.size()).isEqualTo(0);
+    assertThat(map.isEmpty()).isTrue();
+    assertThat(map.containsKey("1")).isFalse();
+    assertThat(map.get("1")).isNull();
+    assertThat(map.firstEntry()).isNull();
+    assertThat(map.lastEntry()).isNull();
+  }
+
+  @Test
+  public void testSizeTracksDuplicateKeyInsertions() {
+    // Verify that inserting duplicate keys does not change size() regardless of value
+    map = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map2 = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    assertThat(map2.size()).isEqualTo(1);
+    PersistentSortedMap<String, String> map3 = map.putAndCopy("3", "B");
+    assertThat(map.size()).isEqualTo(1);
+    assertThat(map3.size()).isEqualTo(1);
+  }
+
+  @Test
+  public void testSizeTracksMissingKeyInsertions() {
+    // Verify that deleting missing keys does not change size()
+    map = map.putAndCopy("3", "A");
+    assertThat(map.size()).isEqualTo(1);
+    map = map.removeAndCopy("2");
+    assertThat(map.size()).isEqualTo(1);
+  }
+
+  private static String[] shuffleKeyOrder(int size) {
+    // Helper method that randomly shuffles key insertion/deletion order
+    int[] keyOrder = new int[size];
+
+    for (int i = 0; i < size; i++) {
+      keyOrder[i] = i + 1;
+    }
+
+    // Randomize insertion order using Fisher-Yates shuffle
+
+    Random random = new Random();
+
+    for (int i = size - 1; i > 0; i--) {
+      int j = random.nextInt(i + 1);
+
+      int temp = keyOrder[i];
+      keyOrder[i] = keyOrder[j];
+      keyOrder[j] = temp;
+    }
+
+    String[] stringKeyOrder = new String[size];
+
+    for (int i = 0; i < size; i++) {
+      stringKeyOrder[i] = Integer.toString(keyOrder[i]);
+    }
+
+    return stringKeyOrder;
+  }
+
+  private void runInsertionOrder(String[] keyInsertionOrder) {
+    // Helper method for test cases that verify correct key insertion and size tracking
+    // across all versions
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+    List<Integer> expectedVersionSizes = new ArrayList<>();
+
+    versions.add(map);
+    expectedVersionSizes.add(map.size());
+
+    for (String key : keyInsertionOrder) {
+      map = map.putAndCopy(key, key);
+      versions.add(map);
+      expectedVersionSizes.add(map.size());
+
+      for (int j = 0; j < versions.size(); j++) {
+        assertThat(versions.get(j).size()).isEqualTo(expectedVersionSizes.get(j));
+      }
+    }
+  }
+
+  @Test
+  public void testSizeTracksAscendingInsertionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every insertion
+    int insertionAmount = 100;
+
+    String[] keyInsertionOrder = new String[insertionAmount];
+
+    for (int i = insertionAmount; i > 0; i--) {
+      keyInsertionOrder[i - 1] = Integer.toString(i);
+    }
+
+    runInsertionOrder(keyInsertionOrder);
+  }
+
+  @Test
+  public void testSizeTracksDescendingInsertionsAcrossAllVersions() {
+    // Insert keys in descending order and verify that size() reflects the correct
+    // number of entries for each version after every insertion
+    int insertionAmount = 100;
+
+    String[] keyInsertionOrder = new String[insertionAmount];
+
+    for (int i = 0; i < insertionAmount; i++) {
+      keyInsertionOrder[i] = Integer.toString(i + 1);
+    }
+
+    runInsertionOrder(keyInsertionOrder);
+  }
+
+  @Test
+  public void testSizeTracksRandomInsertionsAcrossAllVersions() {
+    // Insert keys in random order and verify that size() reflects the correct
+    // number of entries for each version after every insertion
+    int insertionAmount = 100;
+
+    runInsertionOrder(shuffleKeyOrder(insertionAmount));
+  }
+
+  private void runDeletionOrder(int n, String[] keyDeletionOrder) {
+    // Helper method for test cases that verify correct key deletion and size tracking
+    // across all versions
+    Set<String> oracle = new TreeSet<>();
+    List<Integer> expectedVersionSizes = new ArrayList<>();
+    List<PersistentSortedMap<String, String>> versions = new ArrayList<>();
+
+    for (int i = 1; i <= n; i++) {
+      map = map.putAndCopy(Integer.toString(i), Integer.toString(i));
+      oracle.add(Integer.toString(i));
+    }
+
+    versions.add(map);
+    expectedVersionSizes.add(map.size());
+
+    for (String keyToDelete : keyDeletionOrder) {
+      map = map.removeAndCopy(keyToDelete);
+      oracle.remove(keyToDelete);
+
+      versions.add(map);
+      expectedVersionSizes.add(map.size());
+
+      assertThat(map.size()).isEqualTo(oracle.size());
+
+      for (int i = 1; i <= n; i++) {
+        assertThat(map.containsKey(Integer.toString(i)))
+                .isEqualTo(oracle.contains(Integer.toString(i)));
+
+        @Var int count = 0;
+
+        for (String key : map.keySet()) {
+          assertThat(oracle.contains(key)).isTrue();
+          count++;
+        }
+
+        assertThat(map.size()).isEqualTo(count);
+
+        for (int j = 0; j < versions.size(); j++) {
+          assertThat(versions.get(j).size()).isEqualTo(expectedVersionSizes.get(j));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testSizeTracksAscendingDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in ascending order
+    int keyAmount = 100;
+    String[] keyDeletionOrder = new String[keyAmount];
+
+    for (int i = 1; i <= keyAmount; i++) {
+      keyDeletionOrder[i - 1] = Integer.toString(i);
+    }
+
+    runDeletionOrder(keyAmount, keyDeletionOrder);
+  }
+
+  @Test
+  public void testSizeTracksDescendingDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in descending order
+    int keyAmount = 100;
+    String[] keyDeletionOrder = new String[keyAmount];
+
+    for (int i = keyAmount; i > 0; i--) {
+      keyDeletionOrder[i - 1] = Integer.toString(i);
+    }
+
+    runDeletionOrder(keyAmount, keyDeletionOrder);
+  }
+
+  @Test
+  public void testSizeTracksRandomDeletionsAcrossAllVersions() {
+    // Insert keys in ascending order and verify that size() reflects the correct
+    // number of entries for each version after every deletion in random order
+    int keyAmount = 100;
+
+    runDeletionOrder(keyAmount, shuffleKeyOrder(keyAmount));
   }
 }
