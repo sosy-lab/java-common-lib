@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.common.collect.union_find;
+package org.sosy_lab.common.collect.union_find.tests;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -14,6 +14,8 @@ import com.google.common.collect.Range;
 import com.google.errorprone.annotations.Var;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sosy_lab.common.collect.union_find.SortedTreeSetUnionFind;
+import org.sosy_lab.common.collect.union_find.SortedUnionFind;
 
 public class SortedUnionFindTest {
 
