@@ -51,7 +51,12 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     } else {
       if (contains(value1)) {
         if (contains(value2)) {
-          mergeExistingSets(find(value1), find(value2));
+          T canon1 = find(value1);
+          T canon2 = find(value2);
+
+          if (!canon1.equals(canon2)) {
+            mergeExistingSets(find(value1), find(value2));
+          }
         } else {
           addElementToExistingSet(value2, find(value1));
         }
@@ -103,15 +108,24 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     @Var ParentPointerTree<T> tree1 = null;
     @Var ParentPointerTree<T> tree2 = null;
 
-    while (tree1 == null || tree2 == null) {
-      for (Entry<T, ParentPointerTree<T>> entry : forest.entrySet()) {
-        if (entry.getKey().equals(canon1)) {
-          tree1 = entry.getValue();
-        } else if (entry.getKey().equals(canon2)) {
-          tree2 = entry.getValue();
+    for (Entry<T, ParentPointerTree<T>> entry : forest.entrySet()) {
+      if (entry.getKey().equals(canon1)) {
+        tree1 = entry.getValue();
+
+        if (tree2 != null) {
+          break;
+        }
+      } else if (entry.getKey().equals(canon2)) {
+        tree2 = entry.getValue();
+
+        if (tree1 != null) {
+          break;
         }
       }
     }
+
+    Preconditions.checkNotNull(tree1);
+    Preconditions.checkNotNull(tree2);
 
     if (tree1.getSize() > tree2.getSize()) {
       assert tree1.appendTree(tree2);
