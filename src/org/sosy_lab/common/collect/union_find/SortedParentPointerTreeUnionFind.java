@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class ParentPointerTreeSortedUnionFind<T> extends ParentPointerTreeUnionFind<T> {
+public class SortedParentPointerTreeUnionFind<T> extends ParentPointerTreeUnionFind<T> {
 
   // subsets are in order of their canonical elements; elements in subsets are sorted as well
   @Override

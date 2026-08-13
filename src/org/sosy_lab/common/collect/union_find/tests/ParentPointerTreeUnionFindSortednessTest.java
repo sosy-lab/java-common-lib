@@ -14,15 +14,15 @@ import java.util.Collection;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.common.collect.union_find.ParentPointerTreeSortedUnionFind;
+import org.sosy_lab.common.collect.union_find.SortedParentPointerTreeUnionFind;
 
 public class ParentPointerTreeUnionFindSortednessTest {
 
-  private ParentPointerTreeSortedUnionFind<Integer> sortedUnionFind;
+  private SortedParentPointerTreeUnionFind<Integer> sortedUnionFind;
 
   @Before
   public void setup() {
-    sortedUnionFind = new ParentPointerTreeSortedUnionFind<>();
+    sortedUnionFind = new SortedParentPointerTreeUnionFind<>();
   }
 
   @Test
@@ -86,8 +86,8 @@ public class ParentPointerTreeUnionFindSortednessTest {
   @Test
   public void testGetAllSubsets_stringElements_areSortedAlphabetically() {
 
-    ParentPointerTreeSortedUnionFind<String> stringSortedUnionFind =
-        new ParentPointerTreeSortedUnionFind<>();
+    SortedParentPointerTreeUnionFind<String> stringSortedUnionFind =
+        new SortedParentPointerTreeUnionFind<>();
     String[] expected = {"-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     for (int i = 0; i <= 2; i++) {
@@ -110,7 +110,7 @@ public class ParentPointerTreeUnionFindSortednessTest {
   }
 
   private static <T> Set<T> onlySubsetOf(
-      ParentPointerTreeSortedUnionFind<T> sortedUnionFind) {
+      SortedParentPointerTreeUnionFind<T> sortedUnionFind) {
 
     Collection<? extends Set<T>> subsets = sortedUnionFind.getAllSubsets();
 
