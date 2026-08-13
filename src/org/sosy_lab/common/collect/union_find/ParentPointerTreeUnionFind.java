@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
-  private final Map<T, ParentPointerTree<T>> forest;
+  protected final Map<T, ParentPointerTree<T>> forest;
 
   public ParentPointerTreeUnionFind() {
     forest = new HashMap<>();
