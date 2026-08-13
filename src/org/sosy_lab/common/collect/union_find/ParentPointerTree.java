@@ -84,6 +84,7 @@ public class ParentPointerTree<T> {
       timeToMoveOn = true;
     } else {
       nextParentIndex++;
+      timeToMoveOn = false;
     }
   }
 }
