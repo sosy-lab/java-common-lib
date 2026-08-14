@@ -9,13 +9,10 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.Var;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -28,11 +25,11 @@ import java.util.Set;
  */
 public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
-  protected final Map<T, ParentPointerTree<T>> forest;
+  protected final Map<T, AbstractTreeNode<T>> allNodes;
 
   /** Creates an empty instance. */
   public ParentPointerTreeUnionFind() {
-    forest = new HashMap<>();
+    allNodes = new HashMap<>();
   }
 
   /**
@@ -47,10 +44,17 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
     Preconditions.checkNotNull(value);
 
-    for (Entry<T, ParentPointerTree<T>> entry : forest.entrySet()) {
-      if (entry.getValue().contains(value)) {
-        return entry.getKey();
+    AbstractTreeNode<T> node = allNodes.get(value);
+
+    if (node != null) {
+      AbstractTreeNode<T> parent = node.getParent();
+
+      while (!node.equals(parent)) {
+        node = parent;
+        parent = node.getParent();
       }
+
+      return parent.getValue();
     }
 
     throw new IllegalArgumentException("Element not contained.");
@@ -81,7 +85,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
           T canon2 = find(value2);
 
           if (!canon1.equals(canon2)) {
-            mergeExistingSets(find(value1), find(value2));
+            mergeExistingSets(canon1, canon2);
           }
         } else {
           addElementToExistingSet(value2, find(value1));
@@ -90,7 +94,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
         addElementToExistingSet(value1, find(value2));
       } else {
         addElementAsNewSet(value1);
-        addElementToExistingSet(value2, value1);
+        addElementToExistingSet(value2, find(value1));
       }
     }
   }
@@ -103,13 +107,22 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
 
-    List<Set<T>> allSubsets = new ArrayList<>();
+    Map<T, Set<T>> allSubsets = new HashMap<>();
 
-    for (ParentPointerTree<T> tree : forest.values()) {
-      allSubsets.add(tree.getSetOfNodeValues());
+    for (AbstractTreeNode<T> node : allNodes.values()) {
+
+      T canon = find(node.getValue());
+
+      if (allSubsets.containsKey(canon)) {
+        allSubsets.get(canon).add(node.getValue());
+      } else {
+        HashSet<T> set = new HashSet<>();
+        set.add(node.getValue());
+        allSubsets.put(canon, set);
+      }
     }
 
-    return allSubsets;
+    return allSubsets.values();
   }
 
   /**
@@ -122,59 +135,47 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   @Override
   public boolean contains(T e) {
 
-    for (ParentPointerTree<T> tree : forest.values()) {
-      if (tree.contains(e)) {
-        return true;
-      }
-    }
-
-    return false;
+    return allNodes.containsKey(e);
   }
 
   private void addElementAsNewSet(T value) {
 
     if (!contains(value)) {
-      ParentPointerTree<T> tree = new ParentPointerTree<>(value);
-      forest.put(value, tree);
+      RootNode<T> root = new RootNode<>(value);
+      allNodes.put(value, root);
     }
   }
 
+  // union by size!
   // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
   // canon
+  // only call with elements that are definitely canonical!
   private void mergeExistingSets(T canon1, T canon2) {
 
-    @Var ParentPointerTree<T> tree1 = null;
-    @Var ParentPointerTree<T> tree2 = null;
+    Preconditions.checkNotNull(canon1);
+    Preconditions.checkNotNull(canon2);
 
-    for (Entry<T, ParentPointerTree<T>> entry : forest.entrySet()) {
-      if (entry.getKey().equals(canon1)) {
-        tree1 = entry.getValue();
+    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(canon1);
+    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(canon2);
 
-        if (tree2 != null) {
-          break;
-        }
-      } else if (entry.getKey().equals(canon2)) {
-        tree2 = entry.getValue();
+    int size1 = rootNode1.getSize();
+    int size2 = rootNode2.getSize();
 
-        if (tree1 != null) {
-          break;
-        }
-      }
-    }
-
-    Preconditions.checkNotNull(tree1);
-    Preconditions.checkNotNull(tree2);
-
-    if (tree1.getSize() > tree2.getSize()) {
-      assert tree1.appendTree(tree2);
-      assert forest.remove(canon2, tree2);
+    if (size1 > size2) {
+      rootNode2.setParent(rootNode1);
+      rootNode1.incrementSizeBy(rootNode2.getSize());
     } else {
-      assert tree2.appendTree(tree1);
-      assert forest.remove(canon1, tree1);
+      rootNode1.setParent(rootNode2);
+      rootNode2.incrementSizeBy(rootNode1.getSize());
     }
   }
 
   private void addElementToExistingSet(T value, T canon) {
-    forest.get(canon).addAsNewNode(value);
+
+    RootNode<T> root = (RootNode<T>) allNodes.get(canon);
+    NonRootNode<T> newNode = new NonRootNode<>(root, value);
+    root.incrementSizeByOne();
+
+    allNodes.put(value, newNode);
   }
 }
