@@ -118,7 +118,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
       if (allSubsets.containsKey(canon)) {
         allSubsets.get(canon).add(node.getValue());
       } else {
-        HashSet<T> set = new HashSet<>();
+        Set<T> set = new HashSet<>();
         set.add(node.getValue());
         allSubsets.put(canon, set);
       }
