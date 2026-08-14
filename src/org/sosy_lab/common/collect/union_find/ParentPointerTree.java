@@ -21,7 +21,6 @@ public class ParentPointerTree<T> {
   private final Map<T, TreeNode<T>> mapOfNodes;
   private int nextParentIndex;
   private boolean timeToMoveOn;
-  private int size;
 
   public ParentPointerTree(T rootValue) {
     root = TreeNode.getNewRootNode(rootValue);
@@ -31,7 +30,6 @@ public class ParentPointerTree<T> {
     mapOfNodes.put(rootValue, root);
     nextParentIndex = 0;
     timeToMoveOn = false;
-    size = 1;
   }
 
   public TreeNode<T> getRoot() {
@@ -39,7 +37,7 @@ public class ParentPointerTree<T> {
   }
 
   public int getSize() {
-    return size;
+    return listOfNodes.size();
   }
 
   public boolean contains(T value) {
@@ -53,7 +51,6 @@ public class ParentPointerTree<T> {
     listOfNodes.add(node);
     mapOfNodes.put(value, node);
     updateNextParent();
-    size++;
   }
 
   public boolean appendTree(ParentPointerTree<T> tree) {
@@ -64,7 +61,6 @@ public class ParentPointerTree<T> {
     Preconditions.checkNotNull(parent);
     rootToBeAdded.setParent(parent);
 
-    size += tree.size;
     listOfNodes.addAll(tree.listOfNodes);
     mapOfNodes.putAll(tree.mapOfNodes);
     updateNextParent();
