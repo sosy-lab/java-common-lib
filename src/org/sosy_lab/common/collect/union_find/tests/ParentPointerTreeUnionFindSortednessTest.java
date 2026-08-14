@@ -109,7 +109,8 @@ public class ParentPointerTreeUnionFindSortednessTest {
     assertThat(onlySubsetOf(stringSortedUnionFind)).containsExactlyElementsIn(expected).inOrder();
   }
 
-  private static <T> Set<T> onlySubsetOf(SortedParentPointerTreeUnionFind<T> sortedUnionFind) {
+  private static <T extends Comparable<T>> Set<T> onlySubsetOf(
+      SortedParentPointerTreeUnionFind<T> sortedUnionFind) {
 
     Collection<? extends Set<T>> subsets = sortedUnionFind.getAllSubsets();
 
