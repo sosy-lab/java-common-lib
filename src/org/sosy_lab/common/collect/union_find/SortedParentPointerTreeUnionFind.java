@@ -9,12 +9,23 @@
 package org.sosy_lab.common.collect.union_find;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/**
+ * A sorted implementation of {@link UnionFind} using a {@link Map} of {@link AbstractTreeNode}s. In
+ * order to represent subsets by canonical elements, each one is mapped to its representative
+ * canonical element. This is always the first element added to the subset, unless it has changed
+ * due to union operations. Each subset is stored as a parent pointer tree comprised of {@link
+ * NonRootNode}s with exactly one {@link RootNode} as the root. The union is implemented as union by
+ * size.
+ *
+ * @param <T> type of elements added to the Union-Find. Must be comparable.
+ */
 public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends ParentPointerTreeUnionFind<T> {
 

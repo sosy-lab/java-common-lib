@@ -16,10 +16,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An implementation of {@link UnionFind} using a {@link Map} of {@link ParentPointerTree}s. In
- * order to represent subsets (the trees) by canonical elements, each one is mapped to its
- * representative canonical element. This is always the first element added to the subset, unless it
- * has changed due to union operations. The union is implemented as union by size.
+ * An implementation of {@link UnionFind} using a {@link Map} of {@link AbstractTreeNode}s. In order
+ * to represent subsets by canonical elements, each one is mapped to its representative canonical
+ * element. This is always the first element added to the subset, unless it has changed due to union
+ * operations. Each subset is stored as a parent pointer tree comprised of {@link NonRootNode}s with
+ * exactly one {@link RootNode} as the root. The union is implemented as union by size.
  *
  * @param <T> type of elements added to the Union-Find.
  */
