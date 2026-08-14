@@ -8,15 +8,15 @@
 
 package org.sosy_lab.common.collect.union_find;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class SortedParentPointerTreeUnionFind<T> extends ParentPointerTreeUnionFind<T> {
+public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
+    extends ParentPointerTreeUnionFind<T> {
 
   /**
    * Provides a {@link Collection} containing all current subsets. It contains the subsets sorted by
@@ -29,13 +29,21 @@ public class SortedParentPointerTreeUnionFind<T> extends ParentPointerTreeUnionF
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
 
-    NavigableMap<T, ParentPointerTree<T>> forestSortedByKeys = new TreeMap<>(forest);
-    List<Set<T>> allSubsets = new ArrayList<>();
+    NavigableMap<T, Set<T>> allSubsets = new TreeMap<>();
 
-    for (ParentPointerTree<T> tree : forestSortedByKeys.values()) {
-      allSubsets.add(new TreeSet<>(tree.getSetOfNodeValues()));
+    for (AbstractTreeNode<T> node : allNodes.values()) {
+
+      T canon = find(node.getValue());
+
+      if (allSubsets.containsKey(canon)) {
+        allSubsets.get(canon).add(node.getValue());
+      } else {
+        NavigableSet<T> set = new TreeSet<>();
+        set.add(node.getValue());
+        allSubsets.put(canon, set);
+      }
     }
 
-    return allSubsets;
+    return allSubsets.values();
   }
 }
