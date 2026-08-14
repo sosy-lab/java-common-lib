@@ -8,8 +8,20 @@
 
 package org.sosy_lab.common.collect.union_find;
 
+/**
+ * An implementation of {@link AbstractTreeNode} resulting in nodes that can only be used as
+ * non-root nodes but not as root nodes.
+ *
+ * @param <T> type of elements each node holds as value
+ */
 public final class NonRootNode<T> extends AbstractTreeNode<T> {
 
+  /**
+   * Constructor for a non-root node.
+   *
+   * @param parent parent node (can be root or non-root)
+   * @param value element to be stored in the node
+   */
   public NonRootNode(AbstractTreeNode<T> parent, T value) {
     super(parent, value);
   }
