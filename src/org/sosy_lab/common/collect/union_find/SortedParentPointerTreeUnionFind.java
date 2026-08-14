@@ -21,15 +21,19 @@ import java.util.TreeSet;
  * order to represent subsets by canonical elements, each one is mapped to its representative
  * canonical element. This is always the first element added to the subset, unless it has changed
  * due to union operations. Each subset is stored as a parent pointer tree comprised of {@link
- * NonRootNode}s with exactly one {@link RootNode} as the root. The union is implemented as union by
- * size.
+ * NonRootNode}s with exactly one {@link RootNode} as the root. The union can be performed either by
+ * size or by rank, determined by a constructor parameter.
  *
  * @param <T> type of elements added to the Union-Find. Must be comparable.
  */
 public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends ParentPointerTreeUnionFind<T> {
 
-  /** Creates an empty instance. */
+  /**
+   * Creates an empty instance.
+   *
+   * @param unionType type of union to be performed for all unions on this instance
+   */
   public SortedParentPointerTreeUnionFind(UnionType unionType) {
     super(unionType);
   }

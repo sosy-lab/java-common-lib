@@ -21,7 +21,8 @@ import java.util.Set;
  * to represent subsets by canonical elements, each one is mapped to its representative canonical
  * element. This is always the first element added to the subset, unless it has changed due to union
  * operations. Each subset is stored as a parent pointer tree comprised of {@link NonRootNode}s with
- * exactly one {@link RootNode} as the root. The union is implemented as union by size.
+ * exactly one {@link RootNode} as the root. The union can be performed either by size or by rank,
+ * determined by a constructor parameter.
  *
  * @param <T> type of elements added to the Union-Find.
  */
@@ -35,7 +36,11 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   protected final Map<T, AbstractTreeNode<T>> allNodes;
   private final UnionType unionType;
 
-  /** Creates an empty instance. */
+  /**
+   * Creates an empty instance.
+   *
+   * @param unionType type of union to be performed for all unions on this instance
+   */
   public ParentPointerTreeUnionFind(UnionType unionType) {
     allNodes = new HashMap<>();
     this.unionType = unionType;
