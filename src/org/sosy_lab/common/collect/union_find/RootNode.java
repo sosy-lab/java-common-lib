@@ -29,6 +29,10 @@ public final class RootNode<T> extends AbstractTreeNode<T> {
     return size;
   }
 
+  public void incrementRankByOne() {
+    rank++;
+  }
+
   public void incrementSizeByOne() {
     size++;
   }
