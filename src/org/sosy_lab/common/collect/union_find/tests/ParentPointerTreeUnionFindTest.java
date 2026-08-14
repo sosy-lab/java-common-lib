@@ -15,13 +15,14 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind;
+import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
 public class ParentPointerTreeUnionFindTest {
   private ParentPointerTreeUnionFind<Integer> integerUnionFind;
 
   @Before
   public void setup() {
-    integerUnionFind = new ParentPointerTreeUnionFind<>();
+    integerUnionFind = new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE);
   }
 
   @Test
@@ -136,7 +137,8 @@ public class ParentPointerTreeUnionFindTest {
   @Test
   public void testUnion_StringElements() {
 
-    ParentPointerTreeUnionFind<String> stringUnionFind = new ParentPointerTreeUnionFind<>();
+    ParentPointerTreeUnionFind<String> stringUnionFind =
+        new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE);
 
     stringUnionFind.union(Integer.toString(0), Integer.toString(1));
     stringUnionFind.union(Integer.toString(0), Integer.toString(2));

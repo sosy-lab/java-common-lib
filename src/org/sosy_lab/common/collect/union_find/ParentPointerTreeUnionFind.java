@@ -27,11 +27,18 @@ import java.util.Set;
  */
 public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
+  public enum UnionType {
+    UNION_BY_RANK,
+    UNION_BY_SIZE
+  }
+
   protected final Map<T, AbstractTreeNode<T>> allNodes;
+  private final UnionType unionType;
 
   /** Creates an empty instance. */
-  public ParentPointerTreeUnionFind() {
+  public ParentPointerTreeUnionFind(UnionType unionType) {
     allNodes = new HashMap<>();
+    this.unionType = unionType;
   }
 
   /**
@@ -148,14 +155,31 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     }
   }
 
-  // union by size!
-  // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
-  // canon
   // only call with elements that are definitely canonical!
   private void mergeExistingSets(T canon1, T canon2) {
 
     Preconditions.checkNotNull(canon1);
     Preconditions.checkNotNull(canon2);
+
+    if (unionType == UnionType.UNION_BY_SIZE) {
+      unionBySize(canon1, canon2);
+    } else {
+      unionByRank(canon1, canon2);
+    }
+  }
+
+  private void addElementToExistingSet(T value, T canon) {
+
+    RootNode<T> root = (RootNode<T>) allNodes.get(canon);
+    NonRootNode<T> newNode = new NonRootNode<>(root, value);
+    root.incrementSizeByOne();
+
+    allNodes.put(value, newNode);
+  }
+
+  // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
+  // canon
+  private void unionBySize(T canon1, T canon2) {
 
     RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(canon1);
     RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(canon2);
@@ -172,12 +196,25 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     }
   }
 
-  private void addElementToExistingSet(T value, T canon) {
+  // canon1 will be new canonical element only if its rank is actually greater, otherwise canon2 new
+  // canon
+  private void unionByRank(T canon1, T canon2) {
 
-    RootNode<T> root = (RootNode<T>) allNodes.get(canon);
-    NonRootNode<T> newNode = new NonRootNode<>(root, value);
-    root.incrementSizeByOne();
+    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(canon1);
+    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(canon2);
 
-    allNodes.put(value, newNode);
+    int rank1 = rootNode1.getRank();
+    int rank2 = rootNode2.getRank();
+
+    if (rank1 > rank2) {
+      rootNode2.setParent(rootNode1);
+    } else {
+      rootNode1.setParent(rootNode2);
+
+      // as rank only changes if both ranks are the same
+      if (rank1 == rank2) {
+        rootNode2.incrementRankByOne();
+      }
+    }
   }
 }

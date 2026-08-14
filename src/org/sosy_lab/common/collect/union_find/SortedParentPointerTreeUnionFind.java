@@ -29,6 +29,11 @@ import java.util.TreeSet;
 public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends ParentPointerTreeUnionFind<T> {
 
+  /** Creates an empty instance. */
+  public SortedParentPointerTreeUnionFind(UnionType unionType) {
+    super(unionType);
+  }
+
   /**
    * Provides a {@link Collection} containing all current subsets. It contains the subsets sorted by
    * their canonical elements in ascending order. The contents of the subsets are also sorted in
