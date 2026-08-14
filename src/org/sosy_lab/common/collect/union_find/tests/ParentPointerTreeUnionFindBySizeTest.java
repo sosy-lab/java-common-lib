@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
-public class ParentPointerTreeUnionFindTest {
+public class ParentPointerTreeUnionFindBySizeTest {
   private ParentPointerTreeUnionFind<Integer> integerUnionFind;
 
   @Before
