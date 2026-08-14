@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,10 +46,10 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
     Preconditions.checkNotNull(value);
 
-    AbstractTreeNode<T> node = allNodes.get(value);
+    @Var AbstractTreeNode<T> node = allNodes.get(value);
 
     if (node != null) {
-      AbstractTreeNode<T> parent = node.getParent();
+      @Var AbstractTreeNode<T> parent = node.getParent();
 
       while (!node.equals(parent)) {
         node = parent;
