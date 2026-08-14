@@ -10,8 +10,8 @@ package org.sosy_lab.common.collect.union_find;
 
 public abstract class AbstractTreeNode<T> {
 
-  protected AbstractTreeNode<T> parent;
-  protected final T value;
+  private AbstractTreeNode<T> parent;
+  private final T value;
 
   protected AbstractTreeNode(T value) {
     this.parent = this;
