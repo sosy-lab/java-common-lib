@@ -8,17 +8,6 @@
 
 package org.sosy_lab.common.collect.union_find;
 
-import com.google.errorprone.annotations.DoNotCall;
 
-public interface ImmutableSortedUnionFind<T extends Comparable<T>> extends SortedUnionFind<T> {
-  /**
-   * @throws UnsupportedOperationException Always.
-   * @deprecated Unsupported operation.
-   */
-  @Deprecated
-  @Override
-  @DoNotCall
-  default void union(T e1, T e2) {
-    throw new UnsupportedOperationException();
-  }
-}
+public interface ImmutableSortedUnionFind<T extends Comparable<T>>
+    extends ImmutableUnionFind<T>, SortedUnionFind<T> {}
