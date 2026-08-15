@@ -10,9 +10,11 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +49,8 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   }
 
   /**
-   * Returns the canonical element of the set containing the provided element.
+   * Returns the canonical element of the set containing the provided element. Applies path
+   * compression where possible.
    *
    * @param value element for which set is to be found
    * @return canonical element of the found set
@@ -58,14 +61,21 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
     Preconditions.checkNotNull(value);
 
+    List<AbstractTreeNode<T>> toBeCompressed = new ArrayList<>();
     @Var AbstractTreeNode<T> node = allNodes.get(value);
 
     if (node != null) {
       @Var AbstractTreeNode<T> parent = node.getParent();
 
       while (!node.equals(parent)) {
+        toBeCompressed.add(node);
         node = parent;
         parent = node.getParent();
+      }
+
+      for (AbstractTreeNode<T> current : toBeCompressed) {
+
+        current.setParent(parent);
       }
 
       return parent.getValue();
