@@ -10,7 +10,7 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.errorprone.annotations.DoNotCall;
 
-public interface ImmutableUnionFind<T> extends UnionFind<T> {
+public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
   /**
    * @throws UnsupportedOperationException Always.
    * @deprecated Unsupported operation.
@@ -18,7 +18,7 @@ public interface ImmutableUnionFind<T> extends UnionFind<T> {
   @Deprecated
   @Override
   @DoNotCall
-  default void union(T e1, T e2) {
+  public final void union(T e1, T e2) {
     throw new UnsupportedOperationException();
   }
 }

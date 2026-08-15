@@ -8,18 +8,45 @@
 
 package org.sosy_lab.common.collect.union_find;
 
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
 public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
-    extends ImmutableParentPointerTreeUnionFind<T> implements ImmutableSortedUnionFind<T> {
+    extends AbstractImmutableSortedUnionFind<T> {
+
+  private final Map<T, AbstractTreeNode<T>> allNodes;
 
   protected ImmutableSortedParentPointerTreeUnionFind(Map<T, AbstractTreeNode<T>> allNodes) {
-    super(allNodes);
+    this.allNodes = allNodes;
+  }
+
+  @Override
+  public T find(T e) {
+
+    Preconditions.checkNotNull(e);
+
+    @Var AbstractTreeNode<T> node = allNodes.get(e);
+
+    if (node != null) {
+      @Var AbstractTreeNode<T> parent = node.getParent();
+
+      while (!node.equals(parent)) {
+        node = parent;
+        parent = node.getParent();
+      }
+
+      return parent.getValue();
+    }
+
+    throw new IllegalArgumentException("Element not contained.");
   }
 
   @Override
@@ -41,5 +68,36 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     }
 
     return allSubsets.values();
+  }
+
+  @Override
+  public boolean contains(T e) {
+
+    return allNodes.containsKey(e);
+  }
+
+  public static final class Builder<T extends Comparable<T>> {
+
+    SortedParentPointerTreeUnionFind<T> unionFind;
+
+    private Builder(UnionType unionType) {
+      unionFind = new SortedParentPointerTreeUnionFind<T>(unionType);
+    }
+
+    public static <T extends Comparable<T>> Builder<T> getBuilder(UnionType unionType) {
+      return new Builder<>(unionType);
+    }
+
+    @CanIgnoreReturnValue
+    public ImmutableSortedParentPointerTreeUnionFind.Builder<T> union(T value1, T value2) {
+
+      unionFind.union(value1, value2);
+
+      return this;
+    }
+
+    public ImmutableParentPointerTreeUnionFind<T> build() {
+      return new ImmutableParentPointerTreeUnionFind<>(unionFind.allNodes);
+    }
   }
 }
