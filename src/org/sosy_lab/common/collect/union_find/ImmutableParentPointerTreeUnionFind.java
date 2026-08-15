@@ -20,9 +20,9 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 
 public class ImmutableParentPointerTreeUnionFind<T> implements ImmutableUnionFind<T> {
 
-  private final Map<T, AbstractTreeNode<T>> allNodes;
+  protected final Map<T, AbstractTreeNode<T>> allNodes;
 
-  private ImmutableParentPointerTreeUnionFind(Map<T, AbstractTreeNode<T>> allNodes) {
+  protected ImmutableParentPointerTreeUnionFind(Map<T, AbstractTreeNode<T>> allNodes) {
     this.allNodes = allNodes;
   }
 
