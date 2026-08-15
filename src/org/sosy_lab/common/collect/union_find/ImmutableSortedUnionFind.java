@@ -8,6 +8,5 @@
 
 package org.sosy_lab.common.collect.union_find;
 
-
 public interface ImmutableSortedUnionFind<T extends Comparable<T>>
     extends ImmutableUnionFind<T>, SortedUnionFind<T> {}
