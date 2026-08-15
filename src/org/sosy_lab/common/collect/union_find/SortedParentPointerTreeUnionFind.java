@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -27,7 +26,7 @@ import java.util.TreeSet;
  * @param <T> type of elements added to the Union-Find. Must be comparable.
  */
 public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
-    extends ParentPointerTreeUnionFind<T> {
+    extends ParentPointerTreeUnionFind<T> implements SortedUnionFind<T> {
 
   /**
    * Creates an empty instance.
@@ -47,9 +46,9 @@ public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
    */
   // subsets are in order of their canonical elements; elements in subsets are sorted as well
   @Override
-  public Collection<? extends Set<T>> getAllSubsets() {
+  public Collection<? extends NavigableSet<T>> getAllSubsets() {
 
-    NavigableMap<T, Set<T>> allSubsets = new TreeMap<>();
+    NavigableMap<T, NavigableSet<T>> allSubsets = new TreeMap<>();
 
     for (AbstractTreeNode<T> node : allNodes.values()) {
 
