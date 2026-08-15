@@ -82,7 +82,7 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     SortedParentPointerTreeUnionFind<T> unionFind;
 
     private Builder(UnionType unionType) {
-      unionFind = new SortedParentPointerTreeUnionFind<T>(unionType);
+      unionFind = new SortedParentPointerTreeUnionFind<>(unionType);
     }
 
     public static <T extends Comparable<T>> Builder<T> getBuilder(UnionType unionType) {
