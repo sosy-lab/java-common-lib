@@ -9,10 +9,10 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -22,9 +22,10 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> {
 
-  private final Map<T, AbstractTreeNode<T>> allNodes;
+  private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
 
-  protected ImmutableSortedParentPointerTreeUnionFind(Map<T, AbstractTreeNode<T>> allNodes) {
+  protected ImmutableSortedParentPointerTreeUnionFind(
+      ImmutableMap<T, AbstractTreeNode<T>> allNodes) {
     this.allNodes = allNodes;
   }
 
@@ -97,7 +98,7 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     }
 
     public ImmutableParentPointerTreeUnionFind<T> build() {
-      return new ImmutableParentPointerTreeUnionFind<>(unionFind.allNodes);
+      return new ImmutableParentPointerTreeUnionFind<>(ImmutableMap.copyOf(unionFind.allNodes));
     }
   }
 }

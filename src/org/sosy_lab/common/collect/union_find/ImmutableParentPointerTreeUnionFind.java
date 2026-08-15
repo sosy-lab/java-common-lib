@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
@@ -20,9 +21,9 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 
 public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T> {
 
-  private final Map<T, AbstractTreeNode<T>> allNodes;
+  private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
 
-  protected ImmutableParentPointerTreeUnionFind(Map<T, AbstractTreeNode<T>> allNodes) {
+  protected ImmutableParentPointerTreeUnionFind(ImmutableMap<T, AbstractTreeNode<T>> allNodes) {
     this.allNodes = allNodes;
   }
 
@@ -95,7 +96,7 @@ public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUni
     }
 
     public ImmutableParentPointerTreeUnionFind<T> build() {
-      return new ImmutableParentPointerTreeUnionFind<>(unionFind.allNodes);
+      return new ImmutableParentPointerTreeUnionFind<>(ImmutableMap.copyOf(unionFind.allNodes));
     }
   }
 }
