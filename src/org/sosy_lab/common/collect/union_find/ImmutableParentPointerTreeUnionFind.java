@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
-public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T> {
+public class ImmutableParentPointerTreeUnionFind<T> implements ImmutableUnionFind<T> {
 
   private final Map<T, AbstractTreeNode<T>> allNodes;
 
