@@ -24,25 +24,21 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     extends AbstractImmutableSortedUnionFind<T> implements PersistentSortedUnionFind<T> {
 
   private final PersistentSortedMap<T, T> mapOfNodesToParents;
-  private final PersistentSortedMap<T, Integer> mapOfRootsToRanks;
-  private final PersistentSortedMap<T, Integer> mapOfRootsToSizes;
+  private final PersistentSortedMap<T, Integer> mapOfRootsToWeights;
   private final UnionType unionType;
 
   private PersistentSortedParentPointerTreeUnionFind(UnionType pUnionType) {
     mapOfNodesToParents = PathCopyingPersistentTreeMap.of();
-    mapOfRootsToRanks = PathCopyingPersistentTreeMap.of();
-    mapOfRootsToSizes = PathCopyingPersistentTreeMap.of();
+    mapOfRootsToWeights = PathCopyingPersistentTreeMap.of();
     unionType = pUnionType;
   }
 
   private PersistentSortedParentPointerTreeUnionFind(
       PersistentSortedMap<T, T> mapOfNodesToParents,
-      PersistentSortedMap<T, Integer> mapOfRootsToRanks,
-      PersistentSortedMap<T, Integer> mapOfRootsToSizes,
+      PersistentSortedMap<T, Integer> mapOfRootsToWeights,
       UnionType unionType) {
     this.mapOfNodesToParents = mapOfNodesToParents;
-    this.mapOfRootsToRanks = mapOfRootsToRanks;
-    this.mapOfRootsToSizes = mapOfRootsToSizes;
+    this.mapOfRootsToWeights = mapOfRootsToWeights;
     this.unionType = unionType;
   }
 
@@ -59,7 +55,7 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     for (Entry<T, T> currentEntry : mapOfNodesToParents.entrySet()) {
 
       T current = currentEntry.getKey();
-      T root = mapOfNodesToParents.get(current);
+      T root = find(current);
 
       if (allSubsets.containsKey(root)) {
         allSubsets.get(root).add(current);
@@ -136,11 +132,16 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
 
     if (!contains(e)) {
       PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(e, e);
-      PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks.putAndCopy(e, 0);
-      PersistentSortedMap<T, Integer> updatedRootsToSizes = mapOfRootsToSizes.putAndCopy(e, 1);
+
+      PersistentSortedMap<T, Integer> updatedRootsToWeights;
+      if (unionType == UnionType.UNION_BY_RANK) {
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e, 0); // rank
+      } else {
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e, 1); // size
+      }
 
       return new PersistentSortedParentPointerTreeUnionFind<>(
-          updatedNodesToParents, updatedRootsToRanks, updatedRootsToSizes, unionType);
+          updatedNodesToParents, updatedRootsToWeights, unionType);
     }
 
     return this;
@@ -165,20 +166,22 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
 
     PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(e, canon);
 
-    @Var int rank = mapOfRootsToRanks.get(canon);
-    @Var PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks;
-    if (rank == 0) {
-      updatedRootsToRanks = mapOfRootsToRanks.removeAndCopy(canon);
-      updatedRootsToRanks = updatedRootsToRanks.putAndCopy(canon, ++rank);
+    PersistentSortedMap<T, Integer> updatedRootsToWeights;
+    if (unionType == UnionType.UNION_BY_RANK) {
+      @Var int rank = mapOfRootsToWeights.get(canon);
+
+      if (rank == 0) {
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon, ++rank);
+      } else {
+        updatedRootsToWeights = mapOfRootsToWeights;
+      }
+    } else {
+      @Var int size = mapOfRootsToWeights.get(canon);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon, ++size);
     }
 
-    @Var int size = mapOfRootsToSizes.get(canon);
-    @Var
-    PersistentSortedMap<T, Integer> updatedRootsToSizes = mapOfRootsToSizes.removeAndCopy(canon);
-    updatedRootsToSizes = updatedRootsToSizes.putAndCopy(canon, ++size);
-
     return new PersistentSortedParentPointerTreeUnionFind<>(
-        updatedNodesToParents, updatedRootsToRanks, updatedRootsToSizes, unionType);
+        updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
   private PersistentSortedUnionFind<T> addTwoElementsAsSetAndCopy(T e1, T e2) {
@@ -187,65 +190,66 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     updatedNodesToParents = mapOfNodesToParents.putAndCopy(e1, e1);
     updatedNodesToParents = updatedNodesToParents.putAndCopy(e2, e1);
 
-    PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks.putAndCopy(e1, 1);
-    PersistentSortedMap<T, Integer> updatedRootsToSizes = mapOfRootsToSizes.putAndCopy(e1, 2);
+    PersistentSortedMap<T, Integer> updatedRootsToWeights;
+    if (unionType == UnionType.UNION_BY_RANK) {
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e1, 1); // rank
+    } else {
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e1, 2); // size
+    }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
-        updatedNodesToParents, updatedRootsToRanks, updatedRootsToSizes, unionType);
+        updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
   // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
   // canon
   private PersistentSortedUnionFind<T> unionBySize(T canon1, T canon2) {
 
-    int size1 = mapOfRootsToSizes.get(canon1);
-    int size2 = mapOfRootsToSizes.get(canon2);
+    int size1 = mapOfRootsToWeights.get(canon1);
+    int size2 = mapOfRootsToWeights.get(canon2);
 
-    @Var PersistentSortedMap<T, T> updatedNodesToParents;
-    @Var PersistentSortedMap<T, Integer> updatedRootsToSizes;
+    PersistentSortedMap<T, T> updatedNodesToParents;
+    PersistentSortedMap<T, Integer> updatedRootsToWeights;
 
     if (size1 > size2) {
-      updatedNodesToParents = mapOfNodesToParents.removeAndCopy(canon2);
-      updatedNodesToParents = updatedNodesToParents.putAndCopy(canon2, canon1);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon2, canon1);
 
-      updatedRootsToSizes = mapOfRootsToSizes.removeAndCopy(canon1);
-      updatedRootsToSizes = updatedRootsToSizes.putAndCopy(canon1, size1 + size2);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon1, size1 + size2);
     } else {
-      updatedNodesToParents = mapOfNodesToParents.removeAndCopy(canon1);
-      updatedNodesToParents = updatedNodesToParents.putAndCopy(canon1, canon2);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon1, canon2);
 
-      updatedRootsToSizes = mapOfRootsToSizes.removeAndCopy(canon2);
-      updatedRootsToSizes = updatedRootsToSizes.putAndCopy(canon2, size2 + size1);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon2, size2 + size1);
     }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
-        updatedNodesToParents, mapOfRootsToRanks, updatedRootsToSizes, unionType);
+        updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
   // canon1 will be new canonical element only if its rank is actually greater, otherwise canon2 new
   // canon
   private PersistentSortedUnionFind<T> unionByRank(T canon1, T canon2) {
 
-    int rank1 = mapOfRootsToRanks.get(canon1);
-    @Var int rank2 = mapOfRootsToRanks.get(canon2);
+    int rank1 = mapOfRootsToWeights.get(canon1);
+    @Var int rank2 = mapOfRootsToWeights.get(canon2);
 
-    @Var PersistentSortedMap<T, T> updatedNodesToParents;
-    @Var PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks;
+    PersistentSortedMap<T, T> updatedNodesToParents;
+    PersistentSortedMap<T, Integer> updatedRootsToWeights;
 
     if (rank1 > rank2) {
-      updatedNodesToParents = mapOfNodesToParents.removeAndCopy(canon2);
-      updatedNodesToParents = updatedNodesToParents.putAndCopy(canon2, canon1);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon2, canon1);
+
+      updatedRootsToWeights = mapOfRootsToWeights;
     } else {
-      updatedNodesToParents = mapOfNodesToParents.removeAndCopy(canon1);
-      updatedNodesToParents = updatedNodesToParents.putAndCopy(canon1, canon2);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon1, canon2);
 
       if (rank1 == rank2) {
-        updatedRootsToRanks = mapOfRootsToRanks.removeAndCopy(canon2);
-        updatedRootsToRanks = updatedRootsToRanks.putAndCopy(canon2, ++rank2);
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon2, ++rank2);
+      } else {
+        updatedRootsToWeights = mapOfRootsToWeights;
       }
     }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
-        updatedNodesToParents, updatedRootsToRanks, mapOfRootsToSizes, unionType);
+        updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 }
