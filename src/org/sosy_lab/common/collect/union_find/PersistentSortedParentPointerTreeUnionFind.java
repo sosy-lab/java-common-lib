@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect.union_find;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -19,7 +20,7 @@ import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentSortedMap;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
-public class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
+public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> implements PersistentSortedUnionFind<T> {
 
   private final PersistentSortedMap<T, T> mapOfNodesToParents;
@@ -55,8 +56,9 @@ public class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
 
     NavigableMap<T, NavigableSet<T>> allSubsets = new TreeMap<>();
 
-    for (T current : mapOfNodesToParents.keySet()) {
+    for (Entry<T, T> currentEntry : mapOfNodesToParents.entrySet()) {
 
+      T current = currentEntry.getKey();
       T root = mapOfNodesToParents.get(current);
 
       if (allSubsets.containsKey(root)) {
@@ -85,8 +87,8 @@ public class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
 
     Preconditions.checkNotNull(e);
 
-    T currentNode = e;
-    T parent = mapOfNodesToParents.get(e);
+    @Var T currentNode = e;
+    @Var T parent = mapOfNodesToParents.get(e);
 
     if (parent != null) {
       while (!currentNode.equals(parent)) {
@@ -163,14 +165,14 @@ public class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
 
     PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(e, canon);
 
-    int rank = mapOfRootsToRanks.get(canon);
+    @Var int rank = mapOfRootsToRanks.get(canon);
     @Var PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks;
     if (rank == 0) {
       updatedRootsToRanks = mapOfRootsToRanks.removeAndCopy(canon);
       updatedRootsToRanks = updatedRootsToRanks.putAndCopy(canon, ++rank);
     }
 
-    int size = mapOfRootsToSizes.get(canon);
+    @Var int size = mapOfRootsToSizes.get(canon);
     @Var
     PersistentSortedMap<T, Integer> updatedRootsToSizes = mapOfRootsToSizes.removeAndCopy(canon);
     updatedRootsToSizes = updatedRootsToSizes.putAndCopy(canon, ++size);
@@ -225,7 +227,7 @@ public class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
   private PersistentSortedUnionFind<T> unionByRank(T canon1, T canon2) {
 
     int rank1 = mapOfRootsToRanks.get(canon1);
-    int rank2 = mapOfRootsToRanks.get(canon2);
+    @Var int rank2 = mapOfRootsToRanks.get(canon2);
 
     @Var PersistentSortedMap<T, T> updatedNodesToParents;
     @Var PersistentSortedMap<T, Integer> updatedRootsToRanks = mapOfRootsToRanks;
