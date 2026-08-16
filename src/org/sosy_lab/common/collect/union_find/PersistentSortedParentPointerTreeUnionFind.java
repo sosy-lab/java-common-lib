@@ -11,7 +11,6 @@ package org.sosy_lab.common.collect.union_find;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
-import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -52,9 +51,8 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
 
     NavigableMap<T, NavigableSet<T>> allSubsets = new TreeMap<>();
 
-    for (Entry<T, T> currentEntry : mapOfNodesToParents.entrySet()) {
+    for (T current : mapOfNodesToParents.keySet()) {
 
-      T current = currentEntry.getKey();
       T root = find(current);
 
       if (allSubsets.containsKey(root)) {
