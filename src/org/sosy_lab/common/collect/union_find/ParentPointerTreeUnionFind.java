@@ -141,6 +141,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
         allSubsets.get(canon).add(node.getValue());
       } else {
         Set<T> set = new HashSet<>();
+        set.add(canon);
         set.add(node.getValue());
         allSubsets.put(canon, set);
       }

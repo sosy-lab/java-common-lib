@@ -58,6 +58,7 @@ public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
         allSubsets.get(canon).add(node.getValue());
       } else {
         NavigableSet<T> set = new TreeSet<>();
+        set.add(canon);
         set.add(node.getValue());
         allSubsets.put(canon, set);
       }
