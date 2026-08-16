@@ -190,7 +190,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     NonRootNode<T> newNode = new NonRootNode<>(root, value);
     root.incrementSizeByOne();
 
-    if(root.getRank() == 0) {
+    if (root.getRank() == 0) {
       root.incrementRankByOne();
     }
 
