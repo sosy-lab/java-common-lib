@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import org.junit.Test;
 import org.sosy_lab.common.collect.union_find.ImmutableSortedParentPointerTreeUnionFind;
-import org.sosy_lab.common.collect.union_find.ImmutableSortedParentPointerTreeUnionFind.Builder;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
 public class ImmutableParentPointerTreeSortednessTest {
@@ -113,7 +112,8 @@ public class ImmutableParentPointerTreeSortednessTest {
   @Test
   public void testGetAllSubsets_stringElements_areSortedAlphabetically() {
 
-    Builder<String> builder = Builder.getBuilder(UnionType.UNION_BY_SIZE);
+    ImmutableSortedParentPointerTreeUnionFind.Builder<String> builder =
+        ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
     String[] expected = {"-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     for (int i = 0; i <= 2; i++) {
