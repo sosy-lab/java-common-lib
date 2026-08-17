@@ -56,7 +56,7 @@ public class PersistentParentPointerTreeUnionFind<T> extends AbstractImmutableUn
    * @return empty instance
    * @param <T> type of elements added to the Union-Find.
    */
-  public static <T> AbstractImmutableUnionFind<T> of(UnionType pUnionType) {
+  public static <T> PersistentUnionFind<T> of(UnionType pUnionType) {
     return new PersistentParentPointerTreeUnionFind<>(pUnionType);
   }
 

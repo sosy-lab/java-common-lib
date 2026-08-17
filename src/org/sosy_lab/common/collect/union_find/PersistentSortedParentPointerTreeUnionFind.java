@@ -61,8 +61,7 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
    * @return empty instance
    * @param <T> type of elements added to the Union-Find. Must be comparable.
    */
-  public static <T extends Comparable<T>> AbstractImmutableSortedUnionFind<T> of(
-      UnionType pUnionType) {
+  public static <T extends Comparable<T>> PersistentSortedUnionFind<T> of(UnionType pUnionType) {
     return new PersistentSortedParentPointerTreeUnionFind<>(pUnionType);
   }
 
