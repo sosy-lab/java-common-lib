@@ -234,7 +234,7 @@ public class ImmutableParentPointerTreeUnionFindTest {
   public void testGetAllSubsets_reflectsCorrectMembershipAfterMultipleUnions() {
 
     int[][] unions = {
-      {0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {5, 5}, {5, 6}, {5, 7}, {5, 8}, {5, 9}
+      {0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {5, 5}, {5, 6}, {5, 7}, {5, 8}, {5, 9},
     };
 
     for (UnionFind<Integer> unionFind : buildUnsortedAndSorted(UnionType.UNION_BY_SIZE, unions)) {
