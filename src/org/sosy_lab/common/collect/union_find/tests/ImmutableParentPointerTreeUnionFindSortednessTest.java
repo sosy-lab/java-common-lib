@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.sosy_lab.common.collect.union_find.ImmutableSortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
-public class ImmutableParentPointerTreeSortednessTest {
+public class ImmutableParentPointerTreeUnionFindSortednessTest {
 
   private static ImmutableSortedParentPointerTreeUnionFind<Integer> buildImmutableSorted(
       UnionType pUnionType, int[]... pUnions) {
