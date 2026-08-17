@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.UnexpectedCheckedException;
+import org.sosy_lab.common.StringSimilarity;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.configuration.converters.BaseTypeConverter;
 import org.sosy_lab.common.configuration.converters.ClassTypeConverter;
@@ -106,6 +107,7 @@ public final class Configuration {
         ImmutableMap.copyOf(DEFAULT_CONVERTERS),
         new HashSet<>(0),
         new HashSet<>(0),
+        new HashSet<>(0),
         null,
         null);
   }
@@ -121,6 +123,7 @@ public final class Configuration {
         oldConfig.converters,
         oldConfig.unusedProperties,
         oldConfig.deprecatedProperties,
+        oldConfig.knownOptionNames,
         oldConfig.printUsedOptions,
         oldConfig.logger);
   }
@@ -255,6 +258,7 @@ public final class Configuration {
 
   final Set<String> unusedProperties;
   final Set<String> deprecatedProperties;
+  final Set<String> knownOptionNames;
 
   private @Nullable PrintStream printUsedOptions;
 
@@ -281,6 +285,7 @@ public final class Configuration {
       ImmutableMap<Class<?>, TypeConverter> pConverters,
       Set<String> pUnusedProperties,
       Set<String> pDeprecatedProperties,
+      Set<String> pKnownOptionNames,
       @Nullable PrintStream pPrintUsedOptions,
       @Nullable LogManager pLogger) {
 
@@ -295,6 +300,7 @@ public final class Configuration {
     converters = checkNotNull(pConverters);
     unusedProperties = checkNotNull(pUnusedProperties);
     deprecatedProperties = checkNotNull(pDeprecatedProperties);
+    knownOptionNames = checkNotNull(pKnownOptionNames);
     printUsedOptions = pPrintUsedOptions;
     logger = Objects.requireNonNullElse(pLogger, LogManager.createNullLogManager());
   }
@@ -352,6 +358,39 @@ public final class Configuration {
 
   public Set<String> getDeprecatedProperties() {
     return Collections.unmodifiableSet(deprecatedProperties);
+  }
+
+  /**
+   * Returns the names of all configuration options that have been requested via {@link
+   * #inject(Object)} (or a related method) so far on this {@code Configuration} instance or any
+   * {@code Configuration} it was derived from (e.g. via {@link ConfigurationBuilder#copyFrom}).
+   *
+   * <p>Like {@link #getUnusedProperties()}, this is a running, order-dependent snapshot: an option
+   * only appears here once some class has actually declared it with {@link Option} and had {@link
+   * #inject(Object)} called on it. If this is called before all classes in an application have been
+   * injected, the result is incomplete.
+   *
+   * @return an unmodifiable view of the known option names
+   */
+  public Set<String> getKnownOptionNames() {
+    return Collections.unmodifiableSet(knownOptionNames);
+  }
+
+  /**
+   * Convenience method to find configuration option names close to {@code unknownOptionName} among
+   * {@link #getKnownOptionNames()}, e.g. to suggest a fix for a typo'd or unrecognized option name
+   * found via {@link #getUnusedProperties()}. See {@link
+   * StringSimilarity#findClosestMatches(String, java.util.Collection, double)} for scoring/ordering
+   * semantics and {@link StringSimilarity#damerauLevenshteinSimilarity(String, String)} for typical
+   * threshold values ({@code 0.6}–{@code 0.79} moderately similar, {@code 0.8}+ very similar).
+   *
+   * @param unknownOptionName the (likely unrecognized) option name to find matches for
+   * @param threshold the minimum similarity score (inclusive) a known option name must reach
+   * @return known option names close to {@code unknownOptionName}, ordered from closest to least
+   *     close
+   */
+  public ImmutableList<String> findSimilarOptions(String unknownOptionName, double threshold) {
+    return StringSimilarity.findClosestMatches(unknownOptionName, getKnownOptionNames(), threshold);
   }
 
   public String asPropertiesString() {
@@ -743,6 +782,7 @@ public final class Configuration {
 
     boolean isEnum = type.getRawType().isEnum();
     String optionName = getOptionName(options, method, option);
+    knownOptionNames.add(optionName);
     @Var String valueStr = getValueString(optionName, option, isEnum);
     Annotation secondaryOption = getSecondaryAnnotation(member);
 
