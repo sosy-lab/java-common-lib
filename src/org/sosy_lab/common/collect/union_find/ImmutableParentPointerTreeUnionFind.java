@@ -20,12 +20,12 @@ import java.util.Set;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
 /**
- * An implementation of {@link UnionFind} using a {@link ImmutableMap} of each element {@link T} to
- * its node {@link AbstractTreeNode}. Each node contains a reference to its respective parent node,
- * thus resulting in a parent pointer tree structure for each subset. These are each represented by
- * canonical elements which are the root of each tree. This is always the first element added to the
- * subset, unless it has changed due to union operations. The union can be performed either by size
- * or by rank, * determined by a constructor parameter.
+ * An implementation of {@link UnionFind} using a {@link ImmutableMap} of each element to its {@link
+ * AbstractTreeNode}. Each node contains a reference to its respective parent node, thus resulting
+ * in a parent pointer tree structure for each subset. These are each represented by canonical
+ * elements which are the root of each tree. This is always the first element added to the subset,
+ * unless it has changed due to union operations. The union can be performed either by size or by
+ * rank, * determined by a constructor parameter.
  *
  * @param <T> type of elements added to the Union-Find.
  */
