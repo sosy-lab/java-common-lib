@@ -48,6 +48,7 @@ public class PersistentParentPointerTreeUnionFindSortednessTest {
     return subsets.iterator().next();
   }
 
+  @Test
   public void testGetAllSubsets_elementsAddedInAscendingOrder_remainSorted() {
 
     PersistentSortedUnionFind<Integer> sortedUnionFind =
@@ -117,6 +118,7 @@ public class PersistentParentPointerTreeUnionFindSortednessTest {
   @Test
   public void testGetAllSubsets_stringElements_areSortedAlphabetically() {
 
+    @Var
     PersistentSortedUnionFind<String> stringSortedUnionFind =
         PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE);
     String[] expected = {"-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
@@ -196,8 +198,9 @@ public class PersistentParentPointerTreeUnionFindSortednessTest {
   @Test
   public void testGetAllSubsets_earlierVersionRemainsSortedAfterLaterUnions() {
 
-    PersistentSortedUnionFind<Integer> version0 =
-        applySortedUnions(UnionType.UNION_BY_SIZE, new int[] {3, 1});
+    int[] union = new int[] {3, 1};
+
+    PersistentSortedUnionFind<Integer> version0 = applySortedUnions(UnionType.UNION_BY_SIZE, union);
     PersistentSortedUnionFind<Integer> version1 = version0.unionAndCopy(3, 2);
 
     assertThat(onlySubsetOf(version0)).containsExactly(1, 3).inOrder();
