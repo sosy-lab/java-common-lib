@@ -29,7 +29,7 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
  *
  * @param <T> The type of elements added to the Union-Find.
  */
-public class PersistentParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T>
+public final class PersistentParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T>
     implements PersistentUnionFind<T> {
 
   private final Map<T, T> mapOfNodesToParents;
