@@ -8,5 +8,10 @@
 
 package org.sosy_lab.common.collect.union_find;
 
+/**
+ * An abstract class for sorted immutable Union-Find implementations.
+ *
+ * @param <T> type of elements added to the Union-Find. Must be comparable.
+ */
 public abstract class AbstractImmutableSortedUnionFind<T extends Comparable<T>>
     extends AbstractImmutableUnionFind<T> implements SortedUnionFind<T> {}

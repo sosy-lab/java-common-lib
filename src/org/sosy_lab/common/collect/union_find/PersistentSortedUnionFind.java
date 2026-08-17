@@ -10,7 +10,6 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.DoNotCall;
-import com.google.errorprone.annotations.Immutable;
 
 /**
  * Interface for a persistent and sorted union-find. A persistent data structure is immutable, but
@@ -22,7 +21,6 @@ import com.google.errorprone.annotations.Immutable;
  *
  * @param <T> The type of values.
  */
-@Immutable(containerOf = "T")
 public interface PersistentSortedUnionFind<T extends Comparable<T>> extends SortedUnionFind<T> {
 
   /**

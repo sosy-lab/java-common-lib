@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.NavigableMap;
@@ -19,6 +20,18 @@ import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentSortedMap;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
+/**
+ * Implementation of a persistent and sorted union-find. A persistent data structure is immutable,
+ * but provides cheap copy-and-write operations. Thus, all write operations ({@link
+ * #union(Comparable, Comparable)}) will not modify the current instance, but return a new instance
+ * instead. The union can be performed either by size or by rank, determined by a constructor
+ * parameter.
+ *
+ * <p>All modifying operations inherited from {@link SortedUnionFind} are not supported and will
+ * always throw {@link UnsupportedOperationException}.
+ *
+ * @param <T> The type of elements added to the Union-Find. Must be comparable.
+ */
 public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> implements PersistentSortedUnionFind<T> {
 
@@ -41,11 +54,25 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     unionType = pUnionType;
   }
 
+  /**
+   * Returns a fresh, empty Union-Find instance of the given union type.
+   *
+   * @param pUnionType specifies whether the union is performed by rank or by size
+   * @return empty instance
+   * @param <T> type of elements added to the Union-Find
+   */
   public static <T extends Comparable<T>> AbstractImmutableSortedUnionFind<T> of(
       UnionType pUnionType) {
     return new PersistentSortedParentPointerTreeUnionFind<>(pUnionType);
   }
 
+  /**
+   * Provides a {@link Collection} containing all current subsets. The subsets are sorted by their
+   * canonical elements in ascending order. The contents of each subset are equally sorted in
+   * ascending order.
+   *
+   * @return {@link Collection} containing all current subsets
+   */
   @Override
   public Collection<? extends NavigableSet<T>> getAllSubsets() {
 
@@ -68,6 +95,13 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     return allSubsets.values();
   }
 
+  /**
+   * Checks whether the provided element is contained in any current subset and returns true or
+   * false accordingly.
+   *
+   * @param pE element to be searched for
+   * @return true if contained, false if not
+   */
   @Override
   public boolean contains(T pE) {
 
@@ -76,6 +110,13 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     return mapOfNodesToParents.containsKey(pE);
   }
 
+  /**
+   * Returns the canonical element of the set containing the provided element.
+   *
+   * @param pE element for which set is to be found
+   * @return canonical element of the found set
+   * @throws IllegalArgumentException if element is not contained in any subset
+   */
   @Override
   public T find(T pE) {
 
@@ -96,6 +137,19 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
     throw new IllegalArgumentException("Element not contained.");
   }
 
+  /**
+   * Merges the sets represented by the two input values according to standard Union-Find behaviour.
+   * This operation does not mutate the existing object, but returns a fresh instance to which the
+   * changes in question have been applied.
+   *
+   * <p>USES: Add new element as new set: pass it as both pE1 and pE2. Add new element to existing
+   * set: one input value is the new element, the other the canonical element of the set to be added
+   * to. Merge two existing sets: pE1, pE2 canonical elements of sets to be merged.
+   *
+   * @param pE1 first element
+   * @param pE2 second element
+   */
+  @CheckReturnValue
   @Override
   public PersistentSortedUnionFind<T> unionAndCopy(T pE1, T pE2) {
 

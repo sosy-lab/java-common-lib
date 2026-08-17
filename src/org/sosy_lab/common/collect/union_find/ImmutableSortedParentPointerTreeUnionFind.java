@@ -19,16 +19,39 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
 
+/**
+ * A sorted implementation of {@link UnionFind} using a {@link ImmutableMap} of each element {@link
+ * T} to its node {@link AbstractTreeNode}. Each node contains a reference to its respective parent
+ * node, thus resulting in a parent pointer tree structure for each subset. These are each
+ * represented by canonical elements which are the root of each tree. This is always the first
+ * element added to the subset, unless it has changed due to union operations. The union can be
+ * performed either by size or by rank, * determined by a constructor parameter. The elements are
+ * stored in unsorted structures, but {@code getAllSubsets()} returns a sorted view.
+ *
+ * @param <T> type of elements added to the Union-Find. Must be comparable.
+ */
 public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> {
 
   private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
 
+  /**
+   * Only for internal use by the builder.
+   *
+   * @param pAllNodes finished immutable map storing all nodes contained in this Union-Find
+   */
   protected ImmutableSortedParentPointerTreeUnionFind(
       ImmutableMap<T, AbstractTreeNode<T>> pAllNodes) {
     allNodes = pAllNodes;
   }
 
+  /**
+   * Returns the canonical element of the set containing the provided element.
+   *
+   * @param pE element for which set is to be found
+   * @return canonical element of the found set
+   * @throws IllegalArgumentException if element is not contained in any subset
+   */
   @Override
   public T find(T pE) {
 
@@ -50,6 +73,13 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     throw new IllegalArgumentException("Element not contained.");
   }
 
+  /**
+   * Provides a {@link Collection} containing all current subsets. The subsets are sorted by their
+   * canonical elements in ascending order. The contents of each subset are equally sorted in
+   * ascending order.
+   *
+   * @return {@link Collection} containing all current subsets
+   */
   @Override
   public Collection<? extends NavigableSet<T>> getAllSubsets() {
 
@@ -71,12 +101,25 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     return allSubsets.values();
   }
 
+  /**
+   * Checks whether the provided element is contained in any current subset and returns true or
+   * false accordingly.
+   *
+   * @param pE element to be searched for
+   * @return true if contained, false if not
+   */
   @Override
   public boolean contains(T pE) {
 
     return allNodes.containsKey(pE);
   }
 
+  /**
+   * Builder class which first collects the data in a mutable sorted Union-Find and converts it to
+   * an immutable Union-Find when {@code build()} is called.
+   *
+   * @param <T> type of elements added to the Union-Find
+   */
   public static final class Builder<T extends Comparable<T>> {
 
     SortedParentPointerTreeUnionFind<T> unionFind;

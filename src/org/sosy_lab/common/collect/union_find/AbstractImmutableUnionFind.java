@@ -10,6 +10,11 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.errorprone.annotations.DoNotCall;
 
+/**
+ * An abstract class for immutable Union-Find implementations.
+ *
+ * @param <T> type of elements added to the Union-Find
+ */
 public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
   /**
    * @throws UnsupportedOperationException Always.
