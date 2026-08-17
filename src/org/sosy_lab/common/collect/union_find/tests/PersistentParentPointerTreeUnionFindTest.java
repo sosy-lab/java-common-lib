@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.Set;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class PersistentParentPointerTreeUnionFindTest {
 
   private static PersistentUnionFind<Integer> applyUnions(UnionType pUnionType, int[]... pUnions) {
 
-    PersistentUnionFind<Integer> unionFind = emptyPersistentUnionFind(pUnionType);
+    @Var PersistentUnionFind<Integer> unionFind = emptyPersistentUnionFind(pUnionType);
 
     for (int[] pair : pUnions) {
       unionFind = unionFind.unionAndCopy(pair[0], pair[1]);
@@ -49,7 +50,7 @@ public class PersistentParentPointerTreeUnionFindTest {
   private static PersistentSortedUnionFind<Integer> applySortedUnions(
       UnionType pUnionType, int[]... pUnions) {
 
-    PersistentSortedUnionFind<Integer> unionFind = emptyPersistentSortedUnionFind(pUnionType);
+    @Var PersistentSortedUnionFind<Integer> unionFind = emptyPersistentSortedUnionFind(pUnionType);
 
     for (int[] pair : pUnions) {
       unionFind = unionFind.unionAndCopy(pair[0], pair[1]);
@@ -215,6 +216,7 @@ public class PersistentParentPointerTreeUnionFindTest {
   @Test
   public void testUnion_stringElements() {
 
+    @Var
     PersistentUnionFind<String> unsortedStringUnionFind =
         PersistentParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE);
     unsortedStringUnionFind =
@@ -222,6 +224,7 @@ public class PersistentParentPointerTreeUnionFindTest {
             .unionAndCopy("0", "1")
             .unionAndCopy("0", "2")
             .unionAndCopy("3", "4");
+    @Var
     PersistentSortedUnionFind<String> sortedStringUnionFind =
         PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE);
     sortedStringUnionFind =
@@ -374,6 +377,7 @@ public class PersistentParentPointerTreeUnionFindTest {
   @Test
   public void testOf_returnsIndependentEmptyInstance() {
 
+    @Var
     PersistentUnionFind<Integer> firstUnsortedUnionFind =
         emptyPersistentUnionFind(UnionType.UNION_BY_SIZE);
     PersistentUnionFind<Integer> secondUnsortedUnionFind =
@@ -384,6 +388,7 @@ public class PersistentParentPointerTreeUnionFindTest {
     assertThat(firstUnsortedUnionFind.contains(0)).isTrue();
     assertThat(secondUnsortedUnionFind.contains(0)).isFalse();
 
+    @Var
     PersistentUnionFind<Integer> firstSortedUnionFind =
         emptyPersistentUnionFind(UnionType.UNION_BY_SIZE);
     PersistentUnionFind<Integer> secondSortedUnionFind =
