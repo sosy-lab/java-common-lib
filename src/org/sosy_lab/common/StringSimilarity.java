@@ -106,33 +106,44 @@ public final class StringSimilarity {
    * turn {@code a} into {@code b}, where a transposed pair of characters may not be edited again
    * afterwards.
    */
-  private static int optimalStringAlignmentDistance(String a, String b) {
-    int aLength = a.length();
-    int bLength = b.length();
-    int[][] dp = new int[aLength + 1][bLength + 1];
-    for (int i = 0; i <= aLength; i++) {
-      dp[i][0] = i;
+  private static int optimalStringAlignmentDistance(String stringA, String stringB) {
+    int lengthA = stringA.length();
+    int lengthB = stringB.length();
+
+    int[][] distances = new int[lengthA + 1][lengthB + 1];
+
+    for (int indexA = 0; indexA <= lengthA; indexA++) {
+      distances[indexA][0] = indexA;
     }
-    for (int j = 0; j <= bLength; j++) {
-      dp[0][j] = j;
+
+    for (int indexB = 0; indexB <= lengthB; indexB++) {
+      distances[0][indexB] = indexB;
     }
-    for (int i = 1; i <= aLength; i++) {
-      for (int j = 1; j <= bLength; j++) {
-        int substitutionCost = a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;
-        @Var
-        int best =
-            Math.min(
-                dp[i - 1][j] + 1, // deletion
-                Math.min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + substitutionCost));
-        if (i > 1
-            && j > 1
-            && a.charAt(i - 1) == b.charAt(j - 2)
-            && a.charAt(i - 2) == b.charAt(j - 1)) {
-          best = Math.min(best, dp[i - 2][j - 2] + 1); // transposition
+
+    for (int indexA = 1; indexA <= lengthA; indexA++) {
+      for (int indexB = 1; indexB <= lengthB; indexB++) {
+        int substitutionCost = stringA.charAt(indexA - 1) == stringB.charAt(indexB - 1) ? 0 : 1;
+        int deletionCost = distances[indexA - 1][indexB] + 1;
+        int insertionCost = distances[indexA][indexB - 1] + 1;
+        int substitutionTotalCost = distances[indexA - 1][indexB - 1] + substitutionCost;
+
+        @Var int minCost = Math.min(deletionCost, Math.min(insertionCost, substitutionTotalCost));
+
+        boolean isTransposition =
+            indexA > 1
+                && indexB > 1
+                && stringA.charAt(indexA - 1) == stringB.charAt(indexB - 2)
+                && stringA.charAt(indexA - 2) == stringB.charAt(indexB - 1);
+
+        if (isTransposition) {
+          int transpositionCost = distances[indexA - 2][indexB - 2] + 1;
+          minCost = Math.min(minCost, transpositionCost);
         }
-        dp[i][j] = best;
+
+        distances[indexA][indexB] = minCost;
       }
     }
-    return dp[aLength][bLength];
+
+    return distances[lengthA][lengthB];
   }
 }
