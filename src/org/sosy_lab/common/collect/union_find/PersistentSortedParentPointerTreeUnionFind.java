@@ -59,7 +59,7 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
    *
    * @param pUnionType specifies whether the union is performed by rank or by size
    * @return empty instance
-   * @param <T> type of elements added to the Union-Find
+   * @param <T> type of elements added to the Union-Find. Must be comparable.
    */
   public static <T extends Comparable<T>> AbstractImmutableSortedUnionFind<T> of(
       UnionType pUnionType) {
