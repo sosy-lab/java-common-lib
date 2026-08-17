@@ -140,8 +140,9 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
       return this;
     }
 
-    public ImmutableParentPointerTreeUnionFind<T> build() {
-      return new ImmutableParentPointerTreeUnionFind<>(ImmutableMap.copyOf(unionFind.allNodes));
+    public ImmutableSortedParentPointerTreeUnionFind<T> build() {
+      return new ImmutableSortedParentPointerTreeUnionFind<>(
+          ImmutableMap.copyOf(unionFind.allNodes));
     }
   }
 }
