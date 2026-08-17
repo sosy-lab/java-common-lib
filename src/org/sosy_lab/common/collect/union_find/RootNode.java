@@ -27,11 +27,11 @@ public final class RootNode<T> extends AbstractTreeNode<T> {
    * the current node simply functions as a non-root node from then on. In the beginning, rank is 0
    * and size is 1.
    *
-   * @param value element to be stored in the node
+   * @param pValue element to be stored in the node
    */
-  public RootNode(T value) {
+  public RootNode(T pValue) {
 
-    super(value);
+    super(pValue);
 
     this.rank = 0;
     this.size = 1;
@@ -56,11 +56,11 @@ public final class RootNode<T> extends AbstractTreeNode<T> {
   }
 
   /**
-   * Increments size by n.
+   * Increments size by pN.
    *
-   * @param n number by which size is to be increased.
+   * @param pN number by which size is to be increased.
    */
-  public void incrementSizeBy(int n) {
-    size += n;
+  public void incrementSizeBy(int pN) {
+    size += pN;
   }
 }

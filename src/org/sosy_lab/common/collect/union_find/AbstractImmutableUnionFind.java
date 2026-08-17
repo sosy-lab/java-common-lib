@@ -18,7 +18,7 @@ public abstract class AbstractImmutableUnionFind<T> implements UnionFind<T> {
   @Deprecated
   @Override
   @DoNotCall
-  public final void union(T e1, T e2) {
+  public final void union(T pE1, T pE2) {
     throw new UnsupportedOperationException();
   }
 }

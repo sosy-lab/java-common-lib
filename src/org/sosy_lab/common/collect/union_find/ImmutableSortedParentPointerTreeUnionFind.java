@@ -25,16 +25,16 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
   private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
 
   protected ImmutableSortedParentPointerTreeUnionFind(
-      ImmutableMap<T, AbstractTreeNode<T>> allNodes) {
-    this.allNodes = allNodes;
+      ImmutableMap<T, AbstractTreeNode<T>> pAllNodes) {
+    allNodes = pAllNodes;
   }
 
   @Override
-  public T find(T e) {
+  public T find(T pE) {
 
-    Preconditions.checkNotNull(e);
+    Preconditions.checkNotNull(pE);
 
-    @Var AbstractTreeNode<T> node = allNodes.get(e);
+    @Var AbstractTreeNode<T> node = allNodes.get(pE);
 
     if (node != null) {
       @Var AbstractTreeNode<T> parent = node.getParent();
@@ -72,27 +72,27 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
   }
 
   @Override
-  public boolean contains(T e) {
+  public boolean contains(T pE) {
 
-    return allNodes.containsKey(e);
+    return allNodes.containsKey(pE);
   }
 
   public static final class Builder<T extends Comparable<T>> {
 
     SortedParentPointerTreeUnionFind<T> unionFind;
 
-    private Builder(UnionType unionType) {
-      unionFind = new SortedParentPointerTreeUnionFind<>(unionType);
+    private Builder(UnionType pUnionType) {
+      unionFind = new SortedParentPointerTreeUnionFind<>(pUnionType);
     }
 
-    public static <T extends Comparable<T>> Builder<T> getBuilder(UnionType unionType) {
-      return new Builder<>(unionType);
+    public static <T extends Comparable<T>> Builder<T> getBuilder(UnionType pUnionType) {
+      return new Builder<>(pUnionType);
     }
 
     @CanIgnoreReturnValue
-    public ImmutableSortedParentPointerTreeUnionFind.Builder<T> union(T value1, T value2) {
+    public ImmutableSortedParentPointerTreeUnionFind.Builder<T> union(T pE1, T pE2) {
 
-      unionFind.union(value1, value2);
+      unionFind.union(pE1, pE2);
 
       return this;
     }

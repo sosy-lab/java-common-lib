@@ -33,17 +33,17 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
   }
 
   private PersistentSortedParentPointerTreeUnionFind(
-      PersistentSortedMap<T, T> mapOfNodesToParents,
-      PersistentSortedMap<T, Integer> mapOfRootsToWeights,
-      UnionType unionType) {
-    this.mapOfNodesToParents = mapOfNodesToParents;
-    this.mapOfRootsToWeights = mapOfRootsToWeights;
-    this.unionType = unionType;
+      PersistentSortedMap<T, T> pMapOfNodesToParents,
+      PersistentSortedMap<T, Integer> pMapOfRootsToWeights,
+      UnionType pUnionType) {
+    mapOfNodesToParents = pMapOfNodesToParents;
+    mapOfRootsToWeights = pMapOfRootsToWeights;
+    unionType = pUnionType;
   }
 
   public static <T extends Comparable<T>> AbstractImmutableSortedUnionFind<T> of(
-      UnionType unionType) {
-    return new PersistentSortedParentPointerTreeUnionFind<>(unionType);
+      UnionType pUnionType) {
+    return new PersistentSortedParentPointerTreeUnionFind<>(pUnionType);
   }
 
   @Override
@@ -69,20 +69,20 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
   }
 
   @Override
-  public boolean contains(T e) {
+  public boolean contains(T pE) {
 
-    Preconditions.checkNotNull(e);
+    Preconditions.checkNotNull(pE);
 
-    return mapOfNodesToParents.containsKey(e);
+    return mapOfNodesToParents.containsKey(pE);
   }
 
   @Override
-  public T find(T e) {
+  public T find(T pE) {
 
-    Preconditions.checkNotNull(e);
+    Preconditions.checkNotNull(pE);
 
-    @Var T currentNode = e;
-    @Var T parent = mapOfNodesToParents.get(e);
+    @Var T currentNode = pE;
+    @Var T parent = mapOfNodesToParents.get(pE);
 
     if (parent != null) {
       while (!currentNode.equals(parent)) {
@@ -97,45 +97,45 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
   }
 
   @Override
-  public PersistentSortedUnionFind<T> unionAndCopy(T e1, T e2) {
+  public PersistentSortedUnionFind<T> unionAndCopy(T pE1, T pE2) {
 
-    Preconditions.checkNotNull(e1);
-    Preconditions.checkNotNull(e2);
+    Preconditions.checkNotNull(pE1);
+    Preconditions.checkNotNull(pE2);
 
-    if (e1.equals(e2)) {
-      return addElementAsNewSetAndCopy(e1);
+    if (pE1.equals(pE2)) {
+      return addElementAsNewSetAndCopy(pE1);
     } else {
-      if (contains(e1)) {
-        if (contains(e2)) {
-          T canon1 = find(e1);
-          T canon2 = find(e2);
+      if (contains(pE1)) {
+        if (contains(pE2)) {
+          T canon1 = find(pE1);
+          T canon2 = find(pE2);
 
           if (!canon1.equals(canon2)) {
             return mergeExistingSetsAndCopy(canon1, canon2);
           }
         } else {
-          return addElementToExistingSetAndCopy(e2, find(e1));
+          return addElementToExistingSetAndCopy(pE2, find(pE1));
         }
-      } else if (contains(e2)) {
-        return addElementToExistingSetAndCopy(e1, find(e2));
+      } else if (contains(pE2)) {
+        return addElementToExistingSetAndCopy(pE1, find(pE2));
       } else {
-        return addTwoElementsAsSetAndCopy(e1, e2);
+        return addTwoElementsAsSetAndCopy(pE1, pE2);
       }
     }
 
     return this;
   }
 
-  private PersistentSortedUnionFind<T> addElementAsNewSetAndCopy(T e) {
+  private PersistentSortedUnionFind<T> addElementAsNewSetAndCopy(T pE) {
 
-    if (!contains(e)) {
-      PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(e, e);
+    if (!contains(pE)) {
+      PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(pE, pE);
 
       PersistentSortedMap<T, Integer> updatedRootsToWeights;
       if (unionType == UnionType.UNION_BY_RANK) {
-        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e, 0); // rank
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pE, 0); // rank
       } else {
-        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e, 1); // size
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pE, 1); // size
       }
 
       return new PersistentSortedParentPointerTreeUnionFind<>(
@@ -146,102 +146,103 @@ public final class PersistentSortedParentPointerTreeUnionFind<T extends Comparab
   }
 
   // only call with elements that are definitely canonical!
-  private PersistentSortedUnionFind<T> mergeExistingSetsAndCopy(T canon1, T canon2) {
+  private PersistentSortedUnionFind<T> mergeExistingSetsAndCopy(T pCanon1, T pCanon2) {
 
-    Preconditions.checkNotNull(canon1);
-    Preconditions.checkNotNull(canon2);
+    Preconditions.checkNotNull(pCanon1);
+    Preconditions.checkNotNull(pCanon2);
 
     if (unionType == UnionType.UNION_BY_SIZE) {
-      return unionBySize(canon1, canon2);
+      return unionBySize(pCanon1, pCanon2);
     } else {
-      return unionByRank(canon1, canon2);
+      return unionByRank(pCanon1, pCanon2);
     }
   }
 
-  private PersistentSortedUnionFind<T> addElementToExistingSetAndCopy(T e, T canon) {
+  private PersistentSortedUnionFind<T> addElementToExistingSetAndCopy(T pE, T pCanon) {
 
-    Preconditions.checkNotNull(canon);
+    Preconditions.checkNotNull(pCanon);
 
-    PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(e, canon);
+    PersistentSortedMap<T, T> updatedNodesToParents = mapOfNodesToParents.putAndCopy(pE, pCanon);
 
     PersistentSortedMap<T, Integer> updatedRootsToWeights;
     if (unionType == UnionType.UNION_BY_RANK) {
-      @Var int rank = mapOfRootsToWeights.get(canon);
+      @Var int rank = mapOfRootsToWeights.get(pCanon);
 
       if (rank == 0) {
-        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon, ++rank);
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pCanon, ++rank);
       } else {
         updatedRootsToWeights = mapOfRootsToWeights;
       }
     } else {
-      @Var int size = mapOfRootsToWeights.get(canon);
-      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon, ++size);
+      @Var int size = mapOfRootsToWeights.get(pCanon);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pCanon, ++size);
     }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
         updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
-  private PersistentSortedUnionFind<T> addTwoElementsAsSetAndCopy(T e1, T e2) {
+  private PersistentSortedUnionFind<T> addTwoElementsAsSetAndCopy(T pE1, T pE2) {
 
     @Var PersistentSortedMap<T, T> updatedNodesToParents;
-    updatedNodesToParents = mapOfNodesToParents.putAndCopy(e1, e1);
-    updatedNodesToParents = updatedNodesToParents.putAndCopy(e2, e1);
+    updatedNodesToParents = mapOfNodesToParents.putAndCopy(pE1, pE1);
+    updatedNodesToParents = updatedNodesToParents.putAndCopy(pE2, pE1);
 
     PersistentSortedMap<T, Integer> updatedRootsToWeights;
     if (unionType == UnionType.UNION_BY_RANK) {
-      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e1, 1); // rank
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pE1, 1); // rank
     } else {
-      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(e1, 2); // size
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pE1, 2); // size
     }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
         updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
-  // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
+  // pCanon1 will be new canonical element only if its set is actually bigger, otherwise pCanon2 new
   // canon
-  private PersistentSortedUnionFind<T> unionBySize(T canon1, T canon2) {
+  private PersistentSortedUnionFind<T> unionBySize(T pCanon1, T pCanon2) {
 
-    int size1 = mapOfRootsToWeights.get(canon1);
-    int size2 = mapOfRootsToWeights.get(canon2);
+    int size1 = mapOfRootsToWeights.get(pCanon1);
+    int size2 = mapOfRootsToWeights.get(pCanon2);
 
     PersistentSortedMap<T, T> updatedNodesToParents;
     PersistentSortedMap<T, Integer> updatedRootsToWeights;
 
     if (size1 > size2) {
-      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon2, canon1);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(pCanon2, pCanon1);
 
-      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon1, size1 + size2);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pCanon1, size1 + size2);
     } else {
-      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon1, canon2);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(pCanon1, pCanon2);
 
-      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon2, size2 + size1);
+      updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pCanon2, size2 + size1);
     }
 
     return new PersistentSortedParentPointerTreeUnionFind<>(
         updatedNodesToParents, updatedRootsToWeights, unionType);
   }
 
-  // canon1 will be new canonical element only if its rank is actually greater, otherwise canon2 new
+  // pCanon1 will be new canonical element only if its rank is actually greater, otherwise pCanon2
+  // new
   // canon
-  private PersistentSortedUnionFind<T> unionByRank(T canon1, T canon2) {
+  private PersistentSortedUnionFind<T> unionByRank(T pCanon1, T pCanon2) {
 
-    int rank1 = mapOfRootsToWeights.get(canon1);
-    @Var int rank2 = mapOfRootsToWeights.get(canon2);
+    int rank1 = mapOfRootsToWeights.get(pCanon1);
+    @Var int rank2 = mapOfRootsToWeights.get(pCanon2);
 
     PersistentSortedMap<T, T> updatedNodesToParents;
     PersistentSortedMap<T, Integer> updatedRootsToWeights;
 
     if (rank1 > rank2) {
-      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon2, canon1);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(pCanon2, pCanon1);
 
       updatedRootsToWeights = mapOfRootsToWeights;
     } else {
-      updatedNodesToParents = mapOfNodesToParents.putAndCopy(canon1, canon2);
+      updatedNodesToParents = mapOfNodesToParents.putAndCopy(pCanon1, pCanon2);
 
       if (rank1 == rank2) {
-        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(canon2, ++rank2);
+        updatedRootsToWeights = mapOfRootsToWeights.putAndCopy(pCanon2, ++rank2);
       } else {
         updatedRootsToWeights = mapOfRootsToWeights;
       }

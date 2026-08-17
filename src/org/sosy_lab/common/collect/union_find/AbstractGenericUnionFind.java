@@ -40,17 +40,17 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   /**
    * Returns the canonical element of the set containing the provided element.
    *
-   * @param e element for which set is to be found
+   * @param pE element for which set is to be found
    * @return canonical element of the found set
    * @throws IllegalArgumentException if element is not contained in any subset
    */
   @Override
-  public T find(T e) {
+  public T find(T pE) {
 
-    Preconditions.checkNotNull(e);
+    Preconditions.checkNotNull(pE);
 
     for (Entry<T, S> mapping : mapOfSets.entrySet()) {
-      if (mapping.getValue().contains(e)) {
+      if (mapping.getValue().contains(pE)) {
         return mapping.getKey();
       }
     }
@@ -61,72 +61,72 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
   /**
    * Merges the sets represented by the two input values according to standard Union-Find behaviour.
    *
-   * <p>USES: Add new element as new set: pass it as both e1 and e2. Add new element to existing
+   * <p>USES: Add new element as new set: pass it as both pE1 and pE2. Add new element to existing
    * set: one input value is the new element, the other the canonical element of the set to be added
-   * to. Merge two existing sets: e1, e2 canonical elements of sets to be merged.
+   * to. Merge two existing sets: pE1, pE2 canonical elements of sets to be merged.
    *
-   * @param e1 first element
-   * @param e2 second element
+   * @param pE1 first element
+   * @param pE2 second element
    */
   @Override
-  public void union(T e1, T e2) {
+  public void union(T pE1, T pE2) {
 
-    Preconditions.checkNotNull(e1);
-    Preconditions.checkNotNull(e2);
+    Preconditions.checkNotNull(pE1);
+    Preconditions.checkNotNull(pE2);
 
-    if (e1.equals(e2)) {
-      addElementAsNewSet(e1);
+    if (pE1.equals(pE2)) {
+      addElementAsNewSet(pE1);
     } else {
       Set<T> canonicalElements = mapOfSets.keySet();
 
-      if (canonicalElements.contains(e1)) {
-        if (canonicalElements.contains(e2)) {
-          mergeExistingSets(e1, e2);
+      if (canonicalElements.contains(pE1)) {
+        if (canonicalElements.contains(pE2)) {
+          mergeExistingSets(pE1, pE2);
         } else {
-          addElementToExistingSet(e2, e1);
+          addElementToExistingSet(pE2, pE1);
         }
-      } else if (canonicalElements.contains(e2)) {
-        addElementToExistingSet(e1, e2);
+      } else if (canonicalElements.contains(pE2)) {
+        addElementToExistingSet(pE1, pE2);
       } else {
 
-        if (contains(e1)) {
-          if (contains(e2)) {
-            mergeExistingSets(find(e1), find(e2));
+        if (contains(pE1)) {
+          if (contains(pE2)) {
+            mergeExistingSets(find(pE1), find(pE2));
           } else {
-            addElementToExistingSet(e2, find(e1));
+            addElementToExistingSet(pE2, find(pE1));
           }
         } else {
-          addElementAsNewSet(e1);
-          addElementToExistingSet(e2, e1);
+          addElementAsNewSet(pE1);
+          addElementToExistingSet(pE2, pE1);
         }
       }
     }
   }
 
   @SuppressWarnings("unchecked")
-  private void addElementAsNewSet(T e) {
+  private void addElementAsNewSet(T pE) {
 
-    if (!contains(e)) {
+    if (!contains(pE)) {
       S newSet = (S) getEmptySet();
-      newSet.add(e);
-      mapOfSets.put(e, newSet);
+      newSet.add(pE);
+      mapOfSets.put(pE, newSet);
     }
   }
 
-  private void addElementToExistingSet(T e, T canon) {
+  private void addElementToExistingSet(T pE, T pCanon) {
 
-    if (!contains(e)) {
-      mapOfSets.get(canon).add(e);
+    if (!contains(pE)) {
+      mapOfSets.get(pCanon).add(pE);
     } else {
-      mergeExistingSets(find(e), canon);
+      mergeExistingSets(find(pE), pCanon);
     }
   }
 
-  // e1 will be new canonical element only if its set is actually bigger, otherwise e2 new canon
-  private void mergeExistingSets(T e1, T e2) {
+  // pE1 will be new canonical element only if its set is actually bigger, otherwise pE2 new canon
+  private void mergeExistingSets(T pE1, T pE2) {
 
-    S set1 = mapOfSets.get(e1);
-    S set2 = mapOfSets.get(e2);
+    S set1 = mapOfSets.get(pE1);
+    S set2 = mapOfSets.get(pE2);
 
     assert set1 != null;
     assert set2 != null;
@@ -136,10 +136,10 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
 
     if (size1 > size2) {
       set1.addAll(set2);
-      assert mapOfSets.remove(e2, set2);
+      assert mapOfSets.remove(pE2, set2);
     } else {
       set2.addAll(set1);
-      assert mapOfSets.remove(e1, set1);
+      assert mapOfSets.remove(pE1, set1);
     }
   }
 
@@ -157,16 +157,16 @@ public abstract class AbstractGenericUnionFind<T, S extends Set<T>, M extends Ma
    * Checks whether the provided element is contained in any current subset and returns true or
    * false accordingly.
    *
-   * @param e element to be searched for
+   * @param pE element to be searched for
    * @return true if contained, false if not
    */
   @Override
-  public boolean contains(T e) {
+  public boolean contains(T pE) {
 
-    Preconditions.checkNotNull(e);
+    Preconditions.checkNotNull(pE);
 
     for (S current : mapOfSets.values()) {
-      if (current.contains(e)) {
+      if (current.contains(pE)) {
         return true;
       }
     }

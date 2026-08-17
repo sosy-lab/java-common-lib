@@ -31,10 +31,10 @@ public class SortedParentPointerTreeUnionFind<T extends Comparable<T>>
   /**
    * Creates an empty instance.
    *
-   * @param unionType type of union to be performed for all unions on this instance
+   * @param pUnionType type of union to be performed for all unions on this instance
    */
-  public SortedParentPointerTreeUnionFind(UnionType unionType) {
-    super(unionType);
+  public SortedParentPointerTreeUnionFind(UnionType pUnionType) {
+    super(pUnionType);
   }
 
   /**

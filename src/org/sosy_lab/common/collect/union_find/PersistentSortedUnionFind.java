@@ -28,12 +28,12 @@ public interface PersistentSortedUnionFind<T extends Comparable<T>> extends Sort
   /**
    * Replacement for {@link #union(Comparable, Comparable)} that returns a fresh new instance.
    *
-   * @param e1 first element
-   * @param e2 second element
+   * @param pE1 first element
+   * @param pE2 second element
    * @return new instance that the desired changes have been applied to
    */
   @CheckReturnValue
-  PersistentSortedUnionFind<T> unionAndCopy(T e1, T e2);
+  PersistentSortedUnionFind<T> unionAndCopy(T pE1, T pE2);
 
   /**
    * @throws UnsupportedOperationException Always.
@@ -42,5 +42,5 @@ public interface PersistentSortedUnionFind<T extends Comparable<T>> extends Sort
   @Deprecated
   @Override
   @DoNotCall
-  void union(T e1, T e2);
+  void union(T pE1, T pE2);
 }

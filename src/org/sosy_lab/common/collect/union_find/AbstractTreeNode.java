@@ -23,30 +23,30 @@ public abstract class AbstractTreeNode<T> {
    * root node. If appended to another tree, parent can be reallocated to the new parent node, while
    * the current node simply functions as a non-root node from then on.
    *
-   * @param value element to be stored in the node
+   * @param pValue element to be stored in the node
    */
-  protected AbstractTreeNode(T value) {
-    this.parent = this;
-    this.value = value;
+  protected AbstractTreeNode(T pValue) {
+    parent = this;
+    value = pValue;
   }
 
   /**
    * Constructor for a non-root node.
    *
-   * @param parent parent node (can be root or non-root)
-   * @param value element to be stored in the node
+   * @param pParent pParent node (can be root or non-root)
+   * @param pValue element to be stored in the node
    */
-  protected AbstractTreeNode(AbstractTreeNode<T> parent, T value) {
-    this.parent = parent;
-    this.value = value;
+  protected AbstractTreeNode(AbstractTreeNode<T> pParent, T pValue) {
+    parent = pParent;
+    value = pValue;
   }
 
   public AbstractTreeNode<T> getParent() {
     return parent;
   }
 
-  public void setParent(AbstractTreeNode<T> parent) {
-    this.parent = parent;
+  public void setParent(AbstractTreeNode<T> pParent) {
+    parent = pParent;
   }
 
   public T getValue() {

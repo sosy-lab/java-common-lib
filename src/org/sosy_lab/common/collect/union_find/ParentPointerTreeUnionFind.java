@@ -41,28 +41,28 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   /**
    * Creates an empty instance.
    *
-   * @param unionType type of union to be performed for all unions on this instance
+   * @param pUnionType type of union to be performed for all unions on this instance
    */
-  public ParentPointerTreeUnionFind(UnionType unionType) {
+  public ParentPointerTreeUnionFind(UnionType pUnionType) {
     allNodes = new HashMap<>();
-    this.unionType = unionType;
+    unionType = pUnionType;
   }
 
   /**
    * Returns the canonical element of the set containing the provided element. Applies path
    * compression where possible.
    *
-   * @param value element for which set is to be found
+   * @param pE element for which set is to be found
    * @return canonical element of the found set
    * @throws IllegalArgumentException if element is not contained in any subset
    */
   @Override
-  public T find(T value) {
+  public T find(T pE) {
 
-    Preconditions.checkNotNull(value);
+    Preconditions.checkNotNull(pE);
 
     List<AbstractTreeNode<T>> toBeCompressed = new ArrayList<>();
-    @Var AbstractTreeNode<T> node = allNodes.get(value);
+    @Var AbstractTreeNode<T> node = allNodes.get(pE);
 
     if (node != null) {
       @Var AbstractTreeNode<T> parent = node.getParent();
@@ -87,38 +87,38 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   /**
    * Merges the sets represented by the two input values according to standard Union-Find behaviour.
    *
-   * <p>USES: Add new element as new set: pass it as both value1 and value2. Add new element to
-   * existing set: one input value is the new element, the other the canonical element of the set to
-   * be added to. Merge two existing sets: value1, value2 canonical elements of sets to be merged.
+   * <p>USES: Add new element as new set: pass it as both pE1 and pE2. Add new element to existing
+   * set: one input value is the new element, the other the canonical element of the set to be added
+   * to. Merge two existing sets: pE1, pE2 canonical elements of sets to be merged.
    *
-   * @param value1 first element
-   * @param value2 second element
+   * @param pE1 first element
+   * @param pE2 second element
    */
   @Override
-  public void union(T value1, T value2) {
+  public void union(T pE1, T pE2) {
 
-    Preconditions.checkNotNull(value1);
-    Preconditions.checkNotNull(value2);
+    Preconditions.checkNotNull(pE1);
+    Preconditions.checkNotNull(pE2);
 
-    if (value1.equals(value2)) {
-      addElementAsNewSet(value1);
+    if (pE1.equals(pE2)) {
+      addElementAsNewSet(pE1);
     } else {
-      if (contains(value1)) {
-        if (contains(value2)) {
-          T canon1 = find(value1);
-          T canon2 = find(value2);
+      if (contains(pE1)) {
+        if (contains(pE2)) {
+          T canon1 = find(pE1);
+          T canon2 = find(pE2);
 
           if (!canon1.equals(canon2)) {
             mergeExistingSets(canon1, canon2);
           }
         } else {
-          addElementToExistingSet(value2, find(value1));
+          addElementToExistingSet(pE2, find(pE1));
         }
-      } else if (contains(value2)) {
-        addElementToExistingSet(value1, find(value2));
+      } else if (contains(pE2)) {
+        addElementToExistingSet(pE1, find(pE2));
       } else {
-        addElementAsNewSet(value1);
-        addElementToExistingSet(value2, find(value1));
+        addElementAsNewSet(pE1);
+        addElementToExistingSet(pE2, find(pE1));
       }
     }
   }
@@ -154,55 +154,55 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
    * Checks whether the provided element is contained in any current subset and returns true or
    * false accordingly.
    *
-   * @param e element to be searched for
+   * @param pE element to be searched for
    * @return true if contained, false if not
    */
   @Override
-  public boolean contains(T e) {
+  public boolean contains(T pE) {
 
-    return allNodes.containsKey(e);
+    return allNodes.containsKey(pE);
   }
 
-  private void addElementAsNewSet(T value) {
+  private void addElementAsNewSet(T pE) {
 
-    if (!contains(value)) {
-      RootNode<T> root = new RootNode<>(value);
-      allNodes.put(value, root);
+    if (!contains(pE)) {
+      RootNode<T> root = new RootNode<>(pE);
+      allNodes.put(pE, root);
     }
   }
 
   // only call with elements that are definitely canonical!
-  private void mergeExistingSets(T canon1, T canon2) {
+  private void mergeExistingSets(T pCanon1, T pCanon2) {
 
-    Preconditions.checkNotNull(canon1);
-    Preconditions.checkNotNull(canon2);
+    Preconditions.checkNotNull(pCanon1);
+    Preconditions.checkNotNull(pCanon2);
 
     if (unionType == UnionType.UNION_BY_SIZE) {
-      unionBySize(canon1, canon2);
+      unionBySize(pCanon1, pCanon2);
     } else {
-      unionByRank(canon1, canon2);
+      unionByRank(pCanon1, pCanon2);
     }
   }
 
-  private void addElementToExistingSet(T value, T canon) {
+  private void addElementToExistingSet(T pE, T pCanon) {
 
-    RootNode<T> root = (RootNode<T>) allNodes.get(canon);
-    NonRootNode<T> newNode = new NonRootNode<>(root, value);
+    RootNode<T> root = (RootNode<T>) allNodes.get(pCanon);
+    NonRootNode<T> newNode = new NonRootNode<>(root, pE);
     root.incrementSizeByOne();
 
     if (root.getRank() == 0) {
       root.incrementRankByOne();
     }
 
-    allNodes.put(value, newNode);
+    allNodes.put(pE, newNode);
   }
 
-  // canon1 will be new canonical element only if its set is actually bigger, otherwise canon2 new
+  // pCanon1 will be new canonical element only if its set is actually bigger, otherwise pCanon2 new
   // canon
-  private void unionBySize(T canon1, T canon2) {
+  private void unionBySize(T pCanon1, T pCanon2) {
 
-    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(canon1);
-    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(canon2);
+    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(pCanon1);
+    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(pCanon2);
 
     int size1 = rootNode1.getSize();
     int size2 = rootNode2.getSize();
@@ -216,12 +216,13 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     }
   }
 
-  // canon1 will be new canonical element only if its rank is actually greater, otherwise canon2 new
+  // pCanon1 will be new canonical element only if its rank is actually greater, otherwise pCanon2
+  // new
   // canon
-  private void unionByRank(T canon1, T canon2) {
+  private void unionByRank(T pCanon1, T pCanon2) {
 
-    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(canon1);
-    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(canon2);
+    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(pCanon1);
+    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(pCanon2);
 
     int rank1 = rootNode1.getRank();
     int rank2 = rootNode2.getRank();

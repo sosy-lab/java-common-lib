@@ -19,10 +19,10 @@ public final class NonRootNode<T> extends AbstractTreeNode<T> {
   /**
    * Constructor for a non-root node.
    *
-   * @param parent parent node (can be root or non-root)
-   * @param value element to be stored in the node
+   * @param pParent parent node (can be root or non-root)
+   * @param pValue element to be stored in the node
    */
-  public NonRootNode(AbstractTreeNode<T> parent, T value) {
-    super(parent, value);
+  public NonRootNode(AbstractTreeNode<T> pParent, T pValue) {
+    super(pParent, pValue);
   }
 }
