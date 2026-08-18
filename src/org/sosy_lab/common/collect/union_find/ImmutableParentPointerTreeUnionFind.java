@@ -111,7 +111,9 @@ public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUni
 
   /**
    * Builder class which first collects the data in a mutable Union-Find and converts it to an
-   * immutable Union-Find when {@code build()} is called.
+   * immutable Union-Find when {@code build()} is called. See documentation in {@link
+   * ParentPointerTreeUnionFind} for explanations on {@code union()}, {@code add()} and {@code
+   * addAll()} as the methods in this builder simply pass to their aforementioned namesakes.
    *
    * @param <T> type of elements added to the Union-Find
    */
@@ -131,6 +133,22 @@ public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUni
     public Builder<T> union(T pE1, T pE2) {
 
       unionFind.union(pE1, pE2);
+
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder<T> add(Set<T> pSet) {
+
+      unionFind.add(pSet);
+
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder<T> addAll(Collection<Set<T>> pSets) {
+
+      unionFind.addAll(pSets);
 
       return this;
     }
