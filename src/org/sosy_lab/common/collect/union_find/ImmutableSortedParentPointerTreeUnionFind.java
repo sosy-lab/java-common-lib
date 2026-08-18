@@ -10,12 +10,10 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
@@ -123,42 +121,18 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
    *
    * @param <T> type of elements added to the Union-Find
    */
-  public static final class Builder<T extends Comparable<T>> {
-
-    SortedParentPointerTreeUnionFind<T> unionFind;
+  public static final class Builder<T extends Comparable<T>>
+      extends AbstractImmutableParentPointerTreeBuilder<T> {
 
     private Builder(UnionType pUnionType) {
-      unionFind = new SortedParentPointerTreeUnionFind<>(pUnionType);
+      super(pUnionType);
     }
 
     public static <T extends Comparable<T>> Builder<T> getBuilder(UnionType pUnionType) {
       return new Builder<>(pUnionType);
     }
 
-    @CanIgnoreReturnValue
-    public Builder<T> union(T pE1, T pE2) {
-
-      unionFind.union(pE1, pE2);
-
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    public Builder<T> add(Set<T> pSet) {
-
-      unionFind.add(pSet);
-
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    public Builder<T> addAll(Collection<Set<T>> pSets) {
-
-      unionFind.addAll(pSets);
-
-      return this;
-    }
-
+    @Override
     public ImmutableSortedParentPointerTreeUnionFind<T> build() {
       return new ImmutableSortedParentPointerTreeUnionFind<>(
           ImmutableMap.copyOf(unionFind.allNodes));

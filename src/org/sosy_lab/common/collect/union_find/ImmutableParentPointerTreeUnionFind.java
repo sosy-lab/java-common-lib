@@ -10,7 +10,6 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.HashMap;
@@ -117,42 +116,18 @@ public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUni
    *
    * @param <T> type of elements added to the Union-Find
    */
-  public static final class Builder<T> {
-
-    ParentPointerTreeUnionFind<T> unionFind;
+  public static final class Builder<T> extends AbstractImmutableParentPointerTreeBuilder<T> {
 
     private Builder(UnionType pUnionType) {
-      unionFind = new ParentPointerTreeUnionFind<>(pUnionType);
+      super(pUnionType);
     }
 
-    public static <T> Builder<T> getBuilder(UnionType pUnionType) {
+    public static <T> AbstractImmutableParentPointerTreeBuilder<T> getBuilder(
+        UnionType pUnionType) {
       return new Builder<>(pUnionType);
     }
 
-    @CanIgnoreReturnValue
-    public Builder<T> union(T pE1, T pE2) {
-
-      unionFind.union(pE1, pE2);
-
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    public Builder<T> add(Set<T> pSet) {
-
-      unionFind.add(pSet);
-
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    public Builder<T> addAll(Collection<Set<T>> pSets) {
-
-      unionFind.addAll(pSets);
-
-      return this;
-    }
-
+    @Override
     public ImmutableParentPointerTreeUnionFind<T> build() {
       return new ImmutableParentPointerTreeUnionFind<>(ImmutableMap.copyOf(unionFind.allNodes));
     }

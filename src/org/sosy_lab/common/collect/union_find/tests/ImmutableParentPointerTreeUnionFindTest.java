@@ -15,6 +15,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Set;
 import org.junit.Test;
+import org.sosy_lab.common.collect.union_find.AbstractImmutableParentPointerTreeBuilder;
+import org.sosy_lab.common.collect.union_find.AbstractImmutableUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableSortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
@@ -24,10 +26,10 @@ public class ImmutableParentPointerTreeUnionFindTest {
 
   private final int[] simpleUnionArgs = new int[] {0, 1};
 
-  private static ImmutableParentPointerTreeUnionFind<Integer> buildImmutable(
+  private static AbstractImmutableUnionFind<Integer> buildImmutable(
       UnionType pUnionType, int[]... pUnions) {
 
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> builder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> builder =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(pUnionType);
 
     for (int[] pair : pUnions) {
@@ -211,14 +213,14 @@ public class ImmutableParentPointerTreeUnionFindTest {
   @Test
   public void testUnion_stringElements() {
 
-    ImmutableParentPointerTreeUnionFind.Builder<String> unsortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<String> unsortedBuilder =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableSortedParentPointerTreeUnionFind.Builder<String> sortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<String> sortedBuilder =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
-    ImmutableParentPointerTreeUnionFind<String> unsortedStringUnionFind =
+    AbstractImmutableUnionFind<String> unsortedStringUnionFind =
         unsortedBuilder.union("0", "1").union("0", "2").union("3", "4").build();
-    ImmutableSortedParentPointerTreeUnionFind<String> sortedStringUnionFind =
+    AbstractImmutableUnionFind<String> sortedStringUnionFind =
         sortedBuilder.union("0", "1").union("0", "2").union("3", "4").build();
 
     assertThat(unsortedStringUnionFind.find("0")).isEqualTo(unsortedStringUnionFind.find("2"));
@@ -292,9 +294,9 @@ public class ImmutableParentPointerTreeUnionFindTest {
   @Test
   public void testBuilder_union_nullElement_throwsNullPointerException() {
 
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> unsortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> unsortedBuilder =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableSortedParentPointerTreeUnionFind.Builder<Integer> sortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> sortedBuilder =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
     assertThrows(NullPointerException.class, () -> unsortedBuilder.union(null, 1));
@@ -304,9 +306,9 @@ public class ImmutableParentPointerTreeUnionFindTest {
   @Test
   public void testBuilder_union_returnsSameBuilderInstance() {
 
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> unsortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> unsortedBuilder =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableSortedParentPointerTreeUnionFind.Builder<Integer> sortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> sortedBuilder =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
     assertThat(unsortedBuilder.union(0, 1)).isSameInstanceAs(unsortedBuilder);
@@ -316,14 +318,14 @@ public class ImmutableParentPointerTreeUnionFindTest {
   @Test
   public void testBuilder_getBuilder_returnsIndependentBuilders() {
 
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> unsortedBuilder1 =
+    AbstractImmutableParentPointerTreeBuilder<Integer> unsortedBuilder1 =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> unsortedBuilder2 =
+    AbstractImmutableParentPointerTreeBuilder<Integer> unsortedBuilder2 =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
-    ImmutableSortedParentPointerTreeUnionFind.Builder<Integer> sortedBuilder1 =
+    AbstractImmutableParentPointerTreeBuilder<Integer> sortedBuilder1 =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableSortedParentPointerTreeUnionFind.Builder<Integer> sortedBuilder2 =
+    AbstractImmutableParentPointerTreeBuilder<Integer> sortedBuilder2 =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
     unsortedBuilder1.union(0, 1);
@@ -339,22 +341,22 @@ public class ImmutableParentPointerTreeUnionFindTest {
   @Test
   public void testBuilder_build_laterMutationsDoNotAffectPreviousResult() {
 
-    ImmutableParentPointerTreeUnionFind.Builder<Integer> unsortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> unsortedBuilder =
         ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
-    ImmutableSortedParentPointerTreeUnionFind.Builder<Integer> sortedBuilder =
+    AbstractImmutableParentPointerTreeBuilder<Integer> sortedBuilder =
         ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE);
 
     unsortedBuilder.union(0, 1);
     sortedBuilder.union(0, 1);
 
-    ImmutableParentPointerTreeUnionFind<Integer> firstUnsortedResult = unsortedBuilder.build();
-    ImmutableSortedParentPointerTreeUnionFind<Integer> firstSortedResult = sortedBuilder.build();
+    AbstractImmutableUnionFind<Integer> firstUnsortedResult = unsortedBuilder.build();
+    AbstractImmutableUnionFind<Integer> firstSortedResult = sortedBuilder.build();
 
     unsortedBuilder.union(2, 3);
     sortedBuilder.union(2, 3);
 
-    ImmutableParentPointerTreeUnionFind<Integer> secondUnsortedResult = unsortedBuilder.build();
-    ImmutableSortedParentPointerTreeUnionFind<Integer> secondSortedResult = sortedBuilder.build();
+    AbstractImmutableUnionFind<Integer> secondUnsortedResult = unsortedBuilder.build();
+    AbstractImmutableUnionFind<Integer> secondSortedResult = sortedBuilder.build();
 
     assertThat(firstUnsortedResult.contains(2)).isFalse();
     assertThat(firstUnsortedResult.getAllSubsets()).hasSize(1);
