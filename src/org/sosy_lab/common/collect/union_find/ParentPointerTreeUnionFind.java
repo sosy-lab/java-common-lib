@@ -163,6 +163,46 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     return allNodes.containsKey(pE);
   }
 
+  /**
+   * Adds the contents of a set of elements to the Union-Find. A random element in the set (the
+   * first one accessed) will be used as the canonical element. If the set contains elements already
+   * found elsewhere in the Union-Find, these sets will be merged accordingly.
+   *
+   * @param pSet set to be added to the Union-Find
+   */
+  public void add(Set<T> pSet) {
+
+    Preconditions.checkNotNull(pSet);
+
+    @Var T canon = null;
+
+    for (T current : pSet) {
+
+      if (canon == null) {
+        canon = current;
+        addElementAsNewSet(canon);
+      }
+
+      addElementToExistingSet(current, canon);
+    }
+  }
+
+  /**
+   * Adds multiple sets of elements to the Union-Find. For each set, a random element in the set
+   * (the first one accessed) will be used as the canonical element. If a set contains elements
+   * already found elsewhere in the Union-Find, these sets will be merged accordingly.
+   *
+   * @param pSets sets to be added to the Union-Find
+   */
+  public void addAll(Collection<Set<T>> pSets) {
+
+    Preconditions.checkNotNull(pSets);
+
+    for (Set<T> set : pSets) {
+      add(set);
+    }
+  }
+
   private void addElementAsNewSet(T pE) {
 
     if (!contains(pE)) {
