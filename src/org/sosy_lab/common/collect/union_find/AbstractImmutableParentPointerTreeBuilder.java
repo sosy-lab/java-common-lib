@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
 import java.util.Collection;
 import java.util.Set;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionType;
@@ -21,9 +22,10 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
  *
  * @param <T> type of elements added to the Union-Find
  */
+@Immutable(containerOf = "T")
 public abstract class AbstractImmutableParentPointerTreeBuilder<T> {
 
-  ParentPointerTreeUnionFind<T> unionFind;
+  final ParentPointerTreeUnionFind<T> unionFind;
 
   protected AbstractImmutableParentPointerTreeBuilder(UnionType pUnionType) {
     unionFind = new ParentPointerTreeUnionFind<>(pUnionType);

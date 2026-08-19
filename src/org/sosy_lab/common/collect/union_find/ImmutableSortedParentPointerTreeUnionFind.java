@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.NavigableMap;
@@ -29,6 +30,7 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
  *
  * @param <T> type of elements added to the Union-Find. Must be comparable.
  */
+@Immutable(containerOf = "T")
 public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> {
 

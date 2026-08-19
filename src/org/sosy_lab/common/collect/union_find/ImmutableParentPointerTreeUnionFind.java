@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
  *
  * @param <T> type of elements added to the Union-Find.
  */
+@Immutable(containerOf = "T")
 public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T> {
 
   private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
