@@ -109,16 +109,16 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
           T canon2 = find(pE2);
 
           if (!canon1.equals(canon2)) {
-            mergeExistingSets(canon1, canon2);
+            mergeExistingSets(findNode(canon1), findNode(canon2));
           }
         } else {
-          addElementToExistingSet(pE2, find(pE1));
+          addElementToExistingSet(pE2, findNode(pE1));
         }
       } else if (contains(pE2)) {
-        addElementToExistingSet(pE1, find(pE2));
+        addElementToExistingSet(pE1, findNode(pE2));
       } else {
         addElementAsNewSet(pE1);
-        addElementToExistingSet(pE2, find(pE1));
+        addElementToExistingSet(pE2, findNode(pE1));
       }
     }
   }
@@ -183,7 +183,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
         addElementAsNewSet(canon);
       }
 
-      addElementToExistingSet(current, canon);
+      addElementToExistingSet(current, findNode(canon));
     }
   }
 
@@ -212,7 +212,7 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
   }
 
   // only call with elements that are definitely canonical!
-  private void mergeExistingSets(T pCanon1, T pCanon2) {
+  private void mergeExistingSets(RootNode<T> pCanon1, RootNode<T> pCanon2) {
 
     Preconditions.checkNotNull(pCanon1);
     Preconditions.checkNotNull(pCanon2);
@@ -224,14 +224,13 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
     }
   }
 
-  private void addElementToExistingSet(T pE, T pCanon) {
+  private void addElementToExistingSet(T pE, RootNode<T> pCanon) {
 
-    RootNode<T> root = (RootNode<T>) allNodes.get(pCanon);
-    NonRootNode<T> newNode = new NonRootNode<>(root, pE);
-    root.incrementSizeByOne();
+    NonRootNode<T> newNode = new NonRootNode<>(pCanon, pE);
+    pCanon.incrementSizeByOne();
 
-    if (root.getRank() == 0) {
-      root.incrementRankByOne();
+    if (pCanon.getRank() == 0) {
+      pCanon.incrementRankByOne();
     }
 
     allNodes.put(pE, newNode);
@@ -239,43 +238,65 @@ public class ParentPointerTreeUnionFind<T> implements UnionFind<T> {
 
   // pCanon1 will be new canonical element only if its set is actually bigger, otherwise pCanon2 new
   // canon
-  private void unionBySize(T pCanon1, T pCanon2) {
+  private void unionBySize(RootNode<T> pCanon1, RootNode<T> pCanon2) {
 
-    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(pCanon1);
-    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(pCanon2);
-
-    int size1 = rootNode1.getSize();
-    int size2 = rootNode2.getSize();
+    int size1 = pCanon1.getSize();
+    int size2 = pCanon2.getSize();
 
     if (size1 > size2) {
-      rootNode2.setParent(rootNode1);
-      rootNode1.incrementSizeBy(rootNode2.getSize());
+      pCanon2.setParent(pCanon1);
+      pCanon1.incrementSizeBy(pCanon2.getSize());
     } else {
-      rootNode1.setParent(rootNode2);
-      rootNode2.incrementSizeBy(rootNode1.getSize());
+      pCanon1.setParent(pCanon2);
+      pCanon2.incrementSizeBy(pCanon1.getSize());
     }
   }
 
   // pCanon1 will be new canonical element only if its rank is actually greater, otherwise pCanon2
   // new
   // canon
-  private void unionByRank(T pCanon1, T pCanon2) {
+  private void unionByRank(RootNode<T> pCanon1, RootNode<T> pCanon2) {
 
-    RootNode<T> rootNode1 = (RootNode<T>) allNodes.get(pCanon1);
-    RootNode<T> rootNode2 = (RootNode<T>) allNodes.get(pCanon2);
-
-    int rank1 = rootNode1.getRank();
-    int rank2 = rootNode2.getRank();
+    int rank1 = pCanon1.getRank();
+    int rank2 = pCanon2.getRank();
 
     if (rank1 > rank2) {
-      rootNode2.setParent(rootNode1);
+      pCanon2.setParent(pCanon1);
     } else {
-      rootNode1.setParent(rootNode2);
+      pCanon1.setParent(pCanon2);
 
       // as rank only changes if both ranks are the same
       if (rank1 == rank2) {
-        rootNode2.incrementRankByOne();
+        pCanon2.incrementRankByOne();
       }
     }
+  }
+
+  // like find; returns node of canonical element of the set pE belongs to, not value
+  private RootNode<T> findNode(T pE) {
+
+    Preconditions.checkNotNull(pE);
+
+    List<AbstractTreeNode<T>> toBeCompressed = new ArrayList<>();
+    @Var AbstractTreeNode<T> node = allNodes.get(pE);
+
+    if (node != null) {
+      @Var AbstractTreeNode<T> parent = node.getParent();
+
+      while (!node.equals(parent)) {
+        toBeCompressed.add(node);
+        node = parent;
+        parent = node.getParent();
+      }
+
+      for (AbstractTreeNode<T> current : toBeCompressed) {
+
+        current.setParent(parent);
+      }
+
+      return (RootNode<T>) parent;
+    }
+
+    throw new IllegalArgumentException("Element not contained.");
   }
 }
