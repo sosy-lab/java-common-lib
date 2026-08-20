@@ -25,6 +25,9 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 @Immutable(containerOf = "T")
 public abstract class AbstractImmutableParentPointerTreeBuilder<T> {
 
+  // union-find not immutable but only used internally and never mutated passed outward
+  // build() returns an immutable union-find that contains a copy of this union-find's map
+  @SuppressWarnings("Immutable")
   final ParentPointerTreeUnionFind<T> unionFind;
 
   protected AbstractImmutableParentPointerTreeBuilder(UnionType pUnionType) {

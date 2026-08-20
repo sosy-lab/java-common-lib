@@ -34,8 +34,16 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 public final class PersistentParentPointerTreeUnionFind<T> extends AbstractImmutableUnionFind<T>
     implements PersistentUnionFind<T> {
 
+  // map only used internally and never mutated after creation
+  // TODO convert to ImmutableMap once Guava upgraded to 31.1 and buildKeepingLast() available
+  @SuppressWarnings("Immutable")
   private final Map<T, T> mapOfNodesToParents;
+
+  // map only used internally and never mutated after creation
+  // TODO convert to ImmutableMap once Guava upgraded to 31.1 and buildKeepingLast() available
+  @SuppressWarnings("Immutable")
   private final Map<T, Integer> mapOfRootsToWeights;
+
   private final UnionType unionType;
 
   private PersistentParentPointerTreeUnionFind(UnionType pUnionType) {

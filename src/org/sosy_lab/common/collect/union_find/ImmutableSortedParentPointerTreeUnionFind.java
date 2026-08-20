@@ -34,6 +34,9 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
     extends AbstractImmutableSortedUnionFind<T> {
 
+  // tree nodes are not immutable but only used internally and never mutated after creation
+  // immutable tree nodes would make conversion during build() difficult and time-consuming
+  @SuppressWarnings("Immutable")
   private final ImmutableMap<T, AbstractTreeNode<T>> allNodes;
 
   /**
