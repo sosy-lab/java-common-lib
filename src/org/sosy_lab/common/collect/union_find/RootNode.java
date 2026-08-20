@@ -33,8 +33,8 @@ public final class RootNode<T> extends AbstractTreeNode<T> {
 
     super(pValue);
 
-    rank = 0;
-    size = 1;
+    this.rank = 0;
+    this.size = 1;
   }
 
   public int getRank() {
