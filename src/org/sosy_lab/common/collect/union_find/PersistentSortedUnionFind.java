@@ -23,7 +23,8 @@ import com.google.errorprone.annotations.Immutable;
  * @param <T> The type of values.
  */
 @Immutable(containerOf = "T")
-public interface PersistentSortedUnionFind<T extends Comparable<T>> extends SortedUnionFind<T> {
+public interface PersistentSortedUnionFind<T extends Comparable<T>>
+    extends SortedUnionFind<T>, PersistentUnionFind<T> {
 
   /**
    * Replacement for {@link #union(Comparable, Comparable)} that returns a fresh new instance.
@@ -32,6 +33,7 @@ public interface PersistentSortedUnionFind<T extends Comparable<T>> extends Sort
    * @param pE2 second element
    * @return new instance that the desired changes have been applied to
    */
+  @Override
   @CheckReturnValue
   PersistentSortedUnionFind<T> unionAndCopy(T pE1, T pE2);
 
