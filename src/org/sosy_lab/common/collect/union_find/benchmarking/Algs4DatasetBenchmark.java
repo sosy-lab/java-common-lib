@@ -8,8 +8,18 @@
 
 package org.sosy_lab.common.collect.union_find.benchmarking;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableParentPointerTreeBuilder;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableParentPointerTreeUnionFind;
@@ -22,7 +32,7 @@ import org.sosy_lab.common.collect.union_find.PersistentUnionFind;
 import org.sosy_lab.common.collect.union_find.SortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.UnionFind;
 
-public final class UnionSingleElementsIntoExistingSetBenchmark {
+public final class Algs4DatasetBenchmark {
 
   public static void main(String[] args) {
 
@@ -30,7 +40,10 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
     @Var boolean persistent = false;
     @Var boolean sorted = false;
     @Var boolean unionByRank = false;
-    @Var int n = 0;
+    @Var
+    @Nullable
+    Path filePath = null;
+    List<Integer> unionInput = new ArrayList<>();
 
     if (args.length == 0) {
       System.exit(1);
@@ -52,56 +65,78 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
         case "-rank" -> unionByRank = true;
 
         default -> {
-          try {
-            n = Integer.parseInt(string);
-          } catch (NumberFormatException pE) {
-            throw new IllegalArgumentException("Incompatible args", pE);
-          }
+          filePath = Path.of(string);
         }
+      }
+
+      try {
+        Preconditions.checkNotNull(filePath);
+
+        for (@Var String line : Files.readAllLines(filePath)) {
+
+          line = line.trim();
+
+          if (line.isEmpty()) {
+            continue;
+          }
+
+          List<String> tokens = Splitter.on(Pattern.compile("\\s+")).splitToList(line);
+
+          unionInput.add(Integer.parseInt(tokens.get(0)));
+          unionInput.add(Integer.parseInt(tokens.get(1)));
+        }
+      } catch (IOException e) {
+        System.exit(1);
       }
     }
 
+    Iterator<Integer> iterator = unionInput.iterator();
+
     if (!immutable && !persistent && !sorted) {
       if (unionByRank) {
-        mutable(new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_RANK), n);
+        mutable(new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_RANK), iterator);
       } else {
-        mutable(new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE), n);
+        mutable(new ParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE), iterator);
       }
     } else if (!immutable && !persistent && sorted) {
       if (unionByRank) {
-        mutable(new SortedParentPointerTreeUnionFind<>(UnionType.UNION_BY_RANK), n);
+        mutable(new SortedParentPointerTreeUnionFind<>(UnionType.UNION_BY_RANK), iterator);
       } else {
-        mutable(new SortedParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE), n);
+        mutable(new SortedParentPointerTreeUnionFind<>(UnionType.UNION_BY_SIZE), iterator);
       }
     } else if (immutable && !sorted) {
       if (unionByRank) {
         immutable(
-            ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_RANK), n);
+            ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_RANK),
+            iterator);
       } else {
         immutable(
-            ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE), n);
+            ImmutableParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE),
+            iterator);
       }
     } else if (immutable && sorted) {
       if (unionByRank) {
         immutable(
             ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_RANK),
-            n);
+            iterator);
       } else {
         immutable(
             ImmutableSortedParentPointerTreeUnionFind.Builder.getBuilder(UnionType.UNION_BY_SIZE),
-            n);
+            iterator);
       }
     } else if (persistent && !sorted) {
       if (unionByRank) {
-        persistent(PersistentParentPointerTreeUnionFind.of(UnionType.UNION_BY_RANK), n);
+        persistent(PersistentParentPointerTreeUnionFind.of(UnionType.UNION_BY_RANK), iterator);
       } else {
-        persistent(PersistentParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE), n);
+        persistent(PersistentParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE), iterator);
       }
     } else if (persistent && sorted) {
       if (unionByRank) {
-        persistent(PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_RANK), n);
+        persistent(
+            PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_RANK), iterator);
       } else {
-        persistent(PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE), n);
+        persistent(
+            PersistentSortedParentPointerTreeUnionFind.of(UnionType.UNION_BY_SIZE), iterator);
       }
     } else {
       System.exit(1);
@@ -109,32 +144,45 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
     System.exit(0);
   }
 
-  private static void mutable(UnionFind<Integer> pUnionFind, int pN) {
+  private static void mutable(UnionFind<Integer> pUnionFind, Iterator<Integer> pIterator) {
 
-    for (int i = 0; i < pN; i++) {
-      pUnionFind.union(0, i);
+    while (pIterator.hasNext()) {
+
+      int a = pIterator.next();
+      int b = pIterator.next();
+
+      pUnionFind.union(a, b);
     }
   }
 
   @CanIgnoreReturnValue
   private static AbstractImmutableUnionFind<Integer> immutable(
-      AbstractImmutableParentPointerTreeBuilder<Integer> pBuilder, int pN) {
+      AbstractImmutableParentPointerTreeBuilder<Integer> pBuilder, Iterator<Integer> pIterator) {
 
-    for (int i = 0; i < pN; i++) {
-      pBuilder.union(0, i);
+    while (pIterator.hasNext()) {
+
+      int a = pIterator.next();
+      int b = pIterator.next();
+
+      pBuilder.union(a, b);
     }
 
     return pBuilder.build();
   }
 
-  private static void persistent(PersistentUnionFind<Integer> pUnionFind, int pN) {
+  private static void persistent(
+      PersistentUnionFind<Integer> pUnionFind, Iterator<Integer> pIterator) {
 
     @Var PersistentUnionFind<Integer> unionFind = pUnionFind;
 
-    for (int i = 0; i < pN; i++) {
-      unionFind = unionFind.unionAndCopy(0, i);
+    while (pIterator.hasNext()) {
+
+      int a = pIterator.next();
+      int b = pIterator.next();
+
+      unionFind = unionFind.unionAndCopy(a, b);
     }
   }
 
-  private UnionSingleElementsIntoExistingSetBenchmark() {}
+  private Algs4DatasetBenchmark() {}
 }
