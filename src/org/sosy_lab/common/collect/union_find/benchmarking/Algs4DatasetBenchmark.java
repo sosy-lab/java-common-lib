@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableParentPointerTreeBuilder;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableParentPointerTreeUnionFind;
@@ -44,6 +44,7 @@ public final class Algs4DatasetBenchmark {
     @Nullable
     Path filePath = null;
     List<Integer> unionInput = new ArrayList<>();
+    Pattern pattern = Pattern.compile("\\s+");
 
     if (args.length == 0) {
       System.exit(1);
@@ -75,13 +76,13 @@ public final class Algs4DatasetBenchmark {
 
         for (@Var String line : Files.readAllLines(filePath)) {
 
-          line = line.trim();
+          String trimmedLine = line.trim();
 
-          if (line.isEmpty()) {
+          if (trimmedLine.isEmpty()) {
             continue;
           }
 
-          List<String> tokens = Splitter.on(Pattern.compile("\\s+")).splitToList(line);
+          List<String> tokens = Splitter.on(pattern).splitToList(trimmedLine);
 
           unionInput.add(Integer.parseInt(tokens.get(0)));
           unionInput.add(Integer.parseInt(tokens.get(1)));

@@ -10,6 +10,8 @@ package org.sosy_lab.common.collect.union_find.benchmarking;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableParentPointerTreeBuilder;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableParentPointerTreeUnionFind;
@@ -52,10 +54,13 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
         case "-rank" -> unionByRank = true;
 
         default -> {
-          try {
-            n = Integer.parseInt(string);
-          } catch (NumberFormatException pE) {
-            throw new IllegalArgumentException("Incompatible args", pE);
+
+          Matcher matcher = Pattern.compile("n_(\\d+)\\.txt$").matcher(string);
+
+          if(matcher.find()) {
+            n = Integer.parseInt(matcher.group(1));
+          } else {
+            throw new IllegalArgumentException("Incompatible args");
           }
         }
       }
