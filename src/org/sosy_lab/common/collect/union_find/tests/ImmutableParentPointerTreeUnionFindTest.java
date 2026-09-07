@@ -364,11 +364,11 @@ public class ImmutableParentPointerTreeUnionFindTest {
     assertThat(firstSortedResult.contains(2)).isFalse();
     assertThat(firstSortedResult.getAllSubsets()).hasSize(1);
 
-    assertThat(secondUnsortedResult.contains(2)).isTrue();
-    assertThat(secondUnsortedResult.getAllSubsets()).hasSize(2);
+    assertThat(secondUnsortedResult.contains(2)).isFalse();
+    assertThat(secondUnsortedResult.getAllSubsets()).hasSize(1);
 
-    assertThat(secondSortedResult.contains(2)).isTrue();
-    assertThat(secondSortedResult.getAllSubsets()).hasSize(2);
+    assertThat(secondSortedResult.contains(2)).isFalse();
+    assertThat(secondSortedResult.getAllSubsets()).hasSize(1);
   }
 
   @Test

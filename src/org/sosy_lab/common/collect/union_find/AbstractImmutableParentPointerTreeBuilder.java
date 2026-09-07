@@ -16,9 +16,10 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 
 /**
  * Abstract builder class which first collects the data in a mutable Union-Find and converts it to
- * an immutable Union-Find when {@code build()} is called. See documentation in {@link
- * ParentPointerTreeUnionFind} for explanations on {@code union()}, {@code add()} and {@code
- * addAll()} as the methods in this builder simply pass to their aforementioned namesakes.
+ * an immutable Union-Find when {@code build()} is called. From then onward, previously modifying
+ * methods will not cause further modifications to the Union-Find instance inside. See documentation
+ * in {@link ParentPointerTreeUnionFind} for explanations on {@code union()}, {@code add()} and
+ * {@code addAll()} as the methods in this builder simply pass to their aforementioned namesakes.
  *
  * @param <T> type of elements added to the Union-Find
  */
@@ -30,14 +31,23 @@ public abstract class AbstractImmutableParentPointerTreeBuilder<T> {
   @SuppressWarnings("Immutable")
   final ParentPointerTreeUnionFind<T> unionFind;
 
+  // prevents further modifications after build()
+  // is never modified once having been switched to false
+  @SuppressWarnings("Immutable")
+  boolean modificationsAllowed;
+
   protected AbstractImmutableParentPointerTreeBuilder(UnionType pUnionType) {
     unionFind = new ParentPointerTreeUnionFind<>(pUnionType);
+    modificationsAllowed = true;
   }
 
   @CanIgnoreReturnValue
   public AbstractImmutableParentPointerTreeBuilder<T> union(T pE1, T pE2) {
 
-    unionFind.union(pE1, pE2);
+    if (modificationsAllowed) {
+
+      unionFind.union(pE1, pE2);
+    }
 
     return this;
   }
@@ -45,7 +55,10 @@ public abstract class AbstractImmutableParentPointerTreeBuilder<T> {
   @CanIgnoreReturnValue
   public AbstractImmutableParentPointerTreeBuilder<T> add(Set<T> pSet) {
 
-    unionFind.add(pSet);
+    if (modificationsAllowed) {
+
+      unionFind.add(pSet);
+    }
 
     return this;
   }
@@ -53,11 +66,15 @@ public abstract class AbstractImmutableParentPointerTreeBuilder<T> {
   @CanIgnoreReturnValue
   public AbstractImmutableParentPointerTreeBuilder<T> addAll(Collection<Set<T>> pSets) {
 
-    unionFind.addAll(pSets);
+    if (modificationsAllowed) {
+
+      unionFind.addAll(pSets);
+    }
 
     return this;
   }
 
   // get map from mutable Union-Find instance and convert to immutable map, then pass to constructor
+  // set modificationsAllowed to false!!
   public abstract AbstractImmutableUnionFind<T> build();
 }

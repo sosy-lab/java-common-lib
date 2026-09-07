@@ -139,6 +139,9 @@ public class ImmutableSortedParentPointerTreeUnionFind<T extends Comparable<T>>
 
     @Override
     public ImmutableSortedParentPointerTreeUnionFind<T> build() {
+
+      modificationsAllowed = false;
+
       return new ImmutableSortedParentPointerTreeUnionFind<>(
           ImmutableMap.copyOf(unionFind.allNodes));
     }

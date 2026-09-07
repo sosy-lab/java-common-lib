@@ -134,6 +134,9 @@ public class ImmutableParentPointerTreeUnionFind<T> extends AbstractImmutableUni
 
     @Override
     public ImmutableParentPointerTreeUnionFind<T> build() {
+
+      modificationsAllowed = false;
+
       return new ImmutableParentPointerTreeUnionFind<>(ImmutableMap.copyOf(unionFind.allNodes));
     }
   }
