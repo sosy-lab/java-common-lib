@@ -34,6 +34,8 @@ import org.sosy_lab.common.collect.union_find.UnionFind;
 
 public final class Algs4DatasetBenchmark {
 
+  static final Pattern PATTERN = Pattern.compile("\\s+");
+
   public static void main(String[] args) {
 
     @Var boolean immutable = false;
@@ -41,10 +43,8 @@ public final class Algs4DatasetBenchmark {
     @Var boolean sorted = false;
     @Var boolean unionByRank = false;
     @Var
-    @Nullable
-    Path filePath = null;
+    @Nullable Path filePath = null;
     List<Integer> unionInput = new ArrayList<>();
-    Pattern pattern = Pattern.compile("\\s+");
 
     if (args.length == 0) {
       System.exit(1);
@@ -71,26 +71,25 @@ public final class Algs4DatasetBenchmark {
       }
     }
 
-      try {
-        Preconditions.checkNotNull(filePath);
+    try {
+      Preconditions.checkNotNull(filePath);
 
-        for (@Var String line : Files.readAllLines(filePath)) {
+      for (String line : Files.readAllLines(filePath)) {
 
-          String trimmedLine = line.trim();
+        String trimmedLine = line.trim();
 
-          if (trimmedLine.isEmpty()) {
-            continue;
-          }
-
-          List<String> tokens = Splitter.on(pattern).splitToList(trimmedLine);
-
-          unionInput.add(Integer.parseInt(tokens.get(0)));
-          unionInput.add(Integer.parseInt(tokens.get(1)));
+        if (trimmedLine.isEmpty()) {
+          continue;
         }
-      } catch (IOException e) {
-        System.exit(1);
-      }
 
+        List<String> tokens = Splitter.on(PATTERN).splitToList(trimmedLine);
+
+        unionInput.add(Integer.parseInt(tokens.get(0)));
+        unionInput.add(Integer.parseInt(tokens.get(1)));
+      }
+    } catch (IOException e) {
+      System.exit(1);
+    }
 
     Iterator<Integer> iterator = unionInput.iterator();
 

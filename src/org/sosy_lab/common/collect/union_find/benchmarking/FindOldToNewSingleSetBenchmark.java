@@ -13,7 +13,6 @@ import com.google.errorprone.annotations.Var;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.sosy_lab.common.collect.union_find.AbstractImmutableParentPointerTreeBuilder;
-import org.sosy_lab.common.collect.union_find.AbstractImmutableUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ImmutableSortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind;
@@ -24,7 +23,7 @@ import org.sosy_lab.common.collect.union_find.PersistentUnionFind;
 import org.sosy_lab.common.collect.union_find.SortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.UnionFind;
 
-public final class UnionSingleElementsIntoExistingSetBenchmark {
+public class FindOldToNewSingleSetBenchmark {
 
   static final Pattern PATTERN = Pattern.compile("\\s+");
 
@@ -112,6 +111,7 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
     } else {
       System.exit(1);
     }
+
     System.exit(0);
   }
 
@@ -120,17 +120,18 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
     for (int i = 0; i < pN; i++) {
       pUnionFind.union(0, i);
     }
+
+    performFinds(pUnionFind, pN);
   }
 
-  @CanIgnoreReturnValue
-  private static AbstractImmutableUnionFind<Integer> immutable(
+  private static void immutable(
       AbstractImmutableParentPointerTreeBuilder<Integer> pBuilder, int pN) {
 
     for (int i = 0; i < pN; i++) {
       pBuilder.union(0, i);
     }
 
-    return pBuilder.build();
+    performFinds(pBuilder.build(), pN);
   }
 
   private static void persistent(PersistentUnionFind<Integer> pUnionFind, int pN) {
@@ -140,7 +141,22 @@ public final class UnionSingleElementsIntoExistingSetBenchmark {
     for (int i = 0; i < pN; i++) {
       unionFind = unionFind.unionAndCopy(0, i);
     }
+
+    performFinds(unionFind, pN);
   }
 
-  private UnionSingleElementsIntoExistingSetBenchmark() {}
+  @CanIgnoreReturnValue
+  private static int performFinds(UnionFind<Integer> pUnionFind, int pN) {
+
+    @Var int root = 0;
+
+    for (int i = 0; i < pN; i++) {
+
+      root = pUnionFind.find(i);
+    }
+
+    return root;
+  }
+
+  private FindOldToNewSingleSetBenchmark() {}
 }
