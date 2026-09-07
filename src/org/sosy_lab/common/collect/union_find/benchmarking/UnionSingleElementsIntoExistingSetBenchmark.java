@@ -26,7 +26,7 @@ import org.sosy_lab.common.collect.union_find.UnionFind;
 
 public final class UnionSingleElementsIntoExistingSetBenchmark {
 
-  static final Pattern PATTERN = Pattern.compile("\\s+");
+  static final Pattern PATTERN = Pattern.compile("n_(\\d+)\\.txt$");
 
   public static void main(String[] args) {
 
