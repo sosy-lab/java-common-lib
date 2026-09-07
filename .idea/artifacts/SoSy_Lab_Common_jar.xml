@@ -1,10 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="UnionSingleElementsBenchmark:jar">
-    <output-path>$PROJECT_DIR$/bin/artifacts/UnionSingleElementsBenchmark_jar</output-path>
+  <artifact type="jar" name="SoSy-Lab Common:jar">
+    <output-path>$PROJECT_DIR$/bin/artifacts/SoSy_Lab_Common_jar</output-path>
     <root id="archive" name="SoSy-Lab Common.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/org/sosy_lab/common/collect/union_find/META-INF/MANIFEST.MF" />
-      </element>
       <element id="module-output" name="SoSy-Lab Common" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/test/asm.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/test/jna.jar" path-in-jar="/" />
@@ -25,9 +22,9 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/test/j2objc-annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/test/auto-value-annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/test/error_prone_annotations.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/build/auto-value-annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/build/auto-common.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/build/error_prone_annotations.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/build/auto-value-annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/runtime/guava.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/runtime/jsr305.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java/runtime/checker-qual.jar" path-in-jar="/" />
