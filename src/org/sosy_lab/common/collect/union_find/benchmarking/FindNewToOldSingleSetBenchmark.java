@@ -23,7 +23,7 @@ import org.sosy_lab.common.collect.union_find.PersistentUnionFind;
 import org.sosy_lab.common.collect.union_find.SortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.UnionFind;
 
-public final class FindOldToNewSingleSetBenchmark {
+public final class FindNewToOldSingleSetBenchmark {
 
   static final Pattern PATTERN = Pattern.compile("\\s+");
 
@@ -150,7 +150,7 @@ public final class FindOldToNewSingleSetBenchmark {
 
     @Var int root = 0;
 
-    for (int i = 0; i < pN; i++) {
+    for (int i = pN; i >= 0; --i) {
 
       root = pUnionFind.find(i);
     }
@@ -158,5 +158,5 @@ public final class FindOldToNewSingleSetBenchmark {
     return root;
   }
 
-  private FindOldToNewSingleSetBenchmark() {}
+  private FindNewToOldSingleSetBenchmark() {}
 }

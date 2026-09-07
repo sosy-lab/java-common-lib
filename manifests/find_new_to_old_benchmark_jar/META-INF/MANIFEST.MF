@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.sosy_lab.common.collect.union_find.benchmarking.FindNewT
+ oOldSingleSetBenchmark
+
