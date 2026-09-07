@@ -68,6 +68,7 @@ public final class Algs4DatasetBenchmark {
           filePath = Path.of(string);
         }
       }
+    }
 
       try {
         Preconditions.checkNotNull(filePath);
@@ -88,7 +89,7 @@ public final class Algs4DatasetBenchmark {
       } catch (IOException e) {
         System.exit(1);
       }
-    }
+
 
     Iterator<Integer> iterator = unionInput.iterator();
 
