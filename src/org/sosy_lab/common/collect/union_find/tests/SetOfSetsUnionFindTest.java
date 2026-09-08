@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect.union_find.tests;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.Set;
 import org.junit.Before;
@@ -60,13 +61,14 @@ public class SetOfSetsUnionFindTest {
 
     Collection<? extends Set<Integer>> subsets = unionFind.getAllSubsets();
 
-    assertThat(subsets).containsExactly(Set.of(0, 1), Set.of(2, 3), Set.of(4));
+    assertThat(subsets)
+        .containsExactly(ImmutableSet.of(0, 1), ImmutableSet.of(2, 3), ImmutableSet.of(4));
     assertThat(unionFind.contains(3)).isTrue();
     assertThat(unionFind.contains(5)).isFalse();
   }
 
   @Test
-  public void testGetAllSubsets_returnsImmutableSnapshot() {
+  public void testGetAllSubsets_returnsImmutableSubsets() {
     unionFind.union(0, 1);
 
     Collection<? extends Set<Integer>> subsets = unionFind.getAllSubsets();

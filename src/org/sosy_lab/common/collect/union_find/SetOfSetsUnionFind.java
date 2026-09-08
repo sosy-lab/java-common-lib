@@ -9,11 +9,9 @@
 package org.sosy_lab.common.collect.union_find;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,7 +27,7 @@ import java.util.Set;
  * #find(Object)} and {@link #contains(Object)} take {@code O(s)} expected time, which is {@code
  * O(n)} in the worst case. {@link #union(Object, Object)} takes {@code O(s + min(a, b))} expected
  * time when it merges two distinct subsets, and {@code O(s)} otherwise. {@link #getAllSubsets()}
- * takes {@code O(n)} expected time to create an immutable snapshot.
+ * takes {@code O(n)} expected time to create a snapshot.
  *
  * @param <T> type of elements added to the Union-Find
  */
@@ -94,17 +92,15 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
   }
 
   /**
-   * Returns immutable copies of all current subsets.
+   * Returns copies of all current subsets.
    *
    * <p>Expected running time: {@code O(n)}, where {@code n} is the number of elements.
    */
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
-    List<Set<T>> result = new ArrayList<>(subsets.size());
-    for (Set<T> subset : subsets) {
-      result.add(Set.copyOf(subset));
-    }
-    return List.copyOf(result);
+    Set<Set<T>> result = new HashSet<>(subsets.size());
+    result.addAll(subsets);
+    return result;
   }
 
   /**
