@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A simple implementation of {@link UnionFind} using a {@link HashSet} of subsets.
@@ -49,11 +49,10 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
    */
   @Override
   public T find(T pE) {
-    Set<T> subset = getSubset(pE);
-    if (subset == null) {
-      throw new IllegalArgumentException("Element not contained.");
-    }
-    return subset.iterator().next();
+    return getSubset(pE)
+        .orElseThrow(() -> new IllegalArgumentException("Element not contained."))
+        .iterator()
+        .next();
   }
 
   /**
@@ -67,20 +66,30 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
     Preconditions.checkNotNull(pE1);
     Preconditions.checkNotNull(pE2);
 
-    Set<T> subset1 = getSubset(pE1);
-    Set<T> subset2 = getSubset(pE2);
+    Optional<Set<T>> subset1 = getSubset(pE1);
+    Optional<Set<T>> subset2 = getSubset(pE2);
 
-    if (subset1 == null && subset2 == null) {
-      Set<T> newSubset = new LinkedHashSet<>();
-      newSubset.add(pE1);
-      newSubset.add(pE2);
-      subsets.add(newSubset);
-    } else if (subset1 == null) {
-      addToSubset(pE1, subset2);
-    } else if (subset2 == null) {
-      addToSubset(pE2, subset1);
-    } else if (subset1 != subset2) {
-      mergeSubsets(subset1, subset2);
+    if (subset1.isEmpty()) {
+      if (subset2.isEmpty()) {
+        Set<T> newSubset = new LinkedHashSet<>();
+        newSubset.add(pE1);
+        newSubset.add(pE2);
+        subsets.add(newSubset);
+      } else {
+        addToSubset(pE1, subset2.orElseThrow());
+      }
+      return;
+    }
+
+    Set<T> existingSubset1 = subset1.orElseThrow();
+    if (subset2.isEmpty()) {
+      addToSubset(pE2, existingSubset1);
+      return;
+    }
+
+    Set<T> existingSubset2 = subset2.orElseThrow();
+    if (existingSubset1 != existingSubset2) {
+      mergeSubsets(existingSubset1, existingSubset2);
     }
   }
 
@@ -105,7 +114,7 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
    */
   @Override
   public boolean contains(T pE) {
-    return getSubset(pE) != null;
+    return getSubset(pE).isPresent();
   }
 
   private void addToSubset(T pE, Set<T> pSubset) {
@@ -126,13 +135,13 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
     subsets.add(largerSubset);
   }
 
-  private @Nullable Set<T> getSubset(T pE) {
+  private Optional<Set<T>> getSubset(T pE) {
     Preconditions.checkNotNull(pE);
     for (Set<T> subset : subsets) {
       if (subset.contains(pE)) {
-        return subset;
+        return Optional.of(subset);
       }
     }
-    return null;
+    return Optional.empty();
   }
 }
