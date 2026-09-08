@@ -98,9 +98,7 @@ public class SetOfSetsUnionFind<T> implements UnionFind<T> {
    */
   @Override
   public Collection<? extends Set<T>> getAllSubsets() {
-    Set<Set<T>> result = new HashSet<>(subsets.size());
-    result.addAll(subsets);
-    return result;
+    return subsets;
   }
 
   /**

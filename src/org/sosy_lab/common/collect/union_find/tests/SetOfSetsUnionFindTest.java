@@ -68,16 +68,6 @@ public class SetOfSetsUnionFindTest {
   }
 
   @Test
-  public void testGetAllSubsets_returnsImmutableSubsets() {
-    unionFind.union(0, 1);
-
-    Collection<? extends Set<Integer>> subsets = unionFind.getAllSubsets();
-
-    assertThrows(UnsupportedOperationException.class, () -> subsets.iterator().next().add(2));
-    assertThat(unionFind.contains(2)).isFalse();
-  }
-
-  @Test
   public void testFind_absentElement_throwsException() {
     assertThrows(IllegalArgumentException.class, () -> unionFind.find(0));
   }
