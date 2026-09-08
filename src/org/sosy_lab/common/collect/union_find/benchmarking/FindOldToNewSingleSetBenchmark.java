@@ -20,6 +20,7 @@ import org.sosy_lab.common.collect.union_find.ParentPointerTreeUnionFind.UnionTy
 import org.sosy_lab.common.collect.union_find.PersistentParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.PersistentSortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.PersistentUnionFind;
+import org.sosy_lab.common.collect.union_find.SetOfSetsUnionFind;
 import org.sosy_lab.common.collect.union_find.SortedParentPointerTreeUnionFind;
 import org.sosy_lab.common.collect.union_find.SortedTreeSetUnionFind;
 import org.sosy_lab.common.collect.union_find.UnionFind;
@@ -31,6 +32,7 @@ public final class FindOldToNewSingleSetBenchmark {
   public static void main(String[] args) {
 
     @Var boolean naive = false;
+    @Var boolean simple = false;
     @Var boolean immutable = false;
     @Var boolean persistent = false;
     @Var boolean sorted = false;
@@ -45,6 +47,8 @@ public final class FindOldToNewSingleSetBenchmark {
 
       switch (string) {
         case "-naive" -> naive = true;
+
+        case "-simple" -> simple = true;
 
         case "-immutable" -> immutable = true;
 
@@ -67,6 +71,8 @@ public final class FindOldToNewSingleSetBenchmark {
     }
 
     if (naive) {
+      mutable(new SetOfSetsUnionFind<>(), n);
+    } else if (simple) {
       mutable(new SortedTreeSetUnionFind<>(), n);
     } else if (!immutable && !persistent && !sorted) {
       if (unionByRank) {
