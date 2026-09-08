@@ -34,6 +34,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests the correctness and behavior of {@link PathCopyingPersistentAvlTreeMap}.
+ * The test class is based on the {@link PathCopyingPersistentTreeMapTest} and adapts
+ * its existing test for the AVL tree-based implementation. It additionally
+ * includes tests specific to AVL balancing and compares the implementation against a reference map
+ * implementation to verify equivalent behavior.  
+ */
 @SuppressWarnings("MemberName")
 public class PathCopyingPersistentAvlTreeMapTest {
   private static final TestStringSortedMapGenerator mapGenerator =

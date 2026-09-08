@@ -2,7 +2,7 @@
 // a library of useful utilities:
 // https://github.com/sosy-lab/java-common-lib
 //
-// SPDX-FileCopyrightText: 2007-2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -40,11 +40,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This is an implementation of {@link PersistentSortedMap} that is based on the Adelson-Velsky and
- * Landis (AVL) tree and bottom-up path copying for copy-efficient persistency.
+ * Landis (AVL) tree.
+ * 
+ * <p> Modifications are implemented using path copying, allowing unchanged parts of the tree to 
+ * be shared between different versions of the map.
+ * The AVL balance invariant is maintained after updates to keep the tree balanced.
  *
- * <p>
- * TODO: Finish documentation
- * It reuses structures of {@link PathCopyingPersistentTreeMap} that do not depend on...
+ * <p> This class provides an AVL tree-based alternative to {@link PathCopyingPersistentTreeMap}.
  *
  * @param <K> The type of keys.
  * @param <V> The type of values.
