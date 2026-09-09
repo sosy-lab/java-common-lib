@@ -158,7 +158,7 @@ public final class FindNewToOldSingleSetBenchmark {
 
     @Var int root = 0;
 
-    for (int i = pN; i >= 0; --i) {
+    for (int i = pN; i > 0; --i) {
 
       root = pUnionFind.find(i);
     }
