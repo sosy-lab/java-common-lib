@@ -137,6 +137,14 @@ public final class PathCopyingPersistentTreeMap<
       }
     }
 
+    Node<K, V> withValue(V newValue) {
+      if (newValue == getValue()) {
+        return this;
+      } else {
+        return new Node<>(getKey(), newValue, left, right, isRed);
+      }
+    }
+
     @SuppressWarnings("ReferenceEquality") // cannot use equals() for check whether tree is the same
     Node<K, V> withLeftChild(Node<K, V> newLeft) {
       if (newLeft == left) {
@@ -555,7 +563,9 @@ public final class PathCopyingPersistentTreeMap<
       current = current.withRightChild(newRight);
 
     } else {
-      current = new Node<>(key, value, current.left, current.right, current.getColor());
+      // This always keeps the old key object (if it compares equal but is not the same instance),
+      // but uses the new value object. This is not strictly necessary but what JDK maps do as well.
+      current = current.withValue(value);
     }
 
     // restore invariants
