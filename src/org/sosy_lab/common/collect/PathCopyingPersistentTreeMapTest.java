@@ -434,4 +434,30 @@ public class PathCopyingPersistentTreeMapTest {
     assertThat(second.entrySet().containsAll(first.entrySet())).isFalse();
     assertThat(first.entrySet().containsAll(second.entrySet())).isFalse();
   }
+
+  @Test
+  public void testRemovingMissingKey() {
+    map = map.putAndCopy("a", "").putAndCopy("b", "").putAndCopy("y", "").putAndCopy("z", "");
+
+    assertWithMessage("Removing missing key should produce same map")
+        .that(map.removeAndCopy("key"))
+        .isSameInstanceAs(map);
+  }
+
+  @Test
+  @SuppressWarnings("checkstyle:IllegalInstantiation")
+  public void testSettingIdenticalKeyValue() {
+    String k = "key";
+    String v = "value";
+    map =
+        map.putAndCopy("a", "")
+            .putAndCopy("b", "")
+            .putAndCopy(k, v)
+            .putAndCopy("y", "")
+            .putAndCopy("z", "");
+
+    assertWithMessage("Reinserting same k/v pair should produce same map")
+        .that(map.putAndCopy(k, v))
+        .isSameInstanceAs(map);
+  }
 }

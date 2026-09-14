@@ -554,6 +554,9 @@ public final class PathCopyingPersistentTreeMap<
       Node<K, V> newRight = putAndCopy0(key, value, current.right);
       current = current.withRightChild(newRight);
 
+    } else if (key == current.getKey() && value == current.getValue()) {
+      return current;
+
     } else {
       current = new Node<>(key, value, current.left, current.right, current.getColor());
     }
