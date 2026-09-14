@@ -447,7 +447,7 @@ public class PathCopyingPersistentTreeMapTest {
   }
 
   @Test
-  @SuppressWarnings("checkstyle:IllegalInstantiation")
+  @SuppressWarnings({"checkstyle:IllegalInstantiation", "StringUselessMethods"})
   public void testSettingIdenticalObjects() {
     String k1 = new String("key");
     String k2 = new String("key");
@@ -494,7 +494,7 @@ public class PathCopyingPersistentTreeMapTest {
     testSettingIdenticalObjectsInStandardMap(new TreeMap<>());
   }
 
-  @SuppressWarnings("checkstyle:IllegalInstantiation")
+  @SuppressWarnings({"checkstyle:IllegalInstantiation", "StringUselessMethods"})
   private static void testSettingIdenticalObjectsInStandardMap(Map<String, String> map) {
     // not testing own code, but checking expectations of other map implementations
 
