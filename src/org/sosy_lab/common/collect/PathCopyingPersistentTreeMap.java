@@ -54,7 +54,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * always compares according to the natural ordering. All methods may throw {@link
  * ClassCastException} is key objects are passed that do not implement {@link Comparable}.
  *
- * <p>The natural ordering of the keys needs to be consistent with equals.
+ * <p>The natural ordering of the keys needs to be consistent with equals and object identity.
  *
  * <p>As for all {@link PersistentMap}s, all collection views and all iterators are immutable. They
  * do not reflect changes made to the map and all their modifying operations throw {@link
