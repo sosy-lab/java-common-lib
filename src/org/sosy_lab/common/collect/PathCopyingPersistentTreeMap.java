@@ -563,8 +563,13 @@ public final class PathCopyingPersistentTreeMap<
       current = current.withRightChild(newRight);
 
     } else {
-      // This always keeps the old key object (if it compares equal but is not the same instance),
-      // but uses the new value object. This is not strictly necessary but what JDK maps do as well.
+      // This always keeps the old (equal) key object. This has useful implications:
+      // Because we reuse the old key object, the key instance does not change and potential `==`
+      // comparisons on the key at other locations still work successfully.
+      // We do always use the new value object; but in case that the new value object is identical
+      // to the old value object, we can reuse the existing Node object and the whole map. This also
+      // enables `==` comparisons to succeed and saves some memory.
+      // This behavior also matches what JDK maps do.
       current = current.withValue(value);
     }
 
