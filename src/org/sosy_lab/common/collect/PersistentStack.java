@@ -13,6 +13,7 @@ import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Interface for persistent stacks. A persistent data structure is structurally immutable, but
@@ -78,4 +79,30 @@ public interface PersistentStack<T> extends Serializable {
 
   /** Returns an unmodifiable bottom-to-top list in O(n) time and space. */
   List<T> copyToList();
+
+  /**
+   * Returns {@code true} if and only if {@code obj} is a {@link PersistentStack} with the same
+   * number of elements and equal corresponding elements in top-to-bottom order. Elements are
+   * compared using {@link Object#equals(Object)}.
+   *
+   * <p>Equality is independent of the concrete implementation and structural sharing. All empty
+   * stacks are equal.
+   *
+   * @param obj the object to compare with this stack
+   * @return whether the object is equal to this stack
+   */
+  @Override
+  boolean equals(@Nullable Object obj);
+
+  /**
+   * Returns the hash code of this stack.
+   *
+   * <p>The hash code is computed starting with {@code hash = 1} and applying
+   * {@code hash = 31 * hash + element.hashCode()} to each element in top-to-bottom order, using
+   * Java {@code int} arithmetic. The hash code of an empty stack is {@code 1}.
+   *
+   * @return the hash code of this stack
+   */
+  @Override
+  int hashCode();
 }
