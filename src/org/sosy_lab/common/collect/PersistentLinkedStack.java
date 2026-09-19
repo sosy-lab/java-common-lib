@@ -279,14 +279,21 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
 
     @Serial
     private Object readResolve() throws InvalidObjectException {
-      try {
-        return PersistentLinkedStack.copyOf(Lists.reverse(Arrays.asList(checkNotNull(values))));
-      } catch (NullPointerException e) {
-        InvalidObjectException exception =
-            new InvalidObjectException("Stack values must not be null or contain null");
-        exception.initCause(e);
-        throw exception;
+      @Nullable Object @Nullable [] serializedValues = values;
+      if (serializedValues == null) {
+        throw new InvalidObjectException("Stack values must not be null");
       }
+
+      @Var PersistentLinkedStack<Object> stack = PersistentLinkedStack.of();
+      // The serialized order is top-to-bottom; push in the opposite direction.
+      for (@Var int index = serializedValues.length - 1; index >= 0; index--) {
+        @Nullable Object value = serializedValues[index];
+        if (value == null) {
+          throw new InvalidObjectException("Stack values must not contain null");
+        }
+        stack = stack.pushAndCopy(value);
+      }
+      return stack;
     }
   }
 
