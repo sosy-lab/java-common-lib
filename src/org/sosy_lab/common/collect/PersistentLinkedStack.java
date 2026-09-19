@@ -13,14 +13,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Joiner;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -195,6 +198,41 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
     return "[" + Joiner.on(", ").join(asTopDownIterable()) + "]";
   }
 
+  /**
+   * Returns a stack by pushing the arguments from left to right. The last argument is on top.
+   *
+   * @throws NullPointerException if an element or the varargs array is null
+   */
+  @SafeVarargs
+  public static <T> PersistentLinkedStack<T> of(T first, T second, T... remaining) {
+    @Var PersistentLinkedStack<T> result = of(first).pushAndCopy(second);
+    for (T value : remaining) {
+      result = result.pushAndCopy(value);
+    }
+    return result;
+  }
+
+  /**
+   * Returns a stack by pushing the elements in iteration order. The last element is on top.
+   *
+   * @throws NullPointerException if {@code values} or an element is null
+   */
+  public static <T> PersistentLinkedStack<T> copyOf(Iterable<? extends T> values) {
+    checkNotNull(values);
+    @Var PersistentLinkedStack<T> result = of();
+    for (T value : values) {
+      result = result.pushAndCopy(value);
+    }
+    return result;
+  }
+
+  /** Returns a collector that pushes elements in encounter order, with the last element on top. */
+  @SuppressWarnings("NoFunctionalReturnType")
+  public static <T> Collector<T, ?, PersistentLinkedStack<T>> toPersistentLinkedStack() {
+    return Collectors.collectingAndThen(
+        ImmutableList.<T>toImmutableList(), PersistentLinkedStack::copyOf);
+  }
+
   @Serial
   private Object writeReplace() {
     return new SerializationProxy(this);
@@ -226,21 +264,14 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
 
     @Serial
     private Object readResolve() throws InvalidObjectException {
-      @Nullable Object @Nullable [] serializedValues = values;
-      if (serializedValues == null) {
-        throw new InvalidObjectException("Stack values must not be null");
+      try {
+        return PersistentLinkedStack.copyOf(Lists.reverse(Arrays.asList(checkNotNull(values))));
+      } catch (NullPointerException e) {
+        InvalidObjectException exception =
+            new InvalidObjectException("Stack values must not be null or contain null");
+        exception.initCause(e);
+        throw exception;
       }
-
-      @Var PersistentLinkedStack<Object> stack = PersistentLinkedStack.of();
-      // Push bottom-to-top to reconstruct the original iteration order.
-      for (@Var int index = serializedValues.length - 1; index >= 0; index--) {
-        @Nullable Object value = serializedValues[index];
-        if (value == null) {
-          throw new InvalidObjectException("Stack values must not contain null");
-        }
-        stack = stack.pushAndCopy(value);
-      }
-      return stack;
     }
   }
 
