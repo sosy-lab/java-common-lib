@@ -9,6 +9,7 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkPositionIndex;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.AbstractIterator;
@@ -196,6 +197,20 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   @Override
   public String toString() {
     return "[" + Joiner.on(", ").join(asTopDownIterable()) + "]";
+  }
+
+  @Override
+  public PersistentLinkedStack<T> takeBottom(int count) {
+    checkPositionIndex(count, size);
+    if (count == 0) {
+      return of();
+    }
+
+    @Var PersistentLinkedStack<T> result = this;
+    while (result.size > count) {
+      result = result.popAndCopy();
+    }
+    return result;
   }
 
   /**

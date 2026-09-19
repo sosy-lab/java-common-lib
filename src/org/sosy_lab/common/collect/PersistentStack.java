@@ -81,6 +81,14 @@ public interface PersistentStack<T> extends Serializable {
   List<T> copyToList();
 
   /**
+   * Returns a stack containing the bottom {@code count} elements.
+   *
+   * @throws IndexOutOfBoundsException if {@code count} is outside {@code [0, size()]}
+   */
+  @CheckReturnValue
+  PersistentStack<T> takeBottom(int count);
+
+  /**
    * Returns {@code true} if and only if {@code obj} is a {@link PersistentStack} with the same
    * number of elements and equal corresponding elements in top-to-bottom order. Elements are
    * compared using {@link Object#equals(Object)}.
