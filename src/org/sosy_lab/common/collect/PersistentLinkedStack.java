@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
@@ -191,15 +192,7 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder("[");
-    Iterator<T> iterator = asTopDownIterable().iterator();
-    while (iterator.hasNext()) {
-      result.append(iterator.next());
-      if (iterator.hasNext()) {
-        result.append(", ");
-      }
-    }
-    return result.append(']').toString();
+    return "[" + Joiner.on(", ").join(asTopDownIterable()) + "]";
   }
 
   @Serial
