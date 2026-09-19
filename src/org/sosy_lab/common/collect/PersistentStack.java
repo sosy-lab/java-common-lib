@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -34,7 +35,7 @@ import java.util.NoSuchElementException;
  * @param <T> The type of values.
  */
 @Immutable(containerOf = "T")
-public interface PersistentStack<T> extends Iterable<T>, Serializable {
+public interface PersistentStack<T> extends Serializable {
 
   /**
    * Returns a stack with {@code value} on top, leaving this stack unchanged.
@@ -68,4 +69,13 @@ public interface PersistentStack<T> extends Iterable<T>, Serializable {
 
   /** Returns the number of values in this stack. */
   int size();
+
+  /**
+   * Returns an unmodifiable top-to-bottom view in O(1) time. Each iterator traverses this stack
+   * version independently.
+   */
+  Iterable<T> asTopDownIterable();
+
+  /** Returns an unmodifiable bottom-to-top list in O(n) time and space. */
+  List<T> copyToList();
 }

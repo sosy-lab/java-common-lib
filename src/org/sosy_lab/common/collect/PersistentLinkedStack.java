@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.InvalidObjectException;
@@ -142,8 +143,13 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   }
 
   @Override
-  public Iterator<T> iterator() {
-    return new StackIterator<>(this);
+  public Iterable<T> asTopDownIterable() {
+    return () -> new StackIterator<>(this);
+  }
+
+  @Override
+  public ImmutableList<T> copyToList() {
+    return ImmutableList.copyOf(asTopDownIterable()).reverse();
   }
 
   @Override
@@ -174,7 +180,7 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   @Override
   public int hashCode() {
     @Var int hashCode = PersistentLinkedStack.class.hashCode();
-    for (T value : this) {
+    for (T value : this.asTopDownIterable()) {
       hashCode = 31 * hashCode + value.hashCode();
     }
     return hashCode;
@@ -187,7 +193,7 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder("[");
-    Iterator<T> iterator = iterator();
+    Iterator<T> iterator = asTopDownIterable().iterator();
     while (iterator.hasNext()) {
       result.append(iterator.next());
       if (iterator.hasNext()) {
@@ -220,7 +226,7 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
     private SerializationProxy(PersistentLinkedStack<?> stack) {
       values = new Object[stack.size];
       @Var int index = 0;
-      for (Object value : stack) {
+      for (Object value : stack.asTopDownIterable()) {
         values[index] = value;
         index++;
       }

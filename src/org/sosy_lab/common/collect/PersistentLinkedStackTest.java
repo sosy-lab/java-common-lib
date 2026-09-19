@@ -33,7 +33,7 @@ public class PersistentLinkedStackTest {
     PersistentStack<String> stack = PersistentLinkedStack.of("value");
 
     assertThat(stack.isEmpty()).isFalse();
-    assertThat(stack).containsExactly("value");
+    assertThat(stack.asTopDownIterable()).containsExactly("value");
   }
 
   @Test
@@ -42,7 +42,8 @@ public class PersistentLinkedStackTest {
     PersistentStack<String> stack = empty.pushAndCopy("value");
 
     assertThat(stack.peek()).isEqualTo("value");
-    assertThat(empty).isEmpty();
+    assertThat(empty.asTopDownIterable()).isEmpty();
+    assertThat(empty.isEmpty()).isTrue();
   }
 
   @Test
@@ -155,12 +156,12 @@ public class PersistentLinkedStackTest {
             .pushAndCopy("middle")
             .pushAndCopy("top");
 
-    assertThat(stack).containsExactly("top", "middle", "bottom").inOrder();
+    assertThat(stack.asTopDownIterable()).containsExactly("top", "middle", "bottom").inOrder();
   }
 
   @Test
   public void testIteratorExhaustion() {
-    Iterator<String> iterator = PersistentLinkedStack.of("value").iterator();
+    Iterator<String> iterator = PersistentLinkedStack.of("value").asTopDownIterable().iterator();
 
     assertThat(iterator.next()).isEqualTo("value");
     assertThrows(NoSuchElementException.class, iterator::next);
@@ -168,7 +169,7 @@ public class PersistentLinkedStackTest {
 
   @Test
   public void testIteratorRemoveRejected() {
-    Iterator<String> iterator = PersistentLinkedStack.of("value").iterator();
+    Iterator<String> iterator = PersistentLinkedStack.of("value").asTopDownIterable().iterator();
 
     assertThrows(UnsupportedOperationException.class, iterator::remove);
   }
