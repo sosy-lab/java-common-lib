@@ -97,9 +97,9 @@ public interface PersistentStack<T> extends Serializable {
   /**
    * Returns the hash code of this stack.
    *
-   * <p>The hash code is computed starting with {@code hash = 1} and applying
-   * {@code hash = 31 * hash + element.hashCode()} to each element in top-to-bottom order, using
-   * Java {@code int} arithmetic. The hash code of an empty stack is {@code 1}.
+   * <p>The hash code is computed starting with {@code hash = 1} and applying {@code hash = 31 *
+   * hash + element.hashCode()} to each element in top-to-bottom order, using Java {@code int}
+   * arithmetic. The hash code of an empty stack is {@code 1}.
    *
    * @return the hash code of this stack
    */
