@@ -24,26 +24,12 @@ import java.util.NoSuchElementException;
  *
  * <p>Null values are not supported.
  *
- * <p>Implementations support standard Java Object Serialization. Serialization succeeds only if
- * each contained value and its serialized object graph are serializable at runtime; otherwise,
- * serialization fails according to the standard rules, for example with {@link
- * java.io.NotSerializableException}.
+ * <p>Instances and their views are thread-safe; iterator instances have no thread-safety guarantee.
+ * Elements are not copied, and their own thread-safety requirements still apply.
  *
- * <p>This serialization contract applies to conforming Java SE runtimes. GraalVM in JVM mode uses
- * the same semantics, while GraalVM Native Image may require explicit serialization metadata or
- * configuration. Support in non-Java-SE environments, such as Android or GWT, is not guaranteed.
- * Deserialization may also be rejected by configured {@link java.io.ObjectInputFilter} policies,
- * and portability of serialized data depends on the serialized forms of contained values.
+ * <p>Stacks are serializable when their elements are serializable.
  *
- * <p>After a stack reference has been made visible to other threads through synchronization, a
- * {@code volatile} field, or a concurrency utility, its immutable structure may be accessed
- * concurrently. Such coordination is still required to publish or update a shared reference to a
- * stack version, and compound updates require synchronization or an atomic operation. No
- * thread-safety guarantee is made for iterator instances.
- *
- * <p>Values are stored by reference: they are not copied or made immutable or thread-safe. Changes
- * to mutable values can affect equality and hash codes. Operations that depend on values also
- * depend on their thread safety.
+ * <p>Values are stored by reference: they are not copied or made immutable or thread-safe.
  *
  * @param <T> The type of values.
  */
