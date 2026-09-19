@@ -20,7 +20,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -153,37 +152,37 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   }
 
   @Override
-  @SuppressWarnings("ReferenceEquality") // Node identity detects structurally shared tails.
+  @SuppressWarnings("ReferenceEquality") // Identical tails need no further comparison.
   public boolean equals(@Nullable Object obj) {
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof PersistentLinkedStack<?> other)) {
-      return false;
-    }
-    if (size != other.size()) {
+    if (!(obj instanceof PersistentStack<?> other) || size != other.size()) {
       return false;
     }
 
-    @Var PersistentLinkedStack<?> thisRemainder = this;
-    @Var PersistentLinkedStack<?> otherRemainder = other;
-    while (thisRemainder != otherRemainder) {
-      if (!Objects.equals(thisRemainder.top, otherRemainder.top)) {
+    @Var PersistentStack<?> left = this;
+    @Var PersistentStack<?> right = other;
+    while (!left.isEmpty()) {
+      if (left == right) {
+        return true;
+      }
+      if (!left.peek().equals(right.peek())) {
         return false;
       }
-      thisRemainder = checkNotNull(thisRemainder.tail);
-      otherRemainder = checkNotNull(otherRemainder.tail);
+      left = left.popAndCopy();
+      right = right.popAndCopy();
     }
     return true;
   }
 
   @Override
   public int hashCode() {
-    @Var int hashCode = PersistentLinkedStack.class.hashCode();
-    for (T value : this.asTopDownIterable()) {
-      hashCode = 31 * hashCode + value.hashCode();
+    @Var int hash = 1;
+    for (T value : asTopDownIterable()) {
+      hash = 31 * hash + value.hashCode();
     }
-    return hashCode;
+    return hash;
   }
 
   /**
