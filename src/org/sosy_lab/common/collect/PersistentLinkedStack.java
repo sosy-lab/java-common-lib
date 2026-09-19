@@ -10,7 +10,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.collect.AbstractIterator;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.InvalidObjectException;
@@ -246,28 +246,22 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
     }
   }
 
-  private static final class StackIterator<T> extends UnmodifiableIterator<T> {
+  private static final class StackIterator<T> extends AbstractIterator<T> {
 
-    private @Nullable PersistentLinkedStack<T> stack;
+    private PersistentLinkedStack<T> remaining;
 
-    private StackIterator(PersistentLinkedStack<T> pStack) {
-      stack = pStack;
+    private StackIterator(PersistentLinkedStack<T> stack) {
+      remaining = stack;
     }
 
     @Override
-    public boolean hasNext() {
-      return stack != null && !stack.isEmpty();
-    }
-
-    @Override
-    public T next() {
-      @Nullable PersistentLinkedStack<T> currentStack = stack;
-      if (currentStack == null || currentStack.isEmpty()) {
-        throw new NoSuchElementException();
+    protected @Nullable T computeNext() {
+      if (remaining.isEmpty()) {
+        return endOfData();
       }
-      T value = checkNotNull(currentStack.top);
-      stack = currentStack.tail;
-      return value;
+      T result = remaining.peek();
+      remaining = remaining.popAndCopy();
+      return result;
     }
   }
 }
