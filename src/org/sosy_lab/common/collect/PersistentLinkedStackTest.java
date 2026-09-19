@@ -11,239 +11,460 @@ package org.sosy_lab.common.collect;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.testing.IteratorFeature;
+import com.google.common.collect.testing.IteratorTester;
+import com.google.common.collect.testing.ListTestSuiteBuilder;
+import com.google.common.collect.testing.TestStringListGenerator;
+import com.google.common.collect.testing.features.CollectionFeature;
+import com.google.common.collect.testing.features.CollectionSize;
+import com.google.common.testing.CollectorTester;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.SerializableTester;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 
 public class PersistentLinkedStackTest {
 
-  @Test
-  public void testEmptyFactory() {
-    PersistentStack<String> stack = PersistentLinkedStack.of();
+  private static final ImmutableList<ImmutableList<String>> INPUTS =
+      ImmutableList.of(
+          ImmutableList.of(),
+          ImmutableList.of("a"),
+          ImmutableList.of("a", "b", "c"),
+          ImmutableList.of("", "", "b"));
 
-    assertThat(stack.isEmpty()).isTrue();
+  public static junit.framework.Test suite() {
+    TestSuite suite = new TestSuite();
+    suite.addTest(new JUnit4TestAdapter(PersistentLinkedStackTest.class));
+    suite.addTest(
+        ListTestSuiteBuilder.using(
+                new TestStringListGenerator() {
+                  @Override
+                  protected ImmutableList<String> create(String[] pElements) {
+                    @Var PersistentLinkedStack<String> stack = PersistentLinkedStack.of();
+                    for (String element : pElements) {
+                      stack = stack.pushAndCopy(element);
+                    }
+                    return stack.copyToList();
+                  }
+                })
+            .named("PersistentLinkedStack.copyToList")
+            .withFeatures(CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
+            .createTestSuite());
+    return suite;
   }
 
   @Test
-  public void testSingletonFactory() {
-    PersistentStack<String> stack = PersistentLinkedStack.of("value");
-
-    assertThat(stack.isEmpty()).isFalse();
-    assertThat(stack.asTopDownIterable()).containsExactly("value");
+  public void testIterator() {
+    for (ImmutableList<String> input : INPUTS) {
+      PersistentStack<String> stack = pushAll(input);
+      Iterable<String> view = stack.asTopDownIterable();
+      IteratorTester<String> tester =
+          new IteratorTester<>(
+              5,
+              IteratorFeature.UNMODIFIABLE,
+              input.reverse(),
+              IteratorTester.KnownOrder.KNOWN_ORDER) {
+            @Override
+            protected Iterator<String> newTargetIterator() {
+              return view.iterator();
+            }
+          };
+      tester.test();
+      tester.testForEachRemaining();
+    }
   }
 
   @Test
-  public void testPushAndCopy() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-    PersistentStack<String> stack = empty.pushAndCopy("value");
+  public void testForEachRemainingBoundaryCases() {
+    List<String> remaining = new ArrayList<>();
+    Iterator<String> iterator = PersistentLinkedStack.of("a").asTopDownIterable().iterator();
+    iterator.forEachRemaining(remaining::add);
+    assertThat(remaining).containsExactly("a");
 
-    assertThat(stack.peek()).isEqualTo("value");
-    assertThat(empty.asTopDownIterable()).isEmpty();
-    assertThat(empty.isEmpty()).isTrue();
+    remaining.clear();
+    iterator.forEachRemaining(remaining::add);
+    PersistentLinkedStack.<String>of()
+        .asTopDownIterable()
+        .iterator()
+        .forEachRemaining(remaining::add);
+    assertThat(remaining).isEmpty();
   }
 
   @Test
-  public void testDuplicateEmptyStrings() {
-    PersistentStack<String> stack =
-        PersistentLinkedStack.<String>of().pushAndCopy("").pushAndCopy("");
+  public void testIteratorsAreIndependent() {
+    Iterable<String> view = pushAll(ImmutableList.of("a", "b")).asTopDownIterable();
+    Iterator<String> first = view.iterator();
+    Iterator<String> second = view.iterator();
 
-    assertThat(stack.size()).isEqualTo(2);
-    assertThat(stack.peek()).isEmpty();
-    PersistentStack<String> popped = stack.popAndCopy();
-    assertThat(popped.size()).isEqualTo(1);
-    assertThat(popped.peek()).isEqualTo(stack.peek());
+    assertThat(first.next()).isEqualTo("b");
+    assertThat(second.next()).isEqualTo("b");
+    assertThat(first.next()).isEqualTo("a");
+    assertThat(second.next()).isEqualTo("a");
   }
 
   @Test
-  public void testIntegerValues() {
-    PersistentStack<Integer> stack =
-        PersistentLinkedStack.<Integer>of().pushAndCopy(1).pushAndCopy(2);
+  public void testViewsRemainOnOriginalVersion() {
+    PersistentStack<String> stack = pushAll(ImmutableList.of("a", "b"));
+    Iterable<String> view = stack.asTopDownIterable();
+    List<String> copy = stack.copyToList();
+    PersistentStack<String> extended = stack.pushAndCopy("c");
 
-    assertThat(stack.size()).isEqualTo(2);
-    assertThat(stack.peek()).isEqualTo(2);
-    PersistentStack<Integer> popped = stack.popAndCopy();
-    assertThat(popped.size()).isEqualTo(1);
-    assertThat(popped.peek()).isEqualTo(1);
+    assertThat(extended.peek()).isEqualTo("c");
+    assertThat(view).containsExactly("b", "a").inOrder();
+    assertThat(copy).containsExactly("a", "b").inOrder();
   }
 
   @Test
-  public void testBigIntegerValueEqualityAndIdentity() {
-    BigInteger sharedValue = new BigInteger("123456789012345678901234567890");
-    BigInteger equalValue = new BigInteger("123456789012345678901234567890");
-    PersistentStack<BigInteger> first = PersistentLinkedStack.of(sharedValue);
-    PersistentStack<BigInteger> sameReference = PersistentLinkedStack.of(sharedValue);
-    PersistentStack<BigInteger> equalReference = PersistentLinkedStack.of(equalValue);
+  public void testPersistentVersions() {
+    for (ImmutableList<String> input : INPUTS) {
+      List<PersistentStack<String>> versions = new ArrayList<>();
+      versions.add(PersistentLinkedStack.of());
+      for (String value : input) {
+        versions.add(versions.get(versions.size() - 1).pushAndCopy(value));
+      }
 
-    assertThat(first).isNotSameInstanceAs(sameReference);
-    assertThat(first).isEqualTo(sameReference);
-    assertThat(first.peek()).isSameInstanceAs(sharedValue);
-    assertThat(sameReference.peek()).isSameInstanceAs(sharedValue);
-
-    assertThat(equalValue).isNotSameInstanceAs(sharedValue);
-    assertThat(equalValue).isEqualTo(sharedValue);
-    assertThat(first).isEqualTo(equalReference);
-    assertThat(equalReference.peek()).isSameInstanceAs(equalValue);
-    assertThat(equalReference.peek()).isNotSameInstanceAs(sharedValue);
+      for (int i = 0; i < versions.size(); i++) {
+        PersistentStack<String> version = versions.get(i);
+        assertThat(version.size()).isEqualTo(i);
+        assertThat(version.isEmpty()).isEqualTo(i == 0);
+        assertThat(version.asTopDownIterable())
+            .containsExactlyElementsIn(input.subList(0, i).reverse())
+            .inOrder();
+        if (i > 0) {
+          assertThat(version.peek()).isEqualTo(input.get(i - 1));
+          assertThat(version.popAndCopy()).isSameInstanceAs(versions.get(i - 1));
+        }
+      }
+    }
   }
 
   @Test
-  public void testPopReturnsSamePredecessor() {
-    PersistentStack<String> predecessor =
-        PersistentLinkedStack.<String>of().pushAndCopy("bottom").pushAndCopy("middle");
-    PersistentStack<String> stack = predecessor.pushAndCopy("top");
+  public void testBranchesSharePredecessor() {
+    PersistentStack<String> predecessor = pushAll(ImmutableList.of("bottom", "middle"));
+    PersistentStack<String> left = predecessor.pushAndCopy("left");
+    PersistentStack<String> right = predecessor.pushAndCopy("right");
 
-    assertThat(stack.popAndCopy()).isSameInstanceAs(predecessor);
-  }
-
-  @Test
-  public void testPeekEmptyThrows() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-
-    assertThrows(NoSuchElementException.class, empty::peek);
-  }
-
-  @Test
-  public void testPopEmptyThrows() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-
-    assertThrows(NoSuchElementException.class, empty::popAndCopy);
-  }
-
-  @Test
-  public void testSizeAcrossPersistentVersions() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-    PersistentStack<String> one = empty.pushAndCopy("one");
-    PersistentStack<String> two = one.pushAndCopy("two");
-
-    assertThat(empty.size()).isEqualTo(0);
-    assertThat(one.size()).isEqualTo(1);
-    assertThat(two.size()).isEqualTo(2);
-    assertThat(two.popAndCopy().size()).isEqualTo(1);
-    assertThat(empty.size()).isEqualTo(0);
-    assertThat(one.size()).isEqualTo(1);
-    assertThat(two.size()).isEqualTo(2);
+    assertThat(left.peek()).isEqualTo("left");
+    assertThat(right.peek()).isEqualTo("right");
+    assertThat(left.popAndCopy()).isSameInstanceAs(predecessor);
+    assertThat(right.popAndCopy()).isSameInstanceAs(predecessor);
+    assertThat(predecessor.asTopDownIterable()).containsExactly("middle", "bottom").inOrder();
   }
 
   @Test
   public void testCanonicalEmpty() {
     PersistentStack<String> empty = PersistentLinkedStack.of();
-    PersistentStack<String> singleton = PersistentLinkedStack.of("value");
+    PersistentStack<String> singleton = PersistentLinkedStack.of("a");
 
+    assertThat(empty.isEmpty()).isTrue();
+    assertThat(empty.size()).isEqualTo(0);
     assertThat(PersistentLinkedStack.<String>of()).isSameInstanceAs(empty);
+    assertThat(empty.empty()).isSameInstanceAs(empty);
     assertThat(singleton.empty()).isSameInstanceAs(empty);
     assertThat(singleton.popAndCopy()).isSameInstanceAs(empty);
+    assertThat(PersistentLinkedStack.copyOf(ImmutableList.<String>of())).isSameInstanceAs(empty);
+    assertThat(Stream.<String>empty().collect(PersistentLinkedStack.toPersistentLinkedStack()))
+        .isSameInstanceAs(empty);
   }
 
   @Test
-  public void testRejectsNull() {
+  public void testEmptyOperationsThrow() {
     PersistentStack<String> empty = PersistentLinkedStack.of();
 
+    assertThrows(NoSuchElementException.class, empty::peek);
+    assertThrows(NoSuchElementException.class, empty::popAndCopy);
+  }
+
+  @Test
+  public void testOfFactories() {
+    assertThat(PersistentLinkedStack.of("a").asTopDownIterable()).containsExactly("a");
+    assertThat(PersistentLinkedStack.of("a", "b").asTopDownIterable())
+        .containsExactly("b", "a")
+        .inOrder();
+    assertThat(PersistentLinkedStack.of("a", "b", "c", "d").asTopDownIterable())
+        .containsExactly("d", "c", "b", "a")
+        .inOrder();
+  }
+
+  @Test
+  public void testArrayIsOneElement() {
+    String[] value = {"a", "b"};
+    PersistentStack<String[]> stack = PersistentLinkedStack.of(value);
+
+    assertThat(stack.size()).isEqualTo(1);
+    assertThat(stack.peek()).isSameInstanceAs(value);
+    assertThat(stack.asTopDownIterable().iterator().next()).isSameInstanceAs(value);
+  }
+
+  @Test
+  public void testCopyOf() {
+    for (ImmutableList<String> input : INPUTS) {
+      PersistentStack<String> stack = PersistentLinkedStack.copyOf(input);
+
+      assertThat(stack.size()).isEqualTo(input.size());
+      assertThat(stack.asTopDownIterable()).containsExactlyElementsIn(input.reverse()).inOrder();
+    }
+  }
+
+  @Test
+  public void testCopyOfDoesNotRetainInput() {
+    List<String> input = new ArrayList<>(ImmutableList.of("a", "b"));
+    PersistentStack<String> stack = PersistentLinkedStack.copyOf(input);
+    input.clear();
+
+    assertThat(stack.asTopDownIterable()).containsExactly("b", "a").inOrder();
+    assertThat(stack.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testCollector() {
+    CollectorTester<String, ?, PersistentLinkedStack<String>> tester =
+        CollectorTester.of(PersistentLinkedStack.<String>toPersistentLinkedStack());
+    for (ImmutableList<String> input : INPUTS) {
+      tester.expectCollects(pushAll(input), input.toArray(new String[0]));
+    }
+  }
+
+  @Test
+  public void testNulls() {
     assertThrows(NullPointerException.class, () -> PersistentLinkedStack.of((String) null));
-    assertThrows(NullPointerException.class, () -> empty.pushAndCopy(null));
+    assertThrows(NullPointerException.class, () -> PersistentLinkedStack.of(null, "a"));
+    assertThrows(NullPointerException.class, () -> PersistentLinkedStack.of("a", null));
     assertThrows(
-        NullPointerException.class, () -> PersistentLinkedStack.of("value").pushAndCopy(null));
+        NullPointerException.class, () -> PersistentLinkedStack.of("a", "b", (String[]) null));
+    assertThrows(NullPointerException.class, () -> PersistentLinkedStack.copyOf(null));
+    assertThrows(NullPointerException.class, () -> PersistentLinkedStack.of().pushAndCopy(null));
+    assertThrows(NullPointerException.class, () -> PersistentLinkedStack.of("a").pushAndCopy(null));
   }
 
   @Test
-  public void testIteratorOrderIsTopToBottom() {
-    PersistentStack<String> stack =
-        PersistentLinkedStack.<String>of()
-            .pushAndCopy("bottom")
-            .pushAndCopy("middle")
-            .pushAndCopy("top");
-
-    assertThat(stack.asTopDownIterable()).containsExactly("top", "middle", "bottom").inOrder();
+  public void testNullElements() {
+    assertThrows(
+        NullPointerException.class, () -> PersistentLinkedStack.of("a", "b", (String) null));
+    assertThrows(
+        NullPointerException.class,
+        () -> PersistentLinkedStack.copyOf(Arrays.asList("a", null, "b")));
+    assertThrows(
+        NullPointerException.class,
+        () -> Stream.of("a", null, "b").collect(PersistentLinkedStack.toPersistentLinkedStack()));
   }
 
   @Test
-  public void testIteratorExhaustion() {
-    Iterator<String> iterator = PersistentLinkedStack.of("value").asTopDownIterable().iterator();
-
-    assertThat(iterator.next()).isEqualTo("value");
-    assertThrows(NoSuchElementException.class, iterator::next);
-  }
-
-  @Test
-  public void testIteratorRemoveRejected() {
-    Iterator<String> iterator = PersistentLinkedStack.of("value").asTopDownIterable().iterator();
-
-    assertThrows(UnsupportedOperationException.class, iterator::remove);
-  }
-
-  @Test
-  public void testEquality() {
-    PersistentStack<String> stack =
-        PersistentLinkedStack.of("bottom").pushAndCopy("middle").pushAndCopy("top");
-    PersistentStack<String> independentlyBuilt =
-        PersistentLinkedStack.<String>of()
-            .pushAndCopy("bottom")
-            .pushAndCopy("middle")
-            .pushAndCopy("top");
-    PersistentStack<String> differentOrder =
-        PersistentLinkedStack.of("top").pushAndCopy("middle").pushAndCopy("bottom");
-    PersistentStack<String> differentMiddle =
-        PersistentLinkedStack.of("bottom").pushAndCopy("other").pushAndCopy("top");
-    PersistentStack<String> differentBottom =
-        PersistentLinkedStack.of("other").pushAndCopy("middle").pushAndCopy("top");
-    PersistentStack<String> shorter = PersistentLinkedStack.of("middle").pushAndCopy("top");
+  public void testEquals() {
+    PersistentStack<String> tail = PersistentLinkedStack.of("bottom");
+    BigInteger value = new BigInteger("123456789012345678901234567890");
+    BigInteger equalValue = new BigInteger("123456789012345678901234567890");
 
     new EqualsTester()
-        .addEqualityGroup(stack, independentlyBuilt)
-        .addEqualityGroup(differentOrder)
-        .addEqualityGroup(differentMiddle)
-        .addEqualityGroup(differentBottom)
-        .addEqualityGroup(shorter)
+        .addEqualityGroup(PersistentLinkedStack.of(), new ListStack<>(ImmutableList.of()))
+        .addEqualityGroup(PersistentLinkedStack.of("a"), new ListStack<>(ImmutableList.of("a")))
+        .addEqualityGroup(
+            tail.pushAndCopy("middle").pushAndCopy("top"),
+            tail.pushAndCopy("middle").pushAndCopy("top"),
+            pushAll(ImmutableList.of("bottom", "middle", "top")),
+            new ListStack<>(ImmutableList.of("top", "middle", "bottom")))
+        .addEqualityGroup(tail.pushAndCopy("middle").pushAndCopy("other"))
+        .addEqualityGroup(tail.pushAndCopy("other").pushAndCopy("top"))
+        .addEqualityGroup(pushAll(ImmutableList.of("other", "middle", "top")))
+        .addEqualityGroup(pushAll(ImmutableList.of("top", "middle", "bottom")))
+        .addEqualityGroup(tail.pushAndCopy("top"))
+        .addEqualityGroup(
+            pushAll(ImmutableList.of("a", "a")), new ListStack<>(ImmutableList.of("a", "a")))
+        .addEqualityGroup(
+            PersistentLinkedStack.of(value),
+            PersistentLinkedStack.of(equalValue),
+            new ListStack<>(ImmutableList.of(equalValue)))
+        .addEqualityGroup(ImmutableList.of("top", "middle", "bottom"))
         .testEquals();
   }
 
   @Test
-  public void testEqualityWithSharedTail() {
-    PersistentLinkedStack<String> sharedTail =
-        PersistentLinkedStack.of("bottom").pushAndCopy("shared");
-    PersistentStack<String> stack = sharedTail.pushAndCopy("middle").pushAndCopy("top");
-    PersistentStack<String> equal = sharedTail.pushAndCopy("middle").pushAndCopy("top");
-    PersistentStack<String> different = sharedTail.pushAndCopy("other").pushAndCopy("top");
-
-    new EqualsTester().addEqualityGroup(stack, equal).addEqualityGroup(different).testEquals();
-  }
-
-  @Test
   public void testToString() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-    PersistentStack<String> stack =
-        PersistentLinkedStack.of("bottom").pushAndCopy("middle").pushAndCopy("top");
-
-    assertThat(empty.toString()).isEqualTo("[]");
-    assertThat(stack.toString()).isEqualTo("[top, middle, bottom]");
+    assertThat(PersistentLinkedStack.of().toString()).isEqualTo("[]");
+    assertThat(PersistentLinkedStack.of("a").toString()).isEqualTo("[a]");
+    assertThat(pushAll(ImmutableList.of("bottom", "middle", "top")).toString())
+        .isEqualTo("[top, middle, bottom]");
   }
 
   @Test
-  public void testSerializationRoundTrip() {
-    PersistentStack<String> stack =
-        PersistentLinkedStack.of("bottom").pushAndCopy("middle").pushAndCopy("top");
+  public void testSerializable() {
+    for (ImmutableList<String> input : INPUTS) {
+      PersistentStack<String> stack = pushAll(input);
+      @Var PersistentStack<String> copy = SerializableTester.reserializeAndAssert(stack);
 
-    SerializableTester.reserializeAndAssert(stack);
+      assertThat(copy.size()).isEqualTo(input.size());
+      for (String value : input.reverse()) {
+        assertThat(copy.peek()).isEqualTo(value);
+        copy = copy.popAndCopy();
+      }
+      assertThat(copy).isSameInstanceAs(PersistentLinkedStack.<String>of());
+    }
   }
 
   @Test
-  public void testEmptySerializationReturnsCanonicalInstance() {
-    PersistentStack<String> empty = PersistentLinkedStack.of();
-
-    assertThat(SerializableTester.reserialize(empty)).isSameInstanceAs(empty);
-  }
-
-  @Test
-  public void testLongStackSerializationRoundTrip() {
+  public void testLongStackSerialization() {
     int length = 10_000;
     @Var PersistentStack<Integer> stack = PersistentLinkedStack.of();
     for (int i = 0; i < length; i++) {
       stack = stack.pushAndCopy(i);
     }
+    @Var PersistentStack<Integer> copy = SerializableTester.reserializeAndAssert(stack);
 
-    assertThat(SerializableTester.reserialize(stack)).isEqualTo(stack);
+    for (int i = length - 1; i >= 0; i--) {
+      assertThat(copy.size()).isEqualTo(i + 1);
+      assertThat(copy.peek()).isEqualTo(i);
+      copy = copy.popAndCopy();
+    }
+    assertThat(copy).isSameInstanceAs(PersistentLinkedStack.<Integer>of());
+  }
+
+  @Test
+  public void testSerializationRejectsNonSerializableElement() throws IOException {
+    try (ObjectOutputStream output = new ObjectOutputStream(new ByteArrayOutputStream())) {
+      assertThrows(
+          NotSerializableException.class,
+          () -> output.writeObject(PersistentLinkedStack.of(new Object())));
+    }
+  }
+
+  @Test
+  public void testSerializationRejectsNullArray() {
+    assertThrows(InvalidObjectException.class, () -> reserializeWithProxyValues(null));
+  }
+
+  @Test
+  public void testSerializationRejectsNullElement() {
+    assertThrows(
+        InvalidObjectException.class,
+        () -> reserializeWithProxyValues(new Object[] {"top", null, "bottom"}));
+  }
+
+  private static <T> PersistentLinkedStack<T> pushAll(Iterable<? extends T> input) {
+    @Var PersistentLinkedStack<T> stack = PersistentLinkedStack.of();
+    for (T value : input) {
+      stack = stack.pushAndCopy(value);
+    }
+    return stack;
+  }
+
+  // The string-only fixture has exactly one object array: the proxy's element array.
+  @SuppressWarnings("BanSerializableRead") // Reads only locally generated test data.
+  private static Object reserializeWithProxyValues(@Nullable Object @Nullable [] values)
+      throws IOException, ClassNotFoundException {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    try (ObjectOutputStream output =
+        new ObjectOutputStream(bytes) {
+          {
+            enableReplaceObject(true);
+          }
+
+          @Override
+          protected @Nullable Object replaceObject(Object object) {
+            return object instanceof Object[] ? values : object;
+          }
+        }) {
+      output.writeObject(PersistentLinkedStack.of("value"));
+    }
+    try (ObjectInputStream input =
+        new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+      return input.readObject();
+    }
+  }
+
+  /** Independent value-based implementation used only for equality and hash-code tests. */
+  @Immutable(containerOf = "T")
+  private static final class ListStack<T> implements PersistentStack<T> {
+
+    @Serial private static final long serialVersionUID = 1L;
+
+    private final ImmutableList<T> values;
+
+    private ListStack(ImmutableList<T> pValues) {
+      values = pValues;
+    }
+
+    @Override
+    public PersistentStack<T> pushAndCopy(T value) {
+      return new ListStack<>(ImmutableList.<T>builder().add(value).addAll(values).build());
+    }
+
+    @Override
+    public PersistentStack<T> popAndCopy() {
+      if (isEmpty()) {
+        throw new NoSuchElementException();
+      }
+      return new ListStack<>(values.subList(1, values.size()));
+    }
+
+    @Override
+    public T peek() {
+      if (isEmpty()) {
+        throw new NoSuchElementException();
+      }
+      return values.get(0);
+    }
+
+    @Override
+    public PersistentStack<T> empty() {
+      return new ListStack<>(ImmutableList.of());
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return values.isEmpty();
+    }
+
+    @Override
+    public int size() {
+      return values.size();
+    }
+
+    @SuppressWarnings("PreferredInterfaceType")
+    @Override
+    public Iterable<T> asTopDownIterable() {
+      return values;
+    }
+
+    @Override
+    public ImmutableList<T> copyToList() {
+      return values.reverse();
+    }
+
+    @Override
+    public PersistentStack<T> takeBottom(int count) {
+      // Currently not needed in tests
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+      return obj instanceof PersistentStack<?> other
+          && values.equals(ImmutableList.copyOf(other.asTopDownIterable()));
+    }
+
+    @Override
+    public int hashCode() {
+      return values.hashCode();
+    }
   }
 }
