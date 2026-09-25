@@ -20,9 +20,10 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.NoSuchElementException;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -240,10 +241,39 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   }
 
   /** Returns a collector that pushes elements in encounter order, with the last element on top. */
-  @SuppressWarnings("NoFunctionalReturnType")
+  @SuppressWarnings("NoFunctionalReturnType") // Collector factory.
   public static <T> Collector<T, ?, PersistentLinkedStack<T>> toPersistentLinkedStack() {
-    return Collectors.collectingAndThen(
-        ImmutableList.<T>toImmutableList(), PersistentLinkedStack::copyOf);
+    return Collector.of(
+        CollectorState<T>::new, CollectorState::add, CollectorState::combine, state -> state.stack);
+  }
+
+  private static final class CollectorState<T> {
+
+    private PersistentLinkedStack<T> stack = PersistentLinkedStack.of();
+
+    private void add(T value) {
+      stack = stack.pushAndCopy(value);
+    }
+
+    private CollectorState<T> combine(CollectorState<T> other) {
+      if (stack.isEmpty()) {
+        return other;
+      }
+      if (other.stack.isEmpty()) {
+        return this;
+      }
+
+      // Immutable tail links prevent attaching other's bottom directly to this stack.
+      // Buffer its values bottom-to-top so we can rebuild its nodes onto this stack.
+      Deque<T> reversed = new ArrayDeque<>(other.stack.size());
+      for (T value : other.stack.asTopDownIterable()) {
+        reversed.push(value);
+      }
+      for (T value : reversed) {
+        add(value);
+      }
+      return this;
+    }
   }
 
   @Serial
