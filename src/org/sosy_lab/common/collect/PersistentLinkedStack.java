@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkPositionIndex;
 import com.google.common.base.Joiner;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.Var;
 import java.io.InvalidObjectException;
@@ -22,10 +23,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -55,14 +58,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * use O(n) temporary memory, excluding the processing of element object graphs. A flattened proxy
  * stores the logical values in top-to-bottom order instead of serializing the linked nodes. This
  * avoids recursive traversal of long stacks and keeps node and cache fields out of the serialized
- * form. Deserialization rejects null proxy data and rebuilds the stack from bottom to top while
- * validating each value, thereby preserving order and restoring the canonical empty instance.
- * Because each stack is flattened independently, distinct, structurally related stacks serialized
- * together have their shared non-empty tails reconstructed independently; {@link #popAndCopy()} on
- * a deserialized stack nevertheless returns its existing tail. Element object graphs must not
- * contain references back to the containing stack because proxy replacement cannot restore such
- * cycles. Persisted data remains readable only while the proxy and element serialized forms remain
- * compatible.
+ * form. A null proxy array causes {@link InvalidObjectException}; a null element causes {@link
+ * NullPointerException}. Deserialization rebuilds the stack from bottom to top, thereby preserving
+ * order and restoring the canonical empty instance. Because each stack is flattened independently,
+ * distinct, structurally related stacks serialized together have their shared non-empty tails
+ * reconstructed independently; {@link #popAndCopy()} on a deserialized stack nevertheless returns
+ * its existing tail. Element object graphs must not contain references back to the containing stack
+ * because proxy replacement cannot restore such cycles. Persisted data remains readable only while
+ * the proxy and element serialized forms remain compatible.
  *
  * @param <T> the type of values
  */
@@ -333,19 +336,15 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
     private Object readResolve() throws InvalidObjectException {
       @Nullable Object @Nullable [] serializedValues = values;
       if (serializedValues == null) {
-        throw new InvalidObjectException("Stack values must not be null");
+        throw new InvalidObjectException("Stack must not be null");
       }
 
-      @Var PersistentLinkedStack<Object> stack = PersistentLinkedStack.of();
-      // The serialized order is top-to-bottom; push in the opposite direction.
-      for (@Var int index = serializedValues.length - 1; index >= 0; index--) {
-        @Nullable Object value = serializedValues[index];
-        if (value == null) {
-          throw new InvalidObjectException("Stack values must not contain null");
-        }
-        stack = stack.pushAndCopy(value);
-      }
-      return stack;
+      // Both adapters are views; neither copies the element array.
+      List<@Nullable Object> topDown = Arrays.asList(serializedValues);
+      // The serialized order is top-to-bottom; so we need to reverse the order for the stack here.
+      // TODO: Use Guava's reversed view List.reversed() once we push our Java version to Java 21
+      List<@Nullable Object> bottomUp = Lists.reverse(topDown);
+      return PersistentLinkedStack.copyOf(bottomUp);
     }
   }
 

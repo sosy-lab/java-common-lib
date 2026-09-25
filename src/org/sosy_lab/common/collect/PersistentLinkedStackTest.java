@@ -355,7 +355,7 @@ public class PersistentLinkedStackTest {
   @Test
   public void testSerializationRejectsNullElement() {
     assertThrows(
-        InvalidObjectException.class,
+        NullPointerException.class,
         () -> reserializeWithProxyValues(new Object[] {"top", null, "bottom"}));
   }
 
