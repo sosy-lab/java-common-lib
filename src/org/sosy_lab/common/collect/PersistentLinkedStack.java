@@ -225,6 +225,14 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
     return "[" + Joiner.on(", ").join(asTopDownIterable()) + "]";
   }
 
+  /**
+   * Returns the bottom {@code count} elements as an existing shared tail, without allocating stack
+   * nodes. A count of zero returns the canonical empty stack; the full size returns this stack.
+   *
+   * <p>Runs in O(size() - count) time for intermediate counts and O(1) time for zero or full size.
+   *
+   * @throws IndexOutOfBoundsException if {@code count} is outside {@code [0, size()]}
+   */
   @Override
   public PersistentLinkedStack<T> takeBottom(int count) {
     checkPositionIndex(count, size);
