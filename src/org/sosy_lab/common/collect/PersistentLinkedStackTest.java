@@ -12,10 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.testing.CollectionTestSuiteBuilder;
 import com.google.common.collect.testing.IteratorFeature;
 import com.google.common.collect.testing.IteratorTester;
-import com.google.common.collect.testing.ListTestSuiteBuilder;
-import com.google.common.collect.testing.TestStringListGenerator;
+import com.google.common.collect.testing.TestStringCollectionGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.testing.CollectorTester;
@@ -34,9 +34,12 @@ import java.io.Serial;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
@@ -56,18 +59,18 @@ public class PersistentLinkedStackTest {
     TestSuite suite = new TestSuite();
     suite.addTest(new JUnit4TestAdapter(PersistentLinkedStackTest.class));
     suite.addTest(
-        ListTestSuiteBuilder.using(
-                new TestStringListGenerator() {
+        CollectionTestSuiteBuilder.using(
+                new TestStringCollectionGenerator() {
                   @Override
-                  protected ImmutableList<String> create(String[] pElements) {
+                  protected Collection<String> create(String[] pElements) {
                     @Var PersistentLinkedStack<String> stack = PersistentLinkedStack.of();
-                    for (String element : pElements) {
-                      stack = stack.pushAndCopy(element);
+                    for (@Var int index = pElements.length - 1; index >= 0; index--) {
+                      stack = stack.pushAndCopy(pElements[index]);
                     }
-                    return stack.copyToList();
+                    return stack.asTopDownIterable();
                   }
                 })
-            .named("PersistentLinkedStack.copyToList")
+            .named("PersistentLinkedStack.asTopDownIterable")
             .withFeatures(CollectionFeature.KNOWN_ORDER, CollectionSize.ANY)
             .createTestSuite());
     return suite;
@@ -125,12 +128,14 @@ public class PersistentLinkedStackTest {
   @Test
   public void testViewsRemainOnOriginalVersion() {
     PersistentStack<String> stack = pushAll(ImmutableList.of("a", "b"));
-    Iterable<String> view = stack.asTopDownIterable();
+    Collection<String> view = stack.asTopDownIterable();
     List<String> copy = stack.copyToList();
     PersistentStack<String> extended = stack.pushAndCopy("c");
 
     assertThat(extended.peek()).isEqualTo("c");
     assertThat(view).containsExactly("b", "a").inOrder();
+    assertThat(view.spliterator().hasCharacteristics(Spliterator.ORDERED)).isTrue();
+    assertThat(view.parallelStream().toList()).containsExactly("b", "a").inOrder();
     assertThat(copy).containsExactly("a", "b").inOrder();
   }
 
@@ -154,6 +159,12 @@ public class PersistentLinkedStackTest {
           assertThat(version.peek()).isEqualTo(input.get(i - 1));
           assertThat(version.popAndCopy()).isSameInstanceAs(versions.get(i - 1));
         }
+        // Identity checks enforce the linked implementation's structural-sharing guarantee.
+        for (@Var int count = 0; count <= version.size(); count++) {
+          assertThat(version.takeBottom(count)).isSameInstanceAs(versions.get(count));
+        }
+        assertThrows(IndexOutOfBoundsException.class, () -> version.takeBottom(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> version.takeBottom(version.size() + 1));
       }
     }
   }
@@ -227,6 +238,19 @@ public class PersistentLinkedStackTest {
   }
 
   @Test
+  public void testCopyOfIterable() {
+    /*
+     * testCopyOf and testCopyOfDoesNotRetainInput use collections; this checks an Iterable input
+     * that is not a Collection.
+     */
+    Iterable<String> input = () -> ImmutableList.of("a", "b", "c").iterator();
+    PersistentLinkedStack<String> stack = PersistentLinkedStack.copyOf(input);
+
+    assertThat(stack.size()).isEqualTo(3);
+    assertThat(stack.asTopDownIterable()).containsExactly("c", "b", "a").inOrder();
+  }
+
+  @Test
   public void testCopyOfDoesNotRetainInput() {
     List<String> input = new ArrayList<>(ImmutableList.of("a", "b"));
     PersistentStack<String> stack = PersistentLinkedStack.copyOf(input);
@@ -237,12 +261,67 @@ public class PersistentLinkedStackTest {
   }
 
   @Test
+  public void testCopyToList() {
+    /*
+     * CollectionTestSuiteBuilder tests asTopDownIterable, not copyToList; verify bottom-to-top order
+     * and the unmodifiable result here.
+     */
+    for (ImmutableList<String> input : INPUTS) {
+      PersistentStack<String> stack = pushAll(input);
+      List<String> copy = stack.copyToList();
+
+      assertThat(copy).containsExactlyElementsIn(input).inOrder();
+      assertThrows(UnsupportedOperationException.class, () -> copy.add("other"));
+    }
+  }
+
+  @Test
   public void testCollector() {
     CollectorTester<String, ?, PersistentLinkedStack<String>> tester =
         CollectorTester.of(PersistentLinkedStack.<String>toPersistentLinkedStack());
     for (ImmutableList<String> input : INPUTS) {
       tester.expectCollects(pushAll(input), input.toArray(new String[0]));
     }
+  }
+
+  @Test
+  public void testCollectorCombinesMultiElementPartitions() {
+    /*
+     * testCollector never merges two multi-element accumulators; testCollectorWithParallelStream
+     * does not fix partition sizes. This explicitly tests a two-by-two merge.
+     */
+    assertCombinesMultiElementPartitions(PersistentLinkedStack.<String>toPersistentLinkedStack());
+  }
+
+  @Test
+  public void testCollectorWithParallelStream() {
+    /*
+     * testCollector and testCollectorCombinesMultiElementPartitions bypass Stream.collect();
+     * testViewsRemainOnOriginalVersion only tests the view's stream. Check parallel collection here.
+     */
+    PersistentLinkedStack<String> stack =
+        Stream.of("a", "b", "c", "d")
+            .parallel()
+            .collect(PersistentLinkedStack.toPersistentLinkedStack());
+
+    assertThat(stack.size()).isEqualTo(4);
+    assertThat(stack.asTopDownIterable()).containsExactly("d", "c", "b", "a").inOrder();
+  }
+
+  private static <A> void assertCombinesMultiElementPartitions(
+      Collector<String, A, PersistentLinkedStack<String>> collector) {
+    A left = collector.supplier().get();
+    collector.accumulator().accept(left, "a");
+    collector.accumulator().accept(left, "b");
+    A right = collector.supplier().get();
+    collector.accumulator().accept(right, "c");
+    collector.accumulator().accept(right, "d");
+
+    PersistentLinkedStack<String> stack =
+        collector.finisher().apply(collector.combiner().apply(left, right));
+
+    assertThat(stack.size()).isEqualTo(4);
+    assertThat(stack.asTopDownIterable()).containsExactly("d", "c", "b", "a").inOrder();
   }
 
   @Test
@@ -348,15 +427,32 @@ public class PersistentLinkedStackTest {
   }
 
   @Test
-  public void testSerializationRejectsNullArray() {
-    assertThrows(InvalidObjectException.class, () -> reserializeWithProxyValues(null));
+  public void testSerializationWithValidProxyValues() throws IOException, ClassNotFoundException {
+    /*
+     * testSerializable does not replace the proxy's value array; testSerializationRejectsNullArray
+     * and testSerializationRejectsNullElement only check rejection. Verify replacement here.
+     */
+    byte[] serialized = serializeWithProxyValues(new Object[] {"top", "bottom"});
+    PersistentLinkedStack<?> stack = deserializeStack(serialized);
+
+    assertThat(stack.size()).isEqualTo(2);
+    assertThat(stack.asTopDownIterable()).containsExactly("top", "bottom").inOrder();
   }
 
   @Test
-  public void testSerializationRejectsNullElement() {
-    assertThrows(
-        NullPointerException.class,
-        () -> reserializeWithProxyValues(new Object[] {"top", null, "bottom"}));
+  public void testSerializationRejectsNullArray() throws IOException {
+    // Serialization must succeed; only deserialization should reject this data.
+    byte[] serialized = serializeWithProxyValues(null);
+
+    assertThrows(InvalidObjectException.class, () -> deserializeStack(serialized));
+  }
+
+  @Test
+  public void testSerializationRejectsNullElement() throws IOException {
+    // Serialization must succeed; only deserialization should reject this data.
+    byte[] serialized = serializeWithProxyValues(new Object[] {"top", null, "bottom"});
+
+    assertThrows(NullPointerException.class, () -> deserializeStack(serialized));
   }
 
   private static <T> PersistentLinkedStack<T> pushAll(Iterable<? extends T> input) {
@@ -368,9 +464,8 @@ public class PersistentLinkedStackTest {
   }
 
   // The string-only fixture has exactly one object array: the proxy's element array.
-  @SuppressWarnings("BanSerializableRead") // Reads only locally generated test data.
-  private static Object reserializeWithProxyValues(@Nullable Object @Nullable [] values)
-      throws IOException, ClassNotFoundException {
+  private static byte[] serializeWithProxyValues(@Nullable Object @Nullable [] values)
+      throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     try (ObjectOutputStream output =
         new ObjectOutputStream(bytes) {
@@ -385,9 +480,14 @@ public class PersistentLinkedStackTest {
         }) {
       output.writeObject(PersistentLinkedStack.of("value"));
     }
-    try (ObjectInputStream input =
-        new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
-      return input.readObject();
+    return bytes.toByteArray();
+  }
+
+  @SuppressWarnings("BanSerializableRead") // Reads only locally generated test data.
+  private static PersistentLinkedStack<?> deserializeStack(byte[] bytes)
+      throws IOException, ClassNotFoundException {
+    try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
+      return (PersistentLinkedStack<?>) input.readObject();
     }
   }
 
