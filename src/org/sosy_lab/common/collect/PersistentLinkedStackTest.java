@@ -439,9 +439,8 @@ public class PersistentLinkedStackTest {
       return values.size();
     }
 
-    @SuppressWarnings("PreferredInterfaceType")
     @Override
-    public Iterable<T> asTopDownIterable() {
+    public ImmutableList<T> asTopDownIterable() {
       return values;
     }
 

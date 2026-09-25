@@ -11,6 +11,7 @@ package org.sosy_lab.common.collect;
 import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -72,10 +73,10 @@ public interface PersistentStack<T> extends Serializable {
   int size();
 
   /**
-   * Returns an unmodifiable top-to-bottom view in O(1) time. Each iterator traverses this stack
-   * version independently.
+   * Returns an {@link Collection} that is a unmodifiable view in top-to-bottom order, as
+   * encountered, in O(1) time. Each iterator traverses this stack version independently.
    */
-  Iterable<T> asTopDownIterable();
+  Collection<T> asTopDownIterable();
 
   /** Returns an unmodifiable bottom-to-top list in O(n) time and space. */
   List<T> copyToList();

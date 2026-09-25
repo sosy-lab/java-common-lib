@@ -20,9 +20,15 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.AbstractCollection;
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -146,8 +152,26 @@ public final class PersistentLinkedStack<T> implements PersistentStack<T> {
   }
 
   @Override
-  public Iterable<T> asTopDownIterable() {
-    return () -> new StackIterator<>(this);
+  public Collection<T> asTopDownIterable() {
+    Collection<T> view =
+        new AbstractCollection<>() {
+          @Override
+          public Iterator<T> iterator() {
+            return new StackIterator<>(PersistentLinkedStack.this);
+          }
+
+          @Override
+          public int size() {
+            return PersistentLinkedStack.this.size;
+          }
+
+          @Override
+          public Spliterator<T> spliterator() {
+            // ORDERED specifies top-to-bottom encounter order.
+            return Spliterators.spliterator(this, Spliterator.ORDERED);
+          }
+        };
+    return Collections.unmodifiableCollection(view);
   }
 
   @Override
