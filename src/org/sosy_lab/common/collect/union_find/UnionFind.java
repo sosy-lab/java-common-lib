@@ -1,0 +1,52 @@
+// This file is part of SoSy-Lab Common,
+// a library of useful utilities:
+// https://github.com/sosy-lab/java-common-lib
+//
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
+
+package org.sosy_lab.common.collect.union_find;
+
+import java.util.Collection;
+import java.util.Set;
+
+/**
+ * Interface for a sorted Union-Find or Disjoint-Set data structure. Uses a {@link Collection} of
+ * {@link Set}s.
+ *
+ * @param <T> type of elements added to the Union-Find.
+ */
+public interface UnionFind<T> {
+  /**
+   * Returns the canonical element of the set containing the provided element.
+   *
+   * @param pE element for which set is to be found
+   * @return canonical element of the found set
+   */
+  T find(T pE);
+
+  /**
+   * Merges the sets represented by the two input values according to standard Union-Find behaviour.
+   *
+   * @param pE1 first element
+   * @param pE2 second element
+   */
+  void union(T pE1, T pE2);
+
+  /**
+   * Provides a {@link Collection} containing all current subsets.
+   *
+   * @return {@link Collection} containing all current subsets
+   */
+  Collection<? extends Set<T>> getAllSubsets();
+
+  /**
+   * Checks whether the provided element is contained in any current subset and returns true or
+   * false accordingly.
+   *
+   * @param pE element to be searched for
+   * @return true if contained, false if not
+   */
+  boolean contains(T pE);
+}
