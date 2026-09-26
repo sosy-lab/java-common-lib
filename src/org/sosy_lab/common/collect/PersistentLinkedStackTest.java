@@ -281,7 +281,7 @@ public class PersistentLinkedStackTest {
     CollectorTester<String, ?, PersistentLinkedStack<String>> tester =
         CollectorTester.of(PersistentLinkedStack.<String>toPersistentLinkedStack());
     for (ImmutableList<String> input : INPUTS) {
-      tester.expectCollects(pushAll(input), input.toArray(new String[0]));
+      tester.expectCollects(pushAll(input), input.toArray(String[]::new));
     }
   }
 
