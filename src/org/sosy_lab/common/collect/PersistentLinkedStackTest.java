@@ -10,6 +10,7 @@ package org.sosy_lab.common.collect;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.common.collect.Collections3.elementAndList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.testing.CollectionTestSuiteBuilder;
@@ -263,8 +264,8 @@ public class PersistentLinkedStackTest {
   @Test
   public void testCopyToList() {
     /*
-     * CollectionTestSuiteBuilder tests asTopDownIterable, not copyToList; verify bottom-to-top order
-     * and the unmodifiable result here.
+     * The generated suite tests asTopDownIterable, not copyToList. Check bottom-to-top order and
+     * the unmodifiable result here.
      */
     for (ImmutableList<String> input : INPUTS) {
       PersistentStack<String> stack = pushAll(input);
@@ -297,7 +298,8 @@ public class PersistentLinkedStackTest {
   public void testCollectorWithParallelStream() {
     /*
      * testCollector and testCollectorCombinesMultiElementPartitions bypass Stream.collect();
-     * testViewsRemainOnOriginalVersion only tests the view's stream. Check parallel collection here.
+     * testViewsRemainOnOriginalVersion tests only the view's stream. Check parallel collection
+     * here.
      */
     PersistentLinkedStack<String> stack =
         Stream.of("a", "b", "c", "d")
@@ -505,7 +507,7 @@ public class PersistentLinkedStackTest {
 
     @Override
     public PersistentStack<T> pushAndCopy(T value) {
-      return new ListStack<>(ImmutableList.<T>builder().add(value).addAll(values).build());
+      return new ListStack<>(elementAndList(value, values));
     }
 
     @Override
