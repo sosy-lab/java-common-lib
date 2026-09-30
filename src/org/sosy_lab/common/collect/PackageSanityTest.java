@@ -16,6 +16,8 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   {
     setDistinctValues(
         PersistentLinkedList.class, PersistentLinkedList.of(), PersistentLinkedList.of("test"));
+    setDistinctValues(
+        PersistentLinkedStack.class, PersistentLinkedStack.of(), PersistentLinkedStack.of("test"));
     @SuppressWarnings("unchecked")
     OurSortedMap<String, String> singletonMap =
         (PathCopyingPersistentTreeMap<String, String>)
