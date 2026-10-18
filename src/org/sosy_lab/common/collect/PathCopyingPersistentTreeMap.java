@@ -54,7 +54,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * always compares according to the natural ordering. All methods may throw {@link
  * ClassCastException} is key objects are passed that do not implement {@link Comparable}.
  *
- * <p>The natural ordering of the keys needs to be consistent with equals.
+ * <p>The natural ordering of the keys needs to be consistent with equals and object identity.
  *
  * <p>As for all {@link PersistentMap}s, all collection views and all iterators are immutable. They
  * do not reflect changes made to the map and all their modifying operations throw {@link
@@ -134,6 +134,14 @@ public final class PathCopyingPersistentTreeMap<
         return this;
       } else {
         return new Node<>(getKey(), getValue(), left, right, color);
+      }
+    }
+
+    Node<K, V> withValue(V newValue) {
+      if (newValue == getValue()) {
+        return this;
+      } else {
+        return new Node<>(getKey(), newValue, left, right, isRed);
       }
     }
 
@@ -555,7 +563,14 @@ public final class PathCopyingPersistentTreeMap<
       current = current.withRightChild(newRight);
 
     } else {
-      current = new Node<>(key, value, current.left, current.right, current.getColor());
+      // This always keeps the old (equal) key object. This has useful implications:
+      // Because we reuse the old key object, the key instance does not change and potential `==`
+      // comparisons on the key at other locations still work successfully.
+      // We do always use the new value object; but in case that the new value object is identical
+      // to the old value object, we can reuse the existing Node object and the whole map. This also
+      // enables `==` comparisons to succeed and saves some memory.
+      // This behavior also matches what JDK maps do.
+      current = current.withValue(value);
     }
 
     // restore invariants

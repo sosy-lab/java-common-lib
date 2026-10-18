@@ -20,8 +20,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Interface for persistent map. A persistent data structure is immutable, but provides cheap
  * copy-and-write operations. Thus all write operations ({{@link #putAndCopy(Object, Object)},
- * {{@link #removeAndCopy(Object)}}) will not modify the current instance, but return a new instance
- * instead.
+ * {{@link #removeAndCopy(Object)}}) will not modify the current instance, but return an updated
+ * instance instead.
  *
  * <p>All modifying operations inherited from {@link Map} are not supported and will always throw
  * {@link UnsupportedOperationException}. All collections returned by methods of this interface are
@@ -35,11 +35,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @Immutable(containerOf = {"K", "V"})
 public interface PersistentMap<K, V extends @Nullable Object> extends Map<K, V> {
 
-  /** Replacement for {{@link #put(Object, Object)} that returns a fresh instance. */
+  /** Replacement for {{@link #put(Object, Object)} that returns an updated map. */
   @CheckReturnValue
   PersistentMap<K, V> putAndCopy(@CompatibleWith("K") K key, @CompatibleWith("V") V value);
 
-  /** Replacement for {{@link #remove(Object)} that returns a fresh instance. */
+  /** Replacement for {{@link #remove(Object)} that returns an updated map. */
   @CheckReturnValue
   PersistentMap<K, V> removeAndCopy(@CompatibleWith("K") Object key);
 

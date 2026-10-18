@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.testing.NavigableMapTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringSortedMapGenerator;
@@ -21,6 +22,7 @@ import com.google.common.collect.testing.features.MapFeature;
 import com.google.common.testing.EqualsTester;
 import com.google.errorprone.annotations.Var;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;
@@ -433,5 +435,97 @@ public class PathCopyingPersistentTreeMapTest {
     // instead of letting Truth check containment (which is not guaranteed to call containsAll).
     assertThat(second.entrySet().containsAll(first.entrySet())).isFalse();
     assertThat(first.entrySet().containsAll(second.entrySet())).isFalse();
+  }
+
+  @Test
+  public void testRemovingMissingKey() {
+    map = map.putAndCopy("a", "").putAndCopy("b", "").putAndCopy("y", "").putAndCopy("z", "");
+
+    assertWithMessage("Removing missing key should produce same map")
+        .that(map.removeAndCopy("key"))
+        .isSameInstanceAs(map);
+  }
+
+  @Test
+  @SuppressWarnings({"checkstyle:IllegalInstantiation", "StringUselessMethods"})
+  public void testSettingIdenticalObjects() {
+    String k1 = new String("key");
+    String k2 = new String("key");
+    String v1 = new String("value");
+    String v2 = new String("value");
+    map =
+        map.putAndCopy("a", "")
+            .putAndCopy("b", "")
+            .putAndCopy(k1, v1)
+            .putAndCopy("y", "")
+            .putAndCopy("z", "");
+
+    assertWithMessage("Reinserting same k/v pair should produce same map")
+        .that(map.putAndCopy(k1, v1))
+        .isSameInstanceAs(map);
+
+    assertWithMessage("Reinserting same value should produce same map")
+        .that(map.putAndCopy(k2, v1))
+        .isSameInstanceAs(map);
+
+    assertWithMessage("Inserting new value should produce map with new value")
+        .that(map.putAndCopy(k1, v2).get(k1))
+        .isSameInstanceAs(v2);
+
+    assertWithMessage("Inserting new k/v pair should keep old key")
+        .that(
+            FluentIterable.from(map.putAndCopy(k2, v2).keySet())
+                .filter(s -> s.length() > 1)
+                .first()
+                .get())
+        .isSameInstanceAs(k1);
+    assertWithMessage("Inserting new k/v pair should produce map with new value")
+        .that(map.putAndCopy(k2, v2).get(k2))
+        .isSameInstanceAs(v2);
+  }
+
+  @Test
+  public void testSettingIdenticalObjectsInHashMap() {
+    testSettingIdenticalObjectsInStandardMap(new HashMap<>());
+  }
+
+  @Test
+  public void testSettingIdenticalObjectsInTreeMap() {
+    testSettingIdenticalObjectsInStandardMap(new TreeMap<>());
+  }
+
+  @SuppressWarnings({"checkstyle:IllegalInstantiation", "StringUselessMethods"})
+  private static void testSettingIdenticalObjectsInStandardMap(Map<String, String> map) {
+    // not testing own code, but checking expectations of other map implementations
+
+    String k1 = new String("key");
+    String k2 = new String("key");
+    String k3 = new String("key");
+    String v1 = new String("value");
+    String v2 = new String("value");
+    String v3 = new String("value");
+    map.put("a", "");
+    map.put("b", "");
+    map.put(k1, v1);
+    map.put("y", "");
+    map.put("z", "");
+
+    map.put(k2, v1);
+    assertWithMessage("Inserting same value should keep old key")
+        .that(FluentIterable.from(map.keySet()).filter(s -> s.length() > 1).first().get())
+        .isSameInstanceAs(k1);
+
+    map.put(k1, v2);
+    assertWithMessage("Inserting new value should produce map with new value")
+        .that(map.get(k1))
+        .isSameInstanceAs(v2);
+
+    map.put(k3, v3);
+    assertWithMessage("Inserting new k/v pair should keep old key")
+        .that(FluentIterable.from(map.keySet()).filter(s -> s.length() > 1).first().get())
+        .isSameInstanceAs(k1);
+    assertWithMessage("Inserting new k/v pair should produce map with new value")
+        .that(map.get(k1))
+        .isSameInstanceAs(v3);
   }
 }
