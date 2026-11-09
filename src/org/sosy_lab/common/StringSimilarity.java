@@ -56,7 +56,7 @@ public final class StringSimilarity {
    * @param b the second string, must not be {@code null}
    * @return a similarity score in {@code [0.0, 1.0]}
    */
-  public static double damerauLevenshteinSimilarity(String a, String b) {
+  public static double getDamerauLevenshteinSimilarity(String a, String b) {
     checkNotNull(a);
     checkNotNull(b);
     int maxLength = Math.max(a.length(), b.length());
@@ -67,7 +67,7 @@ public final class StringSimilarity {
   }
 
   /**
-   * Returns the elements of {@code candidates} whose {@link #damerauLevenshteinSimilarity} to
+   * Returns the elements of {@code candidates} whose {@link #getDamerauLevenshteinSimilarity} to
    * {@code stringToCompareTo} is at least {@code threshold}, sorted by descending similarity.
    * Candidates with equal similarity keep their relative order from {@code candidates} (stable
    * sort). Duplicate candidates are not removed.
@@ -84,7 +84,7 @@ public final class StringSimilarity {
 
     List<SimpleImmutableEntry<String, Double>> scoredMatches = new ArrayList<>();
     for (String candidate : candidates) {
-      double score = damerauLevenshteinSimilarity(stringToCompareTo, candidate);
+      double score = getDamerauLevenshteinSimilarity(stringToCompareTo, candidate);
       if (score >= threshold) {
         scoredMatches.add(new SimpleImmutableEntry<>(candidate, score));
       }
