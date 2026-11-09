@@ -346,6 +346,94 @@ public class ConfigurationTest {
     assertThat(c.getDeprecatedProperties()).contains("prefix.test");
   }
 
+  @Test
+  public void testGetKnownOptionNamesEmptyBeforeInject() throws Exception {
+    Configuration c = Configuration.builder().build();
+    assertThat(c.getKnownOptionNames()).isEmpty();
+  }
+
+  @Test
+  public void testGetKnownOptionNames() throws Exception {
+    Configuration c = Configuration.builder().setOption("s1", "1").setOption("s2", "2").build();
+    c.inject(new TestStringOptions());
+    assertThat(c.getKnownOptionNames()).containsExactly("s1", "s2");
+  }
+
+  @Test
+  public void testGetKnownOptionNamesUsesPrefixedName() throws Exception {
+    Configuration c = Configuration.builder().setOption("prefix.test", "value").build();
+    c.inject(new SecureOptions());
+    assertThat(c.getKnownOptionNames()).containsExactly("prefix.test");
+  }
+
+  @Test
+  public void testGetKnownOptionNamesUsesCustomOptionName() throws Exception {
+    Configuration c = Configuration.builder().setOption("prefix.name", "value").build();
+    c.inject(new DeprecatedOptionNames());
+    // Both fields in DeprecatedOptionNames resolve to the same option name "prefix.name", so the
+    // resulting set contains that name only once.
+    assertThat(c.getKnownOptionNames()).containsExactly("prefix.name");
+  }
+
+  @Test
+  public void testGetKnownOptionNamesExcludesDeprecatedName() throws Exception {
+    Configuration c = Configuration.builder().setOption("deprecated.test", "myValue").build();
+    c.inject(new DeprecatedOptions());
+    assertThat(c.getKnownOptionNames()).containsExactly("prefix.test");
+    assertThat(c.getKnownOptionNames()).doesNotContain("deprecated.test");
+  }
+
+  @Test
+  public void testGetKnownOptionNamesAccumulatesAcrossInjectCalls() throws Exception {
+    Configuration c = Configuration.builder().setOption("s1", "1").setOption("s2", "2").build();
+    c.inject(new TestStringOptions());
+    c.inject(new SecureOptions());
+    assertThat(c.getKnownOptionNames()).containsExactly("s1", "s2", "prefix.test");
+  }
+
+  @Test
+  public void testGetKnownOptionNamesSharedAcrossCopyFrom() throws Exception {
+    Configuration c1 = Configuration.builder().setOption("s1", "1").setOption("s2", "2").build();
+    c1.inject(new TestStringOptions());
+    Configuration c2 = Configuration.builder().copyFrom(c1).build();
+    c2.inject(new SecureOptions());
+    assertThat(c1.getKnownOptionNames()).containsExactly("s1", "s2", "prefix.test");
+    assertThat(c2.getKnownOptionNames()).containsExactly("s1", "s2", "prefix.test");
+  }
+
+  @Options
+  private static class TestThresholdOption {
+    @SuppressWarnings("UnusedVariable")
+    @Option(secure = true, description = "test")
+    private String threshold = "default";
+  }
+
+  @Test
+  public void testFindSimilarOptionsFindsCloseMatch() throws Exception {
+    Configuration c = Configuration.builder().build();
+    c.inject(new TestThresholdOption());
+    assertThat(c.findSimilarOptions("thresold", 0.6)).containsExactly("threshold");
+  }
+
+  @Test
+  public void testFindSimilarOptionsNoMatchBelowThreshold() throws Exception {
+    Configuration c = Configuration.builder().build();
+    c.inject(new TestThresholdOption());
+    assertThat(c.findSimilarOptions("completelyUnrelatedName", 0.6)).isEmpty();
+  }
+
+  @Test
+  public void testFindSimilarOptionsEmptyBeforeInject() throws Exception {
+    Configuration c = Configuration.builder().build();
+    assertThat(c.findSimilarOptions("threshold", 0.6)).isEmpty();
+  }
+
+  @Test
+  public void testFindSimilarOptionsNullNameThrows() throws Exception {
+    Configuration c = Configuration.builder().build();
+    assertThrows(NullPointerException.class, () -> c.findSimilarOptions(null, 0.6));
+  }
+
   @Options(prefix = "prefix", deprecatedPrefix = "deprecated")
   private static class DeprecatedOptionNames {
     @Option(secure = true, description = "test", name = "name", deprecatedName = "deprecated")

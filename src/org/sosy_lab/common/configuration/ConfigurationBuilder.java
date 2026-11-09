@@ -427,18 +427,26 @@ public final class ConfigurationBuilder {
 
     Set<String> newUnusedProperties;
     Set<String> newDeprecatedProperties;
+    Set<String> newKnownOptionNames;
     if (oldConfig != null) {
       // share the same set of unused properties
       newUnusedProperties = oldConfig.unusedProperties;
       newDeprecatedProperties = oldConfig.deprecatedProperties;
+      newKnownOptionNames = oldConfig.knownOptionNames;
     } else {
       newUnusedProperties = new HashSet<>(newProperties.keySet());
       newDeprecatedProperties = new HashSet<>(0);
+      newKnownOptionNames = new HashSet<>(0);
     }
 
     ImmutableMap<Class<?>, TypeConverter> newConverters =
         buildNewConverters(
-            newProperties, newSources, newPrefix, newUnusedProperties, newDeprecatedProperties);
+            newProperties,
+            newSources,
+            newPrefix,
+            newUnusedProperties,
+            newDeprecatedProperties,
+            newKnownOptionNames);
 
     @SuppressWarnings("resource")
     Configuration newConfig =
@@ -449,6 +457,7 @@ public final class ConfigurationBuilder {
             newConverters,
             newUnusedProperties,
             newDeprecatedProperties,
+            newKnownOptionNames,
             oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
             oldConfig != null ? oldConfig.getLogger() : null);
 
@@ -465,7 +474,8 @@ public final class ConfigurationBuilder {
       ImmutableMap<String, Path> newSources,
       String newPrefix,
       Set<String> newUnusedProperties,
-      Set<String> newDeprecatedProperties)
+      Set<String> newDeprecatedProperties,
+      Set<String> newKnownOptionNames)
       throws InvalidConfigurationException {
     // For converters, we first create a map of all previously-existing converters
     // and those explicitly set on this builder
@@ -488,6 +498,7 @@ public final class ConfigurationBuilder {
             ImmutableMap.copyOf(newConverters),
             newUnusedProperties,
             newDeprecatedProperties,
+            newKnownOptionNames,
             oldConfig != null ? oldConfig.getUsedOptionsPrintStream() : null,
             oldConfig != null ? oldConfig.getLogger() : null);
 
