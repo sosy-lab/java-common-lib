@@ -45,10 +45,9 @@ public class LazyFutureTaskTest {
     NullPointerException testException = new NullPointerException();
 
     Future<Boolean> f =
-        new LazyFutureTask<>(
-            () -> {
-              throw testException;
-            });
+        new LazyFutureTask<>(() -> {
+          throw testException;
+        });
 
     ExecutionException thrown = assertThrows(ExecutionException.class, () -> f.get());
     assertThat(thrown).hasCauseThat().isSameInstanceAs(testException);
@@ -68,10 +67,9 @@ public class LazyFutureTaskTest {
   @Test
   @SuppressWarnings({"unused", "CheckReturnValue"})
   public void testExceptionNoExecution() {
-    new LazyFutureTask<>(
-        () -> {
-          throw new NullPointerException();
-        });
+    new LazyFutureTask<>(() -> {
+      throw new NullPointerException();
+    });
 
     // no call to f.get()
   }

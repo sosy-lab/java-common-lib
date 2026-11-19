@@ -162,44 +162,43 @@ public class ProcessExecutor<E extends Exception> {
     logger.log(Level.FINEST, startedMsgSupplier);
 
     processFuture =
-        executor.submit(
-            () -> {
-              // this callable guarantees that when it finishes,
-              // the external process also has finished and it has been wait()ed for
-              // (which is important for ulimit timing measurements on Linux)
+        executor.submit(() -> {
+          // this callable guarantees that when it finishes,
+          // the external process also has finished and it has been wait()ed for
+          // (which is important for ulimit timing measurements on Linux)
 
-              logger.logf(Level.FINEST, "Waiting for %s[%d]", name, pid);
+          logger.logf(Level.FINEST, "Waiting for %s[%d]", name, pid);
 
+          try {
+            int exitCode1 = process.waitFor();
+            logger.logf(Level.FINEST, "%s[%d] has terminated normally", name, pid);
+
+            handleExitCode(exitCode1);
+
+            return exitCode1;
+
+          } catch (InterruptedException e) {
+
+            process.destroy();
+
+            while (true) {
               try {
-                int exitCode1 = process.waitFor();
-                logger.logf(Level.FINEST, "%s[%d] has terminated normally", name, pid);
+                int exitCode2 = process.waitFor();
+                logger.logf(
+                    Level.FINEST, "%s[%d] has terminated after it was cancelled", name, pid);
 
-                handleExitCode(exitCode1);
+                // no call to handleExitCode() here, we do this only with normal termination
 
-                return exitCode1;
+                // reset interrupted status
+                Thread.currentThread().interrupt();
+                return exitCode2;
 
-              } catch (InterruptedException e) {
-
-                process.destroy();
-
-                while (true) {
-                  try {
-                    int exitCode2 = process.waitFor();
-                    logger.logf(
-                        Level.FINEST, "%s[%d] has terminated after it was cancelled", name, pid);
-
-                    // no call to handleExitCode() here, we do this only with normal termination
-
-                    // reset interrupted status
-                    Thread.currentThread().interrupt();
-                    return exitCode2;
-
-                  } catch (InterruptedException ignored) {
-                    // ignore, we will call interrupt()
-                  }
-                }
+              } catch (InterruptedException ignored) {
+                // ignore, we will call interrupt()
               }
-            });
+            }
+          }
+        });
 
     // platform charset is what processes usually use for communication
     in = new OutputStreamWriter(process.getOutputStream(), IO.getNativeCharset());
@@ -207,54 +206,52 @@ public class ProcessExecutor<E extends Exception> {
     // wrap both output handling callables in CancellingCallables so that
     // exceptions thrown by the handling methods terminate the process immediately
     outFuture =
-        executor.submit(
-            () -> {
-              try (BufferedReader reader =
-                  new BufferedReader(
-                      // platform charset is what processes usually use for communication
-                      new InputStreamReader(process.getInputStream(), IO.getNativeCharset()))) {
-                @Var String line;
-                while ((line = reader.readLine()) != null) {
-                  handleOutput(line);
-                }
+        executor.submit(() -> {
+          try (BufferedReader reader =
+              new BufferedReader(
+                  // platform charset is what processes usually use for communication
+                  new InputStreamReader(process.getInputStream(), IO.getNativeCharset()))) {
+            @Var String line;
+            while ((line = reader.readLine()) != null) {
+              handleOutput(line);
+            }
 
-              } catch (IOException e) {
-                if (processFuture.isCancelled()) {
-                  // IOExceptions after a killed process are no suprise
-                  // Log and ignore so they don't mask the real cause
-                  // why we killed the process.
-                  logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
-                } else {
-                  throw e;
-                }
-              }
-              return null;
-            });
+          } catch (IOException e) {
+            if (processFuture.isCancelled()) {
+              // IOExceptions after a killed process are no suprise
+              // Log and ignore so they don't mask the real cause
+              // why we killed the process.
+              logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
+            } else {
+              throw e;
+            }
+          }
+          return null;
+        });
 
     errFuture =
-        executor.submit(
-            () -> {
-              try (BufferedReader reader =
-                  new BufferedReader(
-                      // platform charset is what processes usually use for communication
-                      new InputStreamReader(process.getErrorStream(), IO.getNativeCharset()))) {
-                @Var String line;
-                while ((line = reader.readLine()) != null) {
-                  handleErrorOutput(line);
-                }
+        executor.submit(() -> {
+          try (BufferedReader reader =
+              new BufferedReader(
+                  // platform charset is what processes usually use for communication
+                  new InputStreamReader(process.getErrorStream(), IO.getNativeCharset()))) {
+            @Var String line;
+            while ((line = reader.readLine()) != null) {
+              handleErrorOutput(line);
+            }
 
-              } catch (IOException e) {
-                if (processFuture.isCancelled()) {
-                  // IOExceptions after a killed process are no suprise
-                  // Log and ignore so they don't mask the real cause
-                  // why we killed the process.
-                  logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
-                } else {
-                  throw e;
-                }
-              }
-              return null;
-            });
+          } catch (IOException e) {
+            if (processFuture.isCancelled()) {
+              // IOExceptions after a killed process are no suprise
+              // Log and ignore so they don't mask the real cause
+              // why we killed the process.
+              logger.logfDebugException(e, "IOException after process[%d] was killed", pid);
+            } else {
+              throw e;
+            }
+          }
+          return null;
+        });
 
     FutureCallback<Object> cancelProcessOnFailure =
         new FutureCallback<>() {
