@@ -9,9 +9,9 @@
 package org.sosy_lab.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableListIterator;
@@ -20,221 +20,158 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.InlineMe;
 import com.google.errorprone.annotations.Var;
 import java.util.AbstractSequentialList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A single-linked-list implementation of {@link PersistentList}. Null values are not supported
- * (similarly to {@link ImmutableList}).
+ * A {@link PersistentList} backed by a {@link PersistentLinkedStack}. List order is top-to-bottom
+ * stack order. Null elements are not supported.
  *
- * <p>Adding to the front of the list needs only O(1) time and memory.
+ * <p>Prepending, head access, tail access, and size take O(1) time. Updates share unchanged stack
+ * nodes.
  *
- * <p>This implementation supports almost all operations, except for the {@link
- * ListIterator#hasPrevious()} and {@link ListIterator#previous()} methods of its list iterator.
- * This means you cannot traverse this list in reverse order.
+ * <p>List iterators support forward traversal only; {@link ListIterator#hasPrevious()} and {@link
+ * ListIterator#previous()} are unsupported.
  *
- * <p>All instances of this class are fully-thread safe. However, note that each modifying operation
- * allocates a new instance whose reference needs to be published safely in order to be usable by
- * other threads. Two concurrent accesses to a modifying operation on the same instance will create
- * two new maps, each reflecting exactly the operation executed by the current thread, and not
- * reflecting the operation executed by the other thread.
+ * <p>The list structure is immutable and thread-safe. Elements are not copied; iterator instances
+ * have no thread-safety guarantee.
+ *
+ * @param <T> the type of elements
  */
 @Immutable(containerOf = "T")
 @SuppressWarnings({
   "deprecation", // javac complains about deprecated methods from PersistentList
-  "Immutable", // AbstractList.modCount is mutable but safe
+  "Immutable", // AbstractList.modCount is mutable but unused
 })
 public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     implements PersistentList<T> {
 
-  private final @Nullable T head; // only null for the empty list
-  private final @Nullable PersistentLinkedList<T> tail; // only null for the empty list
+  private static final PersistentLinkedList<?> EMPTY =
+      new PersistentLinkedList<>(PersistentLinkedStack.of());
 
-  private PersistentLinkedList(@Nullable T head, @Nullable PersistentLinkedList<T> tail) {
-    this.head = head;
-    this.tail = tail;
+  private final PersistentStack<T> stack;
+
+  private PersistentLinkedList(PersistentStack<T> pStack) {
+    stack = checkNotNull(pStack);
   }
 
-  @SuppressWarnings("rawtypes")
-  private static final PersistentLinkedList EMPTY = makeEmpty();
-
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  private static PersistentLinkedList makeEmpty() {
-    return new PersistentLinkedList(null, null);
+  private static <T> PersistentLinkedList<T> fromStack(PersistentStack<T> stack) {
+    return stack.isEmpty() ? of() : new PersistentLinkedList<>(stack);
   }
 
-  /**
-   * Returns the empty list.
-   *
-   * @return The empty list
-   */
-  @SuppressWarnings("unchecked")
+  /** Returns the empty list. */
+  @SuppressWarnings("unchecked") // The empty list contains no elements.
   public static <T> PersistentLinkedList<T> of() {
-    return EMPTY;
+    return (PersistentLinkedList<T>) EMPTY;
   }
 
-  /**
-   * Returns a list containing the specified value.
-   *
-   * @return A list containing the specified value
-   */
+  /** Returns a list containing the given element. */
   public static <T> PersistentLinkedList<T> of(T value) {
-    checkNotNull(value);
-    return new PersistentLinkedList<>(value, PersistentLinkedList.<T>of());
+    return new PersistentLinkedList<>(PersistentLinkedStack.of(value));
   }
 
-  /**
-   * Returns a list containing the specified values.
-   *
-   * @return A list containing the specified values
-   */
+  /** Returns a list containing the given elements in argument order. */
   public static <T> PersistentLinkedList<T> of(T v1, T v2) {
     return of(v2).with(v1);
   }
 
-  /**
-   * Returns a list containing the specified values.
-   *
-   * @return A list containing the specified values
-   */
+  /** Returns a list containing the given elements in argument order. */
   public static <T> PersistentLinkedList<T> of(T v1, T v2, T v3) {
     return of(v3).with(v2).with(v1);
   }
 
-  /**
-   * Returns a list containing the specified values.
-   *
-   * @return A list containing the specified values
-   */
-  @SuppressWarnings("unchecked")
+  /** Returns a list containing the given elements in argument order. */
+  @SafeVarargs
+  @SuppressWarnings("varargs") // The array is only read and is not retained.
   public static <T> PersistentLinkedList<T> of(T v1, T... values) {
     return copyOf(values).with(v1);
   }
 
-  /**
-   * Returns a list containing the specified values.
-   *
-   * @return A list containing the specified values
-   */
-  @SuppressWarnings("unchecked")
+  /** Returns a list containing the given elements in array order. */
+  @SafeVarargs
+  @SuppressWarnings("varargs") // The array is only read and is not retained.
   public static <T> PersistentLinkedList<T> copyOf(T... values) {
     return copyOf(Arrays.asList(values));
   }
 
   /**
-   * Returns A new list with the values from the Iterable.
-   *
-   * @return A new list with the values from the Iterable
+   * Returns a list in iteration order, reusing {@code values} if it is a {@code
+   * PersistentLinkedList}.
    */
   public static <T> PersistentLinkedList<T> copyOf(List<T> values) {
-    if (values instanceof PersistentLinkedList<?>) {
-      return (PersistentLinkedList<T>) values;
+    if (values instanceof PersistentLinkedList<T> list) {
+      return list;
     }
-    @Var PersistentLinkedList<T> result = PersistentLinkedList.<T>of();
-    for (T value : Lists.reverse(values)) {
-      result = result.with(value);
-    }
-    return result;
+    return PersistentLinkedList.<T>of().withAll(values);
   }
 
   /**
-   * Returns the value at the start of the list for non-empty lists.
+   * Returns the first element.
    *
-   * @throws NoSuchElementException if the list is empty.
-   * @return The value at the start of the list
+   * @throws NoSuchElementException if this list is empty
    */
   public T head() {
-    if (isEmpty()) {
-      throw new NoSuchElementException();
-    } else {
-      return head;
-    }
+    return stack.peek();
   }
 
   /**
-   * Returns the remainder of the list without the first element for non-empty lists.
+   * Returns the list without its first element, sharing the remaining stack nodes.
    *
-   * @throws IllegalStateException if the list is empty.
-   * @return The remainder of the list without the first element
+   * @throws IllegalStateException if this list is empty
    */
   public PersistentLinkedList<T> tail() {
     checkState(!isEmpty());
-    return tail;
+    return fromStack(stack.popAndCopy());
   }
 
-  /**
-   * Returns a new list with value as the head and the old list as the tail.
-   *
-   * @return A new list with value as the head and the old list as the tail
-   */
+  /** Returns a list with {@code value} prepended in O(1) time and space. */
   @Override
   public PersistentLinkedList<T> with(T value) {
-    checkNotNull(value);
-    return new PersistentLinkedList<>(value, this);
+    return fromStack(stack.pushAndCopy(value));
   }
 
-  /**
-   * Returns a new list with values as the head and the old list as the tail.
-   *
-   * @return A new list with value sas the head and the old list as the tail
-   */
+  /** Returns a list with {@code values} prepended in their iteration order. */
   @Override
-  public PersistentLinkedList<T> withAll(@Var List<T> values) {
-    @Var PersistentLinkedList<T> result = this;
-    if (values instanceof PersistentLinkedList<?>) {
-      // does not support listIterator() and thus fails on Lists.reverse()
-      values = ImmutableList.copyOf(values);
+  public PersistentLinkedList<T> withAll(List<T> values) {
+    if (values.isEmpty()) {
+      return this;
     }
-    for (T value : Lists.reverse(values)) {
-      result = result.with(value);
+    @Var PersistentStack<T> result = stack;
+    // A snapshot also supports inputs whose list iterators cannot traverse backwards.
+    for (T value : ImmutableList.copyOf(values).reverse()) {
+      result = result.pushAndCopy(value);
     }
-    return result;
+    return fromStack(result);
   }
 
-  /**
-   * Returns a new list omitting the specified value. Note: O(N)
-   *
-   * @return A new list omitting the specified value
-   */
+  /** Returns a list without the first occurrence of {@code value}, or this list if absent. */
   @Override
   public PersistentLinkedList<T> without(@Nullable T value) {
-    @Var PersistentLinkedList<T> suffix = of(); // remainder of list after value
-
-    // find position of value and update suffix
-    @Var int pos = 0;
-    for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
-      if (Objects.equals(value, list.head)) {
-        suffix = list.tail;
-        break;
-      }
-      pos++;
+    int index = indexOf(value);
+    if (index < 0) {
+      return this;
     }
 
-    // get start of list until value
-    // into a separate list so we can iterate in reverse
-    ImmutableList<T> prefix = FluentIterable.from(this).limit(pos).toList();
-
-    // concatenate prefix and suffix
-    @Var PersistentLinkedList<T> result = suffix;
-    for (T v : prefix.reverse()) {
-      result = result.with(v);
+    List<T> prefix = new ArrayList<>(index);
+    @Var PersistentStack<T> result = stack;
+    for (int i = 0; i < index; i++) {
+      prefix.add(result.peek());
+      result = result.popAndCopy();
     }
-
-    return result;
+    result = result.popAndCopy();
+    for (T element : Lists.reverse(prefix)) {
+      result = result.pushAndCopy(element);
+    }
+    return fromStack(result);
   }
 
   @Override
@@ -242,82 +179,90 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     return of();
   }
 
-  /**
-   * Returns the number of elements in the list. Note: O(N)
-   *
-   * @return The number of elements in the list
-   */
+  /** Returns the number of elements in O(1) time. */
   @Override
   public int size() {
-    @Var int size = 0;
-    for (PersistentLinkedList<T> list = this; !list.isEmpty(); list = list.tail) {
-      ++size;
-    }
-    return size;
+    return stack.size();
   }
 
   @Override
-  @SuppressWarnings("ReferenceEquality") // singleton instance
   public boolean isEmpty() {
-    return this == EMPTY;
+    return stack.isEmpty();
   }
 
-  /**
-   * Returns a new list with the elements in the reverse order. This operation runs in O(n).
-   *
-   * @return A new list with the elements in the reverse order
-   */
+  /** Returns a list in reverse order in O(n) time and space. */
   @Override
   public PersistentLinkedList<T> reversed() {
-    @Var PersistentLinkedList<T> result = empty();
-    for (PersistentLinkedList<T> p = this; !p.isEmpty(); p = p.tail) {
-      result = result.with(p.head);
-    }
-    return result;
+    return fromStack(PersistentLinkedStack.copyOf(stack.asTopDownIterable()));
   }
 
   @Override
   public Iterator<T> iterator() {
-    return new Iter<>(this);
+    return stack.asTopDownIterable().iterator();
   }
 
   @Override
   public ListIterator<T> listIterator(int index) {
-    if (index < 0) {
-      throw new IndexOutOfBoundsException();
-    }
-    ListIterator<T> it = new Iter<>(this);
+    checkPositionIndex(index, size());
+    ListIterator<T> result = new Iter<>(iterator());
     for (int i = 0; i < index; i++) {
-      if (!it.hasNext()) {
-        throw new IndexOutOfBoundsException();
-      }
-      it.next();
+      result.next();
     }
-    return it;
+    return result;
+  }
+
+  /** Returns a collector that collects elements in reverse encounter order. */
+  @SuppressWarnings("NoFunctionalReturnType")
+  public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
+    return Collectors.collectingAndThen(
+        PersistentLinkedStack.<T>toPersistentLinkedStack(), PersistentLinkedList::fromStack);
+  }
+
+  /**
+   * Returns a collector that collects elements in reverse encounter order.
+   *
+   * @deprecated use {@link #toPersistentLinkedList()}
+   */
+  @Deprecated
+  @InlineMe(
+      replacement = "PersistentLinkedList.toPersistentLinkedList()",
+      imports = "org.sosy_lab.common.collect.PersistentLinkedList")
+  public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
+    return toPersistentLinkedList();
+  }
+
+  @Deprecated
+  @Override
+  @DoNotCall
+  public void replaceAll(UnaryOperator<T> pOperator) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  @DoNotCall
+  public void sort(Comparator<? super T> pComparator) {
+    throw new UnsupportedOperationException();
   }
 
   private static final class Iter<T> extends UnmodifiableListIterator<T> {
 
-    private PersistentLinkedList<T> list;
+    private final Iterator<T> delegate;
     private int nextIndex = 0;
 
-    private Iter(PersistentLinkedList<T> list) {
-      this.list = list;
+    private Iter(Iterator<T> pDelegate) {
+      delegate = pDelegate;
     }
 
     @Override
     public boolean hasNext() {
-      return !list.isEmpty();
+      return delegate.hasNext();
     }
 
     @Override
     public T next() {
-      if (list.isEmpty()) {
-        throw new NoSuchElementException();
-      }
+      T result = delegate.next();
       nextIndex++;
-      T result = list.head;
-      list = list.tail;
       return result;
     }
 
@@ -340,84 +285,5 @@ public final class PersistentLinkedList<T> extends AbstractSequentialList<T>
     public T previous() {
       throw new UnsupportedOperationException();
     }
-  }
-
-  /**
-   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in {@link
-   * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
-   * streams.
-   */
-  @SuppressWarnings("NoFunctionalReturnType")
-  public static <T> Collector<T, ?, PersistentLinkedList<T>> toPersistentLinkedList() {
-    return new Collector<T, PersistentLinkedListBuilder<T>, PersistentLinkedList<T>>() {
-
-      @Override
-      public Supplier<PersistentLinkedListBuilder<T>> supplier() {
-        return PersistentLinkedListBuilder::new;
-      }
-
-      @Override
-      public BiConsumer<PersistentLinkedListBuilder<T>, T> accumulator() {
-        return PersistentLinkedListBuilder::add;
-      }
-
-      @Override
-      public BinaryOperator<PersistentLinkedListBuilder<T>> combiner() {
-        return (a, b) -> {
-          throw new UnsupportedOperationException("Should be used sequentially");
-        };
-      }
-
-      @Override
-      public Function<PersistentLinkedListBuilder<T>, PersistentLinkedList<T>> finisher() {
-        return PersistentLinkedListBuilder::build;
-      }
-
-      @Override
-      public Set<Characteristics> characteristics() {
-        return EnumSet.noneOf(Characteristics.class);
-      }
-    };
-  }
-
-  /**
-   * Return a {@link Collector} that creates PersistentLinkedLists and can be used in {@link
-   * java.util.stream.Stream#collect(Collector)}. The returned collector does not support parallel
-   * streams.
-   *
-   * @deprecated renamed to {@link #toPersistentLinkedList()} to conform with Guava's naming
-   */
-  @Deprecated
-  @InlineMe(
-      replacement = "PersistentLinkedList.toPersistentLinkedList()",
-      imports = "org.sosy_lab.common.collect.PersistentLinkedList")
-  public static <T> Collector<T, ?, PersistentLinkedList<T>> collector() {
-    return toPersistentLinkedList();
-  }
-
-  private static final class PersistentLinkedListBuilder<T> {
-    private PersistentLinkedList<T> list = PersistentLinkedList.of();
-
-    void add(T e) {
-      list = list.with(e);
-    }
-
-    PersistentLinkedList<T> build() {
-      return list;
-    }
-  }
-
-  @Deprecated
-  @Override
-  @DoNotCall
-  public void replaceAll(UnaryOperator<T> pOperator) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  @Override
-  @DoNotCall
-  public void sort(Comparator<? super T> pC) {
-    throw new UnsupportedOperationException();
   }
 }
