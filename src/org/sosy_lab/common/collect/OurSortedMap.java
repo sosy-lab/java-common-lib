@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 sealed interface OurSortedMap<K, V extends @Nullable Object> extends NavigableMap<K, V>
     permits AbstractImmutableSortedMap,
         DescendingSortedMap,
+        PathCopyingPersistentAvlTreeMap.PartialSortedMap,
         PathCopyingPersistentTreeMap.PartialSortedMap {
 
   Iterator<Entry<K, V>> entryIterator();
